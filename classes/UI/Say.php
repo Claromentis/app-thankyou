@@ -4,20 +4,21 @@ namespace Claromentis\ThankYou\UI;
 use Claromentis\ThankYou\ThanksRepository;
 
 /**
- * Description of Say.php
+ * Component displays list of recent thanks and allows submitting a new one.
+ *
+ * <component class="\Claromentis\ThankYou\UI\Say" allow_new="1" limit="10">
  *
  * @author Alexander Polyanskikh
  */
 class Say extends \TemplaterComponentTmpl
 {
-
 	public function Show($attributes)
 	{
 		$args = array();
 
 		$repository = new ThanksRepository();
 
-		$thanks = $repository->GetRecent(10);
+		$thanks = $repository->GetRecent(isset($attributes['limit']) ? (int)$attributes['limit'] : 10);
 
 		$args['items.datasrc'] = [];
 		foreach ($thanks as $item)
@@ -32,6 +33,11 @@ class Say extends \TemplaterComponentTmpl
 			    'description.body_html' => \ClaText::ProcessPlain($item->description),
 			    'has_description.visible' => strlen(trim($item->description)) > 0,
 			];
+		}
+
+		if (isset($attributes['allow_new']) && !(bool)$attributes['allow_new'])
+		{
+			$args['allow_new.visible'] = 0;
 		}
 
 		$template = 'thankyou/say.html';
