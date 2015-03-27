@@ -1,0 +1,28 @@
+<b><a href="#thank_you_modal" data-toggle="modal">Say thank you</a></b>
+<ul name="items" datasrc="">
+	<li>Thank you, <a name="user_link"><txt name="user_name">John Smith</txt></a><txt name="has_description">:</txt>
+		<txt name="has_description"><p name="description"></p></txt>
+		<p class="Right">&mdash; <a name="author_link"><txt name="author_name"></txt></a></p>
+	</li>
+</ul>
+
+
+<!-- Modal -->
+<div id="thank_you_modal" class="modal hide fade" tabindex="-1" aria-hidden="true">
+	<form action="/intranet/thankyou/save.php" method="post" class="form-horizontal"><input type="hidden" name="csrf_token">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<b style="font-size: 19px">Say thank you</b>
+	</div>
+	<div class="modal-body">
+		To: <component class_key="user_picker" name="thank_you_user" id="thank_you_user"><br><br>
+
+		Comment (optional):<br>
+		<textarea name="thank_you_description" class="input-xxlarge"></textarea>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		<button class="btn btn-primary">Save</button>
+	</div>
+	</form>
+</div>
