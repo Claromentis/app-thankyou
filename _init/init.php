@@ -6,6 +6,13 @@ if (!isset($installer))
 	throw new Exception("Install options are not defined");
 /** @var $installer Claromentis\Setup\SetupFacade */
 
-$config_file = $installer->GetConfigEditor();
-$config_file->AddText('$cfg_cla_plugins[] = "\\\\Claromentis\\\\ThankYou\\\\Plugin";'."\r\n");
+/** @var $installer \Claromentis\Setup\SetupFacade */
+if (method_exists($installer, 'GetPluginsRepository'))
+{
+	$installer->GetPluginsRepository()->Add("thankyou", 'Claromentis\ThankYou\Plugin');
+} else
+{
+	$config_file = $installer->GetConfigEditor();
+	$config_file->AddText('$cfg_cla_plugins[] = \'Claromentis\ThankYou\Plugin\';'.PHP_EOL);
+}
 
