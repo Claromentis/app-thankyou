@@ -7,6 +7,6 @@
 	"require": {
 		"php": ">=5.4.0",
 		"claromentis/installer-composer-plugin": "^1.0.6",
-		"claromentis/framework": "7.3.x | 7.4.x"
+		"claromentis/framework": "8.0.x"
 	}
 }

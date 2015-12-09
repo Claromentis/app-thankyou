@@ -13,16 +13,14 @@ class Plugin implements \ClaPlugin, \TemplaterComponent
 		switch ($attr['page'])
 		{
 			case 'viewprofile.tab_nav':
-				$user_id = getvar('id');
-				if (!$user_id)
+				if (empty($attr['user_id']))
 					return '';
 				return '<li><a href="#thanks"><span class="cla-icon-thumbs-up"></span> Thanks</a></li>';
 			case 'viewprofile.tab_content':
-				$user_id = getvar('id');
-				if (!$user_id)
+				if (empty($attr['user_id']))
 					return '';
 				$component = new UI\Wall();
-				$component_data = $component->Show(array('user_id' => $user_id));
+				$component_data = $component->Show(array('user_id' => $attr['user_id']));
 				return '<div id="thanks">' . $component_data . '</div>';
 		}
 		return '';

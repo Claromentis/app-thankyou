@@ -45,6 +45,8 @@ class Wall extends \TemplaterComponentTmpl
 			$args['allow_new.visible'] = 0;
 		} else
 		{
+			$args['select_user.visible'] = 0;
+			$args['preselected_user.visible'] = 1;
 			$args['to_user_link.href'] = \User::GetProfileUrl($user_id);
 			$args['to_user_name.body'] = \User::GetNameById($user_id);
 			$args['thank_you_user.value'] = $user_id;
