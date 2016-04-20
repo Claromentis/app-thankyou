@@ -1,22 +1,25 @@
 <?php
 
 namespace Claromentis\ThankYou\UI;
+use Claromentis\Core\Application;
+use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\ThanksRepository;
 
 /**
- * Component displays list of recent thanks and allows submitting a new one.
+ * Component displays list of recent thanks for a particular user and allows submitting a new one.
  *
- * <component class="\Claromentis\ThankYou\UI\Say" allow_new="1">
+ * <component class="\Claromentis\ThankYou\UI\Wall" allow_new="1" user_id="123" limit="10">
  *
  * @author Alexander Polyanskikh
  */
-class Wall extends \TemplaterComponentTmpl
+class Wall extends TemplaterComponentTmpl
 {
-	public function Show($attributes)
+	public function Show($attributes, Application $app)
 	{
 		$args = array();
 
-		$repository = new ThanksRepository();
+		/** @var ThanksRepository $repository */
+		$repository = $app['thankyou.repository'];
 
 		$user_id = (int)$attributes['user_id'];
 		if (!$user_id)

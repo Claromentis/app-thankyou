@@ -2,7 +2,6 @@
 namespace Claromentis\ThankYou;
 
 use Claromentis\Core\DAL;
-use Claromentis\Core\Services;
 
 /**
  *
@@ -12,9 +11,9 @@ class ThanksRepository
 {
 	protected $db;
 
-	public function __construct()
+	public function __construct(DAL\Db $db)
 	{
-		$this->db = Services::I()->GetDb();
+		$this->db = $db;
 	}
 
 	/**
@@ -24,6 +23,7 @@ class ThanksRepository
 	 */
 	public function GetRecent($limit)
 	{
+		/** @var ThanksItem[] $items */
 		$items = \ObjectsStorage::I()->GetMultiple(new ThanksItem(), '', 'date_created DESC', $limit);
 		$this->PopulateUsers($items);
 		return $items;
@@ -66,6 +66,7 @@ class ThanksRepository
 	 */
 	public function GetForUser($user_id, $limit)
 	{
+		/** @var ThanksItem[] $items */
 		$items = \ObjectsStorage::I()->GetMultipleExt(new ThanksItem(), function (DAL\QueryBuilder $qb, $table_name) use ($user_id, $limit) {
 			$qb->AddJoin($table_name, 'thankyou_user', 'tu', "tu.thanks_id={$table_name}.id");
 			$qb->AddWhereAndClause(new DAL\QueryPart("tu.user_id=int:id", $user_id));

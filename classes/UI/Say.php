@@ -1,6 +1,8 @@
 <?php
 
 namespace Claromentis\ThankYou\UI;
+use Claromentis\Core\Application;
+use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\ThanksRepository;
 
 /**
@@ -10,13 +12,14 @@ use Claromentis\ThankYou\ThanksRepository;
  *
  * @author Alexander Polyanskikh
  */
-class Say extends \TemplaterComponentTmpl
+class Say extends TemplaterComponentTmpl
 {
-	public function Show($attributes)
+	public function Show($attributes, Application $app)
 	{
 		$args = array();
 
-		$repository = new ThanksRepository();
+		/** @var ThanksRepository $repository */
+		$repository = $app['thankyou.repository'];
 
 		$thanks = $repository->GetRecent(isset($attributes['limit']) ? (int)$attributes['limit'] : 10);
 

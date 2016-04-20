@@ -1,6 +1,7 @@
 <?php
 
 namespace Claromentis\ThankYou;
+use Claromentis\Core\Services;
 use ObjectsStorage;
 
 /**
@@ -26,7 +27,7 @@ class ThanksItem extends \ActiveRecord
 	{
 		parent::Save();
 
-		global $db;
+		$db = Services::I()->GetDb();
 
 		$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $this->GetProperty('id'));
 		foreach ($this->users_ids as $user_id)
