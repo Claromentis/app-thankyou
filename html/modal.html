@@ -1,0 +1,51 @@
+<div id="thank_you_modal" class="modal hide fade" tabindex="-1" aria-hidden="true">
+	<form action="/intranet/thankyou/save.php" method="post" class="form-horizontal"><input type="hidden" name="csrf_token">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<b style="font-size: 19px">Say thank you</b>
+		</div>
+		<div class="modal-body">
+			<div class="row-fluid" id="thank_you_user_row">
+				<div class="span1">To:</div>
+				<div>
+					<txt name="select_user" visible="1">
+						<component class_key="user_picker" name="thank_you_user" id="thank_you_user" multiple="1"><br>
+					</txt>
+					<txt name="preselected_user" visible="0">
+						<a name="to_user_link"><txt name="to_user_name">John Smith</txt></a>
+						<input type="hidden" name="thank_you_user">
+					</txt>
+				</div>
+			</div>
+
+			Comment:<br>
+			<textarea name="thank_you_description" class="input-xxlarge"></textarea>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			<button class="btn btn-primary">Submit</button>
+		</div>
+	</form>
+	<script src="/intranet/js/jquery.validate.min.js"></script>
+	<script type="text/javascript">
+		jQuery('#thank_you_modal').find('form').validate({
+			rules: {
+				thank_you_description: {
+					required: true,
+					minlength: { param: 3 }
+				},
+				'thank_you_user[]': {
+					required: true
+				}
+			},
+			errorPlacement: function(error, element) {
+				if (element.attr("name") == "thank_you_user[]") {
+					error.insertAfter("#thank_you_user_row");
+				} else {
+					error.insertAfter(element);
+				}
+			},
+			errorClass : 'text-error'
+		});
+	</script>
+</div>
