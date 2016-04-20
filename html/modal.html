@@ -7,23 +7,48 @@
 					<b style="font-size: 19px">Say thank you</b>
 				</div>
 				<div class="modal-body">
-					<label for="thank_you_user">To:</label>
-					<txt name="select_user" visible="1">
-						<component class_key="user_picker" name="thank_you_user" id="thank_you_user">
-					</txt>
-					<txt name="preselected_user" visible="0">
-						<a name="to_user_link"><txt name="to_user_name">John Smith</txt></a>
-						<input type="hidden" name="thank_you_user">
-					</txt><br>
+					<div id="thank_you_user_row">
+						<label for="thank_you_user">To:</label>
+						<txt name="select_user" visible="1">
+							<component class_key="user_picker" name="thank_you_user" multiple="1" id="thank_you_user">
+						</txt>
+						<txt name="preselected_user" visible="0">
+							<a name="to_user_link"><txt name="to_user_name">John Smith</txt></a>
+							<input type="hidden" name="thank_you_user">
+						</txt>
+					</div>
+					<br>
 
-					<label for="thank_you_description">Comment (optional):</label>
+					<label for="thank_you_description">Comment:</label>
 					<textarea name="thank_you_description" id="thank_you_description" class="form-control"></textarea>
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
-					<button class="btn btn-primary">Save</button>
+					<button class="btn btn-primary">Commit</button>
 				</div>
 			</form>
 		</div>
 	</div>
+	<script src="/intranet/js/jquery.validate.min.js"></script>
+	<script type="text/javascript">
+		jQuery('#thank_you_modal').find('form').validate({
+			rules: {
+				thank_you_description: {
+					required: true,
+					minlength: { param: 3 }
+				},
+				'thank_you_user[]': {
+					required: true
+				}
+			},
+			errorPlacement: function(error, element) {
+				if (element.attr("name") == "thank_you_user[]") {
+					error.insertAfter("#thank_you_user_row");
+				} else {
+					error.insertAfter(element);
+				}
+			},
+			errorClass : 'text-error'
+		});
+	</script>
 </div>

@@ -28,9 +28,22 @@ class Wall extends \TemplaterComponentTmpl
 		$args['items.datasrc'] = [];
 		foreach ($thanks as $item)
 		{
+			$users_dsrc = [];
+			if (count($item->GetUsers()) > 0)
+			{
+				foreach ($item->GetUsers() as $user_id)
+				{
+					$users_dsrc[] = [
+						'user_name.body' => \User::GetNameById($user_id),
+						'user_link.href' => \User::GetProfileUrl($user_id),
+						'delimiter_visible.visible' => 1,
+					];
+				}
+				$users_dsrc[count($users_dsrc) - 1]['delimiter_visible.visible'] = 0;
+			}
+
 			$args['items.datasrc'][] = [
-				'user_name.body' => \User::GetNameById($item->user_id),
-				'user_link.href' => \User::GetProfileUrl($item->user_id),
+				'users.datasrc' => $users_dsrc,
 
 				'author_name.body' => \User::GetNameById($item->author),
 				'author_link.href' => \User::GetProfileUrl($item->author),
@@ -50,6 +63,8 @@ class Wall extends \TemplaterComponentTmpl
 			$args['to_user_link.href'] = \User::GetProfileUrl($user_id);
 			$args['to_user_name.body'] = \User::GetNameById($user_id);
 			$args['thank_you_user.value'] = $user_id;
+			$args['preselected_user.visible'] = 1;
+			$args['select_user.visible'] = 0;
 		}
 
 		$template = 'thankyou/wall.html';
