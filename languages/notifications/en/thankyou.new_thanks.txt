@@ -1,0 +1,3 @@
+%author% said Thank you to you@if %other_people_number%@ (and %other_people_number% other people)@endif@
+
+%description%
