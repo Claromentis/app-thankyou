@@ -16,7 +16,9 @@ class Plugin implements \ClaPlugin, \TemplaterComponent
 				$user_id = getvar('id');
 				if (!$user_id)
 					return '';
-				return '<li><a href="#thanks"><span class="cla-icon-thumbs-up"></span> Thanks</a></li>';
+				$repository = new ThanksRepository();
+				$count = $repository->GetCount($user_id);
+				return '<li><a href="#thanks"><span class="cla-icon-thumbs-up"></span> Thanks ('.$count.')</a></li>';
 			case 'viewprofile.tab_content':
 				$user_id = getvar('id');
 				if (!$user_id)

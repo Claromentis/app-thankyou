@@ -73,4 +73,20 @@ class ThanksRepository
 		$this->PopulateUsers($items);
 		return $items;
 	}
+
+	/**
+	 * Returns number of "thanks" for user
+	 *
+	 * @param int $user_id
+	 *
+	 * @return int
+	 */
+	public function GetCount($user_id)
+	{
+		global $db;
+
+		list($count) = $db->query_row("SELECT COUNT(1) FROM thankyou_user WHERE user_id=int:uid", $user_id);
+
+		return $count;
+	}
 }
