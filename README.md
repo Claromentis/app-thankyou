@@ -2,15 +2,24 @@
 
 A simple application to say thanks to fellow employee
 
+  Version 2.x - for Claromentis 8.x
+  Version 1.x - for Claromentis 7.3 and 7.4
+
+
 ## Installation
 
 Via composer
 
-``composer require claromentis/thankyou:"*"``
+Add this line to `modules.json`
+
+``"claromentis/thankyou":"*"``
+
+then run the installer
+
 
 Manually:
   * clone this repository to /intranet/thankyou
-  * go to "web" folder in Claromentis and run ``phing -Dapp=thankyou install``
+  * go to "application" folder in Claromentis and run ``vendor/bin/phing -Dapp=thankyou install``
 
 ## Usage
 
