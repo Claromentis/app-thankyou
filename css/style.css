@@ -2,10 +2,6 @@
     $THANKYOU
 *------------------------------------*/
 
-.thank__you {
-    background: #DFF5FE;
-}
-
 .thank__you.thank__you .btn-info {
     color: #fff !important;
 }
@@ -20,7 +16,7 @@
 }
 
 .thank_you_wrapper li {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgb(246, 246, 247);
     padding: 10px;
     list-style: none;
 }
