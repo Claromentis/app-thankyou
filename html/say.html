@@ -1,12 +1,26 @@
-<txt name="allow_new"><b><a href="#thank_you_modal" data-toggle="modal">Say thank you</a></b></txt>
-<ul name="items" datasrc="">
-	<li>Thank you, <datasrc name="users"><a name="user_link"><txt name="user_name">John Smith</txt></a><txt name="delimiter_visible">, </txt></datasrc><txt name="has_description">:</txt>
-		<txt name="has_description"><p name="description"></p></txt>
-		<p class="Right">&mdash; <a name="author_link"><txt name="author_name"></txt></a></p>
-	</li>
-</ul>
+<!--@head@
+	<link type="text/css" href="/intranet/thankyou/css/style.css" media="all" rel="stylesheet" />
+-->
 
+<div class="panel panel-default thank__you">
 
-<txt name="allow_new"><!-- Modal -->
-	<include file="modal.html" />
-</txt>
+	<div class="panel-heading" name="allow_new">
+		<a href="#thank_you_modal" data-toggle="modal" class="pull-right btn btn-info">Say thank you</a>
+		Thank You
+	</div>
+
+	<div class="panel-body thank_you_wrapper">
+		<ul name="items" datasrc="" class="list-unstyled">
+			<li>Thank you, <datasrc name="users"><a name="user_link"><txt name="user_name">John Smith</txt></a><txt name="delimiter_visible">, </txt></datasrc><txt name="has_description">:</txt>
+				<txt name="has_description"><p name="description"></p></txt>
+				<p class="Right">&mdash; <a name="author_link"><txt name="author_name"></txt></a></p>
+			</li>
+		</ul>
+	</div>
+
+	<txt name="allow_new">
+		<!-- modal -->
+		<include file="modal.html" />
+	</txt>
+
+</div>
