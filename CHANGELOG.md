@@ -1,5 +1,8 @@
 # Change Log #
 
+## 2.1.1 ##
+* Minor visual changes
+
 ## 2.1.0 ##
 Same changes as in 1.1.0, but for Claromentis 8
 * Ability to say thank you to several people at once
