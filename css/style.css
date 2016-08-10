@@ -2,10 +2,6 @@
     $THANKYOU
 *------------------------------------*/
 
-.thank__you {
-    background: #DFF5FE;
-}
-
 .thank__you.thank__you .btn-info {
     color: #fff !important;
 }
@@ -14,30 +10,20 @@
     max-height: 220px;
     overflow: auto;
 }
-/*
-.thank__you ul {
-    margin-left: 0;
-}*/
 
 .thank_you_wrapper li {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgb(246, 246, 247);
     padding: 10px;
-    /*list-style: none;*/
+    list-style: none;
 }
 
 .thank_you_wrapper li + li {
     margin-top: 10px;
 }
 
-/*.thank_you.infobox h3 {
-    border-bottom: 0;
-    margin-bottom: 0;
+.thank__you.panel .panel-heading .btn.pull-right {
+    margin: -7px -4px 0 0;
 }
-
-.thank_you.infobox h3 a,
-.thank_you.infobox h3 a:hover {
-    color: #fff;
-}*/
 
 @media only screen and (max-width: 768px) {
 
