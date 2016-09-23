@@ -1,0 +1,18 @@
+// 
+// Thank you
+// 
+
+.thank-you {
+    
+    .panel-body {
+        li {
+            background: rgb(246, 246, 247);
+            padding: 10px;
+            list-style: none;
+
+            & + li {
+                margin-top: 10px
+            }
+        }
+    }
+}

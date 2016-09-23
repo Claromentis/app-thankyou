@@ -6,7 +6,7 @@
 	"license": "Claromentis License",
 	"require": {
 		"php": ">=5.4.0",
-		"claromentis/installer-composer-plugin": "^1.0.6",
-		"claromentis/framework": "8.0.x"
+		"claromentis/installer-composer-plugin": "^1.0.8",
+		"claromentis/framework": "8.1.x"
 	}
 }
