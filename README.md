@@ -2,8 +2,9 @@
 
 A simple application to say thanks to fellow employee
 
-  Version 2.x - for Claromentis 8.x
-  Version 1.x - for Claromentis 7.3 and 7.4
+ * Version 3.x - for Claromentis 8.1 (includes Pages app component) 
+ * Version 2.x - for Claromentis 8.0
+ * Version 1.x - for Claromentis 7.3 and 7.4
 
 
 ## Installation

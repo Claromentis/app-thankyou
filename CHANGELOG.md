@@ -1,5 +1,9 @@
 # Change Log #
 
+## 3.0.0 (not released yet) ##
+* Compatibility with Claromentis 8.1
+* Pages application component
+
 ## 2.1.1 ##
 * Minor visual changes
 

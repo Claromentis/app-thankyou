@@ -3,31 +3,19 @@
 	<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
 </unique_section>
 -->
-
-
 <div class="thank-you">
-
-<!-- todo: dev to strip out header 
 
 	<div class="panel-heading" name="allow_new">
 		<a href="#thank_you_modal" data-toggle="modal" class="pull-right btn btn-info">Say thank you</a>
 		Thank You
-	</div> 
-
--->
+	</div>
 
 	<div class="panel-body">
-		<ul name="items" datasrc="" class="list-unstyled">
-			<li>Thank you, <datasrc name="users"><a name="user_link"><txt name="user_name">John Smith</txt></a><txt name="delimiter_visible">, </txt></datasrc><txt name="has_description">:</txt>
-				<txt name="has_description"><p name="description"></p></txt>
-				<p class="Right">&mdash; <a name="author_link"><txt name="author_name"></txt></a></p>
-			</li>
-		</ul>
+		<include file="includes/thanks_list.html" />
 	</div>
 
 	<txt name="allow_new">
-		<!-- modal -->
-		<include file="modal.html" />
+		<include file="includes/modal.html" />
 	</txt>
 
 </div>

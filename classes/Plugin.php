@@ -25,6 +25,12 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 		$app['thankyou.repository'] = function ($app) {
 			return new ThanksRepository($app->db);
 		};
+
+		// pages component
+		$app['pages.component.thankyou'] = function()
+		{
+			return new UI\PagesComponent();
+		};
 	}
 
 	public function Show($attr, Application $app)
