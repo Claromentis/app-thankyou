@@ -6,4 +6,4 @@ if (!isset($installer))
 	throw new Exception("Install options are not defined");
 /** @var $installer Claromentis\Setup\SetupFacade */
 
-$installer->GetPluginsRepository()->Add("thankyou", 'Claromentis\ThankYou\Plugin');
+$installer->GetPluginsRepository()->Remove("thankyou", 'Claromentis\ThankYou\Plugin');
