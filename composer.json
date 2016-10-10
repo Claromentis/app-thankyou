@@ -1,12 +1,17 @@
 {
-	"name": "claromentis/thankyou",
-	"description": "A component to say thanks to each other",
-	"type": "claromentis-module-v7",
-	"keywords": ["claromentis", "thankyou", "thanks"],
-	"license": "Claromentis License",
-	"require": {
-		"php": ">=5.4.0",
-		"claromentis/installer-composer-plugin": "^1.2.3",
-		"claromentis/framework": "8.1.x"
-	}
+    "name": "claromentis/thankyou",
+    "description": "A component to say thanks to each other",
+    "type": "claromentis-module-v7",
+    "keywords": ["claromentis", "thankyou", "thanks"],
+    "license": "Claromentis License",
+    "require": {
+        "php": ">=5.5.0",
+        "claromentis/installer-composer-plugin": "^1.2.3",
+        "claromentis/framework": "8.1.x"
+    },
+   "extra": {
+        "branch-alias": {
+            "core81": "3.0.x-dev"
+        }
+    }
 }
