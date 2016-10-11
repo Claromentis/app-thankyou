@@ -48,7 +48,7 @@ class PagesComponent implements ComponentInterface
 	 *
 	 * @return string
 	 */
-	public function Show($id_string, OptionsInterface $options, Application $app)
+	public function ShowBody($id_string, OptionsInterface $options, Application $app)
 	{
 		$args = array();
 
@@ -121,5 +121,20 @@ class PagesComponent implements ComponentInterface
 		return [
 			'min_height' => 2,
 		];
+	}
+
+	/**
+	 * Returns CSS class name to be set on component tile when it's displayed.
+	 * This class then can be used to change the display style.
+	 *
+	 * Recommended class name is 'tile-' followed by full component code.
+	 *
+	 * It also can be empty.
+	 *
+	 * @return string
+	 */
+	public function GetCssClass()
+	{
+		return '';
 	}
 }
