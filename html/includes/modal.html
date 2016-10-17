@@ -7,20 +7,27 @@
 					<h4 class="modal-title">Say thank you</h4>
 				</div>
 				<div class="modal-body">
-					<div id="thank_you_user_row">
-						<label for="thank_you_user">To:</label>
-						<txt name="select_user" visible="1">
-							<component class_key="user_picker" name="thank_you_user" multiple="1" id="thank_you_user" />
-						</txt>
-						<txt name="preselected_user" visible="0">
-							<a name="to_user_link"><txt name="to_user_name">John Smith</txt></a>
-							<input type="hidden" name="thank_you_user">
-						</txt>
-					</div>
-					<br>
+					<div id="thank_you_user_row" class="form-group">
+						<label class="control-label col-sm-2" for="thank_you_user">To</label>
 
-					<label for="thank_you_description">Comment:</label>
-					<textarea name="thank_you_description" id="thank_you_description" class="form-control"></textarea>
+						<div class="col-sm-10">
+							<txt name="select_user" visible="1">
+								<component class_key="user_picker" name="thank_you_user" multiple="1" id="thank_you_user" />
+							</txt>
+							<txt name="preselected_user" visible="0">
+								<a name="to_user_link"><txt name="to_user_name">John Smith</txt></a>
+								<input type="hidden" name="thank_you_user">
+							</txt>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="thank_you_description">Comment</label>
+
+						<div class="col-sm-10">
+							<textarea name="thank_you_description" id="thank_you_description" class="form-control"></textarea>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>

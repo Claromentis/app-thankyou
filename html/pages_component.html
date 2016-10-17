@@ -3,10 +3,11 @@
 	<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
 </unique_section>
 -->
-<txt name="allow_new"><b><a href="#thank_you_modal" data-toggle="modal">Say thank you</a></b></txt>
+<div class="panel-body text-right" name="allow_new">
+	<a href="#thank_you_modal" class="btn btn-primary" data-toggle="modal">Say thank you</a>
+</div>
 
 <include file="includes/thanks_list.html" />
 
-<txt name="allow_new"><!-- Modal -->
-	<include file="includes/modal.html" />
-</txt>
+<!-- Modal -->
+<include file="includes/modal.html" />
