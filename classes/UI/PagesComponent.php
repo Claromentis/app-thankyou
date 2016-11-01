@@ -5,6 +5,8 @@ use Claromentis\Core\Application;
 use Claromentis\Pages\Api\ComponentInterface;
 use Claromentis\Pages\Api\OptionsInterface;
 use Claromentis\Pages\Api\TemplaterTrait;
+use Claromentis\Pages\OptionType\BoolOption;
+use Claromentis\Pages\OptionType\UserPickerOption;
 use Claromentis\ThankYou\ThanksRepository;
 use Claromentis\ThankYou\View\ThanksListView;
 
@@ -32,10 +34,10 @@ class PagesComponent implements ComponentInterface
 	public function GetOptions()
 	{
 		return [
-			'allow_new' => ['type' => 'bool', 'title' => 'Show "Say thank you" button', 'default' => true],
-			'show_header' => ['type' => 'bool', 'title' => 'Show header', 'default' => true],
+			'allow_new' => new BoolOption(['title' => 'Show "Say thank you" button', 'default' => true]),
+			'show_header' => new BoolOption(['title' => 'Show header', 'default' => true]),
 			'limit' => ['type' => 'int', 'title' => 'Number of items to show', 'default' => 10],
-			'user_id' => ['type' => 'int', 'title' => 'User ID to show thanks for one user only', 'default' => null],
+			'user_id' => new UserPickerOption(['title' => 'User ID to show thanks for one user only', 'default' => 0]),
 		];
 	}
 
