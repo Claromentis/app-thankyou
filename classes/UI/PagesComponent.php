@@ -139,4 +139,28 @@ class PagesComponent implements ComponentInterface
 	{
 		return '';
 	}
+
+	/**
+	 * Returns associative array with description of this component to be displayed for users in the
+	 * components list.
+	 *
+	 * Result array has these keys:
+	 *   title       - Localized component title, up to 40 characters
+	 *   description - A paragraph-size plain text description of the component, without linebreaks or HTML
+	 *   image       - Image URL
+	 *   application - One-word lowercase application CODE (same as folder name and admin panel code)
+	 *
+	 * Some values may be missing - reasonable defaults will be used. But it's strongly recommended to have
+	 * at least title.
+	 *
+	 * @return array
+	 */
+	public function GetCoverInfo()
+	{
+		return [
+			'title' => 'Thank you',
+			'description' => 'Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"',
+			'application' => 'thankyou'
+		];
+	}
 }
