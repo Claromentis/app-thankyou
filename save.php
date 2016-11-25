@@ -30,7 +30,7 @@ if (gpc::IsSubmit())
 		$params = array(
 			'author' => AuthUser::I()->GetFullName(),
 			'other_people_number' => count($users_ids) - 1,
-			'description' => cla_htmlsafe($description),
+			'description' => $description,
 		);
 
 		NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
