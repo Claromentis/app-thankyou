@@ -1,0 +1,1 @@
+intranet/thankyou/languages/notifications/en/thankyou.new_thanks.txt

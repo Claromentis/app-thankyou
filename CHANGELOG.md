@@ -1,5 +1,8 @@
 # Change Log #
 
+## 2.1.2 ##
+* Added German translation for notification
+
 ## 2.1.1 ##
 * Minor visual changes
 
