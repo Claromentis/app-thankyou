@@ -1,3 +1,0 @@
-%author% hat sich bei Ihnen bedankt@if %other_people_number%@ (und %other_people_number% anderen Personen)@endif@
-
-%description%
