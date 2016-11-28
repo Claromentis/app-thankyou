@@ -35,7 +35,7 @@ class PagesComponent implements ComponentInterface
 			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => 'Show "Say thank you" button'],
 			'show_header' => ['type' => 'bool', 'title' => 'Show header', 'default' => true],
 			'limit' => ['type' => 'int', 'title' => 'Number of items to show', 'default' => 10],
-			'user_id' => ['type' => 'int', 'title' => 'User ID to show thanks for one user only', 'default' => 0, 'display_type' => 'user_picker'],
+			'user_id' => ['type' => 'int', 'title' => 'User ID to show thanks for one user only', 'default' => 0, 'input' => 'user_picker'],
 		];
 	}
 
