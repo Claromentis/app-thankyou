@@ -158,7 +158,8 @@ class PagesComponent implements ComponentInterface
 		return [
 			'title' => 'Thank you',
 			'description' => 'Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"',
-			'application' => 'thankyou'
+			'application' => 'thankyou',
+			'icon_class' => 'glyphicons glyphicons-handshake'
 		];
 	}
 }
