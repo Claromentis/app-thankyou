@@ -32,10 +32,10 @@ class PagesComponent implements ComponentInterface
 	public function GetOptions()
 	{
 		return [
-			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => 'Show "Say thank you" button'],
-			'show_header' => ['type' => 'bool', 'title' => 'Show header', 'default' => true],
-			'limit' => ['type' => 'int', 'title' => 'Number of items to show', 'default' => 10],
-			'user_id' => ['type' => 'int', 'title' => 'User ID to show thanks for one user only', 'default' => 0, 'input' => 'user_picker'],
+			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => lmsg('thankyou.component.options.show_button')],
+			'show_header' => ['type' => 'bool', 'title' => lmsg('thankyou.component.options.show_header'), 'default' => true],
+			'limit' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.num_items'), 'default' => 10],
+			'user_id' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker'],
 		];
 	}
 
@@ -156,8 +156,8 @@ class PagesComponent implements ComponentInterface
 	public function GetCoverInfo()
 	{
 		return [
-			'title' => 'Thank you',
-			'description' => 'Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"',
+			'title' => lmsg('thankyou.component.cover_info.title'),
+			'description' => lmsg('thankyou.component.cover_info.desc'),
 			'application' => 'thankyou',
 			'icon_class' => 'glyphicons glyphicons-handshake'
 		];

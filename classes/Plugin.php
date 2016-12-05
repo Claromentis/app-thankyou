@@ -31,6 +31,10 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 		{
 			return new UI\PagesComponent();
 		};
+
+		$app['localization.domain.thankyou'] = function ($app) {
+			return $app['localization.domain_from_files_factory']('thankyou');
+		};
 	}
 
 	public function Show($attr, Application $app)
