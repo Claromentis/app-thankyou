@@ -9,9 +9,9 @@
         "claromentis/installer-composer-plugin": "^1.2.3",
         "claromentis/framework": "8.1.x"
     },
-   "extra": {
+    "extra": {
         "branch-alias": {
-            "core81": "3.0.x-dev"
+            "v3.x": "3.0.x-dev"
         }
     }
 }
