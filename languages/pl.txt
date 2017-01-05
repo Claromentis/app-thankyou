@@ -5,3 +5,10 @@ lm	thankyou.component.options.num_items
 lm	thankyou.component.options.show_button		
 lm	thankyou.component.options.show_header		
 lm	thankyou.component.options.user_id		
+lt	thankyou:component:modal:close.body		
+lt	thankyou:component:modal:comment.body		
+lt	thankyou:component:modal:share.body		
+lt	thankyou:component:modal:to.body		
+lt	thankyou:component:say:heading.body		
+lt	thankyou:component:say_thank_you.body		
+lt	thankyou:component:thankyou_users_name.body		
