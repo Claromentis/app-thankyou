@@ -66,6 +66,15 @@ class PagesComponent implements ComponentInterface
 		$view = new ThanksListView();
 		$args['items.datasrc'] = $view->Show($thanks);
 
+		if (count($args['items.datasrc']) === 0)
+		{
+			$msg = lmsg('thankyou.component.no_thanks_all');
+			if ($user_id)
+				$msg = lmsg('thankyou.component.no_thanks_user', \User::GetNameById($user_id));
+
+			$args['no_thanks.body'] = $msg;
+		}
+
 		// show "say thank you" within body if header is hidden
 		if ($options->Get('allow_new') && !$options->Get('show_header'))
 		{
