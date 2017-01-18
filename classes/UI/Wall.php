@@ -41,6 +41,8 @@ class Wall extends TemplaterComponentTmpl
 			$args = $view->ShowAddNew($user_id) + $args;
 		}
 
+		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_user', \User::GetNameById($user_id));
+
 		$template = 'thankyou/wall.html';
 		return $this->CallTemplater($template, $args);
 	}

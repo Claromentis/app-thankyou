@@ -32,6 +32,8 @@ class Say extends TemplaterComponentTmpl
 			$args['allow_new.visible'] = 0;
 		}
 
+		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_all');
+
 		$template = 'thankyou/say.html';
 		return $this->CallTemplater($template, $args);
 	}
