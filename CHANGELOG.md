@@ -1,5 +1,9 @@
 # Change Log #
 
+## 2.1.3 ##
+* Fixed an incorrect user being shown in the "Say thank you" modal on user
+  profiles if the last person thanked in the list was someone else (#5)
+
 ## 2.1.2 ##
 * Added German translation for notification
 
