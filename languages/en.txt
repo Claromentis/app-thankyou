@@ -3,14 +3,17 @@ lm	thankyou.component.cover_info.desc		Allows users to tag someone and publicly 
 lm	thankyou.component.cover_info.title		Thank you
 lm	thankyou.component.no_thanks_all		Nobody has been thanked yet
 lm	thankyou.component.no_thanks_user		%s has not been thanked yet
+lm	thankyou.component.options.custom_title		Custom title (optional)
 lm	thankyou.component.options.num_items		Number of items to show
 lm	thankyou.component.options.show_button		Show "Say thank you" button
 lm	thankyou.component.options.show_header		Show header
 lm	thankyou.component.options.user_id		User ID to show thanks for one user only
+lm	thankyou.component_heading		Thank you
+lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:component:modal:close.body		Close
 lt	thankyou:component:modal:comment.body		Comment
-lt	thankyou:component:modal:share.body		Share
+lt	thankyou:component:modal:share.body		Submit
 lt	thankyou:component:modal:to.body		To
-lt	thankyou:component:say:heading.body		Thank You
+lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		Say thank you
 lt	thankyou:component:thankyou_users_name.body		Thank you,

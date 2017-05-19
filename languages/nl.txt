@@ -3,14 +3,17 @@ lm	thankyou.component.cover_info.desc
 lm	thankyou.component.cover_info.title		
 lm	thankyou.component.no_thanks_all		
 lm	thankyou.component.no_thanks_user		
+lm	thankyou.component.options.custom_title		
 lm	thankyou.component.options.num_items		
 lm	thankyou.component.options.show_button		
 lm	thankyou.component.options.show_header		
 lm	thankyou.component.options.user_id		
+lm	thankyou.component_heading		
+lm	thankyou.user_profile.tab_name		
 lt	thankyou:component:modal:close.body		
 lt	thankyou:component:modal:comment.body		
 lt	thankyou:component:modal:share.body		
 lt	thankyou:component:modal:to.body		
-lt	thankyou:component:say:heading.body		
+lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		
 lt	thankyou:component:thankyou_users_name.body		

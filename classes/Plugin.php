@@ -47,7 +47,7 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 				/** @var ThanksRepository $repository */
 				$repository = $app['thankyou.repository'];
 				$count = $repository->GetCount($attr['user_id']);
-				return '<li><a href="#thanks"><span class="cla-icon-thumbs-up"></span> Thanks (<b>'.$count.'</b>)</a></li>';
+				return '<li><a href="#thanks"><span class="cla-icon-thumbs-up"></span> '.lmsg("thankyou.user_profile.tab_name").' (<b>'.$count.'</b>)</a></li>';
 			case 'viewprofile.tab_content':
 				if (empty($attr['user_id']) || !is_numeric($attr['user_id']))
 					return '';

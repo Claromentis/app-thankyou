@@ -3,6 +3,7 @@ namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\ComponentInterface;
+use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\ThankYou\ThanksRepository;
@@ -12,7 +13,7 @@ use Claromentis\ThankYou\View\ThanksListView;
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
  * a button to allow adding a new "thank you"
  */
-class PagesComponent implements ComponentInterface
+class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 {
 	use TemplaterTrait;
 
@@ -34,6 +35,7 @@ class PagesComponent implements ComponentInterface
 		return [
 			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => lmsg('thankyou.component.options.show_button')],
 			'show_header' => ['type' => 'bool', 'title' => lmsg('thankyou.component.options.show_header'), 'default' => true],
+			'title' => ['type' => 'string', 'title' => lmsg('thankyou.component.options.custom_title'), 'default' => '', 'placeholder' => lmsg('thankyou.component_heading')],
 			'limit' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50],
 			'user_id' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker'],
 		];
@@ -114,6 +116,13 @@ class PagesComponent implements ComponentInterface
 			$args = ['allow_new.visible' => 0];
 		}
 
+		if ($options->Get('title') !== '')
+		{
+			$args['custom_title.body'] = $options->Get('title');
+			$args['custom_title.visible'] = 1;
+			$args['default_title.visible'] = 0;
+		}
+
 		$template = 'thankyou/pages_component_header.html';
 		return $this->CallTemplater($template, $args);
 	}
@@ -170,5 +179,30 @@ class PagesComponent implements ComponentInterface
 			'application' => 'thankyou',
 			'icon_class' => 'glyphicons glyphicons-handshake'
 		];
+	}
+
+	/**
+	 * Allows the component to change it's option definitions to reflect a change of values
+	 *
+	 * Input and output are the same array that GetOptions() returns, plus each items current value -
+	 *
+	 * array(
+	 *   'option_name' => ['type' => ...,
+	 *                     'default' => ...,
+	 *                     'title' => ...,
+	 *                     'value' => ...,
+	 *                    ],
+	 *   'other_option' => ...
+	 * )
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
+	public function MutateOptions($options)
+	{
+		if (empty($options['show_header']['value']))
+			unset($options['title']);
+		return $options;
 	}
 }
