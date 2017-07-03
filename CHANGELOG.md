@@ -1,5 +1,8 @@
 # Change Log #
 
+## 3.0.2 ##
+* Minor improvements and bugfixes
+
 ## 3.0.1 ##
 * Added some missing localisation
 * Made it possible to set custom component title
