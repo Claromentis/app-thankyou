@@ -8,10 +8,5 @@
         "php": ">=5.5.0",
         "claromentis/installer-composer-plugin": "^1.2.3",
         "claromentis/framework": "8.1.x"
-    },
-    "extra": {
-        "branch-alias": {
-            "v3.x": "3.0.x-dev"
-        }
     }
 }
