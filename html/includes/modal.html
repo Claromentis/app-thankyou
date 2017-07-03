@@ -38,26 +38,27 @@
 			</form>
 		</div>
 	</div>
-	<script src="/intranet/js/jquery.validate.min.js"></script>
 	<script type="text/javascript">
-		jQuery('#thank_you_modal').find('form').validate({
-			rules: {
-				thank_you_description: {
-					required: true,
-					minlength: { param: 3 }
-				},
-				'thank_you_user[]': {
-					required: true
-				}
-			},
-			errorPlacement: function(error, element) {
-				if (element.attr("name") == "thank_you_user[]") {
-					error.insertAfter("#thank_you_user_row");
-				} else {
-					error.insertAfter(element);
-				}
-			},
-			errorClass : 'text-error'
-		});
+		requirejs(['/intranet/js/jquery.validate.min.js'], function (validate) {
+            jQuery('#thank_you_modal').find('form').validate({
+                rules: {
+                    thank_you_description: {
+                        required: true,
+                        minlength: { param: 3 }
+                    },
+                    'thank_you_user[]': {
+                        required: true
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.attr("name") == "thank_you_user[]") {
+                        error.insertAfter("#thank_you_user_row");
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                errorClass : 'text-error'
+            });
+        });
 	</script>
 </div>
