@@ -2,7 +2,8 @@
 
 A simple application to say thanks to fellow employee
 
- * Version 3.x - for Claromentis 8.1 (includes Pages app component) 
+ * Version 3.1 - for Claromentis 8.2
+ * Version 3.0 - for Claromentis 8.1 (includes Pages app component) 
  * Version 2.x - for Claromentis 8.0
  * Version 1.x - for Claromentis 7.3 and 7.4
 
@@ -20,7 +21,7 @@ then run the installer
 
 Manually:
   * clone this repository to /intranet/thankyou
-  * go to "application" folder in Claromentis and run ``vendor/bin/phing -Dapp=thankyou install``
+  * go to "application" folder in Claromentis and run ``./clc app:install thankyou``
 
 ## Usage
 
