@@ -1,6 +1,6 @@
 # Change Log #
 
-## 3.1.0 (not released yet) ##
+## 3.1.0 ##
 * Compatibility with Claromentis 8.2
 
 ## 3.0.2 ##
