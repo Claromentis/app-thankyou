@@ -1,5 +1,9 @@
 # Change Log #
 
+## 3.0.3 ##
+* Fixed notification not sent when "thank you" is added from the user's profile page
+* Minor improvements and bugfixes
+
 ## 3.0.2 ##
 * Minor improvements and bugfixes
 
