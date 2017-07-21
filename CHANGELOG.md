@@ -3,6 +3,10 @@
 ## 3.1.0 ##
 * Compatibility with Claromentis 8.2
 
+## 3.0.3 ##
+* Fixed notification not sent when "thank you" is added from the user's profile page
+* Minor improvements and bugfixes
+
 ## 3.0.2 ##
 * Minor improvements and bugfixes
 
@@ -13,6 +17,13 @@
 ## 3.0.0 ##
 * Compatibility with Claromentis 8.1
 * Pages application component
+
+## 2.1.4 ##
+* Fixed notification not sent when "thank you" is added from the user's profile page
+
+## 2.1.3 ##
+* Fixed an incorrect user being shown in the "Say thank you" modal on user
+  profiles if the last person thanked in the list was someone else (#5)
 
 ## 2.1.2 ##
 * Added German translation for notification

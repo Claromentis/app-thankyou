@@ -34,7 +34,7 @@ if (gpc::IsSubmit())
 		);
 
 		NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
-		NotificationMessage::Send('thankyou.new_thanks', $params, $user_id, IMessage::TYPE_PEOPLE);
+		NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, IMessage::TYPE_PEOPLE);
 	}
 }
 
