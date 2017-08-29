@@ -25,3 +25,15 @@
 	padding: 8px 10px 0 0;
 	font-weight: bold;
 }
+
+// 1 narrow column 
+@element ".tile-thank-you" and (max-width: 280px) {
+    eq_this {
+		.panel .panel-heading .btn.pull-right.thank-you--button {
+					width: 70px;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+  	  		}
+}

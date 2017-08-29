@@ -153,7 +153,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	 */
 	public function GetCssClass()
 	{
-		return '';
+		return 'tile-thank-you';
 	}
 
 	/**
