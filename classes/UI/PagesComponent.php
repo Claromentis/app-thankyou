@@ -137,7 +137,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function GetSizeConstraints()
 	{
 		return [
-			'min_height' => 2,
+			'min_height' => 4,
 		];
 	}
 
