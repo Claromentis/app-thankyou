@@ -177,7 +177,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			'title' => lmsg('thankyou.component.cover_info.title'),
 			'description' => lmsg('thankyou.component.cover_info.desc'),
 			'application' => 'thankyou',
-			'icon_class' => 'glyphicons glyphicons-handshake'
+			'icon_class' => 'glyphicons glyphicons-donate'
 		];
 	}
 
