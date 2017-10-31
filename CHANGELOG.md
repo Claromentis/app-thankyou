@@ -1,5 +1,9 @@
 # Change Log #
 
+## 3.1.2 ##
+* Minor improvements and bugfixes
+* Changed admin panel icon to more appropriate
+
 ## 3.1.1 ##
 * Minor improvements and bugfixes
 
