@@ -1,6 +1,7 @@
 <?php
 namespace Claromentis\ThankYou\View;
 
+use Carbon\Carbon;
 use Claromentis\ThankYou\ThanksItem;
 
 /**
@@ -9,13 +10,15 @@ use Claromentis\ThankYou\ThanksItem;
 class ThanksListView
 {
 	/**
-	 * @param ThanksItem[] $thanks
+	 * Build a datasource for the given thanks items.
 	 *
+	 * @param ThanksItem[] $thanks
 	 * @return array
 	 */
 	public function Show($thanks)
 	{
 		$result = [];
+
 		foreach ($thanks as $item)
 		{
 			$users_dsrc = [];
@@ -41,6 +44,8 @@ class ThanksListView
 
 				'description.body_html' => \ClaText::ProcessPlain($item->description),
 				'has_description.visible' => strlen(trim($item->description)) > 0,
+
+				'date_created.body' => Carbon::createFromFormat('YmdHis', $item->date_created)->diffForHumans()
 			];
 		}
 
