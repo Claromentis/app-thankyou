@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou;
 use Claromentis\Core\Application;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
+use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -24,6 +25,10 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 	{
 		$app['thankyou.repository'] = function ($app) {
 			return new ThanksRepository($app->db);
+		};
+
+		$app['thankyou.thanks_list_view'] = function () {
+			return new ThanksListView();
 		};
 
 		// pages component

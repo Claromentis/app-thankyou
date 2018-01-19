@@ -24,7 +24,10 @@ class Say extends TemplaterComponentTmpl
 
 		$thanks = $repository->GetRecent(isset($attributes['limit']) ? (int)$attributes['limit'] : 10);
 
-		$view = new ThanksListView();
+		/**
+		 * @var ThanksListView $view
+		 */
+		$view = $app['thankyou.thanks_list_view'];
 		$args['items.datasrc'] = $view->Show($thanks);
 
 		if (isset($attributes['allow_new']) && !(bool)$attributes['allow_new'])

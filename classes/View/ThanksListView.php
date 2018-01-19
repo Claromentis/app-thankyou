@@ -3,6 +3,7 @@ namespace Claromentis\ThankYou\View;
 
 use Carbon\Carbon;
 use Claromentis\ThankYou\ThanksItem;
+use Date;
 
 /**
  * Displays list of "thank you" items
@@ -22,6 +23,7 @@ class ThanksListView
 		foreach ($thanks as $item)
 		{
 			$users_dsrc = [];
+
 			/** @var ThanksItem $item */
 			if (count($item->GetUsers()) > 0)
 			{
@@ -45,7 +47,7 @@ class ThanksListView
 				'description.body_html' => \ClaText::ProcessPlain($item->description),
 				'has_description.visible' => strlen(trim($item->description)) > 0,
 
-				'date_created.body' => Carbon::createFromFormat('YmdHis', $item->date_created)->diffForHumans()
+				'date_created.body' => Carbon::instance(new Date($item->date_created))->diffForHumans()
 			];
 		}
 

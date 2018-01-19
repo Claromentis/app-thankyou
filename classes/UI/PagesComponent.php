@@ -65,7 +65,10 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		else
 			$thanks = $repository->GetRecent($limit);
 
-		$view = new ThanksListView();
+		/**
+		 * @var ThanksListView $view
+		 */
+		$view = $app['thankyou.thanks_list_view'];
 		$args['items.datasrc'] = $view->Show($thanks);
 
 		if (count($args['items.datasrc']) === 0)
@@ -109,7 +112,10 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		if ($options->Get('allow_new'))
 		{
-			$view = new ThanksListView();
+			/**
+			 * @var ThanksListView $view
+			 */
+			$view = $app['thankyou.thanks_list_view'];
 			$args = $view->ShowAddNew($user_id);
 		} else
 		{

@@ -30,7 +30,10 @@ class Wall extends TemplaterComponentTmpl
 		$limit = isset($attributes['limit']) ? (int)$attributes['limit'] : 10;
 		$thanks = $repository->GetForUser($user_id, $limit);
 
-		$view = new ThanksListView();
+		/**
+		 * @var ThanksListView $view
+		 */
+		$view = $app['thankyou.thanks_list_view'];
 		$args['items.datasrc'] = $view->Show($thanks);
 
 		if (isset($attributes['allow_new']) && !(bool)$attributes['allow_new'])
