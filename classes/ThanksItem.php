@@ -5,9 +5,12 @@ use Claromentis\Core\Services;
 use ObjectsStorage;
 
 /**
- * Description of ThanksItem.php
+ * A thank you item.
  *
- * @author Alexander Polyanskikh
+ * @property-read int    $id
+ * @property-read int    $author
+ * @property-read int    $date_created
+ * @property-read string $description
  */
 class ThanksItem extends \ActiveRecord
 {
@@ -30,10 +33,16 @@ class ThanksItem extends \ActiveRecord
 		$db = Services::I()->GetDb();
 
 		$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $this->GetProperty('id'));
+
 		foreach ($this->users_ids as $user_id)
 		{
 			$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $this->GetProperty('id'), $user_id);
 		}
+	}
+
+	public function SetDescription($value)
+	{
+		$this->SetProperty('description', $value);
 	}
 
 	public function SetUsers($users_ids)

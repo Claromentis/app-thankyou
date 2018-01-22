@@ -1,17 +1,21 @@
 <?php
-
 namespace Claromentis\ThankYou;
+
 use Claromentis\Core\Application;
+use Claromentis\Core\ControllerCollection;
+use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
+use Claromentis\ThankYou\Controller\Rest\ThanksController;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Silex\Api\BootableProviderInterface;
 
 /**
  *
  * @author Alexander Polyanskikh
  */
-class Plugin implements TemplaterComponent, ServiceProviderInterface
+class Plugin implements TemplaterComponent, ServiceProviderInterface, RestServiceInterface, BootableProviderInterface
 {
 	/**
 	 * Registers services on the given container.
@@ -23,6 +27,10 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 	 */
 	public function register(Container $app)
 	{
+		$app['thankyou.thanks_rest_controller'] = function ($app) {
+			return new ThanksController($app['thankyou.repository']);
+		};
+
 		$app['thankyou.repository'] = function ($app) {
 			return new ThanksRepository($app->db);
 		};
@@ -32,8 +40,7 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 		};
 
 		// pages component
-		$app['pages.component.thankyou'] = function()
-		{
+		$app['pages.component.thankyou'] = function () {
 			return new UI\PagesComponent();
 		};
 
@@ -42,6 +49,33 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 		};
 	}
 
+	/**
+	 * Bootstraps the application.
+	 *
+	 * This method is called after all services are registered
+	 * and should be used for "dynamic" configuration (whenever
+	 * a service must be requested).
+	 *
+	 * @param \Silex\Application $app
+	 */
+	public function boot(\Silex\Application $app)
+	{
+		/**
+		 * @var Application $app
+		 */
+		$app->registerRestService($this);
+	}
+
+
+	/**
+	 * User profile hooks.
+	 *
+	 * Adds the thank you tab.
+	 *
+	 * @param string $attr
+	 * @param Application $app
+	 * @return string
+	 */
 	public function Show($attr, Application $app)
 	{
 		switch ($attr['page'])
@@ -61,5 +95,21 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface
 				return '<div id="thanks">' . $component_data . '</div>';
 		}
 		return '';
+	}
+
+	/**
+	 * Returns REST routes for the application.
+	 *
+	 * @param Application $app An Application instance
+	 * @return array
+	 */
+	public function GetRestRoutes(Application $app)
+	{
+		return [
+			'/thankyou/v0' => '/thankyou/v1',
+			'/thankyou/v1' => function (ControllerCollection $routes) {
+				$routes->get('/thanks/{id}', 'thankyou.thanks_rest_controller:GetThanksItem')->assert('id', '\d+');
+			}
+		];
 	}
 }

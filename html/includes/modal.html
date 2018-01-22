@@ -2,6 +2,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<form action="/intranet/thankyou/save.php" method="post" class="form-horizontal">
+				<input type="hidden" name="thank_you_id" id="thank_you_id" />
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<h4 name="thankyou:component:say_thank_you" class="modal-title">Say thank you</h4>
@@ -39,8 +40,43 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		requirejs(['/intranet/js/jquery.validate.min.js'], function (validate) {
-            jQuery('#thank_you_modal').find('form').validate({
+		requirejs(['jquery', '/intranet/js/jquery.validate.min.js'], function ($, validate) {
+			/**
+			 * Set the thanks item to display in the modal form.
+			 *
+			 * @param {object} item
+			 */
+			function updateThanksForm(item) {
+				$.extend({
+					id: 0,
+					description: '',
+					users: {}
+				}, item);
+
+				// Set ID and description
+				$('#thank_you_id').val(item.id);
+				$('#thank_you_description').text(item.description);
+
+				// Clear and update users
+				var thankYouUserSelect = $('#thank_you_user');
+				thankYouUserSelect.val(null).trigger('change');
+
+				if (!item.users)
+					return;
+
+				for (var i in item.users) {
+					var user = item.users[i];
+
+					var option = new Option(user.name, user.id, false, true);
+					thankYouUserSelect.append(option);
+				}
+
+				thankYouUserSelect.trigger('change');
+			}
+
+			var modal = $('#thank_you_modal');
+
+            modal.find('form').validate({
                 rules: {
                     thank_you_description: {
                         required: true,
@@ -59,6 +95,17 @@
                 },
                 errorClass : 'text-error'
             });
+
+			$('.thank-you').on('click', '.js-edit-thanks', function () {
+				var data = $(this).data();
+
+				$.ajax('/api/thankyou/v1/thanks/' + data.id, {
+					success: function (data) {
+						updateThanksForm(data);
+						modal.modal('show');
+					}
+				});
+			});
         });
 	</script>
 </div>

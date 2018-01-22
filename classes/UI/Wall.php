@@ -1,11 +1,12 @@
 <?php
-
 namespace Claromentis\ThankYou\UI;
+
 use Claromentis\Core\Application;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThanksRepository;
 use Claromentis\ThankYou\View\ThanksListView;
+use Exception;
 
 /**
  * Component displays list of recent thanks for a particular user and allows submitting a new one.
@@ -16,6 +17,13 @@ use Claromentis\ThankYou\View\ThanksListView;
  */
 class Wall extends TemplaterComponentTmpl
 {
+	/**
+	 * Show the thanks wall.
+	 *
+	 * @param array $attributes
+	 * @param Application $app
+	 * @return string
+	 */
 	public function Show($attributes, Application $app)
 	{
 		$args = array();
@@ -24,10 +32,15 @@ class Wall extends TemplaterComponentTmpl
 		$repository = $app['thankyou.repository'];
 
 		$user_id = (int)$attributes['user_id'];
-		if (!$user_id)
-			return "No user id given";
 
-		$limit = isset($attributes['limit']) ? (int)$attributes['limit'] : 10;
+		if (!$user_id)
+			return "No user ID given";
+
+		$limit = isset($attributes['limit']) ? (int) $attributes['limit'] : 10;
+
+		/**
+		 * @var ThanksItem[] $thanks
+		 */
 		$thanks = $repository->GetForUser($user_id, $limit);
 
 		/**

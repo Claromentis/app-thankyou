@@ -1,7 +1,9 @@
 <?php
 namespace Claromentis\ThankYou\View;
 
+use AuthUser;
 use Carbon\Carbon;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\ThanksItem;
 use Date;
 
@@ -14,10 +16,13 @@ class ThanksListView
 	 * Build a datasource for the given thanks items.
 	 *
 	 * @param ThanksItem[] $thanks
+	 * @param SecurityContext $context [optional]
 	 * @return array
 	 */
-	public function Show($thanks)
+	public function Show($thanks, SecurityContext $context = null)
 	{
+		$context = $context ?: AuthUser::I()->GetContext();
+
 		$result = [];
 
 		foreach ($thanks as $item)
@@ -38,6 +43,8 @@ class ThanksListView
 				$users_dsrc[count($users_dsrc) - 1]['delimiter_visible.visible'] = 0;
 			}
 
+			$can_edit = (int) $context->GetUserId() === (int) $item->author;
+
 			$result[] = [
 				'users.datasrc' => $users_dsrc,
 
@@ -47,6 +54,9 @@ class ThanksListView
 				'description.body_html' => \ClaText::ProcessPlain($item->description),
 				'has_description.visible' => strlen(trim($item->description)) > 0,
 
+				'edit_thanks.visible' => $can_edit,
+				'edit_thanks_link.data-id' => $item->id,
+
 				'date_created.body' => Carbon::instance(new Date($item->date_created))->diffForHumans()
 			];
 		}
@@ -54,12 +64,18 @@ class ThanksListView
 		return $result;
 	}
 
-
+	/**
+	 * Build arguments for the add new thanks modal.
+	 *
+	 * @param int $user_id [optional]
+	 * @return array
+	 */
 	public function ShowAddNew($user_id = null)
 	{
 		$args = [];
 
 		$args['allow_new.visible'] = 1;
+
 		if ($user_id)
 		{
 			$args['select_user.visible'] = 0;
