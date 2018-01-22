@@ -37,15 +37,11 @@
 		 * @param {object} item
 		 */
 		function updateThanksForm(item) {
-			console.log(item);
-
 			item = $.extend({
 				id: 0,
 				description: '',
 				users: {}
 			}, item);
-
-			console.log(item);
 
 			// Set ID and description
 			$('#thank_you_id').val(item.id);
