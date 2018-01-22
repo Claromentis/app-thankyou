@@ -24,7 +24,17 @@ if (gpc::IsSubmit())
 	{
 		$item = new \Claromentis\ThankYou\ThanksItem();
 
-		if ($id > 0)
+		$is_new = $id <= 0;
+
+		if ($is_new)
+		{
+			// Create a new thank you item
+			$item->LoadFromArray([
+				'author' => AuthUser::I()->GetId(),
+				'description' => $description,
+				'date_created' => Date::getNowTimestamp()
+			]);
+		} else
 		{
 			// Edit an existing thank you item
 			$item->Load($id);
@@ -36,14 +46,6 @@ if (gpc::IsSubmit())
 				httpRedirect($ref, 'You do not have permission to edit this thank you note', true);
 
 			$item->SetDescription($description);
-		} else
-		{
-			// Create a new thank you item
-			$item->LoadFromArray([
-				'author' => AuthUser::I()->GetId(),
-				'description' => $description,
-				'date_created' => Date::getNowTimestamp()
-			]);
 		}
 
 		$item->SetUsers($users_ids);
@@ -55,8 +57,12 @@ if (gpc::IsSubmit())
 			'description' => $description,
 		);
 
-		NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
-		NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, IMessage::TYPE_PEOPLE);
+		// Send a notification if this is a new thank you item
+		if ($is_new)
+		{
+			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
+			NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, IMessage::TYPE_PEOPLE);
+		}
 	}
 }
 

@@ -32,6 +32,7 @@ class ThanksRepository
 	 *
 	 * @param int $id
 	 * @return ThanksItem|bool
+	 * @throws Exception
 	 */
 	public function GetById($id)
 	{

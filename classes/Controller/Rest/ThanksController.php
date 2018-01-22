@@ -5,12 +5,13 @@ use Claromentis\Core\Application;
 use Claromentis\Core\Http\JsonPrettyResponse;
 use Claromentis\ThankYou\ThanksRepository;
 use Date;
+use Exception;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use RestExNotFound;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * A thanks rest controller.
+ * A rest controller for thank you items.
  */
 class ThanksController
 {
@@ -37,6 +38,7 @@ class ThanksController
 	 * @param int $id
 	 * @return JsonResponse
 	 * @throws RestExNotFound
+	 * @throws Exception
 	 */
 	public function GetThanksItem(Application $app, Request $request, $id)
 	{
