@@ -1,4 +1,4 @@
-<ul name="items" datasrc="" class="list-unstyled thank-you">
+<ul name="items" datasrc="" class="list-unstyled thank-you js-thank-you-list">
 	<ifempty><li name="no_thanks">No thanks</li></ifempty>
 	<li>
 		<txt name="thankyou:component:thankyou_users_name">Thank you</txt> <datasrc name="users"><a name="user_link"><txt name="user_name">John Smith</txt></a><txt name="delimiter_visible">, </txt></datasrc><txt name="has_description">:</txt>
@@ -15,3 +15,53 @@
 		</p>
 	</li>
 </ul>
+<script type="text/javascript">
+	requirejs(['jquery'], function ($) {
+		var modal = $('#thank_you_modal');
+
+		// Populate and show the modal when a note's edit button is clicked
+		$('.js-thank-you-list').on('click', '.js-edit-thanks', function () {
+			var data = $(this).data();
+
+			$.ajax('/api/thankyou/v1/thanks/' + data.id, {
+				success: function (data) {
+					updateThanksForm(data);
+					modal.modal('show');
+				}
+			});
+		});
+
+		/**
+		 * Set the thanks item to display in the modal form.
+		 *
+		 * @param {object} item
+		 */
+		function updateThanksForm(item) {
+			$.extend({
+				id: 0,
+				description: '',
+				users: {}
+			}, item);
+
+			// Set ID and description
+			$('#thank_you_id').val(item.id);
+			$('#thank_you_description').text(item.description);
+
+			// Clear and update users
+			var thankYouUserSelect = $('#thank_you_user');
+			thankYouUserSelect.val(null).trigger('change');
+
+			if (!item.users)
+				return;
+
+			for (var i in item.users) {
+				var user = item.users[i];
+
+				var option = new Option(user.name, user.id, false, true);
+				thankYouUserSelect.append(option);
+			}
+
+			thankYouUserSelect.trigger('change');
+		}
+	});
+</script>
