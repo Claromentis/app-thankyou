@@ -37,15 +37,19 @@
 		 * @param {object} item
 		 */
 		function updateThanksForm(item) {
-			$.extend({
+			console.log(item);
+
+			item = $.extend({
 				id: 0,
 				description: '',
 				users: {}
 			}, item);
 
+			console.log(item);
+
 			// Set ID and description
 			$('#thank_you_id').val(item.id);
-			$('#thank_you_description').text(item.description);
+			$('#thank_you_description').val(item.description);
 
 			// Clear and update users
 			var thankYouUserSelect = $('#thank_you_user');

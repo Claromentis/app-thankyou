@@ -43,6 +43,7 @@
 		requirejs(['jquery', '/intranet/js/jquery.validate.min.js'], function ($, validate) {
 			var modal = $('#thank_you_modal');
 
+			// Validate the modal form
 			modal.find('form').validate({
 				rules: {
 					thank_you_description: {
@@ -63,6 +64,13 @@
 				errorClass : 'text-error'
 			});
 
+			// Clear and show the modal if the thank you button is clicked
+			$('.js-thank-you-button').on('click', function () {
+				$('#thank_you_id').val(null);
+				$('#thank_you_user').val(null).trigger('change');
+				$('#thank_you_description').val(null);
+				$('#thank_you_modal').modal('show');
+			});
 		});
 	</script>
 </div>

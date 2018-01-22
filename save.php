@@ -12,9 +12,9 @@ if (gpc::IsSubmit())
 	$user_id = getvar('thank_you_user');
 	$description = getvar('thank_you_description');
 
-	if (is_scalar($user_id) && (int)$user_id > 0)
+	if (is_scalar($user_id) && (int) $user_id > 0)
 	{
-		$users_ids = array((int)$user_id);
+		$users_ids = array((int) $user_id);
 	} elseif (is_array($user_id))
 	{
 		$users_ids = intval_r($user_id);
@@ -51,15 +51,15 @@ if (gpc::IsSubmit())
 		$item->SetUsers($users_ids);
 		$item->Save();
 
-		$params = array(
-			'author' => AuthUser::I()->GetFullName(),
-			'other_people_number' => count($users_ids) - 1,
-			'description' => $description,
-		);
-
 		// Send a notification if this is a new thank you item
 		if ($is_new)
 		{
+			$params = array(
+				'author' => AuthUser::I()->GetFullName(),
+				'other_people_number' => count($users_ids) - 1,
+				'description' => $description,
+			);
+
 			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
 			NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, IMessage::TYPE_PEOPLE);
 		}
