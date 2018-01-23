@@ -44,6 +44,7 @@ class ThanksListView
 			}
 
 			$can_edit = (int) $context->GetUserId() === (int) $item->author;
+			$date_created = new Date($item->date_created);
 
 			$result[] = [
 				'users.datasrc' => $users_dsrc,
@@ -58,7 +59,8 @@ class ThanksListView
 				'edit_thanks_link.data-id' => $item->id,
 				'delete_thanks_link.data-id' => $item->id,
 
-				'date_created.body' => Carbon::instance(new Date($item->date_created))->diffForHumans()
+				'date_created.body' => Carbon::instance($date_created)->diffForHumans(),
+				'date_created.title' => $date_created->getDate(DATE_FORMAT_CLA_LONG_DATE)
 			];
 		}
 
