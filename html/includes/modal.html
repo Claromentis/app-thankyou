@@ -67,7 +67,7 @@
 			// Clear and show the modal if the thank you button is clicked
 			$('.js-thank-you-button').on('click', function () {
 				$('#thank_you_id').val(null);
-				$('#thank_you_user').val(null).trigger('change');
+				$('#thank_you_user').val(null).trigger('change').html(null);
 				$('#thank_you_description').val(null);
 				$('#thank_you_modal').modal('show');
 			});

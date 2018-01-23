@@ -21,11 +21,12 @@
 </ul>
 <script type="text/javascript">
 	requirejs(['jquery'], function ($) {
+		var thankYouList = $('.js-thank-you-list');
 		var modal = $('#thank_you_modal');
 		var deleteModal = $('#thank_you_delete_modal');
 
 		// Populate and show the modal when a note's edit button is clicked
-		$('.js-thank-you-list').on('click', '.js-edit-thanks', function () {
+		thankYouList.on('click', '.js-edit-thanks', function () {
 			var data = $(this).data();
 
 			$.ajax('/api/thankyou/v1/thanks/' + data.id, {
@@ -37,7 +38,7 @@
 		});
 
 		// Show the delete modal when a note's delete button is clicked
-		$('.js-thank-you-list').on('click', '.js-delete-thanks', function () {
+		thankYouList.on('click', '.js-delete-thanks', function () {
 			$('#delete_thank_you_id').val($(this).data('id'));
 			deleteModal.modal('show');
 		});
@@ -60,7 +61,7 @@
 
 			// Clear and update users
 			var thankYouUserSelect = $('#thank_you_user');
-			thankYouUserSelect.val(null).trigger('change');
+			thankYouUserSelect.val(null).trigger('change').html(null);
 
 			if (!item.users)
 				return;
