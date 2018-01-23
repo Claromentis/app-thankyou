@@ -3,7 +3,7 @@
     "description": "A component to say thanks to each other",
     "type": "claromentis-module-v7",
     "keywords": ["claromentis", "thankyou", "thanks"],
-    "license": "Claromentis License",
+    "license": "proprietary",
     "require": {
         "php": ">=5.6.0",
         "claromentis/installer-composer-plugin": "^1.2.3",
