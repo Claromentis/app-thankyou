@@ -8,6 +8,9 @@ if (gpc::IsSubmit())
 {
 	$ref = $_SERVER['HTTP_REFERER'];
 
+	if (!strlen($ref))
+		$ref = '/intranet/main/';
+
 	$id = getvar('thank_you_id');
 	$user_id = getvar('thank_you_user');
 	$description = getvar('thank_you_description');
@@ -20,14 +23,14 @@ if (gpc::IsSubmit())
 		$item->Load($id);
 
 		if (!$item->id)
-			httpRedirect($ref, 'Thank you note does not exist', true);
+			httpRedirect($ref, lmsg('thankyou.error.thanks_not_found'), true);
 
 		if ((int) $item->author !== (int) AuthUser::I()->GetId())
-			httpRedirect($ref, 'You do not have permission to delete this thank you note', true);
+			httpRedirect($ref, lmsg('thankyou.error.no_edit_permission'), true);
 
 		$repository->Delete($item);
 
-		httpRedirect($ref, 'Thank you note successfully deleted');
+		httpRedirect($ref, lmsg('thankyou.common.thanks_deleted'));
 	}
 
 	if (is_scalar($user_id) && (int) $user_id > 0)
@@ -58,10 +61,10 @@ if (gpc::IsSubmit())
 			$item->Load($id);
 
 			if (!$item->id)
-				httpRedirect($ref, 'Thank you note does not exist', true);
+				httpRedirect($ref, lmsg('thankyou.error.thanks_not_found'), true);
 
 			if ((int) $item->author !== (int) AuthUser::I()->GetId())
-				httpRedirect($ref, 'You do not have permission to edit this thank you note', true);
+				httpRedirect($ref, lmsg('thankyou.error.no_edit_permission'), true);
 
 			$item->SetDescription($description);
 		}
@@ -83,8 +86,5 @@ if (gpc::IsSubmit())
 		}
 	}
 }
-
-if (!strlen($ref))
-	$ref = '/intranet/main/';
 
 httpRedirect($ref);

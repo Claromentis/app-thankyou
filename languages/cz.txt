@@ -1,4 +1,5 @@
 .	.	.	cz
+lm	thankyou.common.thanks_deleted		
 lm	thankyou.component.cover_info.desc		
 lm	thankyou.component.cover_info.title		
 lm	thankyou.component.no_thanks_all		
@@ -9,6 +10,8 @@ lm	thankyou.component.options.show_button
 lm	thankyou.component.options.show_header		
 lm	thankyou.component.options.user_id		
 lm	thankyou.component_heading		
+lm	thankyou.error.no_edit_permission		
+lm	thankyou.error.thanks_not_found		
 lm	thankyou.user_profile.tab_name		
 lt	thankyou:component:delete_confirm.body		
 lt	thankyou:component:delete_thank_you.body		
