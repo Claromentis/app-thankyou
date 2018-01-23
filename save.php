@@ -12,6 +12,24 @@ if (gpc::IsSubmit())
 	$user_id = getvar('thank_you_user');
 	$description = getvar('thank_you_description');
 
+	$repository = new \Claromentis\ThankYou\ThanksRepository($db);
+
+	if (getvar('delete'))
+	{
+		$item = new \Claromentis\ThankYou\ThanksItem();
+		$item->Load($id);
+
+		if (!$item->id)
+			httpRedirect($ref, 'Thank you note does not exist', true);
+
+		if ((int) $item->author !== (int) AuthUser::I()->GetId())
+			httpRedirect($ref, 'You do not have permission to delete this thank you note', true);
+
+		$repository->Delete($item);
+
+		httpRedirect($ref, 'Thank you note successfully deleted');
+	}
+
 	if (is_scalar($user_id) && (int) $user_id > 0)
 	{
 		$users_ids = array((int) $user_id);
@@ -40,7 +58,7 @@ if (gpc::IsSubmit())
 			$item->Load($id);
 
 			if (!$item->id)
-				httpRedirect($ref, 'Thank you item does not exist', true);
+				httpRedirect($ref, 'Thank you note does not exist', true);
 
 			if ((int) $item->author !== (int) AuthUser::I()->GetId())
 				httpRedirect($ref, 'You do not have permission to edit this thank you note', true);

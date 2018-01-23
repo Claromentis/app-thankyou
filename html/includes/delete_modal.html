@@ -1,0 +1,19 @@
+<div id="thank_you_delete_modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form action="/intranet/thankyou/save.php" method="post" class="form-horizontal">
+				<input type="hidden" name="csrf_token" />
+				<input type="hidden" name="thank_you_id" id="delete_thank_you_id" />
+				<input type="hidden" name="delete" value="1" />
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 name="thankyou:component:delete_thank_you" class="modal-title">Delete thank you</h4>
+				</div>
+				<div class="modal-body">
+					<p><txt name="thankyou:component:delete_confirm">Are you sure you want to delete this thank you note?</txt></p>
+					<button type="submit" class="btn btn-danger">Delete</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

@@ -56,6 +56,7 @@ class ThanksListView
 
 				'edit_thanks.visible' => $can_edit,
 				'edit_thanks_link.data-id' => $item->id,
+				'delete_thanks_link.data-id' => $item->id,
 
 				'date_created.body' => Carbon::instance(new Date($item->date_created))->diffForHumans()
 			];

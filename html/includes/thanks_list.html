@@ -1,3 +1,5 @@
+<include file="delete_modal.html" />
+
 <ul name="items" datasrc="" class="list-unstyled thank-you js-thank-you-list">
 	<ifempty><li name="no_thanks">No thanks</li></ifempty>
 	<li>
@@ -9,6 +11,8 @@
 				<txt name="edit_thanks">
 					<a href="#" name="edit_thanks_link" class="js-edit-thanks" data-id="0">Edit</a>
 					&bull;
+					<a href="#" name="delete_thanks_link" class="js-delete-thanks" data-id="0">Delete</a>
+					&bull;
 				</txt>
 				<txt name="date_created"></txt>
 			</small>
@@ -18,6 +22,7 @@
 <script type="text/javascript">
 	requirejs(['jquery'], function ($) {
 		var modal = $('#thank_you_modal');
+		var deleteModal = $('#thank_you_delete_modal');
 
 		// Populate and show the modal when a note's edit button is clicked
 		$('.js-thank-you-list').on('click', '.js-edit-thanks', function () {
@@ -29,6 +34,12 @@
 					modal.modal('show');
 				}
 			});
+		});
+
+		// Show the delete modal when a note's delete button is clicked
+		$('.js-thank-you-list').on('click', '.js-delete-thanks', function () {
+			$('#delete_thank_you_id').val($(this).data('id'));
+			deleteModal.modal('show');
 		});
 
 		/**

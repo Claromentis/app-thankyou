@@ -112,12 +112,8 @@ class ThanksRepository
 			$qb->SetLimit($limit);
 		}, 'date_created DESC');
 
-		//foreach ($items as $item)
-		//{
-		//	/** @var ThanksItem $item */
-		//	$item->SetUsers([$user_id]);
-		//}
 		$this->PopulateUsers($items);
+
 		return $items;
 	}
 
@@ -133,5 +129,22 @@ class ThanksRepository
 		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_user WHERE user_id=int:uid", $user_id);
 
 		return $count;
+	}
+
+	/**
+	 * Delete the given thank you note and its user associations.
+	 *
+	 * @param ThanksItem $item
+	 */
+	public function Delete(ThanksItem $item)
+	{
+		$id = $item->id;
+
+		if (!$id)
+			return;
+
+		$item->Delete();
+
+		$this->db->query('DELETE FROM thankyou_user WHERE thanks_id = int:id', $id);
 	}
 }

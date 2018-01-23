@@ -10,6 +10,8 @@ lm	thankyou.component.options.show_header
 lm	thankyou.component.options.user_id		
 lm	thankyou.component_heading		
 lm	thankyou.user_profile.tab_name		
+lt	thankyou:component:delete_confirm.body		
+lt	thankyou:component:delete_thank_you.body		
 lt	thankyou:component:modal:close.body		
 lt	thankyou:component:modal:comment.body		
 lt	thankyou:component:modal:share.body		

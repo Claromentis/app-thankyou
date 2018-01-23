@@ -10,6 +10,8 @@ lm	thankyou.component.options.show_header		Show title
 lm	thankyou.component.options.user_id		User to show thanks for one user only
 lm	thankyou.component_heading		Thank you
 lm	thankyou.user_profile.tab_name		Thanks
+lt	thankyou:component:delete_confirm.body		Are you sure you want to delete this thank you note?
+lt	thankyou:component:delete_thank_you.body		Delete thank you
 lt	thankyou:component:modal:close.body		Close
 lt	thankyou:component:modal:comment.body		Comment
 lt	thankyou:component:modal:share.body		Submit
