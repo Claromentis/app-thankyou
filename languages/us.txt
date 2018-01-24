@@ -1,4 +1,6 @@
 .	.	.	us
+lm	thankyou.common.thank_you_note		
+lm	thankyou.common.thank_you_notes		
 lm	thankyou.common.thanks_deleted		
 lm	thankyou.component.cover_info.desc		
 lm	thankyou.component.cover_info.title		

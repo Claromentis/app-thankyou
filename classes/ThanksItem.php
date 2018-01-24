@@ -1,6 +1,6 @@
 <?php
-
 namespace Claromentis\ThankYou;
+
 use Claromentis\Core\Services;
 use ObjectsStorage;
 
@@ -14,7 +14,7 @@ use ObjectsStorage;
  */
 class ThanksItem extends \ActiveRecord
 {
-	const OBJECT_TYPE = 143;
+	const AGGREGATION = 143;
 
 	protected $users_ids = null;
 

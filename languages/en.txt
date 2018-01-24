@@ -1,4 +1,6 @@
 .	.	.	en
+lm	thankyou.common.thank_you_note		Thank you note
+lm	thankyou.common.thank_you_notes		Thank you notes
 lm	thankyou.common.thanks_deleted		Thank you note successfully deleted
 lm	thankyou.component.cover_info.desc		Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"
 lm	thankyou.component.cover_info.title		Thank you

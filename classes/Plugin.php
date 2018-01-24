@@ -82,10 +82,10 @@ class Plugin implements
 	public function RegisterAggregation(AggregationFilterEvent $event)
 	{
 		$event->GetConfig()->AddAggregation(
-			ThanksItem::OBJECT_TYPE,
+			ThanksItem::AGGREGATION,
 			'thanks',
-			__('Thank you note'),
-			__('Thank you notes')
+			lmsg('thankyou.common.thank_you_note'),
+			lmsg('thankyou.common.thank_you_notes')
 		);
 	}
 
