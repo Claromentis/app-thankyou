@@ -4,24 +4,30 @@
 	<ifempty><li name="no_thanks">No thanks</li></ifempty>
 	<li>
 		<txt name="thankyou:component:thankyou_users_name">Thank you</txt>
-		<datasrc name="users">	
-		<a name="user_link" rel="tooltip" data-placement="top" data-original-title="Firstname Surname" >
-			<img class="img-circle" name="profile_image" src="/appdata/people/1.jpg" alt="" style="width:32px">
-			<!-- <txt name="user_name">John Smith</txt></a><txt name="delimiter_visible">, </txt> -->
-		</a>	
+		<datasrc name="users">
+			<a name="user_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
+				<img class="img-circle user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+				<txt name="user_name">John Smith</txt><!--
+			--></a><!--
+			--><txt name="delimiter_visible">, </txt>
 		</datasrc>
 		<div class="row">
 			<div class="col-xs-12">
-		<txt name="has_description"><br/></txt>
-		<txt name="has_description"><p name="description" class="lead"></p></txt>
-
+				<txt name="has_description">
+					<p name="description"></p>
+				</txt>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-12 text-right">
 				<p>
-					<img class="img-circle" name="profile_image" src="/appdata/people/1.jpg" style="width:20px;">
-					<a name="author_link"><txt name="author_name"></txt></a></p>
+					<a name="author_link" class="no-decoration">
+						<img class="img-circle author-photo" name="profile_image" src="/appdata/people/no_photo.jpg">
+					</a>
+					<a name="author_link">
+						<txt name="author_name"></txt>
+					</a>
+				</p>
 			</div>
 		</div>
 		<div class="row">
@@ -32,13 +38,12 @@
 				<p class="text-muted Right">
 					<small>
 						<txt name="edit_thanks">
-							<a href="#" name="edit_thanks_link" class="js-edit-thanks" data-id="0" rel="tooltip" data-original-title="Edit" >
-								<span class="glyphicons glyphicons-pencil"></span>
-								<!-- <txt name="thankyou:component:edit">Edit</txt>--></a>
-							
-							<a href="#" name="delete_thanks_link" class="js-delete-thanks" data-id="0" rel="tooltip" data-original-title="Delete">
+							<a href="#" name="edit_thanks_link" class="no-decoration js-edit-thanks" data-id="0" rel="tooltip" title="Edit">
+								<span class="glyphicons glyphicons-pencil" rel="tooltip" title=""></span>
+							</a>
+							<a href="#" name="delete_thanks_link" class="no-decoration js-delete-thanks" data-id="0" rel="tooltip" title="Delete">
 								<span class="glyphicons glyphicons-bin"></span>
-								<!-- <txt name="thankyou:component:delete">Delete</txt>--></a>
+							</a>
 							&bull;
 						</txt>
 						<span rel="tooltip" data-placement="bottom" title="" name="date_created">2 days ago</span>

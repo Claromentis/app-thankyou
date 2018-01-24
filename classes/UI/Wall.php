@@ -6,7 +6,6 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThanksRepository;
 use Claromentis\ThankYou\View\ThanksListView;
-use Exception;
 
 /**
  * Component displays list of recent thanks for a particular user and allows submitting a new one.
@@ -18,6 +17,13 @@ use Exception;
 class Wall extends TemplaterComponentTmpl
 {
 	/**
+	 * @var array
+	 */
+	protected $default_attributes = [
+		'profile_images' => false
+	];
+
+	/**
 	 * Show the thanks wall.
 	 *
 	 * @param array $attributes
@@ -26,12 +32,15 @@ class Wall extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app)
 	{
+		$attributes = array_merge($this->default_attributes, $attributes);
 		$args = array();
 
-		/** @var ThanksRepository $repository */
+		/**
+		 * @var ThanksRepository $repository
+		 */
 		$repository = $app['thankyou.repository'];
 
-		$user_id = (int)$attributes['user_id'];
+		$user_id = (int) $attributes['user_id'];
 
 		if (!$user_id)
 			return "No user ID given";
@@ -47,7 +56,7 @@ class Wall extends TemplaterComponentTmpl
 		 * @var ThanksListView $view
 		 */
 		$view = $app['thankyou.thanks_list_view'];
-		$args['items.datasrc'] = $view->Show($thanks);
+		$args['items.datasrc'] = $view->Show($thanks, $attributes);
 
 		if (isset($attributes['allow_new']) && !(bool)$attributes['allow_new'])
 		{

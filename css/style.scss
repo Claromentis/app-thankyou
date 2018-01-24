@@ -1,39 +1,50 @@
-//
-// Thank you
-//
-
 .thank-you {
+  margin: 10px;
 
-    margin: 10px;
+  li {
+    background: rgb(246, 246, 247);
+    padding: 10px;
+    list-style: none;
+    margin-top: 10px;
+  }
 
-    li {
-        background: rgb(246, 246, 247);
-        padding: 10px;
-        list-style: none;
-        margin-top: 10px;
-    }
+  .no-decoration:hover {
+    text-decoration: none;
+  }
+
+  .user-photo {
+    width: 32px;
+  }
+
+  .author-photo {
+    width: 20px;
+  }
 }
 
 .panel .panel-heading .btn.pull-right.thank-you--button {
-    position: absolute;
-    right: 23px;
-    top: 14px;
+  position: absolute;
+  right: 23px;
+  top: 14px;
 }
 
 .thank-you-link-inline {
-	text-align: right;
-	padding: 8px 10px 0 0;
-	font-weight: bold;
+  text-align: right;
+  padding: 8px 10px 0 0;
+  font-weight: bold;
 }
 
-// 1 narrow column 
+.thank-you {
+
+}
+
+// 1 narrow column
 @element ".tile-thank-you" and (max-width: 280px) {
-    eq_this {
-		.panel .panel-heading .btn.pull-right.thank-you--button {
-					width: 70px;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-				}
-  	  		}
+  eq_this {
+    .panel .panel-heading .btn.pull-right.thank-you--button {
+      width: 70px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }

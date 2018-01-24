@@ -8,6 +8,7 @@ lm	thankyou.component.no_thanks_all
 lm	thankyou.component.no_thanks_user		
 lm	thankyou.component.options.custom_title		
 lm	thankyou.component.options.num_items		
+lm	thankyou.component.options.profile_images		
 lm	thankyou.component.options.show_button		
 lm	thankyou.component.options.show_header		
 lm	thankyou.component.options.user_id		

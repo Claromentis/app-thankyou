@@ -36,6 +36,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			'title' => ['type' => 'string', 'title' => lmsg('thankyou.component.options.custom_title'), 'default' => '', 'placeholder' => lmsg('thankyou.component_heading')],
 			'show_header' => ['type' => 'bool', 'title' => lmsg('thankyou.component.options.show_header'), 'default' => true, 'mutate_on_change' => true],
 			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => lmsg('thankyou.component.options.show_button')],
+			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => lmsg('thankyou.component.options.profile_images')],
 			'limit' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50],
 			'user_id' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
 		];
@@ -69,7 +70,9 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		 * @var ThanksListView $view
 		 */
 		$view = $app['thankyou.thanks_list_view'];
-		$args['items.datasrc'] = $view->Show($thanks);
+		$args['items.datasrc'] = $view->Show($thanks, [
+			'profile_images' => $options->Get('profile_images')
+		], $app->security);
 
 		if (count($args['items.datasrc']) === 0)
 		{
