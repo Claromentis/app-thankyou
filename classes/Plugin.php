@@ -1,6 +1,7 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use Claromentis\Core\Aggregation\AggregationFilterEvent;
 use Claromentis\Core\Application;
 use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\REST\RestServiceInterface;
@@ -10,12 +11,19 @@ use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Silex\Api\BootableProviderInterface;
+use Silex\Api\EventListenerProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  *
  * @author Alexander Polyanskikh
  */
-class Plugin implements TemplaterComponent, ServiceProviderInterface, RestServiceInterface, BootableProviderInterface
+class Plugin implements
+	TemplaterComponent,
+	ServiceProviderInterface,
+	RestServiceInterface,
+	BootableProviderInterface,
+	EventListenerProviderInterface
 {
 	/**
 	 * Registers services on the given container.
@@ -66,6 +74,31 @@ class Plugin implements TemplaterComponent, ServiceProviderInterface, RestServic
 		$app->registerRestService($this);
 	}
 
+	/**
+	 * Register the module's aggregation via an aggregation filter event.
+	 *
+	 * @param AggregationFilterEvent $event
+	 */
+	public function RegisterAggregation(AggregationFilterEvent $event)
+	{
+		$event->GetConfig()->AddAggregation(
+			ThanksItem::OBJECT_TYPE,
+			'thanks',
+			__('Thank you note'),
+			__('Thank you notes')
+		);
+	}
+
+	/**
+	 * Register the module's event listeners.
+	 *
+	 * @param Container $app
+	 * @param EventDispatcherInterface $dispatcher
+	 */
+	public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
+	{
+		$dispatcher->addListener('core.aggregations_filter', [$this, 'RegisterAggregation']);
+	}
 
 	/**
 	 * User profile hooks.

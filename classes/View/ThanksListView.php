@@ -55,6 +55,8 @@ class ThanksListView
 				'description.body_html' => \ClaText::ProcessPlain($item->description),
 				'has_description.visible' => strlen(trim($item->description)) > 0,
 
+				'like_component.object_id' => $item->id,
+
 				'edit_thanks.visible' => $can_edit,
 				'edit_thanks_link.data-id' => $item->id,
 				'delete_thanks_link.data-id' => $item->id,

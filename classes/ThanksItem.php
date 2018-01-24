@@ -14,6 +14,8 @@ use ObjectsStorage;
  */
 class ThanksItem extends \ActiveRecord
 {
+	const OBJECT_TYPE = 143;
+
 	protected $users_ids = null;
 
 	public function InitDbMapping(ObjectsStorage $storage)

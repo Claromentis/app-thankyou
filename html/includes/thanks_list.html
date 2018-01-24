@@ -5,18 +5,29 @@
 	<li>
 		<txt name="thankyou:component:thankyou_users_name">Thank you</txt> <datasrc name="users"><a name="user_link"><txt name="user_name">John Smith</txt></a><txt name="delimiter_visible">, </txt></datasrc><txt name="has_description">:</txt>
 		<txt name="has_description"><p name="description"></p></txt>
-		<p class="Right">&mdash; <a name="author_link"><txt name="author_name"></txt></a></p>
-		<p class="text-muted Right">
-			<small>
-				<txt name="edit_thanks">
-					<a href="#" name="edit_thanks_link" class="js-edit-thanks" data-id="0"><txt name="thankyou:component:edit">Edit</txt></a>
-					&bull;
-					<a href="#" name="delete_thanks_link" class="js-delete-thanks" data-id="0"><txt name="thankyou:component:delete">Delete</txt></a>
-					&bull;
-				</txt>
-				<span rel="tooltip" data-placement="bottom" title="" name="date_created"></span>
-			</small>
-		</p>
+		<div class="row">
+			<div class="col-xs-12">
+				<p class="Right">&mdash; <a name="author_link"><txt name="author_name"></txt></a></p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-6">
+				<component name="like_component" class_key="like_it" object_type="thanks" object_id=""/>
+			</div>
+			<div class="col-xs-6 text-small">
+				<p class="text-muted Right">
+					<small>
+						<txt name="edit_thanks">
+							<a href="#" name="edit_thanks_link" class="js-edit-thanks" data-id="0"><txt name="thankyou:component:edit">Edit</txt></a>
+							&bull;
+							<a href="#" name="delete_thanks_link" class="js-delete-thanks" data-id="0"><txt name="thankyou:component:delete">Delete</txt></a>
+							&bull;
+						</txt>
+						<span rel="tooltip" data-placement="bottom" title="" name="date_created">2 days ago</span>
+					</small>
+				</p>
+			</div>
+		</div>
 	</li>
 </ul>
 <script type="text/javascript">
