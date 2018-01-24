@@ -40,7 +40,7 @@ class Wall extends TemplaterComponentTmpl
 		 */
 		$repository = $app['thankyou.repository'];
 
-		$user_id = (int) $attributes['user_id'];
+		$user_id = isset($attributes['user_id']) ? (int) $attributes['user_id'] : 0;
 
 		if (!$user_id)
 			return "No user ID given";

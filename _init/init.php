@@ -7,3 +7,6 @@ if (!isset($installer))
 /** @var $installer Claromentis\Setup\SetupFacade */
 
 $installer->GetPluginsRepository()->Add("thankyou", 'Claromentis\ThankYou\Plugin');
+
+$panels = $installer->GetAdminPanelCreator();
+$panels->Enable('thankyou');

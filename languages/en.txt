@@ -1,4 +1,5 @@
 .	.	.	en
+lm	thankyou.app_name		Thank you
 lm	thankyou.common.thank_you_note		Thank you note
 lm	thankyou.common.thank_you_notes		Thank you notes
 lm	thankyou.common.thanks_deleted		Thank you note successfully deleted
@@ -16,6 +17,7 @@ lm	thankyou.component_heading		Thank you
 lm	thankyou.error.no_edit_permission		You do not have permission to modify this thank you note
 lm	thankyou.error.thanks_not_found		Thank you note does not exist
 lm	thankyou.user_profile.tab_name		Thanks
+lt	thankyou:admin:breadcrumb	$lm['thankyou.app_name']	
 lt	thankyou:component:delete.body		Delete
 lt	thankyou:component:delete_confirm.body		Are you sure you want to delete this thank you note?
 lt	thankyou:component:delete_thank_you.body		Delete thank you

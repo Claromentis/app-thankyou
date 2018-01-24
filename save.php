@@ -4,6 +4,8 @@ require_once("../common/sessioncheck.php");
 require_once("../common/core.php");
 require_once("../common/connect.php");
 
+global $g_application;
+
 if (gpc::IsSubmit())
 {
 	$ref = $_SERVER['HTTP_REFERER'];
@@ -15,7 +17,13 @@ if (gpc::IsSubmit())
 	$user_id = getvar('thank_you_user');
 	$description = getvar('thank_you_description');
 
-	$repository = new \Claromentis\ThankYou\ThanksRepository($db);
+	/**
+	 * @var \Claromentis\Core\Admin\AdminPanel $panel
+	 */
+	$panel = $g_application['admin.panels_list']->GetOne('thankyou');
+	$repository = new \Claromentis\ThankYou\ThanksRepository($g_application->db);
+
+	$is_admin = $panel->IsAccessible($g_application->security);
 
 	if (getvar('delete'))
 	{
@@ -25,7 +33,7 @@ if (gpc::IsSubmit())
 		if (!$item->id)
 			httpRedirect($ref, lmsg('thankyou.error.thanks_not_found'), true);
 
-		if ((int) $item->author !== (int) AuthUser::I()->GetId())
+		if ((int) $item->author !== (int) AuthUser::I()->GetId() && !$is_admin)
 			httpRedirect($ref, lmsg('thankyou.error.no_edit_permission'), true);
 
 		$repository->Delete($item);
@@ -63,7 +71,7 @@ if (gpc::IsSubmit())
 			if (!$item->id)
 				httpRedirect($ref, lmsg('thankyou.error.thanks_not_found'), true);
 
-			if ((int) $item->author !== (int) AuthUser::I()->GetId())
+			if ((int) $item->author !== (int) AuthUser::I()->GetId() && !$is_admin)
 				httpRedirect($ref, lmsg('thankyou.error.no_edit_permission'), true);
 
 			$item->SetDescription($description);

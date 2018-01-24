@@ -3,6 +3,7 @@ namespace Claromentis\ThankYou\View;
 
 use AuthUser;
 use Carbon\Carbon;
+use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\ThanksItem;
 use ClaText;
@@ -15,17 +16,34 @@ use User;
 class ThanksListView
 {
 	/**
+	 * @var AdminPanel
+	 */
+	protected $panel;
+
+	/**
 	 * @var array
 	 */
 	protected $default_options = [
+		'admin' => false,
 		'profile_images' => false
 	];
+
+	/**
+	 * Create a new list view for thank you notes.
+	 *
+	 * @param AdminPanel $panel
+	 */
+	public function __construct(AdminPanel $panel)
+	{
+		$this->panel = $panel;
+	}
 
 	/**
 	 * Build a datasource for the given thanks items.
 	 *
 	 * Options:
 	 *   'profile_images' - Show profile images instead of names for thanked users
+	 *   'admin'          - Allow users with admin panel access to edit/delete all thank you notes
 	 *
 	 * @param ThanksItem[] $thanks
 	 * @param array $options [optional]
@@ -36,6 +54,7 @@ class ThanksListView
 	{
 		$options = array_merge($this->default_options, $options);
 		$context = $context ?: AuthUser::I()->GetContext();
+		$is_admin = $this->panel->IsAccessible($context);
 
 		$result = [];
 
@@ -65,7 +84,8 @@ class ThanksListView
 				$users_dsrc[count($users_dsrc) - 1]['delimiter_visible.visible'] = 0;
 			}
 
-			$can_edit = (int) $context->GetUserId() === (int) $item->author;
+			$is_author = (int) $context->GetUserId() === (int) $item->author;
+			$can_edit =  $is_author || ($options['admin'] && $is_admin);
 			$date_created = new Date($item->date_created);
 
 			$result[] = [

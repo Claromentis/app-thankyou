@@ -1,6 +1,6 @@
 <?php
-
 namespace Claromentis\ThankYou\UI;
+
 use Claromentis\Core\Application;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\ThanksRepository;
@@ -9,9 +9,7 @@ use Claromentis\ThankYou\View\ThanksListView;
 /**
  * Component displays list of recent thanks and allows submitting a new one.
  *
- * <component class="\Claromentis\ThankYou\UI\Say" allow_new="1" limit="10">
- *
- * @author Alexander Polyanskikh
+ * <component class="\Claromentis\ThankYou\UI\Say" allow_new="1" limit="10" admin="0">
  */
 class Say extends TemplaterComponentTmpl
 {
@@ -28,7 +26,7 @@ class Say extends TemplaterComponentTmpl
 		 * @var ThanksListView $view
 		 */
 		$view = $app['thankyou.thanks_list_view'];
-		$args['items.datasrc'] = $view->Show($thanks);
+		$args['items.datasrc'] = $view->Show($thanks, $attributes);
 
 		if (isset($attributes['allow_new']) && !(bool)$attributes['allow_new'])
 		{
@@ -37,7 +35,6 @@ class Say extends TemplaterComponentTmpl
 
 		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_all');
 
-		$template = 'thankyou/say.html';
-		return $this->CallTemplater($template, $args);
+		return $this->CallTemplater('thankyou/say.html', $args);
 	}
 }

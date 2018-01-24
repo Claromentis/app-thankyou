@@ -2,7 +2,7 @@
 
 <ul name="items" datasrc="" class="list-unstyled thank-you js-thank-you-list">
 	<ifempty><li name="no_thanks">No thanks</li></ifempty>
-	<li>
+	<li class="thank-you-note">
 		<txt name="thankyou:component:thankyou_users_name">Thank you</txt>
 		<datasrc name="users">
 			<a name="user_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
@@ -35,7 +35,7 @@
 				<component name="like_component" class_key="like_it" object_type="thanks" object_id=""/>
 			</div>
 			<div class="col-xs-6">
-				<p class="text-muted Right">
+				<p class="text-muted text-right">
 					<txt name="edit_thanks">
 						<a href="#" name="edit_thanks_link" class="no-decoration js-edit-thanks" data-id="0" rel="tooltip" title="Edit">
 							<span class="glyphicons glyphicons-pencil" rel="tooltip" title=""></span>

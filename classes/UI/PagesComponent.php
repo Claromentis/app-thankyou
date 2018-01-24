@@ -77,6 +77,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		if (count($args['items.datasrc']) === 0)
 		{
 			$msg = lmsg('thankyou.component.no_thanks_all');
+
 			if ($user_id)
 				$msg = lmsg('thankyou.component.no_thanks_user', \User::GetNameById($user_id));
 

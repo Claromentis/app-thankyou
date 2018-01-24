@@ -1,15 +1,17 @@
 .thank-you {
   margin: 10px;
 
-  li {
+  li.thank-you-note {
     background: rgb(246, 246, 247);
     padding: 10px;
     list-style: none;
     margin-top: 10px;
   }
 
-  .no-decoration:hover {
-    text-decoration: none;
+  .no-decoration {
+    &:hover, &:focus {
+      text-decoration: none;
+    }
   }
 
   .user-photo {

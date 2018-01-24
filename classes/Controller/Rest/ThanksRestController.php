@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * A rest controller for thank you items.
  */
-class ThanksController
+class ThanksRestController
 {
 	/**
 	 * @var ThanksRepository
