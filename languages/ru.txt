@@ -17,7 +17,10 @@ lm	thankyou.component_heading
 lm	thankyou.error.no_edit_permission		
 lm	thankyou.error.thanks_not_found		
 lm	thankyou.user_profile.tab_name		
-lt	thankyou:admin:breadcrumb	$lm['thankyou.app_name']	
+lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
+lt	thankyou:admin:export_csv.body		
+lt	thankyou:admin:menu:notes.body		
+lt	thankyou:admin:notes_heading.body		
 lt	thankyou:component:delete.body		
 lt	thankyou:component:delete_confirm.body		
 lt	thankyou:component:delete_thank_you.body		

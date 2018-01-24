@@ -6,6 +6,7 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThanksRepository;
 use Claromentis\ThankYou\View\ThanksListView;
+use User;
 
 /**
  * Component displays list of recent thanks for a particular user and allows submitting a new one.
@@ -20,7 +21,10 @@ class Wall extends TemplaterComponentTmpl
 	 * @var array
 	 */
 	protected $default_attributes = [
-		'profile_images' => false
+		'admin' => false,
+		'profile_images' => false,
+		'limit' => 10,
+		'user_id' => 0
 	];
 
 	/**
@@ -40,12 +44,12 @@ class Wall extends TemplaterComponentTmpl
 		 */
 		$repository = $app['thankyou.repository'];
 
-		$user_id = isset($attributes['user_id']) ? (int) $attributes['user_id'] : 0;
+		$user_id = (int) $attributes['user_id'];
 
 		if (!$user_id)
 			return "No user ID given";
 
-		$limit = isset($attributes['limit']) ? (int) $attributes['limit'] : 10;
+		$limit = (int) $attributes['limit'];
 
 		/**
 		 * @var ThanksItem[] $thanks
@@ -56,9 +60,9 @@ class Wall extends TemplaterComponentTmpl
 		 * @var ThanksListView $view
 		 */
 		$view = $app['thankyou.thanks_list_view'];
-		$args['items.datasrc'] = $view->Show($thanks, $attributes);
+		$args['items.datasrc'] = $view->Show($thanks, $attributes, $app->security);
 
-		if (isset($attributes['allow_new']) && !(bool)$attributes['allow_new'])
+		if (isset($attributes['allow_new']) && !(bool) $attributes['allow_new'])
 		{
 			$args['allow_new.visible'] = 0;
 		} else
@@ -66,9 +70,8 @@ class Wall extends TemplaterComponentTmpl
 			$args = $view->ShowAddNew($user_id) + $args;
 		}
 
-		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_user', \User::GetNameById($user_id));
+		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_user', User::GetNameById($user_id));
 
-		$template = 'thankyou/wall.html';
-		return $this->CallTemplater($template, $args);
+		return $this->CallTemplater('thankyou/wall.html', $args);
 	}
 }

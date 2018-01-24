@@ -13,6 +13,11 @@ use Claromentis\ThankYou\View\ThanksListView;
  */
 class Say extends TemplaterComponentTmpl
 {
+	/**
+	 * @param $attributes
+	 * @param Application $app
+	 * @return string
+	 */
 	public function Show($attributes, Application $app)
 	{
 		$args = array();
@@ -20,15 +25,15 @@ class Say extends TemplaterComponentTmpl
 		/** @var ThanksRepository $repository */
 		$repository = $app['thankyou.repository'];
 
-		$thanks = $repository->GetRecent(isset($attributes['limit']) ? (int)$attributes['limit'] : 10);
+		$thanks = $repository->GetRecent(isset($attributes['limit']) ? (int) $attributes['limit'] : 10);
 
 		/**
 		 * @var ThanksListView $view
 		 */
 		$view = $app['thankyou.thanks_list_view'];
-		$args['items.datasrc'] = $view->Show($thanks, $attributes);
+		$args['items.datasrc'] = $view->Show($thanks, $attributes, $app->security);
 
-		if (isset($attributes['allow_new']) && !(bool)$attributes['allow_new'])
+		if (isset($attributes['allow_new']) && !(bool) $attributes['allow_new'])
 		{
 			$args['allow_new.visible'] = 0;
 		}
