@@ -1,11 +1,22 @@
 .thank-you {
   margin: 10px;
-
-  li.thank-you-note {
-    background: rgb(246, 246, 247);
+  .thank-you-item {
+		list-style: none;
+		margin-top: 10px;
+  	&:not(:first-of-type){
+		margin-top:20px;
+  	}
+  }
+  .thank-you-note {
+    background: #f8f8f8;
     padding: 10px;
-    list-style: none;
-    margin-top: 10px;
+  }
+  
+  .thank-you-meta {
+  	margin-top: 5px;
+      .author-photo {
+        width: 40px;
+      }
   }
 
   .no-decoration {
@@ -16,10 +27,6 @@
 
   .user-photo {
     width: 32px;
-  }
-
-  .author-photo {
-    width: 20px;
   }
   
   .js-like-component {
@@ -35,6 +42,9 @@
         width: 12px;
       }
     }
+	.edit-tools {
+		display:block;
+	}
 }
 
 .panel .panel-heading .btn.pull-right.thank-you--button {
