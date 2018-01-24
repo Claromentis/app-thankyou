@@ -21,6 +21,20 @@
   .author-photo {
     width: 20px;
   }
+  
+  .js-like-component {
+      display: inline-block;
+      .liked.liked {
+        border-right: 1px solid #b9b9b9;
+        margin-right: 3px;
+        padding-right: 6px;
+        display: inline-block;
+      }
+
+      .glyphicons.glyphicons-thumbs-up {
+        width: 12px;
+      }
+    }
 }
 
 .panel .panel-heading .btn.pull-right.thank-you--button {
@@ -33,10 +47,6 @@
   text-align: right;
   padding: 8px 10px 0 0;
   font-weight: bold;
-}
-
-.thank-you {
-
 }
 
 // 1 narrow column
