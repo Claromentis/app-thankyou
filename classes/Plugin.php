@@ -121,9 +121,13 @@ class Plugin implements
 	public function GetRoutes(Application $app)
 	{
 		return [
-			'/thankyou' => function (ControllerCollection $routes) {
-				$routes->get('/admin/', 'thankyou.admin_controller:ShowNotesPanel');
-				$routes->get('/admin/csv', 'thankyou.admin_controller:ExportCsv');
+			'/thankyou' => function (ControllerCollection $routes) use ($app) {
+				$routes->get('/admin/', function () use ($app) {
+					return $app->redirect('/thankyou/admin/notes');
+				});
+				$routes->get('/admin/notes', 'thankyou.admin_controller:ShowNotesPanel');
+				$routes->get('/admin/export', 'thankyou.admin_controller:ShowExportPanel');
+				$routes->post('/admin/export', 'thankyou.admin_controller:ExportCsv');
 			}
 		];
 	}

@@ -7,6 +7,7 @@ use Claromentis\Core\Http\gpc;
 use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\ThankYou\ThanksRepository;
 use Date;
+use DateInterval;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\HttpFoundation\Response;
 use User;
@@ -31,6 +32,25 @@ class AdminController
 	}
 
 	/**
+	 * Show the export panel.
+	 *
+	 * @param Application $app
+	 * @param Request $request
+	 * @return TemplaterCallResponse
+	 */
+	public function ShowExportPanel(Application $app, Request $request)
+	{
+		$start_date = new Date();
+		$start_date->sub(new DateInterval('P1Y'));
+
+		$arguments = [
+			'start_date.value' => $start_date->getDate(DATE_FORMAT_CLA_DATETIME)
+		];
+
+		return new TemplaterCallResponse('thankyou/admin/export.html', $arguments, lmsg('thankyou.app_name'));
+	}
+
+	/**
 	 * Export the thank you notes in the given date range as a CSV file.
 	 *
 	 * @param Application $app
@@ -48,7 +68,10 @@ class AdminController
 		$repository = $app['thankyou.repository'];
 
 		// Get the thank you notes after the given date
-		$start_date = new Date(gpc::get($request, 'from'));
+		$start_date = Date::CreateFrom(gpc::get($request, 'start_date'));
+
+		if (!$start_date)
+			throw new \InvalidArgumentException('Invalid start date');
 
 		$thanks = $repository->GetByDate($start_date);
 
