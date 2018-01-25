@@ -51,7 +51,7 @@ class AdminController
 
 		$arguments = [
 			'nav_export.+class' => 'active',
-			'start_date.value' => $start_date->getDate(DATE_FORMAT_CLA_DATETIME)
+			'start_date.value' => $start_date->getDate(DATE_FORMAT_CLA_SHORT_DATE)
 		];
 
 		return new TemplaterCallResponse('thankyou/admin/export.html', $arguments, lmsg('thankyou.app_name'));
