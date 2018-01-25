@@ -14,18 +14,29 @@ use Claromentis\ThankYou\View\ThanksListView;
 class Say extends TemplaterComponentTmpl
 {
 	/**
+	 * @var array
+	 */
+	protected $default_attributes = [
+		'admin' => false,
+		'profile_images' => false,
+		'limit' => 10,
+		'user_id' => 0
+	];
+
+	/**
 	 * @param $attributes
 	 * @param Application $app
 	 * @return string
 	 */
 	public function Show($attributes, Application $app)
 	{
+		$attributes = array_merge($this->default_attributes, $attributes);
 		$args = array();
 
 		/** @var ThanksRepository $repository */
 		$repository = $app['thankyou.repository'];
 
-		$thanks = $repository->GetRecent(isset($attributes['limit']) ? (int) $attributes['limit'] : 10);
+		$thanks = $repository->GetRecent($attributes['limit']);
 
 		/**
 		 * @var ThanksListView $view

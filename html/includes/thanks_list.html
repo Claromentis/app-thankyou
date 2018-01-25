@@ -1,5 +1,5 @@
 <include file="delete_modal.html" />
-<div class="panel-body">
+<div name="list_panel" class="panel-body">
 	<ul name="items" datasrc="" class="list-unstyled thank-you js-thank-you-list">
 	<ifempty><li name="no_thanks">No thanks</li></ifempty>
 	<li class="thank-you-item">
@@ -38,18 +38,18 @@
 				</div>
 			</div>
 		</div>
-		<div class="thank-you-meta">	
+		<div class="thank-you-meta">
 			<div class="media">
-		        <div class="media-body">
+			<div class="media-body">
 					<a name="author_link"><txt name="author_name"></txt></a>
 					<br>
-		            <small rel="tooltip" class="text-muted" data-placement="left" title="" name="date_created">2 days ago</small>
-		        </div>
-		        <div class="media-right">
+					<small rel="tooltip" class="text-muted" data-placement="left" title="" name="date_created">2 days ago</small>
+				</div>
+				<div class="media-right">
 					<a name="author_link" class="no-decoration">
 						<img class="img-circle author-photo" name="profile_image" src="/appdata/people/no_photo.jpg">
 					</a>
-		        </div>
+				</div>
 			</div>	
 		</div>
 	</li>

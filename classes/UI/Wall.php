@@ -11,7 +11,7 @@ use User;
 /**
  * Component displays list of recent thanks for a particular user and allows submitting a new one.
  *
- * <component class="\Claromentis\ThankYou\UI\Wall" allow_new="1" user_id="123" limit="10">
+ * <component class="\Claromentis\ThankYou\UI\Wall" allow_new="1" user_id="123" limit="10" admin="0">
  *
  * @author Alexander Polyanskikh
  */
