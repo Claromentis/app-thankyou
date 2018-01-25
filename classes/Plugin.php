@@ -123,9 +123,9 @@ class Plugin implements
 		return [
 			'/thankyou' => function (ControllerCollection $routes) use ($app) {
 				$routes->get('/admin/', function () use ($app) {
-					return $app->redirect('/thankyou/admin/notes');
+					return $app->redirect('/thankyou/admin/messages');
 				});
-				$routes->get('/admin/notes', 'thankyou.admin_controller:ShowNotesPanel');
+				$routes->get('/admin/messages', 'thankyou.admin_controller:ShowMessagesPanel');
 				$routes->get('/admin/export', 'thankyou.admin_controller:ShowExportPanel');
 				$routes->post('/admin/export', 'thankyou.admin_controller:ExportCsv');
 			}
@@ -159,8 +159,8 @@ class Plugin implements
 		$event->GetConfig()->AddAggregation(
 			ThanksItem::AGGREGATION,
 			'thanks',
-			lmsg('thankyou.common.thank_you_note'),
-			lmsg('thankyou.common.thank_you_notes')
+			lmsg('thankyou.common.thank_you_message'),
+			lmsg('thankyou.common.thank_you_messages')
 		);
 	}
 

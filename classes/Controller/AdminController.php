@@ -8,6 +8,8 @@ use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\ThankYou\ThanksRepository;
 use Date;
 use DateInterval;
+use Exception;
+use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\HttpFoundation\Response;
 use User;
@@ -18,32 +20,37 @@ use User;
 class AdminController
 {
 	/**
-	 * Show the admin panel.
+	 * Show the messages admin panel.
 	 *
 	 * @param Application $app
 	 * @param Request $request
 	 * @return TemplaterCallResponse
 	 */
-	public function ShowNotesPanel(Application $app, Request $request)
+	public function ShowMessagesPanel(Application $app, Request $request)
 	{
-		$arguments = [];
+		$arguments = [
+			'nav_messages.+class' => 'active'
+		];
 
 		return new TemplaterCallResponse('thankyou/admin/admin.html', $arguments, lmsg('thankyou.app_name'));
 	}
 
 	/**
-	 * Show the export panel.
+	 * Show the export admin panel.
 	 *
 	 * @param Application $app
 	 * @param Request $request
 	 * @return TemplaterCallResponse
+	 * @throws Exception
 	 */
 	public function ShowExportPanel(Application $app, Request $request)
 	{
+		// Set the initial start date to 1 year ago
 		$start_date = new Date();
 		$start_date->sub(new DateInterval('P1Y'));
 
 		$arguments = [
+			'nav_export.+class' => 'active',
 			'start_date.value' => $start_date->getDate(DATE_FORMAT_CLA_DATETIME)
 		];
 
@@ -58,7 +65,7 @@ class AdminController
 	 * @return Response
 	 * @throws \Claromentis\Core\Csv\Exception\FilesystemException
 	 * @throws \Claromentis\Core\Csv\Exception\NoDataException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function ExportCsv(Application $app, Request $request)
 	{
@@ -67,13 +74,15 @@ class AdminController
 		 */
 		$repository = $app['thankyou.repository'];
 
-		// Get the thank you notes after the given date
+		// Get the thank you notes within the given date range
 		$start_date = Date::CreateFrom(gpc::get($request, 'start_date'));
 
 		if (!$start_date)
-			throw new \InvalidArgumentException('Invalid start date');
+			throw new InvalidArgumentException('Invalid start date');
 
-		$thanks = $repository->GetByDate($start_date);
+		$end_date = Date::CreateFrom(gpc::get($request, 'end_date')) ?: null;
+
+		$thanks = $repository->GetByDate($start_date, $end_date);
 
 		// Process them into an array of values for the CSV
 		$thanks_array = [];
