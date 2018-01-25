@@ -1,6 +1,6 @@
 <include file="delete_modal.html" />
-
-<ul name="items" datasrc="" class="list-unstyled thank-you js-thank-you-list">
+<div class="panel-body">
+	<ul name="items" datasrc="" class="list-unstyled thank-you js-thank-you-list">
 	<ifempty><li name="no_thanks">No thanks</li></ifempty>
 	<li class="thank-you-item">
 		<div class="thank-you-note">
@@ -56,6 +56,7 @@
 		</div>
 	</li>
 </ul>
+</div>
 <script type="text/javascript">
 	requirejs(['jquery'], function ($) {
 		var thankYouList = $('.js-thank-you-list');
