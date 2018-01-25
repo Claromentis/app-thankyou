@@ -2,6 +2,7 @@
 namespace Claromentis\ThankYou;
 
 use Claromentis\Core\DAL;
+use Date;
 use Exception;
 use ObjectsStorage;
 
@@ -60,6 +61,33 @@ class ThanksRepository
 		/** @var ThanksItem[] $items */
 		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), '', 'date_created DESC', $limit);
 		$this->PopulateUsers($items);
+		return $items;
+	}
+
+	/**
+	 * Gets thank you items between a given date range.
+	 *
+	 * If an end date is not provided, the current date is used in its place.
+	 *
+	 * @param Date $start_date
+	 * @param Date $end_date [optional]
+	 * @return ThanksItem[]
+	 * @throws Exception
+	 */
+	public function GetByDate(Date $start_date, Date $end_date = null)
+	{
+		if (!$end_date)
+			$end_date = new Date();
+
+		$filter = new DAL\QueryPart('date_created >= int:start_date AND date_created <= int:end_date', $start_date->getDate(), $end_date->getDate());
+
+		/**
+		 * @var ThanksItem[] $items
+		 */
+		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), $filter, 'date_created DESC');
+
+		$this->PopulateUsers($items);
+
 		return $items;
 	}
 

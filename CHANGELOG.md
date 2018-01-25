@@ -3,7 +3,8 @@
 ## Unreleased ##
 * Implemented editing and deleting thanks from a list
 * Added created date to thanks list
-* Localized some phrases such as error messages
+* Implemented admin panel
+* Localization improvements
 
 ## 3.1.2 ##
 * Minor improvements and bugfixes

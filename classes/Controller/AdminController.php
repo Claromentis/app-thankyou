@@ -2,9 +2,14 @@
 namespace Claromentis\ThankYou\Controller;
 
 use Claromentis\Core\Application;
-use Claromentis\Core\Http\FileResponse;
+use Claromentis\Core\Csv\Csv;
+use Claromentis\Core\Http\gpc;
 use Claromentis\Core\Http\TemplaterCallResponse;
+use Claromentis\ThankYou\ThanksRepository;
+use Date;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Symfony\Component\HttpFoundation\Response;
+use User;
 
 /**
  * The admin panel controller.
@@ -30,12 +35,51 @@ class AdminController
 	 *
 	 * @param Application $app
 	 * @param Request $request
-	 * @return FileResponse
+	 * @return Response
+	 * @throws \Claromentis\Core\Csv\Exception\FilesystemException
+	 * @throws \Claromentis\Core\Csv\Exception\NoDataException
+	 * @throws \Exception
 	 */
 	public function ExportCsv(Application $app, Request $request)
 	{
-		// TODO: Implement
+		/**
+		 * @var ThanksRepository $repository
+		 */
+		$repository = $app['thankyou.repository'];
 
-		//return new FileResponse();
+		// Get the thank you notes after the given date
+		$start_date = new Date(gpc::get($request, 'from'));
+
+		$thanks = $repository->GetByDate($start_date);
+
+		// Process them into an array of values for the CSV
+		$thanks_array = [];
+
+		foreach ($thanks as $thank)
+		{
+			$author_name = User::GetNameById($thank->author);
+			$date_created = new Date($thank->date_created);
+			$thanked_user_names = implode(', ', array_map(function ($user_id) {
+				return User::GetNameById($user_id);
+			}, $thank->GetUsers()));
+
+			$item = [
+				$thank->id,
+				$author_name,
+				$date_created->getDate(DATE_FORMAT_CLA_LONG_DATE),
+				$thanked_user_names,
+				$thank->description
+			];
+
+			$thanks_array[] = $item;
+		}
+
+		// Create the CSV
+		$csv = new Csv();
+		$csv->SetHeaders(['id', 'author', 'date_created', 'thanked_users', 'description']);
+		$csv->ImportFromArray($thanks_array);
+
+		// Send it back to the user
+		return $csv->Export("thankyou.csv");
 	}
 }

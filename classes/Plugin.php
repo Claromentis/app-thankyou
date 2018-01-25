@@ -123,6 +123,7 @@ class Plugin implements
 		return [
 			'/thankyou' => function (ControllerCollection $routes) {
 				$routes->get('/admin/', 'thankyou.admin_controller:ShowNotesPanel');
+				$routes->get('/admin/csv', 'thankyou.admin_controller:ExportCsv');
 			}
 		];
 	}
