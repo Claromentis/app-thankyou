@@ -22,6 +22,8 @@ lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
+lt	thankyou:admin:export:end_date.body		Until
+lt	thankyou:admin:export:start_date.body		From
 lt	thankyou:admin:export_csv.body		Export to *.csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:export_help.body		Want to export the love and cherish it forever in a CSV format?
