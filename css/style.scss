@@ -60,6 +60,14 @@
     }
 	.edit-tools {
 		display:block;
+		.edit-thanks {
+	        border-right: 1px solid #e7e7e7;
+	        margin-right: 3px;
+	        padding-right: 6px;
+		}
+		.delete-thanks {
+			padding-left: 6px;
+		}
 	}
 }
 
