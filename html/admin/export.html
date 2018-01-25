@@ -1,0 +1,27 @@
+<block id="admin_breadcrumb">
+	<li class="active"><loc name="thankyou:admin:breadcrumb">Thank You</loc></li>
+</block>
+
+<block id="info_panel_pills">
+	<include file="menu.html" />
+</block>
+
+<block id="page_body">
+	<h3>
+		<loc>Export Messages</loc>
+	</h3>
+	
+	<p class="text-muted">
+		<loc>Export messages in a given date range in to a .CSV file.</loc>
+	</p>
+	
+	<div class="btn-toolbar">
+		<button href="/" class="btn btn-default">
+			<span class="glyphicons glyphicons-disk-save"></span>
+			<loc name="thankyou:admin:export_csv">Export to *.csv</loc>
+		</button>
+	</div>
+
+</block>
+
+<include file="../../common/layouts/admin_with_info_panel.html" />
