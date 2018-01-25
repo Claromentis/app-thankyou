@@ -1,5 +1,5 @@
 .	.	.	en
-lm	thankyou.admin.panel.export		Export Messages
+lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.app_name		Thank you
 lm	thankyou.common.thank_you_message		Thank you message
