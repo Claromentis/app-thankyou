@@ -76,8 +76,7 @@ class ThanksRepository
 	 */
 	public function GetByDate(Date $start_date, Date $end_date = null)
 	{
-		if (!$end_date)
-			$end_date = new Date();
+		$end_date = $end_date ?: new Date();
 
 		$filter = new DAL\QueryPart('date_created >= int:start_date AND date_created <= int:end_date', $start_date->getDate(), $end_date->getDate());
 

@@ -3,6 +3,7 @@ namespace Claromentis\ThankYou\Controller;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Csv\Csv;
+use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Http\gpc;
 use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\ThankYou\ThanksRepository;
@@ -49,9 +50,13 @@ class AdminController
 		$start_date = new Date();
 		$start_date->sub(new DateInterval('P1Y'));
 
+		// Set the inital end date to today
+		$end_date = new Date();
+
 		$arguments = [
 			'nav_export.+class' => 'active',
-			'start_date.value' => $start_date->getDate(DATE_FORMAT_CLA_SHORT_DATE)
+			'start_date.value' => $start_date->getDate(DateFormatter::SHORT_DATE),
+			'end_date.value' => $end_date->getDate(DateFormatter::SHORT_DATE)
 		];
 
 		return new TemplaterCallResponse('thankyou/admin/export.html', $arguments, lmsg('thankyou.app_name'));
@@ -80,7 +85,12 @@ class AdminController
 		if (!$start_date)
 			throw new InvalidArgumentException('Invalid start date');
 
-		$end_date = Date::CreateFrom(gpc::get($request, 'end_date')) ?: null;
+		$start_date = $start_date->getStartOfDay();
+
+		$end_date = Date::CreateFrom(gpc::get($request, 'end_date'));
+
+		if ($end_date)
+			$end_date = $end_date->getEndOfDay();
 
 		$thanks = $repository->GetByDate($start_date, $end_date);
 
