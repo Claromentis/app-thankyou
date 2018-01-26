@@ -4,6 +4,9 @@
 * Implemented editing and deleting thanks from a list
 * Added created date to thanks list
 * Implemented admin panel
+  * Manage thank you messages
+  * Export messages to CSV between given date range
+* Design and UX improvements
 * Localization improvements
 
 ## 3.1.2 ##
