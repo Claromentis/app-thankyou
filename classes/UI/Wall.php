@@ -22,6 +22,7 @@ class Wall extends TemplaterComponentTmpl
 	 */
 	protected $default_attributes = [
 		'admin' => false,
+		'allow_new' => true,
 		'profile_images' => false,
 		'limit' => 10,
 		'user_id' => 0

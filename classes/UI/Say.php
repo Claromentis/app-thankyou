@@ -18,6 +18,7 @@ class Say extends TemplaterComponentTmpl
 	 */
 	protected $default_attributes = [
 		'admin' => false,
+		'allow_new' => true,
 		'profile_images' => false,
 		'limit' => 10,
 		'user_id' => 0
@@ -47,6 +48,12 @@ class Say extends TemplaterComponentTmpl
 		if (isset($attributes['allow_new']) && !(bool) $attributes['allow_new'])
 		{
 			$args['allow_new.visible'] = 0;
+		}
+
+		if ($attributes['admin'])
+		{
+			$args['panel.class'] = '';
+			$args['panel_body.class'] = '';
 		}
 
 		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_all');
