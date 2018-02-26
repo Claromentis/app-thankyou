@@ -1,6 +1,6 @@
 # Change Log #
 
-## 3.2.0 ##
+## 3.2.0-rc ##
 * Implemented editing and deleting thanks from a list
 * Added created date to thanks list
 * Implemented admin panel
