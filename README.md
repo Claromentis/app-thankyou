@@ -2,6 +2,7 @@
 
 A simple application to say thanks to fellow employees.
 
+ * Version 3.2 - for Claromentis 8.2 and 8.3 (new features - see change log)
  * Version 3.1 - for Claromentis 8.2
  * Version 3.0 - for Claromentis 8.1 (includes Pages app component) 
  * Version 2.x - for Claromentis 8.0
