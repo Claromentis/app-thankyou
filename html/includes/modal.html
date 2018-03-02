@@ -56,7 +56,7 @@
 				},
 				errorPlacement: function(error, element) {
 					if (element.attr("name") == "thank_you_user[]") {
-						error.insertAfter("#thank_you_user_row");
+						error.insertAfter("#thank_you_user_row .form-control, #thank_you_user_row .select2-container");
 					} else {
 						error.insertAfter(element);
 					}

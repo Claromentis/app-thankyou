@@ -53,9 +53,6 @@
       text-decoration: none;
     }
   }
-  .lead {
-    margin-bottom: 10px;
-  }
   .user-photo {
     width: 26px;
     margin-bottom: 3px;
@@ -102,6 +99,8 @@
   padding: 8px 10px 0 0;
   font-weight: bold;
 }
+
+
 
 // 1 narrow column
 @element ".tile-thank-you" and (max-width: 280px) {
