@@ -6,7 +6,7 @@ use Claromentis\Core\Http\JsonPrettyResponse;
 use Claromentis\ThankYou\ThanksRepository;
 use Date;
 use Exception;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ServerRequestInterface;
 use RestExNotFound;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -34,15 +34,15 @@ class ThanksRestController
 	 * Get a single thanks item by ID.
 	 *
 	 * @param Application $app
-	 * @param Request $request
-	 * @param int $id
+	 * @param ServerRequestInterface $request
+	 *
 	 * @return JsonResponse
 	 * @throws RestExNotFound
 	 * @throws Exception
 	 */
-	public function GetThanksItem(Application $app, Request $request, $id)
+	public function GetThanksItem(Application $app, ServerRequestInterface $request)
 	{
-		$id = (int) $id;
+		$id = (int)$request->getAttribute('id');
 		$item = $this->repository->GetById($id);
 
 		if (!$item)
@@ -60,17 +60,17 @@ class ThanksRestController
 				continue;
 
 			$users[] = [
-				'id'   => $user->GetId(),
-				'name' => $user->GetFullname()
+				'id' => $user->GetId(),
+				'name' => $user->GetFullname(),
 			];
 		}
 
 		return new JsonPrettyResponse([
-			'id'           => (int) $item->id,
-			'author'       => (int) $item->author,
-			'date_created' => new Date($item->date_created),
-			'description'  => $item->description,
-			'users'        => $users
-		]);
+                  'id' => (int)$item->id,
+                  'author' => (int)$item->author,
+                  'date_created' => new Date($item->date_created),
+                  'description' => $item->description,
+                  'users' => $users,
+              ]);
 	}
 }

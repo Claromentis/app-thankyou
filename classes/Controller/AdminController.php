@@ -11,7 +11,7 @@ use Date;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Response;
 use User;
 
@@ -24,13 +24,14 @@ class AdminController
 	 * Show the messages admin panel.
 	 *
 	 * @param Application $app
-	 * @param Request $request
+	 * @param ServerRequestInterface $request
+	 *
 	 * @return TemplaterCallResponse
 	 */
-	public function ShowMessagesPanel(Application $app, Request $request)
+	public function ShowMessagesPanel(Application $app, ServerRequestInterface $request)
 	{
 		$arguments = [
-			'nav_messages.+class' => 'active'
+			'nav_messages.+class' => 'active',
 		];
 
 		return new TemplaterCallResponse('thankyou/admin/admin.html', $arguments, lmsg('thankyou.app_name'));
@@ -40,11 +41,12 @@ class AdminController
 	 * Show the export admin panel.
 	 *
 	 * @param Application $app
-	 * @param Request $request
+	 * @param ServerRequestInterface $request
+	 *
 	 * @return TemplaterCallResponse
 	 * @throws Exception
 	 */
-	public function ShowExportPanel(Application $app, Request $request)
+	public function ShowExportPanel(Application $app, ServerRequestInterface $request)
 	{
 		// Set the initial start date to 1 year ago
 		$start_date = new Date();
@@ -56,7 +58,7 @@ class AdminController
 		$arguments = [
 			'nav_export.+class' => 'active',
 			'start_date.value' => $start_date->getDate(DateFormatter::SHORT_DATE),
-			'end_date.value' => $end_date->getDate(DateFormatter::SHORT_DATE)
+			'end_date.value' => $end_date->getDate(DateFormatter::SHORT_DATE),
 		];
 
 		return new TemplaterCallResponse('thankyou/admin/export.html', $arguments, lmsg('thankyou.app_name'));
@@ -66,13 +68,14 @@ class AdminController
 	 * Export the thank you notes in the given date range as a CSV file.
 	 *
 	 * @param Application $app
-	 * @param Request $request
+	 * @param ServerRequestInterface $request
+	 *
 	 * @return Response
 	 * @throws \Claromentis\Core\Csv\Exception\FilesystemException
 	 * @throws \Claromentis\Core\Csv\Exception\NoDataException
 	 * @throws Exception
 	 */
-	public function ExportCsv(Application $app, Request $request)
+	public function ExportCsv(Application $app, ServerRequestInterface $request)
 	{
 		/**
 		 * @var ThanksRepository $repository
@@ -108,9 +111,9 @@ class AdminController
 			$item = [
 				$thank->id,
 				$author_name,
-				$date_created->getDate(DATE_FORMAT_CLA_LONG_DATE),
+				$date_created->getDate(DATE_FORMAT_ISO),
 				$thanked_user_names,
-				$thank->description
+				$thank->description,
 			];
 
 			$thanks_array[] = $item;
