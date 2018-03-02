@@ -24,7 +24,7 @@
 	  right: 10px;
 	}
   }
-  
+
   .thank-you-meta {
   	margin-top: 15px;
 	text-align:right;
@@ -42,9 +42,13 @@
   	margin-bottom: 10px;
   }
   .user-photo {
-    width: 32px;
+    width: 28px;
+    margin-bottom: 3px;
   }
-  
+  .thank-you-title {
+  margin-right: 8px;
+  }
+
   .js-like-component {
       display: inline-block;
       .liked.liked {
