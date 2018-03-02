@@ -57,11 +57,12 @@
     margin-bottom: 10px;
   }
   .user-photo {
-    width: 28px;
+    width: 26px;
     margin-bottom: 3px;
   }
-  .thank-you-title {
-    margin-right: 8px;
+
+  .thank-you-note a:nth-child(1) img {
+  margin-left: 8px;
   }
 
   .js-like-component {
