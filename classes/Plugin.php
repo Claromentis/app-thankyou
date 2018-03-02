@@ -1,14 +1,12 @@
 <?php
 namespace Claromentis\ThankYou;
 
-use Claromentis\Core\Admin\AdminPanelStandard;
 use Claromentis\Core\Admin\PanelsList;
 use Claromentis\Core\Aggregation\AggregationFilterEvent;
 use Claromentis\Core\Application;
 use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
-use Claromentis\Core\Templater\Plugin\ComponentClassLocator;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\ThankYou\Controller\AdminController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
@@ -16,7 +14,6 @@ use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use Silex\Api\BootableProviderInterface;
 use Silex\Api\EventListenerProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -29,7 +26,6 @@ class Plugin implements
 	ServiceProviderInterface,
 	RouteProviderInterface,
 	RestServiceInterface,
-	BootableProviderInterface,
 	EventListenerProviderInterface
 {
 	/**
@@ -49,23 +45,18 @@ class Plugin implements
 
 		// Admin panel
 		$app['admin.panels'] = $app->extend('admin.panels', function ($panels) {
-			$panels['thankyou'] = new AdminPanelStandard('thankyou', array(
-				'name'      => lmsg('thankyou.app_name'),
-				'url'       => '/thankyou/admin/',
-				'css_class' => 'glyphicons-donate'
-			));
+			$panels['thankyou'] = [
+				'name' => lmsg('thankyou.app_name'),
+				'css_class' => 'glyphicons-donate',
+				'url' => '/thankyou/admin/'];
 
 			return $panels;
 		});
 
-		// Component class key
-		$app->extend('templater.plugin_component.class_locator', function (ComponentClassLocator $component_locator) {
-			$component_locator->RegisterComponents([
-				'thankyou' => [Say::class, '']
-			]);
-
-			return $component_locator;
-		});
+		// Templater component class key
+		$app['templater.ui.thankyou'] = function () {
+			return new Say();
+		};
 
 		// Controllers
 		$app['thankyou.admin_controller'] = function ($app) {
@@ -97,37 +88,48 @@ class Plugin implements
 	}
 
 	/**
-	 * Bootstraps the application.
-	 *
-	 * This method is called after all services are registered
-	 * and should be used for "dynamic" configuration (whenever
-	 * a service must be requested).
-	 *
-	 * @param \Silex\Application $app
-	 */
-	public function boot(\Silex\Application $app)
-	{
-		/**
-		 * @var Application $app
-		 */
-		$app->registerRestService($this);
-	}
-
-	/**
 	 * Returns routes for the application.
+	 *
+	 * This method should return an array in form of array($prefix => $closure), where $prefix is a string starting
+	 * from slash, without trailing slash and $closure is a function that takes an instance of
+	 * \Claromentis\Core\ControllerCollection and registers all route handlers into it.
+	 *
+	 * Each route handler should be defined as a string - controller class and method name, such as
+	 *   $routes->get('/home', "MyApp\MyAppMainControler::OnHome")
+	 * or as a service name and method name:
+	 *   $routes->get('/home', "myapp.controller.home:OnHome")  // note, only one colon
+	 *
+	 * Make sure to secure all routes either by defining default security such as $routes->secure('html', 'user');
+	 * or for each route $routes->get(....)->secure('html', 'user');
+	 * Note, default security works only for routes defined _after_ it's set, so put it to the top of the closure
+	 *
+	 * Example:
+	 *  return array(
+	 *     '/main' => function (\Claromentis\Core\ControllerCollection $routes)
+	 *     {
+	 *          $routes->secure('html', 'user'); // default security rule
+	 *          $routes->get('/', '\Claromentis\Main\Controller\HomePageController::Show');
+	 *          $routes->get('/whats_new', '\Claromentis\Main\Controller\WhatsNewController::Show')->secure('ajax');
+	 *          $routes->get('/{item_id}', '\Claromentis\Main\Controller\ItemController::Show')->assert('item_id', '\d+');
+	 *          $routes->get('/admin', ItemController::class.'::Show')->secure('html', 'admin', ['panel_code' => 'main'])
+	 *     }
+	 *  );
+	 *
+	 * @param \Claromentis\Core\Application $app An Application instance
 	 *
 	 * @return array
 	 */
 	public function GetRoutes(Application $app)
 	{
 		return [
-			'/thankyou' => function (ControllerCollection $routes) use ($app) {
-				$routes->get('/admin/', function () use ($app) {
+			'/thankyou/admin' => function (ControllerCollection $routes) use ($app) {
+				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
+				$routes->get('/', function () use ($app) {
 					return $app->redirect('/thankyou/admin/messages');
 				});
-				$routes->get('/admin/messages', 'thankyou.admin_controller:ShowMessagesPanel');
-				$routes->get('/admin/export', 'thankyou.admin_controller:ShowExportPanel');
-				$routes->post('/admin/export', 'thankyou.admin_controller:ExportCsv');
+				$routes->get('/messages', 'thankyou.admin_controller:ShowMessagesPanel');
+				$routes->get('/export', 'thankyou.admin_controller:ShowExportPanel');
+				$routes->post('/export', 'thankyou.admin_controller:ExportCsv');
 			}
 		];
 	}
