@@ -37,7 +37,7 @@ lt	thankyou:component:delete_thank_you.body		Dankeschön löschen
 lt	thankyou:component:edit.body		Bearbeiten
 lt	thankyou:component:modal:close.body		Schließen
 lt	thankyou:component:modal:comment.body		Kommentar
-lt	thankyou:component:modal:share.body		Einreichen
+lt	thankyou:component:modal:submit.body		Einreichen
 lt	thankyou:component:modal:to.body		Zu
 lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		Sag Danke

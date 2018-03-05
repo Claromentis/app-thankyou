@@ -37,7 +37,7 @@ lt	thankyou:component:delete_thank_you.body
 lt	thankyou:component:edit.body		
 lt	thankyou:component:modal:close.body		
 lt	thankyou:component:modal:comment.body		
-lt	thankyou:component:modal:share.body		
+lt	thankyou:component:modal:submit.body		
 lt	thankyou:component:modal:to.body		
 lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		
