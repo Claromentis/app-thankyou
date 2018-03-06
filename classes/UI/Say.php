@@ -9,7 +9,7 @@ use Claromentis\ThankYou\View\ThanksListView;
 /**
  * Component displays list of recent thanks and allows submitting a new one.
  *
- * <component class="\Claromentis\ThankYou\UI\Say" allow_new="1" limit="10" admin="0">
+ * <component class="\Claromentis\ThankYou\UI\Say" allow_new="1" limit="10">
  */
 class Say extends TemplaterComponentTmpl
 {
@@ -17,7 +17,6 @@ class Say extends TemplaterComponentTmpl
 	 * @var array
 	 */
 	protected $default_attributes = [
-		'admin' => false,
 		'allow_new' => true,
 		'profile_images' => false,
 		'limit' => 10,
@@ -48,12 +47,6 @@ class Say extends TemplaterComponentTmpl
 		if (isset($attributes['allow_new']) && !(bool) $attributes['allow_new'])
 		{
 			$args['allow_new.visible'] = 0;
-		}
-
-		if ($attributes['admin'])
-		{
-			$args['panel.class'] = '';
-			$args['panel_body.class'] = '';
 		}
 
 		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_all');

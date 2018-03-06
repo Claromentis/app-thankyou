@@ -15,7 +15,18 @@
 		<loc name="thankyou:admin:messages_help">Manage Thank You Messages posted by the users. Please note that any changes done here will be reflected in the Thank You component and on each user's profile.</loc>
 	</p>
 
-	<component class_key="thankyou" admin="1" allow_new="0" limit="0" />
+	<!--@head@
+	<unique_section name="thankyou_component_styles">
+		<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
+	</unique_section>
+	-->
+	<div class="thank-you">
+		<include file="../includes/thanks_list.html" />
+	</div>
+
+	<include file="../includes/modal.html" />
+
+	<div class="footer"><div name="paging"></div></div>
 </block>
 
 <include file="../../common/layouts/admin_with_info_panel.html" />

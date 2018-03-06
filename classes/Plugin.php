@@ -8,7 +8,8 @@ use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
-use Claromentis\ThankYou\Controller\AdminController;
+use Claromentis\ThankYou\Controller\AdminExportController;
+use Claromentis\ThankYou\Controller\AdminMessagesController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -59,8 +60,12 @@ class Plugin implements
 		};
 
 		// Controllers
-		$app['thankyou.admin_controller'] = function ($app) {
-			return new AdminController();
+		$app['thankyou.admin_messages_controller'] = function ($app) {
+			return new AdminMessagesController();
+		};
+
+		$app['thankyou.admin_export_controller'] = function ($app) {
+			return new AdminExportController();
 		};
 
 		$app['thankyou.rest_controller'] = function ($app) {
@@ -124,9 +129,9 @@ class Plugin implements
 		return [
 			'/thankyou/admin' => function (ControllerCollection $routes) use ($app) {
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
-				$routes->get('/', 'thankyou.admin_controller:ShowMessagesPanel');
-				$routes->get('/export', 'thankyou.admin_controller:ShowExportPanel');
-				$routes->post('/export', 'thankyou.admin_controller:ExportCsv');
+				$routes->get('/', 'thankyou.admin_messages_controller:Show');
+				$routes->get('/export', 'thankyou.admin_export_controller:ShowExportPanel');
+				$routes->post('/export', 'thankyou.admin_export_controller:ExportCsv');
 			}
 		];
 	}
@@ -179,7 +184,7 @@ class Plugin implements
 	 *
 	 * Adds the thank you tab.
 	 *
-	 * @param string $attr
+	 * @param array $attr
 	 * @param Application $app
 	 * @return string
 	 */
@@ -192,7 +197,7 @@ class Plugin implements
 					return '';
 				/** @var ThanksRepository $repository */
 				$repository = $app['thankyou.repository'];
-				$count = $repository->GetCount($attr['user_id']);
+				$count = $repository->GetCountForUser($attr['user_id']);
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> '.lmsg("thankyou.user_profile.tab_name").' (<b>'.$count.'</b>)</a></li>';
 			case 'viewprofile.tab_content':
 				if (empty($attr['user_id']) || !is_numeric($attr['user_id']))

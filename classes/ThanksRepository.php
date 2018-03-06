@@ -52,16 +52,29 @@ class ThanksRepository
 	 * Gets the most recent thank you items.
 	 *
 	 * @param int $limit
+	 * @param int $offset
 	 *
 	 * @return ThanksItem[]
 	 * @throws Exception
 	 */
-	public function GetRecent($limit)
+	public function GetRecent($limit, $offset = 0)
 	{
 		/** @var ThanksItem[] $items */
-		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), '', 'date_created DESC', $limit);
+		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), '', 'date_created DESC', $limit, $offset);
 		$this->PopulateUsers($items);
 		return $items;
+	}
+
+	/**
+	 * Returns total number of thanks items in the database
+	 *
+	 * @return int
+	 */
+	public function GetCount()
+	{
+		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_item");
+
+		return $count;
 	}
 
 	/**
@@ -151,7 +164,7 @@ class ThanksRepository
 	 *
 	 * @return int
 	 */
-	public function GetCount($user_id)
+	public function GetCountForUser($user_id)
 	{
 		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_user WHERE user_id=int:uid", $user_id);
 

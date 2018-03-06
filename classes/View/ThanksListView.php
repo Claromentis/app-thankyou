@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou\View;
 use AuthUser;
 use Carbon\Carbon;
 use Claromentis\Core\Admin\AdminPanel;
+use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\ThanksItem;
 use ClaText;
@@ -106,7 +107,7 @@ class ThanksListView
 
 
 				'date_created.body' => Carbon::instance($date_created)->diffForHumans(),
-				'date_created.title' => $date_created->getDate(DATE_FORMAT_CLA_LONG_DATE)
+				'date_created.title' => $date_created->getDate(DateFormatter::LONG_DATE)
 			];
 		}
 

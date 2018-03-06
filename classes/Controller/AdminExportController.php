@@ -18,25 +18,8 @@ use User;
 /**
  * The admin panel controller.
  */
-class AdminController
+class AdminExportController
 {
-	/**
-	 * Show the messages admin panel.
-	 *
-	 * @param Application $app
-	 * @param ServerRequestInterface $request
-	 *
-	 * @return TemplaterCallResponse
-	 */
-	public function ShowMessagesPanel(Application $app, ServerRequestInterface $request)
-	{
-		$arguments = [
-			'nav_messages.+class' => 'active',
-		];
-
-		return new TemplaterCallResponse('thankyou/admin/admin.html', $arguments, lmsg('thankyou.app_name'));
-	}
-
 	/**
 	 * Show the export admin panel.
 	 *
@@ -55,13 +38,13 @@ class AdminController
 		// Set the inital end date to today
 		$end_date = new Date();
 
-		$arguments = [
+		$args = [
 			'nav_export.+class' => 'active',
 			'start_date.value' => $start_date->getDate(DateFormatter::SHORT_DATE),
 			'end_date.value' => $end_date->getDate(DateFormatter::SHORT_DATE),
 		];
 
-		return new TemplaterCallResponse('thankyou/admin/export.html', $arguments, lmsg('thankyou.app_name'));
+		return new TemplaterCallResponse('thankyou/admin/export.html', $args, lmsg('thankyou.app_name'));
 	}
 
 	/**
