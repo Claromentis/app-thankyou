@@ -203,7 +203,7 @@ class Plugin implements
 				if (empty($attr['user_id']) || !is_numeric($attr['user_id']))
 					return '';
 				$component = new UI\Wall();
-				$component_data = $component->Show(array('user_id' => $attr['user_id']), $app);
+				$component_data = $component->Show(array('user_id' => $attr['user_id'], 'limit' => 20), $app);
 				return '<div id="thanks">' . $component_data . '</div>';
 		}
 		return '';

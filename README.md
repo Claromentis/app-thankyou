@@ -31,6 +31,6 @@ Once installed, this application adds "Thanks" tab on each user's profile that d
 It's also possible to add a global list of thanks on the intranet home page or any other page using a component:
 
 ```html
-<component class="\Claromentis\ThankYou\UI\Say" allow_new="1" limit="10">
+<component class_key="thankyou" allow_new="1" limit="10">
 ```
 
