@@ -124,10 +124,7 @@ class Plugin implements
 		return [
 			'/thankyou/admin' => function (ControllerCollection $routes) use ($app) {
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
-				$routes->get('/', function () use ($app) {
-					return $app->redirect('/thankyou/admin/messages');
-				});
-				$routes->get('/messages', 'thankyou.admin_controller:ShowMessagesPanel');
+				$routes->get('/', 'thankyou.admin_controller:ShowMessagesPanel');
 				$routes->get('/export', 'thankyou.admin_controller:ShowExportPanel');
 				$routes->post('/export', 'thankyou.admin_controller:ExportCsv');
 			}
