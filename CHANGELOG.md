@@ -1,11 +1,17 @@
 # Change Log #
 
+## 3.2.1 ##
+* Updated composer.json to work in Claromentis 8.2+
+
+## 3.2.0 ##
+* Minor improvements and bugfixes (#20, #14, #12, #15, #7)
+
 ## 3.2.0-rc ##
 * Implemented editing and deleting thanks from a list
 * Added created date to thanks list
 * Implemented admin panel
-  * Manage thank you messages
-  * Export messages to CSV between given date range
+* Manage thank you messages
+* Export messages to CSV between given date range
 * Design and UX improvements
 * Localization improvements
 
