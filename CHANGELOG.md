@@ -1,5 +1,8 @@
 # Change Log #
 
+## 3.2.2 ##
+* Localisation change
+
 ## 3.2.1 ##
 * Updated composer.json to work in Claromentis 8.2+
 
