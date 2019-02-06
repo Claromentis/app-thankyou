@@ -101,15 +101,16 @@
 }
 
 
+.tile-thank-you.grid-stack-item-6[data-gs-width="1"] {
+  .thank-title {
+    display: none;
+  }
+}
 
-// 1 narrow column
-@element ".tile-thank-you" and (max-width: 280px) {
-  eq_this {
-    .panel .panel-heading .btn.pull-right.thank-you--button {
-      width: 70px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+@media only screen and (max-width:768px) {
+  .tile-thank-you {
+    .thank-title {
+      display: none;
     }
   }
 }
