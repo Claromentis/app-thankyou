@@ -10,6 +10,7 @@ use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminMessagesController;
+use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -68,13 +69,26 @@ class Plugin implements
 			return new AdminExportController();
 		};
 
+		$app['thankyou.admin_notifications_controller'] = function ($app) {
+			return new AdminNotificationsController();
+		};
+
 		$app['thankyou.rest_controller'] = function ($app) {
 			return new ThanksRestController($app['thankyou.repository']);
+		};
+
+		// Notification
+		$app['thankyou.line_manager_notifier'] = function () {
+			return new LineManagerNotifier();
 		};
 
 		// Repositories
 		$app['thankyou.repository'] = function ($app) {
 			return new ThanksRepository($app->db);
+		};
+
+		$app['thankyou.settings_repository'] = function ($app) {
+			return new SettingsRepository($app->db);
 		};
 
 		$app['thankyou.thanks_list_view'] = function ($app) {
@@ -132,6 +146,8 @@ class Plugin implements
 				$routes->get('/', 'thankyou.admin_messages_controller:Show');
 				$routes->get('/export', 'thankyou.admin_export_controller:ShowExportPanel');
 				$routes->post('/export', 'thankyou.admin_export_controller:ExportCsv');
+				$routes->get('/notifications', 'thankyou.admin_notifications_controller:ShowNotificationsPanel');
+				$routes->post('/notifications', 'thankyou.admin_notifications_controller:SubmitNotificationsConfig');
 			}
 		];
 	}

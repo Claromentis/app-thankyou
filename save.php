@@ -1,5 +1,7 @@
 <?php
 // TODO: Move to REST API
+use Claromentis\ThankYou\LineManagerNotifier;
+
 require_once("../common/sessioncheck.php");
 require_once("../common/core.php");
 require_once("../common/connect.php");
@@ -91,6 +93,14 @@ if (gpc::IsSubmit())
 
 			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
 			NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, IMessage::TYPE_PEOPLE);
+
+			$settings_repo = $g_application['thankyou.settings_repository'];
+			$notify_line_manager = $settings_repo->Get('notify_line_manager');
+
+			if ($notify_line_manager) {
+				$lm_notifier = $g_application['thankyou.line_manager_notifier'];
+				$lm_notifier->SendMessage($params, $users_ids);
+			}
 		}
 	}
 }
