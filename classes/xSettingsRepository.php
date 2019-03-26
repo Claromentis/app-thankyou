@@ -5,7 +5,7 @@ use Claromentis\Core\DAL;
 use DBVar;
 use \InvalidArgumentException;
 
-class SettingsRepository
+class xSettingsRepository
 {
 	const DB_VAR_DATA = [
 		'notify_line_manager' => [

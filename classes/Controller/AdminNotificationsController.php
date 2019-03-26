@@ -21,8 +21,8 @@ class AdminNotificationsController
 	 */
 	public function ShowNotificationsPanel(Application $app)
 	{
-		$settings_repo = $app['thankyou.settings_repository'];
-		$notify_line_manager = $settings_repo->Get('notify_line_manager');
+		$config = $app['thankyou.config'];
+		$notify_line_manager = $config->Get('notify_line_manager');
 
 		$args = [
 			'nav_notifications.+class' => 'active',
@@ -45,8 +45,8 @@ class AdminNotificationsController
 	{
 		$notify_line_manager = isset($request->getParsedBody()['notify_line_manager']);
 
-		$settings_repo = $app['thankyou.settings_repository'];
-		$settings_repo->Set('notify_line_manager', $notify_line_manager);
+		$config = $app['thankyou.config'];
+		$config->Set('notify_line_manager', $notify_line_manager);
 
 		return $this->ShowNotificationsPanel($app);
 	}

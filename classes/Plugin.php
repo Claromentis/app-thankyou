@@ -87,10 +87,6 @@ class Plugin implements
 			return new ThanksRepository($app->db);
 		};
 
-		$app['thankyou.settings_repository'] = function ($app) {
-			return new SettingsRepository($app->db);
-		};
-
 		$app['thankyou.thanks_list_view'] = function ($app) {
 			/**
 			 * @var PanelsList $panels;
@@ -103,6 +99,10 @@ class Plugin implements
 		// Pages component
 		$app['pages.component.thankyou'] = function () {
 			return new UI\PagesComponent();
+		};
+
+		$app['thankyou.config'] = function ($app) {
+			return $app['config.factory']('thankyou');
 		};
 	}
 

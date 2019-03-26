@@ -94,8 +94,8 @@ if (gpc::IsSubmit())
 			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
 			NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, IMessage::TYPE_PEOPLE);
 
-			$settings_repo = $g_application['thankyou.settings_repository'];
-			$notify_line_manager = $settings_repo->Get('notify_line_manager');
+			$config = $g_application['thankyou.config'];
+			$notify_line_manager = $config->Get('notify_line_manager');
 
 			if ($notify_line_manager) {
 				$lm_notifier = $g_application['thankyou.line_manager_notifier'];
