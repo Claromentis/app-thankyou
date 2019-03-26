@@ -6,6 +6,7 @@ lm	thankyou.app_name
 lm	thankyou.common.thank_you_message		
 lm	thankyou.common.thank_you_messages		
 lm	thankyou.common.thanks_deleted		
+lm	thankyou.communication.imessages		
 lm	thankyou.component.cover_info.desc		
 lm	thankyou.component.cover_info.title		
 lm	thankyou.component.no_thanks_all		

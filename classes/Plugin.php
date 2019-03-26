@@ -185,6 +185,21 @@ class Plugin implements
 	}
 
 	/**
+	 * Instant Message types
+	 * @return array
+	 */
+	public function GetIMConfig()
+	{
+		return array(
+			"thankyou",
+			lmsg("thankyou.communication.imessages"),
+			array(
+				Constants::IM_TYPE_THANKYOU
+			)
+		);
+	}
+
+	/**
 	 * Register the module's event listeners.
 	 *
 	 * @param Container $app

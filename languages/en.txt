@@ -6,6 +6,7 @@ lm	thankyou.app_name		Thank you
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
 lm	thankyou.common.thanks_deleted		Thank you message successfully deleted
+lm	thankyou.communication.imessages		Thank You
 lm	thankyou.component.cover_info.desc		Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"
 lm	thankyou.component.cover_info.title		Thank you
 lm	thankyou.component.no_thanks_all		Nobody has been thanked yet

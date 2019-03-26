@@ -20,7 +20,7 @@ class LineManagerNotifier extends ErrorHandler
 
 			$line_manager = \UsersHierarchy::GetManager($user_id);
 
-			NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], IMessage::TYPE_THANKYOU, null, $thanker_id);
+			NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], Constants::IM_TYPE_THANKYOU, null, $thanker_id);
 		}
 	}
 }

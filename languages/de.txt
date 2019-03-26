@@ -6,6 +6,7 @@ lm	thankyou.app_name		Vielen Dank
 lm	thankyou.common.thank_you_message		Dankesnachricht
 lm	thankyou.common.thank_you_messages		Dankesnachricht
 lm	thankyou.common.thanks_deleted		Dankesnachricht erfolgreich gelöscht
+lm	thankyou.communication.imessages		
 lm	thankyou.component.cover_info.desc		Ermöglicht Benutzern, ein Tag zu markieren und öffentlich Danke zu sagen. Zeigt eine Liste der letzten "Danke" an
 lm	thankyou.component.cover_info.title		Vielen Dank
 lm	thankyou.component.no_thanks_all		Bisher wurde noch niemand gedankt
