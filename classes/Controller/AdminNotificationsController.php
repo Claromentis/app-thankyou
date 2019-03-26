@@ -47,6 +47,7 @@ class AdminNotificationsController
 
 		$config = $app['thankyou.config'];
 		$config->Set('notify_line_manager', $notify_line_manager);
+		$config->Save();
 
 		return $this->ShowNotificationsPanel($app);
 	}
