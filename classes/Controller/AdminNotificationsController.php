@@ -49,6 +49,14 @@ class AdminNotificationsController
 		$config->Set('notify_line_manager', $notify_line_manager);
 		$config->Save();
 
-		return $this->ShowNotificationsPanel($app);
+		$args = [
+			'nav_notifications.+class' => 'active',
+			'notify_line_manager.checked' => $notify_line_manager ? 'checked' : '',
+		];
+
+		$response = new TemplaterCallResponse('thankyou/admin/notifications.html', $args, lmsg('thankyou.app_name'));
+		$response->SetMessage(lmsg('thankyou.notifications.saved'));
+
+		return $response;
 	}
 }

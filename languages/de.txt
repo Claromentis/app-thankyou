@@ -20,6 +20,7 @@ lm	thankyou.component.options.user_id		Dankesnachricht auf einen Benutzer einsch
 lm	thankyou.component_heading		Vielen Dank
 lm	thankyou.error.no_edit_permission		Sie sind nicht berechtigt, diese Dankesnachricht zu ändern
 lm	thankyou.error.thanks_not_found		Dankesnachricht existiert nicht
+lm	thankyou.notifications.saved		
 lm	thankyou.user_profile.tab_name		Vielen Dank
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
