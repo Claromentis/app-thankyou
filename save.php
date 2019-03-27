@@ -92,7 +92,7 @@ if (gpc::IsSubmit())
 			);
 
 			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
-			NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, IMessage::TYPE_PEOPLE);
+			NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, \Claromentis\ThankYou\Constants::IM_TYPE_THANKYOU);
 
 			$config = $g_application['thankyou.config'];
 			$notify_line_manager = $config->Get('notify_line_manager');
