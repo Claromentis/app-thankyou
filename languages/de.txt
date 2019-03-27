@@ -21,7 +21,6 @@ lm	thankyou.component_heading		Vielen Dank
 lm	thankyou.error.no_edit_permission		Sie sind nicht berechtigt, diese Dankesnachricht zu ändern
 lm	thankyou.error.thanks_not_found		Dankesnachricht existiert nicht
 lm	thankyou.user_profile.tab_name		Vielen Dank
-lm	thankyou:admin:notifications:save.body	$lm['common.save']	
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
@@ -36,6 +35,7 @@ lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notification
 lt	thankyou:admin:messages_heading.body		Dankesnachrichten
 lt	thankyou:admin:messages_help.body		Verwalten Sie die Dankesmeldungen der Benutzer. Bitte beachten Sie, dass alle hier vorgenommenen Änderungen in der Dankeschön-Komponente und im Profil jedes Nutzers berücksichtigt werden.
 lt	thankyou:admin:notifications:notify_line_manager.body		
+lt	thankyou:admin:notifications:save.body		
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		
 lt	thankyou:component:delete.body		Löschen

@@ -21,7 +21,6 @@ lm	thankyou.component_heading		Thank you
 lm	thankyou.error.no_edit_permission		You do not have permission to modify this thank you message
 lm	thankyou.error.thanks_not_found		Thank you message does not exist
 lm	thankyou.user_profile.tab_name		Thanks
-lm	thankyou:admin:notifications:save.body	$lm['common.save']	
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
@@ -36,6 +35,7 @@ lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notification
 lt	thankyou:admin:messages_heading.body		Thank You Messages
 lt	thankyou:admin:messages_help.body		Manage Thank You Messages posted by the users. Please note that any changes done here will be reflected in the Thank You component and on each user's profile.
 lt	thankyou:admin:notifications:notify_line_manager.body		Also notify the line manager of the person being thanked
+lt	thankyou:admin:notifications:save.body		Save
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		Users will be notified whenever they're being thanked.
 lt	thankyou:component:delete.body		Delete
