@@ -1,10 +1,12 @@
 .	.	.	de
 lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Mitteilungen
+lm	thankyou.admin.panel.notifications		
 lm	thankyou.app_name		Vielen Dank
 lm	thankyou.common.thank_you_message		Dankesnachricht
 lm	thankyou.common.thank_you_messages		Dankesnachricht
 lm	thankyou.common.thanks_deleted		Dankesnachricht erfolgreich gelöscht
+lm	thankyou.communication.imessages		
 lm	thankyou.component.cover_info.desc		Ermöglicht Benutzern, ein Tag zu markieren und öffentlich Danke zu sagen. Zeigt eine Liste der letzten "Danke" an
 lm	thankyou.component.cover_info.title		Vielen Dank
 lm	thankyou.component.no_thanks_all		Bisher wurde noch niemand gedankt
@@ -18,19 +20,26 @@ lm	thankyou.component.options.user_id		Dankesnachricht auf einen Benutzer einsch
 lm	thankyou.component_heading		Vielen Dank
 lm	thankyou.error.no_edit_permission		Sie sind nicht berechtigt, diese Dankesnachricht zu ändern
 lm	thankyou.error.thanks_not_found		Dankesnachricht existiert nicht
+lm	thankyou.grammar.list.and		
+lm	thankyou.notifications.saved		
 lm	thankyou.user_profile.tab_name		Vielen Dank
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
+lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:export:end_date.body		Bis
 lt	thankyou:admin:export:start_date.body		Von
 lt	thankyou:admin:export_csv.body		Exportieren nach * .csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
-lt	thankyou:admin:export_help.body		Willst du die Dankesnachrichten im CSV-Format exportieren?
 lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:menu:messages.body	$lm['thankyou.admin.panel.messages']	
+lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:messages_heading.body		Dankesnachrichten
 lt	thankyou:admin:messages_help.body		Verwalten Sie die Dankesmeldungen der Benutzer. Bitte beachten Sie, dass alle hier vorgenommenen Änderungen in der Dankeschön-Komponente und im Profil jedes Nutzers berücksichtigt werden.
+lt	thankyou:admin:notifications:notify_line_manager.body		
+lt	thankyou:admin:notifications:save.body		
+lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:notifications_help.body		
 lt	thankyou:component:delete.body		Löschen
 lt	thankyou:component:delete_confirm.body		Möchten Sie diese Dankesnachricht wirklich löschen?
 lt	thankyou:component:delete_thank_you.body		Dankeschön löschen

@@ -1,0 +1,45 @@
+<block id="admin_breadcrumb">
+	<li><a href="/thankyou/admin/"><loc name="thankyou:admin:breadcrumb">Thank You</loc></a></li>
+	<li class="active"><loc name="thankyou:admin:breadcrumb:notifications">Notifications</loc></li>
+</block>
+
+<block id="info_panel_pills">
+	<include file="menu.html" />
+</block>
+
+<block id="page_body">
+	<h3>
+		<loc name="thankyou:admin:notifications_heading">Notifications</loc>
+	</h3>
+
+	<p class="text-muted">
+		<loc name="thankyou:admin:notifications_help">Users will be notified whenever they're being thanked.</loc>
+	</p>
+
+	<hr/>
+
+	<form method="post" href="/thankyou/admin/notifications/submit" class="form-horizontal">
+		<div class="form-group">
+			<div class="checkbox col-sm-11">
+				<label>
+					<input type="checkbox" name="notify_line_manager">
+					<loc name="thankyou:admin:notifications:notify_line_manager">Also notify the line manager of the person being thanked</loc>
+				</label>
+			</div>
+		</div>
+
+		<hr/>
+
+		<div class="form-group">
+			<div class="col-sm-11">
+				<div class="btn-toolbar">
+					<button type="submit" class="btn btn-default">
+						<loc name="thankyou:admin:notifications:save">Save</loc>
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</block>
+
+<include file="../../common/layouts/admin_with_info_panel.html" />

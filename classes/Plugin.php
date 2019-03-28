@@ -10,6 +10,7 @@ use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminMessagesController;
+use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -68,8 +69,17 @@ class Plugin implements
 			return new AdminExportController();
 		};
 
+		$app['thankyou.admin_notifications_controller'] = function ($app) {
+			return new AdminNotificationsController();
+		};
+
 		$app['thankyou.rest_controller'] = function ($app) {
 			return new ThanksRestController($app['thankyou.repository']);
+		};
+
+		// Notification
+		$app['thankyou.line_manager_notifier'] = function () {
+			return new LineManagerNotifier();
 		};
 
 		// Repositories
@@ -89,6 +99,10 @@ class Plugin implements
 		// Pages component
 		$app['pages.component.thankyou'] = function () {
 			return new UI\PagesComponent();
+		};
+
+		$app['thankyou.config'] = function ($app) {
+			return $app['config.factory']('thankyou');
 		};
 	}
 
@@ -132,6 +146,8 @@ class Plugin implements
 				$routes->get('/', 'thankyou.admin_messages_controller:Show');
 				$routes->get('/export', 'thankyou.admin_export_controller:ShowExportPanel');
 				$routes->post('/export', 'thankyou.admin_export_controller:ExportCsv');
+				$routes->get('/notifications', 'thankyou.admin_notifications_controller:ShowNotificationsPanel');
+				$routes->post('/notifications', 'thankyou.admin_notifications_controller:SubmitNotificationsConfig');
 			}
 		];
 	}
@@ -165,6 +181,21 @@ class Plugin implements
 			'thanks',
 			lmsg('thankyou.common.thank_you_message'),
 			lmsg('thankyou.common.thank_you_messages')
+		);
+	}
+
+	/**
+	 * Instant Message types
+	 * @return array
+	 */
+	public function GetIMConfig()
+	{
+		return array(
+			"thankyou",
+			lmsg("thankyou.communication.imessages"),
+			array(
+				Constants::IM_TYPE_THANKYOU
+			)
 		);
 	}
 
