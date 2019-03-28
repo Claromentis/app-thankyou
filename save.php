@@ -98,8 +98,9 @@ if (gpc::IsSubmit())
 			$notify_line_manager = $config->Get('notify_line_manager');
 
 			if ($notify_line_manager) {
+				/** @var LineManagerNotifier $lm_notifier */
 				$lm_notifier = $g_application['thankyou.line_manager_notifier'];
-				$lm_notifier->SendMessage($params, $users_ids);
+				$lm_notifier->SendMessage($description, $users_ids);
 			}
 		}
 	}
