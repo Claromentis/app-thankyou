@@ -1,6 +1,6 @@
 # Change Log #
 
-## 3.2.3 (Unreleased)
+## 3.2.3
 * Added manager notifications
   * When any of a user's subordinates are thanked, they will recieve a notification
   * Thank you notifications now have their own notification type
