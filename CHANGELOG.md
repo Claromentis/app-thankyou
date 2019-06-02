@@ -1,9 +1,12 @@
 # Change Log #
 
+## 3.2.4
+* Added Russian translations and twig template
+
 ## 3.2.3
 * Added manager notifications
-  * When any of a user's subordinates are thanked, they will recieve a notification
-  * Thank you notifications now have their own notification type
+* When any of a user's subordinates are thanked, they will receive a notification
+* Thank you notifications now have their own notification type
 
 ## 3.2.2 ##
 * Localisation change

@@ -1,53 +1,53 @@
 .	.	.	ru
-lm	thankyou.admin.panel.export		
-lm	thankyou.admin.panel.messages		
+lm	thankyou.admin.panel.export		Экспорт
+lm	thankyou.admin.panel.messages		Сообщения
 lm	thankyou.admin.panel.notifications		
-lm	thankyou.app_name		
-lm	thankyou.common.thank_you_message		
-lm	thankyou.common.thank_you_messages		
-lm	thankyou.common.thanks_deleted		
+lm	thankyou.app_name		Спасибо!
+lm	thankyou.common.thank_you_message		Сообщение благодарности
+lm	thankyou.common.thank_you_messages		Сообщение благодарности
+lm	thankyou.common.thanks_deleted		Сообщение благодарности успешно удалено
 lm	thankyou.communication.imessages		
-lm	thankyou.component.cover_info.desc		
-lm	thankyou.component.cover_info.title		
-lm	thankyou.component.no_thanks_all		
-lm	thankyou.component.no_thanks_user		
-lm	thankyou.component.options.custom_title		
-lm	thankyou.component.options.num_items		
-lm	thankyou.component.options.profile_images		
-lm	thankyou.component.options.show_button		
-lm	thankyou.component.options.show_header		
-lm	thankyou.component.options.user_id		
-lm	thankyou.component_heading		
-lm	thankyou.error.no_edit_permission		
-lm	thankyou.error.thanks_not_found		
+lm	thankyou.component.cover_info.desc		Позволить пользователям отмечать кого-то и публично говорить "спасибо". Отображает список последних "спасибо"
+lm	thankyou.component.cover_info.title		Спасибо
+lm	thankyou.component.no_thanks_all		Еще никого не поблагодарили
+lm	thankyou.component.no_thanks_user		% s еще не поблагодарили
+lm	thankyou.component.options.custom_title		Заголовок
+lm	thankyou.component.options.num_items		Количество элементов для отображения
+lm	thankyou.component.options.profile_images		Показать изображения профиля
+lm	thankyou.component.options.show_button		Показать кнопку "Сказать спасибо"
+lm	thankyou.component.options.show_header		Показать заголовок
+lm	thankyou.component.options.user_id		Фильтровать по пользователю
+lm	thankyou.component_heading		Спасибо
+lm	thankyou.error.no_edit_permission		У вас нет прав на изменение этого сообщения
+lm	thankyou.error.thanks_not_found		Сообщение благодарности не существует
 lm	thankyou.grammar.list.and		
 lm	thankyou.notifications.saved		
-lm	thankyou.user_profile.tab_name		
+lm	thankyou.user_profile.tab_name		Спасибо
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
-lt	thankyou:admin:export:end_date.body		
-lt	thankyou:admin:export:start_date.body		
-lt	thankyou:admin:export_csv.body		
+lt	thankyou:admin:export:end_date.body		До тех пор
+lt	thankyou:admin:export:start_date.body		От:
+lt	thankyou:admin:export_csv.body		Экспорт в *.csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:menu:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notifications']	
-lt	thankyou:admin:messages_heading.body		
-lt	thankyou:admin:messages_help.body		
+lt	thankyou:admin:messages_heading.body		Сообщения благодарности
+lt	thankyou:admin:messages_help.body		Управляйте сообщениями благодарности, опубликованными пользователями. Обратите внимание, что любые выполненные здесь изменения будут отражены в компоненте благодарности и в профиле каждого пользователя.
 lt	thankyou:admin:notifications:notify_line_manager.body		
 lt	thankyou:admin:notifications:save.body		
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		
-lt	thankyou:component:delete.body		
-lt	thankyou:component:delete_confirm.body		
-lt	thankyou:component:delete_thank_you.body		
-lt	thankyou:component:edit.body		
-lt	thankyou:component:modal:close.body		
-lt	thankyou:component:modal:comment.body		
-lt	thankyou:component:modal:submit.body		
-lt	thankyou:component:modal:to.body		
+lt	thankyou:component:delete.body		Удалить
+lt	thankyou:component:delete_confirm.body		Вы уверены, что хотите удалить это сообщение благодарности?
+lt	thankyou:component:delete_thank_you.body		Удалить благодарность
+lt	thankyou:component:edit.body		Редактировать
+lt	thankyou:component:modal:close.body		Закрыть
+lt	thankyou:component:modal:comment.body		Комментарий
+lt	thankyou:component:modal:submit.body		Отправить
+lt	thankyou:component:modal:to.body		По
 lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
-lt	thankyou:component:say_thank_you.body		
-lt	thankyou:component:thankyou_users_name.body		
+lt	thankyou:component:say_thank_you.body		Сказать спасибо
+lt	thankyou:component:thankyou_users_name.body		Спасибо
