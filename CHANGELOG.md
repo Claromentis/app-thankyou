@@ -1,5 +1,8 @@
 # Change Log #
 
+## Version 3.3.0 ##
+* Core dependency updated **>=8.6**
+
 ## 3.2.4
 * Added Russian translations and twig template
 
