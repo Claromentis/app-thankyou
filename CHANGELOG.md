@@ -1,5 +1,8 @@
 # Change Log #
 
+## 3.2.5 Unreleased
+* !38 BT-680 Fixed missing Localizations in User Picker.
+
 ## 3.2.4
 * Added Russian translations and twig template
 
