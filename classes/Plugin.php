@@ -46,11 +46,11 @@ class Plugin implements
 		};
 
 		// Admin panel
-		$app['admin.panels'] = $app->extend('admin.panels', function ($panels) {
+		$app['admin.panels'] = $app->extend('admin.panels', function ($panels, $app) {
 			$panels['thankyou'] = [
-				'name' => lmsg('thankyou.app_name'),
+				'name'      => $app['lmsg']('thankyou.app_name'),
 				'css_class' => 'glyphicons-donate',
-				'url' => '/thankyou/admin/'];
+				'url'       => '/thankyou/admin/'];
 
 			return $panels;
 		});
@@ -61,15 +61,15 @@ class Plugin implements
 		};
 
 		// Controllers
-		$app['thankyou.admin_messages_controller'] = function ($app) {
+		$app['thankyou.admin_messages_controller'] = function () {
 			return new AdminMessagesController();
 		};
 
-		$app['thankyou.admin_export_controller'] = function ($app) {
+		$app['thankyou.admin_export_controller'] = function () {
 			return new AdminExportController();
 		};
 
-		$app['thankyou.admin_notifications_controller'] = function ($app) {
+		$app['thankyou.admin_notifications_controller'] = function () {
 			return new AdminNotificationsController();
 		};
 
@@ -89,7 +89,7 @@ class Plugin implements
 
 		$app['thankyou.thanks_list_view'] = function ($app) {
 			/**
-			 * @var PanelsList $panels;
+			 * @var PanelsList $panels ;
 			 */
 			$panels = $app['admin.panels_list'];
 
@@ -134,7 +134,7 @@ class Plugin implements
 	 *     }
 	 *  );
 	 *
-	 * @param \Claromentis\Core\Application $app An Application instance
+	 * @param Application $app An Application instance
 	 *
 	 * @return array
 	 */
@@ -151,7 +151,6 @@ class Plugin implements
 			}
 		];
 	}
-
 
 	/**
 	 * Returns REST routes for the application.
@@ -186,23 +185,24 @@ class Plugin implements
 
 	/**
 	 * Instant Message types
+	 *
 	 * @return array
 	 */
 	public function GetIMConfig()
 	{
-		return array(
+		return [
 			"thankyou",
 			lmsg("thankyou.communication.imessages"),
-			array(
+			[
 				Constants::IM_TYPE_THANKYOU
-			)
-		);
+			]
+		];
 	}
 
 	/**
 	 * Register the module's event listeners.
 	 *
-	 * @param Container $app
+	 * @param Container                $app
 	 * @param EventDispatcherInterface $dispatcher
 	 */
 	public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
@@ -215,7 +215,7 @@ class Plugin implements
 	 *
 	 * Adds the thank you tab.
 	 *
-	 * @param array $attr
+	 * @param array       $attr
 	 * @param Application $app
 	 * @return string
 	 */
@@ -228,15 +228,18 @@ class Plugin implements
 					return '';
 				/** @var ThanksRepository $repository */
 				$repository = $app['thankyou.repository'];
-				$count = $repository->GetCountForUser($attr['user_id']);
-				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> '.lmsg("thankyou.user_profile.tab_name").' (<b>'.$count.'</b>)</a></li>';
+				$count      = $repository->GetCountForUser($attr['user_id']);
+
+				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $app['lmsg']("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
 				if (empty($attr['user_id']) || !is_numeric($attr['user_id']))
 					return '';
-				$component = new UI\Wall();
-				$component_data = $component->Show(array('user_id' => $attr['user_id'], 'limit' => 20), $app);
+				$component      = new UI\Wall();
+				$component_data = $component->Show(['user_id' => $attr['user_id'], 'limit' => 20], $app);
+
 				return '<div id="thanks">' . $component_data . '</div>';
 		}
+
 		return '';
 	}
 }
