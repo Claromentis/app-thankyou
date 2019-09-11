@@ -5,8 +5,8 @@
     "keywords": ["claromentis", "thankyou", "thanks"],
     "license": "proprietary",
     "require": {
-        "php": ">=5.6.0",
+        "php": ">=7.2",
         "claromentis/installer-composer-plugin": "^1.2.3",
-        "claromentis/framework": ">=8.2"
+        "claromentis/framework": ">=8.9"
     }
 }
