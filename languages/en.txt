@@ -18,6 +18,7 @@ lm	thankyou.component.options.show_button		Show "Say thank you" button
 lm	thankyou.component.options.show_header		Show title
 lm	thankyou.component.options.user_id		Filter by user
 lm	thankyou.component_heading		Thank you
+lm	thankyou.error.invalid_users		Failed to save Thank You, the Users provided were not valid
 lm	thankyou.error.no_edit_permission		You do not have permission to modify this thank you message
 lm	thankyou.error.thanks_not_found		Thank you message does not exist
 lm	thankyou.grammar.list.and		and

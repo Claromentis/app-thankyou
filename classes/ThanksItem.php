@@ -1,7 +1,11 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use ActiveRecord;
 use Claromentis\Core\Services;
+use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
+use Exception;
+use LogicException;
 use ObjectsStorage;
 
 /**
@@ -12,11 +16,51 @@ use ObjectsStorage;
  * @property-read int    $date_created
  * @property-read string $description
  */
-class ThanksItem extends \ActiveRecord
+class ThanksItem extends ActiveRecord
 {
+	//TODO: add constructor so that the object can only exist fully instantiated
+
 	const AGGREGATION = 143;
 
 	protected $users_ids = null;
+
+	public function Delete()
+	{
+		try
+		{
+			$id = $this->GetProperty('id');
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
+		}
+
+		if (!isset($id))
+		{
+			throw new ThankYouRuntimeException("Failed to delete Thank You, ID unknown");
+		}
+
+		$id = (int) $id;
+
+		$db = Services::I()->GetDb();
+		$db->query('DELETE FROM thankyou_user WHERE thanks_id = int:id', $id);
+
+		parent::Delete();
+	}
+
+	/**
+	 * @return int
+	 * @throws LogicException
+	 */
+	public function GetAuthor()
+	{
+		try
+		{
+			return (int) $this->GetProperty('author');
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
+		}
+	}
 
 	public function InitDbMapping(ObjectsStorage $storage)
 	{
@@ -28,27 +72,92 @@ class ThanksItem extends \ActiveRecord
 		$storage->MapDbColumn($this, 'description', ObjectsStorage::T_CLOB);
 	}
 
+	/**
+	 * @throws ThankYouRuntimeException
+	 * @throws LogicException
+	 */
 	public function Save()
 	{
-		parent::Save();
+		if (!parent::Save())
+		{
+			throw new ThankYouRuntimeException("Failed to Save Thank You");
+		}
 
 		$db = Services::I()->GetDb();
 
-		$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $this->GetProperty('id'));
+		try{
+			$id = $this->GetProperty('id');
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
+		}
+
+		$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $id);
 
 		foreach ($this->users_ids as $user_id)
 		{
-			$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $this->GetProperty('id'), $user_id);
+			$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $id, $user_id);
 		}
 	}
 
+	/**
+	 * @param int $value
+	 * @throws LogicException
+	 */
+	public function SetAuthor(int $value)
+	{
+		try
+		{
+			$this->SetProperty('author', $value);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by SetProperty", null, $exception);
+		}
+	}
+
+	/**
+	 * @param string $value
+	 * @throws LogicException
+	 */
+	public function SetDateCreated(string $value)
+	{
+		try
+		{
+			$this->SetProperty('date_created', $value);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by SetProperty", null, $exception);
+		}
+	}
+
+	/**
+	 * @param $value
+	 * @throws LogicException
+	 */
 	public function SetDescription($value)
 	{
-		$this->SetProperty('description', $value);
+		try
+		{
+			$this->SetProperty('description', $value);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by Set Property", null, $exception);
+		}
 	}
 
 	public function SetUsers($users_ids)
 	{
+		//TODO: Validate Users
+		if (!is_array($users_ids))
+		{
+			$users_ids = [$users_ids];
+		}
+
+		foreach ($users_ids as $offset => $user_id)
+		{
+			$users_ids[$offset] = (int) $user_id;
+		}
+
 		$this->users_ids = $users_ids;
 	}
 

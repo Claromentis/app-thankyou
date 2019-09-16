@@ -12,6 +12,8 @@ use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminMessagesController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
+use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
+use Claromentis\ThankYou\Controller\ThanksController;
 use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
@@ -78,9 +80,9 @@ class Plugin implements
 		};
 
 		// Notification
-		$app['thankyou.line_manager_notifier'] = function () {
+		/*$app['thankyou.line_manager_notifier'] = function () {
 			return new LineManagerNotifier();
-		};
+		};*/
 
 		// Repositories
 		$app['thankyou.repository'] = function ($app) {
@@ -103,6 +105,10 @@ class Plugin implements
 
 		$app['thankyou.config'] = function ($app) {
 			return $app['config.factory']('thankyou');
+		};
+
+		$app[ThanksController::class] = function ($app) {
+			return new ThanksController($app['lmsg'], $app[UseCase\ThankYou::class], $app['thankyou.config'], $app['admin.panels_list']->GetOne('thankyou'));
 		};
 	}
 
@@ -141,13 +147,17 @@ class Plugin implements
 	public function GetRoutes(Application $app)
 	{
 		return [
-			'/thankyou/admin' => function (ControllerCollection $routes) use ($app) {
+			'/thankyou' => function (ControllerCollection $routes) use ($app) {
+				$routes->secure('html', 'user');
+				$routes->post('/thanks/create', ThanksController::class . ':CreateOrUpdate');
+				$routes->post('/thanks/delete', ThanksController::class . ':Delete');
+
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
-				$routes->get('/', 'thankyou.admin_messages_controller:Show');
-				$routes->get('/export', 'thankyou.admin_export_controller:ShowExportPanel');
-				$routes->post('/export', 'thankyou.admin_export_controller:ExportCsv');
-				$routes->get('/notifications', 'thankyou.admin_notifications_controller:ShowNotificationsPanel');
-				$routes->post('/notifications', 'thankyou.admin_notifications_controller:SubmitNotificationsConfig');
+				$routes->get('/admin', 'thankyou.admin_messages_controller:Show');
+				$routes->get('/admin/export', 'thankyou.admin_export_controller:ShowExportPanel');
+				$routes->post('/admin/export', 'thankyou.admin_export_controller:ExportCsv');
+				$routes->get('/admin/notifications', 'thankyou.admin_notifications_controller:ShowNotificationsPanel');
+				$routes->post('/admin/notifications', 'thankyou.admin_notifications_controller:SubmitNotificationsConfig');
 			}
 		];
 	}
