@@ -170,21 +170,4 @@ class ThanksRepository
 
 		return $count;
 	}
-
-	/**
-	 * Delete the given thank you note and its user associations.
-	 *
-	 * @param ThanksItem $item
-	 */
-	public function Delete(ThanksItem $item)
-	{
-		$id = $item->id;
-
-		if (!$id)
-			return;
-
-		$item->Delete();
-
-		$this->db->query('DELETE FROM thankyou_user WHERE thanks_id = int:id', $id);
-	}
 }
