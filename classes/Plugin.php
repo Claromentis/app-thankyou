@@ -8,12 +8,14 @@ use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
+use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminMessagesController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
@@ -89,13 +91,13 @@ class Plugin implements
 			return new ThanksRepository($app->db);
 		};
 
-		$app['thankyou.thanks_list_view'] = function ($app) {
+		$app[ThanksListView::class] = function ($app) {
 			/**
 			 * @var PanelsList $panels ;
 			 */
 			$panels = $app['admin.panels_list'];
 
-			return new ThanksListView($panels->GetOne('thankyou'));
+			return new ThanksListView($panels->GetOne('thankyou'), $app[Api::class]);
 		};
 
 		// Pages component
@@ -107,8 +109,8 @@ class Plugin implements
 			return $app['config.factory']('thankyou');
 		};
 
-		$app[ThanksController::class] = function ($app) {
-			return new ThanksController($app['lmsg'], $app[UseCase\ThankYou::class], $app['thankyou.config'], $app['admin.panels_list']->GetOne('thankyou'));
+		$app[ThankYous::class] = function ($app) {
+			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['admin.panels_list']->GetOne('thankyou'), $app['thankyou.config']);
 		};
 	}
 
@@ -171,9 +173,13 @@ class Plugin implements
 	public function GetRestRoutes(Application $app)
 	{
 		return [
-			'/thankyou/v0' => '/thankyou/v1',
+			'/thankyou/v0' => '/thankyou/v2',
 			'/thankyou/v1' => function (ControllerCollection $routes) {
 				$routes->get('/thanks/{id}', 'thankyou.rest_controller:GetThanksItem')->assert('id', '\d+');
+			},
+			'/thankyou/v2' => function (ControllerCollection $routes) {
+				$routes->get('/thanks/{id}', ThanksRestV2::class . ':GetThankYou')->assert('id', '\d+');
+				$routes->get('/thanks', ThanksRestV2::class . ':GetThankYous');
 			}
 		];
 	}

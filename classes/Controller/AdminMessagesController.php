@@ -41,7 +41,7 @@ class AdminMessagesController
 		/**
 		 * @var ThanksListView $view
 		 */
-		$view = $app['thankyou.thanks_list_view'];
+		$view = $app[ThanksListView::class];
 		$args['items.datasrc'] = $view->Show($thanks, ['admin' => true], $app->security);
 
 		$args['no_thanks.body'] = lmsg('thankyou.component.no_thanks_all');

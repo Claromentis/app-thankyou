@@ -60,7 +60,7 @@ class Wall extends TemplaterComponentTmpl
 		/**
 		 * @var ThanksListView $view
 		 */
-		$view = $app['thankyou.thanks_list_view'];
+		$view = $app[ThanksListView::class];
 		$args['items.datasrc'] = $view->Show($thanks, $attributes, $app->security);
 
 		if (isset($attributes['allow_new']) && !(bool) $attributes['allow_new'])

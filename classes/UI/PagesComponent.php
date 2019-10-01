@@ -69,7 +69,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		/**
 		 * @var ThanksListView $view
 		 */
-		$view = $app['thankyou.thanks_list_view'];
+		$view = $app[ThanksListView::class];
 		$args['items.datasrc'] = $view->Show($thanks, [
 			'profile_images' => $options->Get('profile_images')
 		], $app->security);
@@ -119,7 +119,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			/**
 			 * @var ThanksListView $view
 			 */
-			$view = $app['thankyou.thanks_list_view'];
+			$view = $app[ThanksListView::class];
 			$args = $view->ShowAddNew($user_id);
 		} else
 		{

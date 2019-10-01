@@ -2,70 +2,68 @@
 
 namespace Claromentis\ThankYou\Controller;
 
-use Claromentis\Core\Admin\AdminPanel;
-use Claromentis\Core\Config\Config;
 use Claromentis\Core\Http\RedirectResponse;
 use Claromentis\Core\Http\RequestData;
 use Claromentis\Core\Http\RequestDataTokenException;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
+use Claromentis\Core\Widget\Sugre\SugreRepository;
+use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\UseCase\ThankYou;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ThanksController
 {
-	private $config;
+	private $api;
 
 	private $lmsg;
 
-	private $thank_you_admin_panel;
+	private $sugre_repository;
 
-	private $use_case;
-
-	public function __construct(Lmsg $lmsg, ThankYou $use_case, Config $config, AdminPanel $thank_you_admin_panel)
+	public function __construct(Lmsg $lmsg, Api $api, SugreRepository $sugre_repository)
 	{
-		$this->config                = $config;
-		$this->lmsg                  = $lmsg;
-		$this->thank_you_admin_panel = $thank_you_admin_panel;
-		$this->use_case              = $use_case;
+		$this->api              = $api;
+		$this->lmsg             = $lmsg;
+		$this->sugre_repository = $sugre_repository;
 	}
 
 	/**
+	 * Create a new Thank You, or update an existing Thank You.
+	 *
 	 * @param RequestData            $request_data
 	 * @param ServerRequestInterface $request
 	 * @param SecurityContext        $security_context
 	 * @return RedirectResponse
-	 * @throws RequestDataTokenException
+	 * @throws
 	 */
 	public function CreateOrUpdate(RequestData $request_data, ServerRequestInterface $request, SecurityContext $security_context)
 	{
 		$request_data->CheckToken();
-		$post     = $request->getParsedBody();
+		$post = $request->getParsedBody();
+
 		$redirect = $request->getServerParams()['HTTP_REFERER'];
 
 		$id          = (int) ($post['thank_you_id'] ?? null);
-		$users_ids   = (array) $post['thank_you_user'] ?? null;
+		$thanked     = (array) ($post['thank_you_user'] ?? null);
 		$description = (string) $post['thank_you_description'] ?? '';
+
+		if (isset($thanked))
+		{
+			$thanked = $this->sugre_repository->DecodeOutput($thanked);
+		}
 
 		try
 		{
 			if ($id === 0)
 			{
-				$notify_line_manager = false;
-				if ($this->config->Get('notify_line_manager'))
-				{
-					$notify_line_manager = true;
-				}
-
-				$this->use_case->Create($users_ids, $description, $notify_line_manager);
+				$this->api->ThankYous()->CreateAndSave($security_context, $thanked, $description);
 			} else
 			{
 				try
 				{
-					$this->use_case->Update($security_context, $id, $users_ids, $description, $this->thank_you_admin_panel);
+					$this->api->ThankYous()->UpdateAndSave($security_context, $id, $thanked, $description);
 				} catch (ThankYouNotFound $thank_you_not_found)
 				{
 					return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.error.thanks_not_found'), true);
@@ -98,7 +96,7 @@ class ThanksController
 
 		try
 		{
-			$this->use_case->Delete($security_context, $id, $this->thank_you_admin_panel);
+			$this->api->ThankYous()->Delete($security_context, $id);
 		} catch (ThankYouNotFound $thank_you_not_found)
 		{
 			return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.error.thanks_not_found'), true);

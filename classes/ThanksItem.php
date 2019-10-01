@@ -22,7 +22,9 @@ class ThanksItem extends ActiveRecord
 
 	const AGGREGATION = 143;
 
-	protected $users_ids = null;
+	protected $users_ids;
+
+	private $thanked;
 
 	public function Delete()
 	{
@@ -43,12 +45,13 @@ class ThanksItem extends ActiveRecord
 
 		$db = Services::I()->GetDb();
 		$db->query('DELETE FROM thankyou_user WHERE thanks_id = int:id', $id);
+		$db->query('DELETE FROM thankyou_thanked WHERE item_id = int:id', $id);
 
 		parent::Delete();
 	}
 
 	/**
-	 * @return int
+	 * @return int|null
 	 * @throws LogicException
 	 */
 	public function GetAuthor()
@@ -56,6 +59,36 @@ class ThanksItem extends ActiveRecord
 		try
 		{
 			return (int) $this->GetProperty('author');
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
+		}
+	}
+
+	/**
+	 * @return string|null
+	 * @throws LogicException
+	 */
+	public function GetDateCreated()
+	{
+		try
+		{
+			return $this->GetProperty('date_created');
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
+		}
+	}
+
+	/**
+	 * @return string|null
+	 * @throws LogicException
+	 */
+	public function GetDescription()
+	{
+		try
+		{
+			return $this->GetProperty('description');
 		} catch (Exception $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
@@ -72,6 +105,21 @@ class ThanksItem extends ActiveRecord
 		$storage->MapDbColumn($this, 'description', ObjectsStorage::T_CLOB);
 	}
 
+	public function Load($id)
+	{
+		if (!($parent_load = parent::Load($id)))
+		{
+			return $parent_load;
+		}
+
+		$db = Services::I()->GetDb();
+
+		$thank_you_users = $db->query("SELECT user_id FROM thankyou_user WHERE thanks_id IN in:int:ids", $id)->fetchAllValues();
+		$this->SetUsers($thank_you_users);
+
+		return true;
+	}
+
 	/**
 	 * @throws ThankYouRuntimeException
 	 * @throws LogicException
@@ -85,18 +133,31 @@ class ThanksItem extends ActiveRecord
 
 		$db = Services::I()->GetDb();
 
-		try{
+		try
+		{
 			$id = $this->GetProperty('id');
 		} catch (Exception $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
 		}
 
-		$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $id);
-
-		foreach ($this->users_ids as $user_id)
+		if (isset($this->users_ids))
 		{
-			$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $id, $user_id);
+			$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $id);
+
+			foreach ($this->users_ids as $user_id)
+			{
+				$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $id, $user_id);
+			}
+		}
+
+		if (isset($this->thanked))
+		{
+			$db->query("DELETE FROM thankyou_thanked WHERE item_id=int:id", $id);
+			foreach ($this->thanked as $thank)
+			{
+				$db->query("INSERT INTO thankyou_thanked (item_id, object_type, object_id) VALUES (int:tyid, int:otid, int:oid)", $id, $thank['object_type'], $thank['object_id']);
+			}
 		}
 	}
 
@@ -143,6 +204,33 @@ class ThanksItem extends ActiveRecord
 		{
 			throw new LogicException("Unexpected Exception thrown by Set Property", null, $exception);
 		}
+	}
+
+	/**
+	 * @param int $id
+	 * @throws LogicException
+	 */
+	public function SetId(int $id)
+	{
+		try
+		{
+			$this->SetProperty('id', $id);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by Set Property", null, $exception);
+		}
+	}
+
+	public function SetThanked(array $thanked)
+	{
+		foreach ($thanked as $thank)
+		{
+			if (!is_array($thank) || !isset($thank['object_type']) || !is_int($thank['object_type']) || !isset($thank['object_id']) || !is_int($thank['object_id']))
+			{
+				throw new ThankYouRuntimeException("Failed to Set Thanked, invalid Thank provided");
+			}
+		}
+		$this->thanked = $thanked;
 	}
 
 	public function SetUsers($users_ids)
