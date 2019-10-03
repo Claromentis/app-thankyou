@@ -58,7 +58,7 @@ class ThanksController
 		{
 			if ($id === 0)
 			{
-				$this->api->ThankYous()->CreateAndSave($security_context, $thanked, $description);
+				$this->api->ThankYous()->CreateAndSave($security_context->GetUser(), $thanked, $description);
 			} else
 			{
 				try
