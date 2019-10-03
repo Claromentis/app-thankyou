@@ -12,33 +12,45 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\ThankYous\ThankYou;
+use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Date;
 use Exception;
 use LogicException;
 use NotificationMessage;
+use User;
 
 class ThankYous
 {
+	private $acl;
+
 	private $config;
 
 	private $line_manager_notifier;
 
-	private $thank_you_admin_panel;
-
 	private $thank_yous;
 
-	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous, AdminPanel $thank_you_admin_panel, Config $config)
+	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous, Config $config, ThankYouAcl $acl)
 	{
+		$this->acl = $acl;
 		$this->config = $config;
 		$this->line_manager_notifier = $line_manager_notifier;
-		$this->thank_you_admin_panel = $thank_you_admin_panel;
 		$this->thank_yous = $thank_yous;
 	}
 
-	public function CreateAndSave(SecurityContext $security_context, array $thanked, string $description, ?Date $date_created = null)
+	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
 	{
-		$thank_you = $this->thank_yous->Create($security_context->GetUser(true), $description, $date_created);
+		return $this->acl->CanDeleteThankYou($thank_you, $security_context);
+	}
+
+	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
+	{
+		return $this->acl->CanEditThankYou($thank_you, $security_context);
+	}
+
+	public function CreateAndSave(User $user, array $thanked, string $description, ?Date $date_created = null)
+	{
+		$thank_you = $this->thank_yous->Create($user, $description, $date_created);
 
 		$thankables = $this->thank_yous->CreateThankablesFromOClasses($thanked);
 		$thank_you->SetThanked($thankables);
@@ -59,7 +71,7 @@ class ThankYous
 			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
 
 			$params = [
-				'author'              => $security_context->GetFullName(),
+				'author'              => $user->GetFullName(),
 				'other_people_number' => count($users_ids) - 1,
 				'description'         => $description,
 			];
@@ -117,18 +129,28 @@ class ThankYous
 		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
 	}
 
+	/**
+	 * @param int      $limit
+	 * @param int      $offset
+	 * @param bool     $thanked
+	 * @param int|null $viewing_user_id
+	 * @return ThankYou[]
+	 * @throws ThankYouInvalidThankable
+	 * @throws ThankYouRuntimeException
+	 * @throws LogicException
+	 */
 	public function GetRecentThankYous(int $limit, int $offset = 0, bool $thanked = false, ?int $viewing_user_id = null)
 	{
 		$extranet_area_id = null;
 		if (isset($viewing_user_id))
 		{
 			$users = $this->thank_yous->GetUsers([$viewing_user_id]);
-			if (!isset($users[0]))
+			if (!isset($users[$viewing_user_id]))
 			{
 				throw new ThankYouRuntimeException("Failed to Get Recent Thank Yous, User not found");
 			}
 
-			$extranet_area_id = $users[0]->GetExAreaId();
+			$extranet_area_id = $users[$viewing_user_id]->GetExAreaId();
 
 			if (is_string($extranet_area_id))
 			{
@@ -138,14 +160,20 @@ class ThankYous
 
 		$thank_you_ids = $this->thank_yous->GetRecentThankYousIdsFromDb($limit, $offset, $extranet_area_id);
 
-		return $this->GetThankYous($thank_you_ids, $thanked);
+		try
+		{
+			return $this->GetThankYous($thank_you_ids, $thanked);
+		} catch (ThankYouNotFound $thank_you_not_found)
+		{
+			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
+		}
 	}
 
 	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
 	{
 		$thank_you = $this->thank_yous->GetThankYous([$id], false)[$id];
 
-		if ($thank_you->GetAuthor()->GetId() !== $security_context->GetUserId() && !$this->thank_you_admin_panel->IsAccessible($security_context))
+		if (!$this->acl->CanEditThankYou($thank_you, $security_context))
 		{
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
@@ -176,7 +204,7 @@ class ThankYous
 	{
 		$thank_you = $this->thank_yous->GetThankYous([$id], false)[$id];
 
-		if ($thank_you->GetAuthor()->GetId() !== $security_context->GetUserId() && !$this->thank_you_admin_panel->IsAccessible($security_context))
+		if (!$this->CanEditThankYou($thank_you, $security_context))
 		{
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
