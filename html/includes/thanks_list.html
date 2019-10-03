@@ -6,11 +6,15 @@
 		<div class="thank-you-note">
 			<txt name="thankyou:component:thankyou_users_name">Thank you</txt>
 			<datasrc name="users">
-				<a name="user_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
+				<a name="thanked_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
 					<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
-					<txt name="user_name">John Smith</txt><!--
-				--></a><!--
-				--><txt name="delimiter_visible">, </txt>
+					<txt name="thanked_name">John Smith</txt>
+				</a>
+				<span name="thanked_no_link">
+					<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+					<txt name="thanked_name">John Smith</txt>
+				 </span>
+				<txt name="delimiter_visible">, </txt>
 			</datasrc>
 			<hr>
 			<div class="row">
@@ -30,6 +34,8 @@
 							<a href="javascript:void(0)" name="edit_thanks_link" class="no-decoration edit-thanks js-edit-thanks" data-id="0" rel="tooltip" title="${common:edit.body}">
 								<span class="glyphicons glyphicons-pencil" rel="tooltip" title=""></span>
 							</a>
+						</txt>
+						<txt name="delete_thanks">
 							<a href="javascript:void(0)" name="delete_thanks_link" class="no-decoration delete-thanks js-delete-thanks" data-id="0" rel="tooltip" title="${common:delete.body}">
 								<span class="glyphicons glyphicons-bin"></span>
 							</a>
@@ -105,7 +111,7 @@
 			for (var i in item.thanked) {
 				var thanked = item.thanked[i];
 
-				cla_multi_object_picker.addOption(thanked.oclass, thanked.id, thanked.object_type.name + ": " + thanked.name, 'thank_you_user');
+				cla_multi_object_picker.addOption(thanked.object_type.id, thanked.id, thanked.object_type.name + ": " + thanked.name, 'thank_you_user');
 			}
 
 			thankYouUserSelect.trigger('change');

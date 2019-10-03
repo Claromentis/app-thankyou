@@ -3,11 +3,14 @@ namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\ComponentInterface;
+use Claromentis\Core\Component\Exception\ComponentRuntimeException;
 use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
-use Claromentis\ThankYou\ThanksRepository;
+use Claromentis\Core\Security\SecurityContext;
+use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\View\ThanksListView;
+use DateClaTimeZone;
 
 /**
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
@@ -38,63 +41,42 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => lmsg('thankyou.component.options.show_button')],
 			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => lmsg('thankyou.component.options.profile_images')],
 			'limit' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50],
-			'user_id' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
+		//	'user_id' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
 		];
 	}
 
 	/**
 	 * Render this component with the specified options
 	 *
-	 * @param string $id_string
+	 * @param string           $id_string
 	 * @param OptionsInterface $options
-	 * @param Application $app
+	 * @param Application      $app
 	 *
 	 * @return string
 	 */
 	public function ShowBody($id_string, OptionsInterface $options, Application $app)
 	{
-		$args = array();
+		$api              = $app[Api::class];
+		$security_context = $app[SecurityContext::class];
+		$view             = $app[ThanksListView::class];
 
-		/** @var ThanksRepository $repository */
-		$repository = $app['thankyou.repository'];
+		$user_id = $security_context->GetUserId();
+		if ($user_id === 0)
+		{
+			$user_id = null;
+		}
 
-		$user_id = $options->Get('user_id');
 		$limit = $options->Get('limit');
-
-		if ($user_id)
-			$thanks = $repository->GetForUser($user_id, $limit);
-		else
-			$thanks = $repository->GetRecent($limit);
-
-		/**
-		 * @var ThanksListView $view
-		 */
-		$view = $app[ThanksListView::class];
-		$args['items.datasrc'] = $view->Show($thanks, [
-			'profile_images' => $options->Get('profile_images')
-		], $app->security);
-
-		if (count($args['items.datasrc']) === 0)
+		if (!is_int($limit))
 		{
-			$msg = lmsg('thankyou.component.no_thanks_all');
-
-			if ($user_id)
-				$msg = lmsg('thankyou.component.no_thanks_user', \User::GetNameById($user_id));
-
-			$args['no_thanks.body'] = $msg;
+			throw new ComponentRuntimeException("Failed to Show Thank You Component, Limit is not an integer");
 		}
 
-		// show "say thank you" within body if header is hidden
-		if ($options->Get('allow_new') && !$options->Get('show_header'))
-		{
-			$args = $view->ShowAddNew($user_id) + $args;
-		} else
-		{
-			$args['allow_new.visible'] = 0;
-		}
+		$thank_yous = $api->ThankYous()->GetRecentThankYous($limit, 0, true, $user_id);
 
-		$template = 'thankyou/pages_component.html';
-		return $this->CallTemplater($template, $args);
+		$allow_new = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
+
+		return $view->DisplayThankYousList($thank_yous, DateClaTimeZone::GetCurrentTZ(), (bool) $options->Get('profile_images'), $allow_new, true, true, true, $security_context);
 	}
 
 	/**
@@ -112,15 +94,13 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		if (!$options->Get('show_header'))
 			return null;
 
-		$user_id = $options->Get('user_id');
-
 		if ($options->Get('allow_new'))
 		{
 			/**
 			 * @var ThanksListView $view
 			 */
 			$view = $app[ThanksListView::class];
-			$args = $view->ShowAddNew($user_id);
+			$args = $view->ShowAddNew();
 		} else
 		{
 			$args = ['allow_new.visible' => 0];

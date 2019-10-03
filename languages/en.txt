@@ -23,6 +23,7 @@ lm	thankyou.error.no_edit_permission		You do not have permission to modify this 
 lm	thankyou.error.thanks_not_found		Thank you message does not exist
 lm	thankyou.grammar.list.and		and
 lm	thankyou.notifications.saved		Settings saved
+lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	

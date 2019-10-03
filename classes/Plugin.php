@@ -5,6 +5,7 @@ use Claromentis\Core\Admin\PanelsList;
 use Claromentis\Core\Aggregation\AggregationFilterEvent;
 use Claromentis\Core\Application;
 use Claromentis\Core\ControllerCollection;
+use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
@@ -99,7 +100,7 @@ class Plugin implements
 			 */
 			$panels = $app['admin.panels_list'];
 
-			return new ThanksListView($panels->GetOne('thankyou'), $app[Api::class]);
+			return new ThanksListView($panels->GetOne('thankyou'), $app[Api::class], $app[Lmsg::class]);
 		};
 
 		// Pages component
