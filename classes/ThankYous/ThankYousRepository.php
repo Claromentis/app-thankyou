@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\ThankYous;
 use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\Exception\InvalidSubjectException;
 use Claromentis\Core\Acl\PermOClass;
+use Claromentis\Core\CDN\CDNSystemException;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
@@ -186,7 +187,18 @@ class ThankYousRepository
 				throw new ThankYouInvalidUsers("Failed to Create Thankables From Users, invalid object passed");
 			}
 
-			$users[$user_offset] = new Thankable($user->GetFullname(), PERM_OCLASS_INDIVIDUAL, $user->GetId(), $user->GetExAreaId());
+			$user_image_url = null;
+			try
+			{
+				$user_image_url = User::GetPhotoUrl($user->GetId());//TODO: Replace with a non-static post People API update
+			} catch (CDNSystemException $cdn_system_exception)
+			{
+				//TODO: add logging.
+			}
+
+			$user_profile_url = User::GetProfileUrl($user->GetId(), false);//TODO: Replace with a non-static post People API update
+
+			$users[$user_offset] = new Thankable($user->GetFullname(), PERM_OCLASS_INDIVIDUAL, $user->GetId(), $user->GetExAreaId(), $user_image_url, $user_profile_url);
 		}
 
 		return $users;
@@ -352,6 +364,11 @@ class ThankYousRepository
 	 */
 	public function GetThankYous(array $ids, bool $thanked = false)
 	{
+		if (count($ids) === 0)
+		{
+			return [];
+		}
+
 		foreach ($ids as $id)
 		{
 			if (!is_int($id))
