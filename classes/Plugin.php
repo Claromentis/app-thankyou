@@ -8,6 +8,7 @@ use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
+use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminMessagesController;
@@ -15,6 +16,7 @@ use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
+use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -110,7 +112,11 @@ class Plugin implements
 		};
 
 		$app[ThankYous::class] = function ($app) {
-			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['admin.panels_list']->GetOne('thankyou'), $app['thankyou.config']);
+			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class]);
+		};
+
+		$app[ThankYouAcl::class] = function ($app) {
+			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'));
 		};
 	}
 
