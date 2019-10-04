@@ -261,7 +261,7 @@ class ThanksListView
 	 * @param bool                 $links_enabled
 	 * @param SecurityContext|null $security_context
 	 * @return string
-	 * @throws CDNSystemException
+	 * @throws InvalidArgumentException
 	 */
 	public function DisplayThankYousList(array $thank_yous, DateTimeZone $time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null)
 	{
@@ -280,12 +280,12 @@ class ThanksListView
 			$date_created = clone $thank_you->GetDateCreated();
 			$date_created->setTimezone($time_zone);
 
-			$thanked      = $thank_you->GetThanked();
+			$thankeds     = $thank_you->GetThanked();
 			$view_thanked = [];
-			if (isset($thanked))
+			if (isset($thankeds))
 			{
-				$total_thanked = count($thank_you->GetThanked());
-				foreach ($thank_you->GetThanked() as $offset => $thanked)
+				$total_thanked = count($thankeds);
+				foreach ($thankeds as $offset => $thanked)
 				{
 					$image_url             = $thanked->GetImageUrl();
 					$thanked_link          = $thanked->GetProfileUrl();
@@ -307,12 +307,20 @@ class ThanksListView
 				}
 			}
 
+			try{
+				$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->GetId());//TODO: Replace with a non-static post People API update
+			} catch (CDNSystemException $CDN_system_exception)
+			{
+				//TODO: Logging
+				$author_image_url = '';
+			}
+
 			$view_thank_yous[] = [
 				'users.datasrc' => $view_thanked,
 
 				'author_name.body'  => $thank_you->GetAuthor()->GetFullname(),
 				'author_link.href'  => User::GetProfileUrl($thank_you->GetAuthor()->GetId()),//TODO: Replace with a non-static post People API update
-				'profile_image.src' => User::GetPhotoUrl($thank_you->GetAuthor()->GetId()),//TODO: Replace with a non-static post People API update
+				'profile_image.src' => $author_image_url,
 
 				'description.body_html'   => ClaText::ProcessPlain($thank_you->GetDescription()),
 				'has_description.visible' => strlen($thank_you->GetDescription()) > 0,
