@@ -238,6 +238,7 @@ class ThankYousRepository
 	public function GetUsers(array $user_ids)
 	{
 		$users_list_provider = new UsersListProvider();
+		$users_list_provider->SetFilterProtectExtranets(false);
 		$users_list_provider->SetFilterIds($user_ids);
 		try
 		{
