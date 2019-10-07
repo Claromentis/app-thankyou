@@ -32,16 +32,17 @@ class ThanksRestV2
 
 	public function GetThankYous(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
 	{
+		$extranet_area_id = (int) $security_context->GetExtranetAreaId();
 		$query_params = $request->getQueryParams();
 		$limit        = $query_params['limit'] ?? 20;
 		$offset       = $query_params['offset'] ?? 0;
 		$thanked      = (bool) (int) ($query_params['thanked'] ?? null);
 
-		$thank_yous         = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked, $security_context->GetExtranetAreaId());
+		$thank_yous         = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked, $extranet_area_id);
 		$display_thank_yous = [];
 		foreach ($thank_yous as $thank_you)
 		{
-			$display_thank_yous[] = $this->thank_you_view->ConvertThankYouToArray($thank_you, DateClaTimeZone::GetCurrentTZ());
+			$display_thank_yous[] = $this->thank_you_view->ConvertThankYouToArray($thank_you, DateClaTimeZone::GetCurrentTZ(), $extranet_area_id);
 		}
 
 		return new JsonPrettyResponse($display_thank_yous);

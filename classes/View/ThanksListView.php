@@ -9,7 +9,6 @@ use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
-use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThankYous\Thankable;
@@ -165,6 +164,7 @@ class ThanksListView
 	/**
 	 * @param ThankYou          $thank_you
 	 * @param DateTimeZone|null $time_zone
+	 * @param int|null $viewing_ex_area_id
 	 * @return array[
 	 *     author => [
 	 *         id => int,
@@ -181,7 +181,7 @@ class ThanksListView
 	 * ]
 	 * @throws ThankYouRuntimeException
 	 */
-	public function ConvertThankYouToArray(ThankYou $thank_you, ?DateTimeZone $time_zone = null): array
+	public function ConvertThankYouToArray(ThankYou $thank_you, ?DateTimeZone $time_zone = null, ?int $viewing_ex_area_id = null): array
 	{
 		if (!isset($time_zone))
 		{
@@ -191,10 +191,18 @@ class ThanksListView
 		$date_created = clone $thank_you->GetDateCreated();
 		$date_created->setTimezone($time_zone);
 
+		if (isset($viewing_ex_area_id) && $thank_you->GetAuthor()->GetExAreaId() !== $viewing_ex_area_id)
+		{
+			$author_name = ($this->lmsg)('common.perms.hidden_name');
+		} else
+		{
+			$author_name = $thank_you->GetAuthor()->GetFullname();
+		}
+
 		$output = [
 			'author'       => [
 				'id'   => $thank_you->GetAuthor()->GetId(),
-				'name' => $thank_you->GetAuthor()->GetFullname()
+				'name' => $author_name
 			],
 			'date_created' => $date_created,
 			'description'  => $thank_you->GetDescription(),
