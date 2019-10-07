@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\Controller\Rest;
 
 use Claromentis\Core\Http\JsonPrettyResponse;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\View\ThanksListView;
 use DateClaTimeZone;
@@ -29,14 +30,14 @@ class ThanksRestV2
 		return new JsonPrettyResponse($display_thank_you);
 	}
 
-	public function GetThankYous(ServerRequestInterface $request)
+	public function GetThankYous(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
 	{
 		$query_params = $request->getQueryParams();
 		$limit        = $query_params['limit'] ?? 20;
 		$offset       = $query_params['offset'] ?? 0;
 		$thanked      = (bool) (int) ($query_params['thanked'] ?? null);
 
-		$thank_yous         = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked);
+		$thank_yous         = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked, $security_context->GetExtranetAreaId());
 		$display_thank_yous = [];
 		foreach ($thank_yous as $thank_you)
 		{
