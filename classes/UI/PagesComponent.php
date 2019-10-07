@@ -59,11 +59,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		$api              = $app[Api::class];
 		$security_context = $app[SecurityContext::class];
 
-		$user_id = $security_context->GetUserId();
-		if ($user_id === 0)
-		{
-			$user_id = null;
-		}
+		$extranet_area_id = $security_context->GetExtranetAreaId();
 
 		$limit = $options->Get('limit');
 		if (!is_int($limit))
@@ -71,7 +67,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			throw new ComponentRuntimeException("Failed to Show Thank You Component, Limit is not an integer");
 		}
 
-		$thank_yous = $api->ThankYous()->GetRecentThankYous($limit, 0, true, $user_id);
+		$thank_yous = $api->ThankYous()->GetRecentThankYous($limit, 0, true, $extranet_area_id);
 
 		$allow_new = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
 

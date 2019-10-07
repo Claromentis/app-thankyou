@@ -264,7 +264,7 @@ class Plugin implements
 
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $app['lmsg']("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
-				$thank_yous     = $api->ThankYous()->GetRecentThankYous(20, 0, true, $security_context->GetUserId());
+				$thank_yous     = $api->ThankYous()->GetRecentThankYous(20, 0, true, (int) $security_context->GetExtranetAreaId());
 				$thank_you_list = $api->ThankYous()->DisplayThankYousList($thank_yous, $time_zone, false, true, true, true, true, $security_context);
 
 				return '<div id="thanks">' . $thank_you_list . '</div>';

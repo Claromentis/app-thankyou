@@ -155,31 +155,14 @@ class ThankYous
 	 * @param int      $limit
 	 * @param int      $offset
 	 * @param bool     $thanked
-	 * @param int|null $viewing_user_id
+	 * @param int|null $extranet_area_id
 	 * @return ThankYou[]
 	 * @throws ThankYouInvalidThankable
 	 * @throws ThankYouRuntimeException
 	 * @throws LogicException
 	 */
-	public function GetRecentThankYous(int $limit, int $offset = 0, bool $thanked = false, ?int $viewing_user_id = null)
+	public function GetRecentThankYous(int $limit, int $offset = 0, bool $thanked = false, ?int $extranet_area_id = null)
 	{
-		$extranet_area_id = null;
-		if (isset($viewing_user_id))
-		{
-			$users = $this->thank_yous_repository->GetUsers([$viewing_user_id]);
-			if (!isset($users[$viewing_user_id]))
-			{
-				throw new ThankYouRuntimeException("Failed to Get Recent Thank Yous, User not found");
-			}
-
-			$extranet_area_id = $users[$viewing_user_id]->GetExAreaId();
-
-			if (is_string($extranet_area_id))
-			{
-				$extranet_area_id = (int) $extranet_area_id;
-			}
-		}
-
 		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIdsFromDb($limit, $offset, $extranet_area_id);
 
 		try
