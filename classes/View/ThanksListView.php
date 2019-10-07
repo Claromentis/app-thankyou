@@ -290,6 +290,12 @@ class ThanksListView
 	 */
 	public function DisplayThankYousList(array $thank_yous, DateTimeZone $time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null)
 	{
+		$viewer_ex_area_id = null;
+		if (isset($security_context))
+		{
+			$viewer_ex_area_id = (int) $security_context->GetExtranetAreaId();
+		}
+
 		$args            = [];
 		$view_thank_yous = [];
 		foreach ($thank_yous as $thank_you)
@@ -299,11 +305,27 @@ class ThanksListView
 				throw new InvalidArgumentException("Failed to Display List of Thank Yous, array of Thank Yous must contain ThankYous only");
 			}
 
-			$id           = $thank_you->GetId();
+			$author_hidden = false;
+			if (isset($viewer_ex_area_id) && $viewer_ex_area_id !== (int) $thank_you->GetAuthor()->GetExAreaId())
+			{
+				$author_hidden = true;
+			}
+
+			try
+			{
+				$author_image_url = $author_hidden ? null : User::GetPhotoUrl($thank_you->GetAuthor()->GetId(), false);//TODO: Replace with a non-static post People API update
+			} catch (CDNSystemException $CDN_system_exception)
+			{
+				//TODO: Logging
+				$author_image_url = null;
+			}
+			$author_link  = $author_hidden ? null : User::GetProfileUrl($thank_you->GetAuthor()->GetId(), false);//TODO: Replace with a non-static post People API update
+			$author_name  = $author_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thank_you->GetAuthor()->GetFullname();
 			$can_edit     = isset($id) && $allow_edit && isset($security_context) && $this->thank_you_acl->CanEditThankYou($thank_you, $security_context);
 			$can_delete   = isset($id) && $allow_delete && isset($security_context) && $this->thank_you_acl->CanDeleteThankYou($thank_you, $security_context);
 			$date_created = clone $thank_you->GetDateCreated();
 			$date_created->setTimezone($time_zone);
+			$id = $thank_you->GetId();
 
 			$thankeds     = $thank_you->GetThanked();
 			$view_thanked = [];
@@ -312,14 +334,22 @@ class ThanksListView
 				$total_thanked = count($thankeds);
 				foreach ($thankeds as $offset => $thanked)
 				{
-					$image_url             = $thanked->GetImageUrl();
-					$thanked_link          = $thanked->GetProfileUrl();
-					$display_thanked_image = $display_thanked_images && isset($image_url);
+					$thanked_ex_area_id = $thanked->GetExtranetAreaId();
+					$thanked_hidden     = false;
+					if (isset($viewer_ex_area_id) && isset($thanked_ex_area_id) && $viewer_ex_area_id !== $thanked_ex_area_id)
+					{
+						$thanked_hidden = true;
+					}
+
+					$image_url             = $thanked_hidden ? null : $thanked->GetImageUrl();
+					$thanked_link          = $thanked_hidden ? null : $thanked->GetProfileUrl();
+					$display_thanked_image = !$thanked_hidden && $display_thanked_images && isset($image_url);
 					$thanked_tooltip       = $display_thanked_image ? $thanked->GetName() : '';
-					$thanked_link_enabled  = $links_enabled && isset($thanked_link);
+					$thanked_link_enabled  = !$thanked_hidden && $links_enabled && isset($thanked_link);
+					$thanked_name          = $thanked_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thanked->GetName();
 
 					$view_thanked[] = [
-						'thanked_name.body'         => $thanked->GetName(),
+						'thanked_name.body'         => $thanked_name,
 						'thanked_name.visible'      => !$display_thanked_image,
 						'thanked_link.visible'      => $thanked_link_enabled,
 						'thanked_no_link.visible'   => !$thanked_link_enabled,
@@ -332,20 +362,11 @@ class ThanksListView
 				}
 			}
 
-			try
-			{
-				$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->GetId());//TODO: Replace with a non-static post People API update
-			} catch (CDNSystemException $CDN_system_exception)
-			{
-				//TODO: Logging
-				$author_image_url = '';
-			}
-
 			$view_thank_yous[] = [
 				'users.datasrc' => $view_thanked,
 
-				'author_name.body'  => $thank_you->GetAuthor()->GetFullname(),
-				'author_link.href'  => User::GetProfileUrl($thank_you->GetAuthor()->GetId()),//TODO: Replace with a non-static post People API update
+				'author_name.body'  => $author_name,
+				'author_link.href'  => $author_link,
 				'profile_image.src' => $author_image_url,
 
 				'description.body_html'   => ClaText::ProcessPlain($thank_you->GetDescription()),
