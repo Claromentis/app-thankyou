@@ -129,12 +129,12 @@ class ThankYousRepository
 	{
 		//TODO: Expand accepted objects to include all PERM_OCLASS_*
 
-		$o_class_ids = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
+		$supported_o_class_ids = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
 
 		$o_classes_object_ids = [];
 		foreach ($o_classes as $o_class)
 		{
-			if (!isset($o_class['oclass']) || !in_array($o_class['oclass'], $o_class_ids))
+			if (!isset($o_class['oclass']) || !in_array($o_class['oclass'], $supported_o_class_ids))
 			{
 				throw new RuntimeException("Failed to Get Permission Object Classes Names, invalid Object Class");
 			}
