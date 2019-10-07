@@ -527,4 +527,24 @@ class ThankYousRepository
 
 		return $thank_you_ids;
 	}
+
+	/**
+	 * @param int $user_id
+	 * @param int $limit
+	 * @param int $offset
+	 * @return int[]
+	 */
+	public function GetUsersRecentThankYousIdsFromDb(int $user_id, int $limit, int $offset)
+	{
+		$query = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
+		$result = $this->db->query($query, $user_id, $limit, $offset);
+
+		$thank_you_ids = [];
+		while ($row = $result->fetchArray())
+		{
+			$thank_you_ids[] = (int) $row['thanks_id'];
+		}
+
+		return $thank_you_ids;
+	}
 }
