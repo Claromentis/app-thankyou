@@ -17,6 +17,7 @@ use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
+use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use User;
@@ -101,7 +102,7 @@ class ThankYousRepository
 	 *
 	 * @param array $groups_ids
 	 * @return Thankable[]
-	 * @throws ThankYouRuntimeException
+	 * @throws InvalidArgumentException
 	 */
 	public function CreateThankablesFromGroupIds(array $groups_ids): array
 	{
@@ -109,7 +110,7 @@ class ThankYousRepository
 		{
 			if (!is_int($groups_id))
 			{
-				throw new ThankYouRuntimeException("Failed to Create Thankables from Groups, invalid Group ID provided");
+				throw new InvalidArgumentException("Failed to Create Thankables from Groups, invalid Group ID provided");
 			}
 		}
 
@@ -125,6 +126,12 @@ class ThankYousRepository
 		return $group_thankables;
 	}
 
+	/**
+	 * @param array $o_classes
+	 * @return Thankable[]
+	 * @throws InvalidArgumentException
+	 * @throws ThankYouInvalidUsers
+	 */
 	public function CreateThankablesFromOClasses(array $o_classes)
 	{
 		//TODO: Expand accepted objects to include all PERM_OCLASS_*
@@ -136,12 +143,12 @@ class ThankYousRepository
 		{
 			if (!isset($o_class['oclass']) || !in_array($o_class['oclass'], $supported_o_class_ids))
 			{
-				throw new RuntimeException("Failed to Get Permission Object Classes Names, invalid Object Class");
+				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified or is not supported");
 			}
 
 			if (!isset($o_class['id']) || !is_int($o_class['id']))
 			{
-				throw new RuntimeException("Failed to Get Permission Object Classes Names, invalid Object ID");
+				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object ID is not specified or is invalid");
 			}
 
 			if (!isset($o_classes_object_ids[$o_class['oclass']]))
@@ -166,6 +173,12 @@ class ThankYousRepository
 		return $thankables;
 	}
 
+	/**
+	 * @param array $user_ids
+	 * @return Thankable[]
+	 * @throws LogicException
+	 * @throws ThankYouInvalidUsers
+	 */
 	public function CreateThankablesFromUserIds(array $user_ids)
 	{
 		return $this->CreateThankablesFromUsers($this->GetUsers($user_ids));
@@ -175,7 +188,7 @@ class ThankYousRepository
 	 * Creates an array of Thankables from an array of Users. Retains indexes.
 	 *
 	 * @param array $users
-	 * @return array
+	 * @return Thankable[]
 	 * @throws ThankYouInvalidUsers
 	 */
 	public function CreateThankablesFromUsers(array $users)
