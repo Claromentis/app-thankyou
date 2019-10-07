@@ -7,6 +7,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Constants;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
+use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\LineManagerNotifier;
@@ -91,6 +92,18 @@ class ThankYous
 		{
 			throw new LogicException("Unexpected Exception thrown by NotificationMessage library", null, $exception);
 		}
+	}
+
+	/**
+	 * @param int $o_class
+	 * @param int $id
+	 * @return Thankable
+	 * @throws InvalidArgumentException
+	 * @throws ThankYouInvalidUsers
+	 */
+	public function CreateThankableFromOClass(int $o_class, int $id)
+	{
+		return $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
 	}
 
 	/**
