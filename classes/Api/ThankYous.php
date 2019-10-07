@@ -189,6 +189,17 @@ class ThankYous
 		}
 	}
 
+	/**
+	 * @param int  $user_id
+	 * @param int  $limit
+	 * @param int  $offset
+	 * @param bool $thanked
+	 * @return ThankYou[]
+	 * @throws ThankYouRuntimeException
+	 * @throws ThankYouInvalidThankable
+	 * @throws ThankYouNotFound
+	 * @throws LogicException
+	 */
 	public function GetUsersRecentThankYous(int $user_id, int $limit, int $offset = 0, bool $thanked = false)
 	{
 		$thank_you_ids = $this->thank_yous_repository->GetUsersRecentThankYousIdsFromDb($user_id, $limit, $offset);
