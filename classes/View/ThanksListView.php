@@ -294,7 +294,7 @@ class ThanksListView
 					$thanked_link_enabled  = $links_enabled && isset($thanked_link);
 
 					$view_thanked[] = [
-						'thanked_name.body'         => $thanked->GetName(),//TODO: Replace user_name with thanked_name or something...
+						'thanked_name.body'         => $thanked->GetName(),
 						'thanked_name.visible'      => !$display_thanked_image,
 						'thanked_link.visible'      => $thanked_link_enabled,
 						'thanked_no_link.visible'   => !$thanked_link_enabled,

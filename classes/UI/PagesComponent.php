@@ -58,7 +58,6 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	{
 		$api              = $app[Api::class];
 		$security_context = $app[SecurityContext::class];
-		$view             = $app[ThanksListView::class];
 
 		$user_id = $security_context->GetUserId();
 		if ($user_id === 0)
@@ -76,7 +75,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		$allow_new = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
 
-		return $view->DisplayThankYousList($thank_yous, DateClaTimeZone::GetCurrentTZ(), (bool) $options->Get('profile_images'), $allow_new, true, true, true, $security_context);
+		return $api->ThankYous()->DisplayThankYousList($thank_yous, DateClaTimeZone::GetCurrentTZ(), (bool) $options->Get('profile_images'), $allow_new, true, true, true, $security_context);
 	}
 
 	/**

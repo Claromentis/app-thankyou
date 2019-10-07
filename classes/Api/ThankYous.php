@@ -2,7 +2,6 @@
 
 namespace Claromentis\ThankYou\Api;
 
-use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Constants;
@@ -14,8 +13,11 @@ use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
+use Claromentis\ThankYou\View\ThanksListView;
 use Date;
+use DateTimeZone;
 use Exception;
+use InvalidArgumentException;
 use LogicException;
 use NotificationMessage;
 use User;
@@ -28,14 +30,17 @@ class ThankYous
 
 	private $line_manager_notifier;
 
-	private $thank_yous;
+	private $thank_yous_repository;
 
-	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous, Config $config, ThankYouAcl $acl)
+	private $thank_yous_view;
+
+	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous_repository, Config $config, ThankYouAcl $acl, ThanksListView $thank_yous_view)
 	{
 		$this->acl = $acl;
 		$this->config = $config;
 		$this->line_manager_notifier = $line_manager_notifier;
-		$this->thank_yous = $thank_yous;
+		$this->thank_yous_repository = $thank_yous_repository;
+		$this->thank_yous_view = $thank_yous_view;
 	}
 
 	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
@@ -50,14 +55,14 @@ class ThankYous
 
 	public function CreateAndSave(User $user, array $thanked, string $description, ?Date $date_created = null)
 	{
-		$thank_you = $this->thank_yous->Create($user, $description, $date_created);
+		$thank_you = $this->thank_yous_repository->Create($user, $description, $date_created);
 
-		$thankables = $this->thank_yous->CreateThankablesFromOClasses($thanked);
+		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses($thanked);
 		$thank_you->SetThanked($thankables);
 
-		$this->thank_yous->PopulateThankYouUsersFromThankables($thank_you);
+		$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 
-		$this->thank_yous->SaveToDb($thank_you);
+		$this->thank_yous_repository->SaveToDb($thank_you);
 
 		$thanked_users = $thank_you->GetUsers();
 		$users_ids = [];
@@ -88,6 +93,23 @@ class ThankYous
 	}
 
 	/**
+	 * @param ThankYou[]                $thank_yous
+	 * @param DateTimeZone         $date_time_zone
+	 * @param bool                 $display_thanked_images
+	 * @param bool                 $allow_new
+	 * @param bool                 $allow_edit
+	 * @param bool                 $allow_delete
+	 * @param bool                 $links_enabled
+	 * @param SecurityContext|null $security_context
+	 * @return string
+	 * @throws InvalidArgumentException
+	 */
+	public function DisplayThankYousList(array $thank_yous, DateTimeZone $date_time_zone,  bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null)
+	{
+		return $this->thank_yous_view->DisplayThankYousList($thank_yous, $date_time_zone, $display_thanked_images, $allow_new, $allow_edit, $allow_delete, $links_enabled, $security_context);
+	}
+
+	/**
 	 * @param int|int[] $object_types_id
 	 * @return string|string[]
 	 * @throws ThankYouRuntimeException
@@ -101,7 +123,7 @@ class ThankYous
 			$object_types_id = [$object_types_id];
 		}
 
-		$names = $this->thank_yous->GetThankableObjectTypesNamesFromIds($object_types_id);
+		$names = $this->thank_yous_repository->GetThankableObjectTypesNamesFromIds($object_types_id);
 
 		return $array_return ?  $names : $names[0];
 	}
@@ -124,7 +146,7 @@ class ThankYous
 			$ids = [$ids];
 		}
 
-		$thank_yous = $this->thank_yous->GetThankYous($ids, $thanked);
+		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked);
 
 		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
 	}
@@ -144,7 +166,7 @@ class ThankYous
 		$extranet_area_id = null;
 		if (isset($viewing_user_id))
 		{
-			$users = $this->thank_yous->GetUsers([$viewing_user_id]);
+			$users = $this->thank_yous_repository->GetUsers([$viewing_user_id]);
 			if (!isset($users[$viewing_user_id]))
 			{
 				throw new ThankYouRuntimeException("Failed to Get Recent Thank Yous, User not found");
@@ -158,7 +180,7 @@ class ThankYous
 			}
 		}
 
-		$thank_you_ids = $this->thank_yous->GetRecentThankYousIdsFromDb($limit, $offset, $extranet_area_id);
+		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIdsFromDb($limit, $offset, $extranet_area_id);
 
 		try
 		{
@@ -171,7 +193,7 @@ class ThankYous
 
 	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
 	{
-		$thank_you = $this->thank_yous->GetThankYous([$id], false)[$id];
+		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
 
 		if (!$this->acl->CanEditThankYou($thank_you, $security_context))
 		{
@@ -185,11 +207,11 @@ class ThankYous
 
 		if (isset($thanked))
 		{
-			$thankables = $this->thank_yous->CreateThankablesFromOClasses($thanked);
+			$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses($thanked);
 			$thank_you->SetThanked($thankables);
-			$this->thank_yous->PopulateThankYouUsersFromThankables($thank_you);
+			$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 		}
-		$this->thank_yous->SaveToDb($thank_you);
+		$this->thank_yous_repository->SaveToDb($thank_you);
 	}
 
 	/**
@@ -202,14 +224,14 @@ class ThankYous
 	 */
 	public function Delete(SecurityContext $security_context, int $id)
 	{
-		$thank_you = $this->thank_yous->GetThankYous([$id], false)[$id];
+		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
 
 		if (!$this->CanEditThankYou($thank_you, $security_context))
 		{
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
 
-		$this->thank_yous->DeleteFromDb($id);
+		$this->thank_yous_repository->DeleteFromDb($id);
 	}
 
 }

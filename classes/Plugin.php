@@ -8,6 +8,7 @@ use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api\ThankYous;
@@ -21,6 +22,7 @@ use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
+use DateClaTimeZone;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Silex\Api\EventListenerProviderInterface;
@@ -113,7 +115,7 @@ class Plugin implements
 		};
 
 		$app[ThankYous::class] = function ($app) {
-			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class]);
+			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class], $app[ThanksListView::class]);
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
@@ -244,23 +246,28 @@ class Plugin implements
 	 */
 	public function Show($attr, Application $app)
 	{
+		if (empty($attr['user_id']) || !is_numeric($attr['user_id']))
+		{
+			return '';
+		}
+
+		$api              = $app[Api::class];
+		$security_context = $app[SecurityContext::class];
+		$time_zone        = DateClaTimeZone::GetCurrentTZ();
+
 		switch ($attr['page'])
 		{
 			case 'viewprofile.tab_nav':
-				if (empty($attr['user_id']) || !is_numeric($attr['user_id']))
-					return '';
 				/** @var ThanksRepository $repository */
 				$repository = $app['thankyou.repository'];
-				$count      = $repository->GetCountForUser($attr['user_id']);
+				$count      = $repository->GetCountForUser($attr['user_id']);//TODO FIX!
 
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $app['lmsg']("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
-				if (empty($attr['user_id']) || !is_numeric($attr['user_id']))
-					return '';
-				$component      = new UI\Wall();
-				$component_data = $component->Show(['user_id' => $attr['user_id'], 'limit' => 20], $app);
+				$thank_yous     = $api->ThankYous()->GetRecentThankYous(20, 0, true, $security_context->GetUserId());
+				$thank_you_list = $api->ThankYous()->DisplayThankYousList($thank_yous, $time_zone, false, true, true, true, true, $security_context);
 
-				return '<div id="thanks">' . $component_data . '</div>';
+				return '<div id="thanks">' . $thank_you_list . '</div>';
 		}
 
 		return '';
