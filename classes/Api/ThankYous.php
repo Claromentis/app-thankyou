@@ -10,6 +10,7 @@ use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\LineManagerNotifier;
+use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
@@ -101,12 +102,13 @@ class ThankYous
 	 * @param bool                 $allow_delete
 	 * @param bool                 $links_enabled
 	 * @param SecurityContext|null $security_context
+	 * @param Thankable|null $preselected_thankable
 	 * @return string
 	 * @throws InvalidArgumentException
 	 */
-	public function DisplayThankYousList(array $thank_yous, DateTimeZone $date_time_zone,  bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null)
+	public function DisplayThankYousList(array $thank_yous, DateTimeZone $date_time_zone,  bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null)
 	{
-		return $this->thank_yous_view->DisplayThankYousList($thank_yous, $date_time_zone, $display_thanked_images, $allow_new, $allow_edit, $allow_delete, $links_enabled, $security_context);
+		return $this->thank_yous_view->DisplayThankYousList($thank_yous, $date_time_zone, $display_thanked_images, $allow_new, $allow_edit, $allow_delete, $links_enabled, $security_context, $preselected_thankable);
 	}
 
 	/**
