@@ -12,13 +12,13 @@
 						<label name="thankyou:component:modal:to" class="control-label col-sm-2" for="thank_you_user">To</label>
 
 						<div class="form-control-static col-sm-10">
-							<txt name="select_user" visible="1">
+							<div id="thank_you_picker">
 								<component class_key="sugre_picker" name="thank_you_user" multiple="1" id="thank_you_user" allow_unset="1" placeholder="much better..."/>
-							</txt>
-							<txt name="preselected_user" visible="0">
-								<a name="to_user_link"><txt name="to_user_name">John Smith</txt></a>
-								<input type="hidden" name="thank_you_user">
-							</txt>
+							</div>
+							<div id="thank_you_preselected" style="display:none;">
+								<span id="thank_you_preselected_name">John Smith</span>
+								<input type="hidden" id="thank_you_preselected_value" name="thank_you_preselected">
+							</div>
 						</div>
 					</div>
 
@@ -40,37 +40,93 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		requirejs(['jquery', '/intranet/js/jquery.validate.min.js'], function ($, validate) {
-			var modal = $('#thank_you_modal');
+        requirejs(['jquery', '/intranet/js/jquery.validate.min.js'], function ($, validate) {
+            var modal = $('#thank_you_modal');
 
-			// Validate the modal form
-			modal.find('form').validate({
-				rules: {
-					thank_you_description: {
-						required: true,
-						minlength: { param: 3 }
-					},
-					'thank_you_user[]': {
-						required: true
-					}
-				},
-				errorPlacement: function(error, element) {
-					if (element.attr("name") == "thank_you_user[]") {
-						error.insertAfter("#thank_you_user_row .form-control, #thank_you_user_row .select2-container");
-					} else {
-						error.insertAfter(element);
-					}
-				},
-				errorClass : 'text-error'
-			});
+            // Validate the modal form
+            modal.find('form').validate({
+                rules: {
+                    thank_you_description: {
+                        required: true,
+                        minlength: {param: 3}
+                    },
+                    'thank_you_user[]': {
+                        required: true
+                    }
+                },
+                errorPlacement: function (error, element) {
+                    if (element.attr("name") == "thank_you_user[]") {
+                        error.insertAfter("#thank_you_user_row .form-control, #thank_you_user_row .select2-container");
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                errorClass: 'text-error'
+            });
 
-			// Clear and show the modal if the thank you button is clicked
-			$('.js-thank-you-button').on('click', function () {
-				$('#thank_you_id').val(null);
-				$('#thank_you_user').val(null).trigger('change').html(null);
-				$('#thank_you_description').val(null);
-				$('#thank_you_modal').modal('show');
-			});
-		});
+            // Clear and show the modal if the thank you button is clicked
+            $('.js-thank-you-button').on('click', function () {
+                $('#thank_you_id').val(null);
+                $('#thank_you_user').val(null).trigger('change').html(null);
+                $('#thank_you_description').val(null);
+                $('#thank_you_modal').modal('show');
+            });
+
+            if (cla_thank_you_modal.preselected_thankable !== null) {
+                var thankable = cla_thank_you_modal.preselected_thankable;
+                var thank_name = null;
+                var thank_object_id = null;
+                var thank_object_type_id = null;
+
+                if ('name' in thankable) {
+                    thank_name = thankable.name;
+                }
+                if ('id' in thankable) {
+                    thank_object_id = thankable.id;
+                }
+                if ('object_type' in thankable && 'id' in thankable.object_type) {
+                    thank_object_type_id = thankable.object_type.id;
+                }
+
+                if (thank_name !== null && thank_object_id !== null && thank_object_type_id !== null) {
+                    cla_thank_you_modal.SetPreselected(thank_name, cla_multi_object_picker.createOptionValue(thank_object_type_id, thank_object_id));
+                    cla_thank_you_modal.DisplayThankMethod('preselected');
+                }
+            }
+        });
+
+        var cla_thank_you_modal = {
+            DisplayPicker: function (display) {
+                if (display === true) {
+                    $('#thank_you_picker').show();
+                } else {
+                    $('#thank_you_picker').hide();
+                }
+            },
+            DisplayPreselected: function (display) {
+                if (display === true) {
+                    $('#thank_you_preselected').show();
+                } else {
+                    $('#thank_you_preselected').hide();
+                }
+            },
+            SetPreselected: function (name, value) {
+                $('#thank_you_preselected_name').text(name);
+                $('#thank_you_preselected_value').val(value);
+            },
+            DisplayThankMethod: function (method) {
+                var picker_display = false;
+                var preselected_display = false;
+                if (method === 'preselected') {
+                    preselected_display = true;
+                } else {
+                    picker_display = true;
+                }
+
+                this.DisplayPicker(picker_display);
+                this.DisplayPreselected(preselected_display);
+            },
+            preselected_thankable: ${preselected_thankable.json}
+        };
 	</script>
 </div>

@@ -277,7 +277,7 @@ class ThanksListView
 	}
 
 	/**
-	 * @param ThankYou[]                $thank_yous
+	 * @param ThankYou[]           $thank_yous
 	 * @param DateTimeZone         $time_zone
 	 * @param bool                 $display_thanked_images
 	 * @param bool                 $allow_new
@@ -285,10 +285,11 @@ class ThanksListView
 	 * @param bool                 $allow_delete
 	 * @param bool                 $links_enabled
 	 * @param SecurityContext|null $security_context
+	 * @param Thankable|null       $preselected_thankable
 	 * @return string
 	 * @throws InvalidArgumentException
 	 */
-	public function DisplayThankYousList(array $thank_yous, DateTimeZone $time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null)
+	public function DisplayThankYousList(array $thank_yous, DateTimeZone $time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null): string
 	{
 		$viewer_ex_area_id = null;
 		if (isset($security_context))
@@ -395,16 +396,11 @@ class ThanksListView
 		if ($allow_new)
 		{
 			$args['allow_new.visible'] = 1;
-			/*if ($user_id)
-			{TODO
-				$args['select_user.visible']      = 0;
-				$args['preselected_user.visible'] = 1;
-				$args['to_user_link.href']        = User::GetProfileUrl($user_id);
-				$args['to_user_name.body']        = User::GetNameById($user_id);
-				$args['thank_you_user.value']     = $user_id;
-				$args['preselected_user.visible'] = 1;
-				$args['select_user.visible']      = 0;
-			}*/
+
+			if (isset($preselected_thankable))
+			{
+				$args['preselected_thankable.json'] = $this->ConvertThankableToArray($preselected_thankable);
+			}
 		} else
 		{
 			$args['allow_new.visible'] = 0;
