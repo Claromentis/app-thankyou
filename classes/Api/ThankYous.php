@@ -189,6 +189,19 @@ class ThankYous
 		}
 	}
 
+	public function GetUsersRecentThankYous(int $user_id, int $limit, int $offset = 0, bool $thanked = false)
+	{
+		$thank_you_ids = $this->thank_yous_repository->GetUsersRecentThankYousIdsFromDb($user_id, $limit, $offset);
+
+		try
+		{
+			return $this->GetThankYous($thank_you_ids, $thanked);
+		} catch (ThankYouNotFound $thank_you_not_found)
+		{
+			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
+		}
+	}
+
 	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
 	{
 		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
