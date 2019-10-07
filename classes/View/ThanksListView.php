@@ -214,7 +214,7 @@ class ThanksListView
 		{
 			foreach ($thanked as $offset => $thank)
 			{
-				$thanked[$offset] = $this->ConvertThankableToArray($thank);
+				$thanked[$offset] = $this->ConvertThankableToArray($thank, $viewing_ex_area_id);
 			}
 		}
 		$output['thanked'] = $thanked;
@@ -234,6 +234,7 @@ class ThanksListView
 
 	/**
 	 * @param Thankable $thankable
+	 * @param int|null $viewing_ex_area_id
 	 * @return array:
 	 * [
 	 *     id => int|null,
@@ -246,7 +247,7 @@ class ThanksListView
 	 * ]
 	 * @throws ThankYouRuntimeException
 	 */
-	public function ConvertThankableToArray(Thankable $thankable): array
+	public function ConvertThankableToArray(Thankable $thankable, ?int $viewing_ex_area_id = null): array
 	{
 		$object_type    = null;
 		$object_type_id = $thankable->GetObjectTypeId();
@@ -255,10 +256,20 @@ class ThanksListView
 			$object_type = ['id' => $object_type_id, 'name' => $this->thank_yous_repository->GetThankableObjectTypesNamesFromIds([$object_type_id])[0]];
 		}
 
+		$ex_area_id = $thankable->GetExtranetAreaId();
+
+		if (isset($viewing_ex_area_id) && isset($ex_area_id) && $viewing_ex_area_id !== $ex_area_id)
+		{
+			$name = ($this->lmsg)('common.perms.hidden_name');
+		} else
+		{
+			$name = $thankable->GetName();
+		}
+
 		$output = [
 			'id'               => $thankable->GetId(),
-			'extranet_area_id' => $thankable->GetExtranetAreaId(),
-			'name'             => $thankable->GetName(),
+			'extranet_area_id' => $ex_area_id,
+			'name'             => $name,
 			'object_type'      => $object_type
 		];
 
