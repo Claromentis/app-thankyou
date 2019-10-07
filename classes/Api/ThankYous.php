@@ -226,7 +226,7 @@ class ThankYous
 	{
 		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
 
-		if (!$this->CanEditThankYou($thank_you, $security_context))
+		if (!$this->acl->CanDeleteThankYou($thank_you, $security_context))
 		{
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}

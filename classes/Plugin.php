@@ -102,7 +102,7 @@ class Plugin implements
 			 */
 			$panels = $app['admin.panels_list'];
 
-			return new ThanksListView($panels->GetOne('thankyou'), $app[Api::class], $app[Lmsg::class]);
+			return new ThanksListView($panels->GetOne('thankyou'), $app[ThankYousRepository::class], $app[ThankYouAcl::class], $app[Lmsg::class]);
 		};
 
 		// Pages component

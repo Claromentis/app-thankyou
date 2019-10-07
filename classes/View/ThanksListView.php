@@ -14,6 +14,8 @@ use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
+use Claromentis\ThankYou\ThankYous\ThankYouAcl;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use ClaText;
 use Date;
 use DateClaTimeZone;
@@ -28,11 +30,13 @@ class ThanksListView
 {
 	use TemplaterTrait;
 
-	private $api;
-
 	private $lmsg;
 
 	protected $panel;
+
+	private $thank_yous_repository;
+
+	private $thank_you_acl;
 
 	/**
 	 * @var array
@@ -45,15 +49,17 @@ class ThanksListView
 	/**
 	 * Create a new list view for thank you notes.
 	 *
-	 * @param AdminPanel $panel
-	 * @param Api        $api
-	 * @param Lmsg       $lmsg
+	 * @param AdminPanel          $panel
+	 * @param ThankYousRepository $thank_yous_repository
+	 * @param ThankYouAcl         $thank_you_acl
+	 * @param Lmsg                $lmsg
 	 */
-	public function __construct(AdminPanel $panel, Api $api, Lmsg $lmsg)
+	public function __construct(AdminPanel $panel, ThankYousRepository $thank_yous_repository, ThankYouAcl $thank_you_acl, Lmsg $lmsg)
 	{
-		$this->api   = $api;
-		$this->lmsg  = $lmsg;
-		$this->panel = $panel;
+		$this->lmsg                  = $lmsg;
+		$this->panel                 = $panel;
+		$this->thank_yous_repository = $thank_yous_repository;
+		$this->thank_you_acl = $thank_you_acl;
 	}
 
 	/**
@@ -238,7 +244,7 @@ class ThanksListView
 		$object_type_id = $thankable->GetObjectTypeId();
 		if (isset($object_type_id))
 		{
-			$object_type = ['id' => $object_type_id, 'name' => $this->api->ThankYous()->GetThankableObjectTypesNamesFromIds($object_type_id)];
+			$object_type = ['id' => $object_type_id, 'name' => $this->thank_yous_repository->GetThankableObjectTypesNamesFromIds([$object_type_id])[0]];
 		}
 
 		$output = [
@@ -275,8 +281,8 @@ class ThanksListView
 			}
 
 			$id           = $thank_you->GetId();
-			$can_edit     = isset($id) && $allow_edit && isset($security_context) && $this->api->ThankYous()->CanEditThankYou($thank_you, $security_context);
-			$can_delete   = isset($id) && $allow_delete && isset($security_context) && $this->api->ThankYous()->CanDeleteThankYou($thank_you, $security_context);
+			$can_edit     = isset($id) && $allow_edit && isset($security_context) && $this->thank_you_acl->CanEditThankYou($thank_you, $security_context);
+			$can_delete   = isset($id) && $allow_delete && isset($security_context) && $this->thank_you_acl->CanDeleteThankYou($thank_you, $security_context);
 			$date_created = clone $thank_you->GetDateCreated();
 			$date_created->setTimezone($time_zone);
 
@@ -307,7 +313,8 @@ class ThanksListView
 				}
 			}
 
-			try{
+			try
+			{
 				$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->GetId());//TODO: Replace with a non-static post People API update
 			} catch (CDNSystemException $CDN_system_exception)
 			{
