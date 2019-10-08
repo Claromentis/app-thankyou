@@ -2,9 +2,11 @@
 
 namespace Claromentis\ThankYou\Controller;
 
+use Claromentis\Core\Application;
 use Claromentis\Core\Http\RedirectResponse;
 use Claromentis\Core\Http\RequestData;
 use Claromentis\Core\Http\RequestDataTokenException;
+use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreRepository;
@@ -12,6 +14,7 @@ use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use DateClaTimeZone;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ThanksController
@@ -27,6 +30,25 @@ class ThanksController
 		$this->api              = $api;
 		$this->lmsg             = $lmsg;
 		$this->sugre_repository = $sugre_repository;
+	}
+
+	public function Admin(ServerRequestInterface $server_request, Application $app)
+	{
+		$limit = 20;
+
+		$query_params = $server_request->getQueryParams();
+		$offset = (int) ($query_params['st'] ?? null);
+
+		$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, true);
+		$args = $this->api->ThankYous()->GetThankYousListArgs($thank_yous, DateClaTimeZone::GetCurrentTZ(), false, false, true, true, true);
+
+		$args['nav_messages.+class'] = 'active';
+
+		require_once('paging.php');
+
+		$args['paging.body_html'] = get_navigation($server_request->getUri()->getPath(), $this->api->ThankYous()->GetTotalThankYousCount(), $offset, '', $limit);
+
+		return new TemplaterCallResponse('thankyou/admin/admin.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
 
 	/**

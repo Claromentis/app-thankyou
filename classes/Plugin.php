@@ -72,11 +72,6 @@ class Plugin implements
 			return new Say();
 		};
 
-		// Controllers
-		$app['thankyou.admin_messages_controller'] = function () {
-			return new AdminMessagesController();
-		};
-
 		$app['thankyou.admin_export_controller'] = function () {
 			return new AdminExportController();
 		};
@@ -167,7 +162,7 @@ class Plugin implements
 				$routes->post('/thanks/delete', ThanksController::class . ':Delete');
 
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
-				$routes->get('/admin', 'thankyou.admin_messages_controller:Show');
+				$routes->get('/admin', ThanksController::class . ':Admin');
 				$routes->get('/admin/export', 'thankyou.admin_export_controller:ShowExportPanel');
 				$routes->post('/admin/export', 'thankyou.admin_export_controller:ExportCsv');
 				$routes->get('/admin/notifications', 'thankyou.admin_notifications_controller:ShowNotificationsPanel');
