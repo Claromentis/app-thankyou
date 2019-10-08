@@ -1,20 +1,3 @@
-<!--@head@
-<unique_section name="thankyou_component_styles">
-	<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
-</unique_section>
--->
-<div class="thank-you-link-inline" name="allow_new">
-	<a href="#thank_you_modal" class="js-thank-you-button btn btn-primary thank-you--button">
-		<span class="glyphicons glyphicons-donate"></span>
-		<span class="thank-title">
-			<txt name="thankyou:component:say_thank_you">Say thank you</txt>
-		</span>
-	</a>
-</div>
-
 <div class="panel-body">
-	<include file="includes/thanks_list.html" />
+	<component class="\Claromentis\ThankYou\UI\ThankYousList" name="ty_list" edit="1" delete="1" links="1" />
 </div>
-
-<!-- Modal -->
-<include file="includes/modal.html" />

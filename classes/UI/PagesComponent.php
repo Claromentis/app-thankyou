@@ -56,24 +56,18 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	 */
 	public function ShowBody($id_string, OptionsInterface $options, Application $app)
 	{
-		$api              = $app[Api::class];
-		$security_context = $app[SecurityContext::class];
+		$args = [];
 
-		$extranet_area_id = $security_context->GetExtranetAreaId();
-
-		$limit = $options->Get('limit');
-		if (!is_int($limit))
+		$args['ty_list.limit'] = $options->Get('limit');
+		if (!is_int($args['ty_list.limit']))
 		{
 			throw new ComponentRuntimeException("Failed to Show Thank You Component, Limit is not an integer");
 		}
 
-		$thank_yous = $api->ThankYous()->GetRecentThankYous($limit, 0, true, $extranet_area_id);
+		$args['ty_list.create']         = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
+		$args['ty_list.thanked_images'] = (bool) $options->Get('profile_images');
 
-		$allow_new = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
-
-		$thanks_list_args = $api->ThankYous()->GetThankYousListArgs($thank_yous, DateClaTimeZone::GetCurrentTZ(), (bool) $options->Get('profile_images'), $allow_new, true, true, true, $security_context);
-
-		return $this->CallTemplater('thankyou/pages_component.html', $thanks_list_args);
+		return $this->CallTemplater('thankyou/pages_component.html', $args);
 	}
 
 	/**
