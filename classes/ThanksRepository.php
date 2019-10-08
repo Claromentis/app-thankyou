@@ -66,18 +66,6 @@ class ThanksRepository
 	}
 
 	/**
-	 * Returns total number of thanks items in the database
-	 *
-	 * @return int
-	 */
-	public function GetCount()
-	{
-		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_item");
-
-		return $count;
-	}
-
-	/**
 	 * Gets thank you items between a given date range.
 	 *
 	 * If an end date is not provided, the current date is used in its place.

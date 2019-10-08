@@ -167,6 +167,16 @@ class ThankYous
 	}
 
 	/**
+	 * Return total number of Thank Yous in the database
+	 *
+	 * @return int
+	 */
+	public function GetTotalThankYousCount(): int
+	{
+		return $this->thank_yous_repository->GetTotalThankYousCount();
+	}
+
+	/**
 	 * @param int      $limit
 	 * @param int      $offset
 	 * @param bool     $thanked

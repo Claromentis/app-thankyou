@@ -529,6 +529,18 @@ class ThankYousRepository
 	}
 
 	/**
+	 * Returns total number of thanks items in the database
+	 *
+	 * @return int
+	 */
+	public function GetTotalThankYousCount(): int
+	{
+		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_item");
+
+		return $count;
+	}
+
+	/**
 	 * @param int $user_id
 	 * @param int $limit
 	 * @param int $offset
