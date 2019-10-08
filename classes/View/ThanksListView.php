@@ -319,8 +319,8 @@ class ThanksListView
 			}
 			$author_link  = $author_hidden ? null : User::GetProfileUrl($thank_you->GetAuthor()->GetId(), false);//TODO: Replace with a non-static post People API update
 			$author_name  = $author_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thank_you->GetAuthor()->GetFullname();
-			$can_edit     = isset($id) && $allow_edit && isset($security_context) && $this->thank_you_acl->CanEditThankYou($thank_you, $security_context);
-			$can_delete   = isset($id) && $allow_delete && isset($security_context) && $this->thank_you_acl->CanDeleteThankYou($thank_you, $security_context);
+			$can_edit     = isset($id) && $allow_edit && (!isset($security_context) || $this->thank_you_acl->CanEditThankYou($thank_you, $security_context));
+			$can_delete   = isset($id) && $allow_delete && (!isset($security_context) || $this->thank_you_acl->CanDeleteThankYou($thank_you, $security_context));
 			$date_created = clone $thank_you->GetDateCreated();
 			$date_created->setTimezone($time_zone);
 			$id = $thank_you->GetId();
