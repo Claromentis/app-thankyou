@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou;
 use Claromentis\Core\Admin\PanelsList;
 use Claromentis\Core\Aggregation\AggregationFilterEvent;
 use Claromentis\Core\Application;
+use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
@@ -39,6 +40,8 @@ class Plugin implements
 	RestServiceInterface,
 	EventListenerProviderInterface
 {
+	use TemplaterTrait;
+
 	/**
 	 * Registers services on the given container.
 	 *
@@ -268,7 +271,9 @@ class Plugin implements
 			case 'viewprofile.tab_content':
 				$thank_yous     = $api->ThankYous()->GetUsersRecentThankYous($user_id, 20, 0, true);
 				$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
-				$thank_you_list = $api->ThankYous()->DisplayThankYousList($thank_yous, $time_zone, false, true, true, true, true, $security_context, $thankable);
+				$thank_you_list_args = $api->ThankYous()->GetThankYousListArgs($thank_yous, $time_zone, false, true, true, true, true, $security_context, $thankable);
+
+				$thank_you_list = $this->CallTemplater('thankyou/pages_component.html', $thank_you_list_args);
 
 				return '<div id="thanks">' . $thank_you_list . '</div>';
 		}

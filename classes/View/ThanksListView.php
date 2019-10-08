@@ -5,7 +5,6 @@ use AuthUser;
 use Carbon\Carbon;
 use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\CDN\CDNSystemException;
-use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
@@ -27,8 +26,6 @@ use User;
  */
 class ThanksListView
 {
-	use TemplaterTrait;
-
 	private $lmsg;
 
 	protected $panel;
@@ -286,10 +283,10 @@ class ThanksListView
 	 * @param bool                 $links_enabled
 	 * @param SecurityContext|null $security_context
 	 * @param Thankable|null       $preselected_thankable
-	 * @return string
+	 * @return array
 	 * @throws InvalidArgumentException
 	 */
-	public function DisplayThankYousList(array $thank_yous, DateTimeZone $time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null): string
+	public function GetThankYousListArgs(array $thank_yous, DateTimeZone $time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null): array
 	{
 		$viewer_ex_area_id = null;
 		if (isset($security_context))
@@ -406,6 +403,6 @@ class ThanksListView
 			$args['allow_new.visible'] = 0;
 		}
 
-		return $this->CallTemplater('thankyou/pages_component.html', $args);
+		return $args;
 	}
 }

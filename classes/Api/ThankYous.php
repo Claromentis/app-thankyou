@@ -116,12 +116,12 @@ class ThankYous
 	 * @param bool                 $links_enabled
 	 * @param SecurityContext|null $security_context
 	 * @param Thankable|null $preselected_thankable
-	 * @return string
+	 * @return array
 	 * @throws InvalidArgumentException
 	 */
-	public function DisplayThankYousList(array $thank_yous, DateTimeZone $date_time_zone,  bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null)
+	public function GetThankYousListArgs(array $thank_yous, DateTimeZone $date_time_zone,  bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null)
 	{
-		return $this->thank_yous_view->DisplayThankYousList($thank_yous, $date_time_zone, $display_thanked_images, $allow_new, $allow_edit, $allow_delete, $links_enabled, $security_context, $preselected_thankable);
+		return $this->thank_yous_view->GetThankYousListArgs($thank_yous, $date_time_zone, $display_thanked_images, $allow_new, $allow_edit, $allow_delete, $links_enabled, $security_context, $preselected_thankable);
 	}
 
 	/**

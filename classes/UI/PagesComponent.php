@@ -71,7 +71,9 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		$allow_new = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
 
-		return $api->ThankYous()->DisplayThankYousList($thank_yous, DateClaTimeZone::GetCurrentTZ(), (bool) $options->Get('profile_images'), $allow_new, true, true, true, $security_context);
+		$thanks_list_args = $api->ThankYous()->GetThankYousListArgs($thank_yous, DateClaTimeZone::GetCurrentTZ(), (bool) $options->Get('profile_images'), $allow_new, true, true, true, $security_context);
+
+		return $this->CallTemplater('thankyou/pages_component.html', $thanks_list_args);
 	}
 
 	/**
