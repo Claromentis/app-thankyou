@@ -1,0 +1,134 @@
+<!--@head@
+<unique_section name="thankyou_component_styles">
+	<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
+</unique_section>
+-->
+<include file="includes/delete_modal.html" />
+<include file="includes/modal.html" />
+<div class="thank-you-link-inline" name="create">
+	<a href="#thank_you_modal" class="js-thank-you-button btn btn-primary thank-you--button">
+		<span class="glyphicons glyphicons-donate"></span>
+		<span class="thank-title">
+			<txt name="thankyou:component:say_thank_you">Say thank you</txt>
+		</span>
+	</a>
+</div>
+<div>
+	<ul name="thank_yous" datasrc="" class="list-unstyled thank-you js-thank-you-list">
+	<ifempty><li name="no_thanks">No thanks</li></ifempty>
+	<li class="thank-you-item">
+		<div class="thank-you-note">
+			<txt name="thankyou:component:thankyou_users_name">Thank you</txt>
+			<datasrc name="thanked">
+				<a name="thanked_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
+					<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+					<txt name="thanked_name">John Smith</txt>
+				</a>
+				<span name="thanked_no_link">
+					<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+					<txt name="thanked_name">John Smith</txt>
+				 </span>
+				<txt name="delimiter_visible">, </txt>
+			</datasrc>
+			<hr>
+			<div class="row">
+				<div class="col-xs-12">
+					<txt name="has_description">
+						<p name="description"></p>
+					</txt>
+				</div>
+			</div>
+			<div class="row small">
+				<div class="col-xs-6">
+					<component name="like_component" class_key="like_it" object_type="thanks" object_id=""/>
+				</div>
+				<div class="col-xs-6">
+					<span class="text-muted text-right edit-tools">
+						<txt name="edit_thanks">
+							<a href="javascript:void(0)" name="edit_thanks_link" class="no-decoration edit-thanks js-edit-thanks" data-id="0" rel="tooltip" title="${common:edit.body}">
+								<span class="glyphicons glyphicons-pencil" rel="tooltip" title=""></span>
+							</a>
+						</txt>
+						<txt name="delete_thanks">
+							<a href="javascript:void(0)" name="delete_thanks_link" class="no-decoration delete-thanks js-delete-thanks" data-id="0" rel="tooltip" title="${common:delete.body}">
+								<span class="glyphicons glyphicons-bin"></span>
+							</a>
+						</txt>
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="thank-you-meta">
+			<div class="media">
+			<div class="media-body">
+					<a name="author_link"><txt name="author_name"></txt></a>
+					<br>
+					<small rel="tooltip" class="text-muted" data-placement="left" title="" name="date_created">2 days ago</small>
+				</div>
+				<div class="media-right">
+					<a name="author_link" class="no-decoration">
+						<img class="profile-img author-photo" name="profile_image" src="/appdata/people/no_photo.jpg">
+					</a>
+				</div>
+			</div>
+		</div>
+	</li>
+</ul>
+</div>
+<script type="text/javascript">
+	requirejs(['jquery'], function ($) {
+		var thankYouList = $('.js-thank-you-list');
+		var modal = $('#thank_you_modal');
+		var deleteModal = $('#thank_you_delete_modal');
+
+		// Populate and show the modal when a note's edit button is clicked
+		thankYouList.on('click', '.js-edit-thanks', function () {
+			var data = $(this).data();
+
+			$.ajax('/api/thankyou/v2/thanks/' + data.id, {
+				success: function (data) {
+					updateThanksForm(data);
+					modal.modal('show');
+				}
+			});
+		});
+
+		// Show the delete modal when a note's delete button is clicked
+		thankYouList.on('click', '.js-delete-thanks', function () {
+			$('#delete_thank_you_id').val($(this).data('id'));
+			deleteModal.modal('show');
+		});
+
+		/**
+		 * Set the thanks item to display in the modal form.
+		 *
+		 * @param {object} item
+		 */
+		function updateThanksForm(item) {
+			item = $.extend({
+				id: 0,
+				description: '',
+				users: {}
+			}, item);
+
+			// Set ID and description
+			$('#thank_you_id').val(item.id);
+			$('#thank_you_description').val(item.description);
+
+			// Clear and update users
+			var thankYouUserSelect = $('#thank_you_user');
+			thankYouUserSelect.val(null).trigger('change').html(null);
+
+			if (!item.thanked)
+				return;
+
+			for (var i in item.thanked) {
+				var thanked = item.thanked[i];
+
+				cla_multi_object_picker.addOption(thanked.object_type.id, thanked.id, thanked.object_type.name + ": " + thanked.name, 'thank_you_user');
+			}
+
+			thankYouUserSelect.trigger('change');
+		}
+	});
+</script>
