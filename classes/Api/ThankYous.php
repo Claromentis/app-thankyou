@@ -160,24 +160,6 @@ class ThankYous
 	}
 
 	/**
-	 * @param ThankYou[]           $thank_yous
-	 * @param DateTimeZone         $date_time_zone
-	 * @param bool                 $display_thanked_images
-	 * @param bool                 $allow_new
-	 * @param bool                 $allow_edit
-	 * @param bool                 $allow_delete
-	 * @param bool                 $links_enabled
-	 * @param SecurityContext|null $security_context
-	 * @param Thankable|null       $preselected_thankable
-	 * @return array
-	 * @throws InvalidArgumentException
-	 */
-	public function GetThankYousListArgs(array $thank_yous, DateTimeZone $date_time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null)
-	{
-		return $this->thank_yous_view->GetThankYousListArgs($thank_yous, $date_time_zone, $display_thanked_images, $allow_new, $allow_edit, $allow_delete, $links_enabled, $security_context, $preselected_thankable);
-	}
-
-	/**
 	 * @param int|int[] $object_types_id
 	 * @return string|string[]
 	 * @throws ThankYouRuntimeException
