@@ -17,6 +17,7 @@ use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\View\ThanksListView;
 use Date;
+use DateClaTimeZone;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
@@ -53,6 +54,35 @@ class ThankYous
 	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
 	{
 		return $this->acl->CanEditThankYou($thank_you, $security_context);
+	}
+
+	/**
+	 * @param ThankYou|ThankYou[] $thank_yous
+	 * @param DateTimeZone|null   $time_zone
+	 * @param int|null            $viewing_ex_area_id
+	 * @return array
+	 */
+	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?int $viewing_ex_area_id = null)
+	{
+		if (!isset($time_zone))
+		{
+			$time_zone = DateClaTimeZone::GetCurrentTZ();
+		}
+
+		$array_return = true;
+		if (!is_array($thank_yous))
+		{
+			$array_return = false;
+			$thank_yous = [$thank_yous];
+		}
+
+		$thank_yous_array = [];
+		foreach ($thank_yous as $thank_you)
+		{
+			$thank_yous_array[] = $this->thank_yous_view->ConvertThankYouToArray($thank_you, $time_zone, $viewing_ex_area_id);
+		}
+
+		return $array_return ? $thank_yous_array : $thank_yous_array[0];
 	}
 
 	public function CreateAndSave(User $user, array $thanked, string $description, ?Date $date_created = null)
