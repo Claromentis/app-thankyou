@@ -24,7 +24,6 @@ use User;
 
 class ThankYousRepository
 {
-	//TODO: Link SUGRE options to this const.
 	const THANKABLES = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
 
 	private $db;

@@ -235,6 +235,14 @@ class ThankYous
 	}
 
 	/**
+	 * @return int[]
+	 */
+	public function GetThankableObjectTypes()
+	{
+		return $this->thank_yous_repository::THANKABLES;
+	}
+
+	/**
 	 * @param int  $user_id
 	 * @param int  $limit
 	 * @param int  $offset
