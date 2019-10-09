@@ -24,7 +24,7 @@ class ThankYousList extends TemplaterComponentTmpl
 	/**
 	 * @param array       $attributes :
 	 *                                admin_mode:
-	 *                                1 = Editing and Deleting Thank Yous ignores permissions.
+	 *                                1 = Editing and Deleting Thank Yous ignores permissions. Thank Yous are not filtered by Thanked Extranet Area ID.
 	 *                                create:
 	 *                                0 = Creating Thank Yous is disabled.
 	 *                                1 = Creating Thank Yous is enabled.
@@ -52,16 +52,16 @@ class ThankYousList extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app)
 	{
-		//?Thankable $preselected_thankable = null TODO: Fix pre-selecting
 		$api              = $app[Api::class];
 		$cla_text         = $app[ClaText::class];
 		$lmsg             = $app[Lmsg::class];
 		$security_context = $app[SecurityContext::class];
 
-		$extranet_area_id = (int) $security_context->GetExtranetAreaId();
+		$admin_mode       = (bool) ($attributes['admin_mode'] ?? null);
+
+		$extranet_area_id = $admin_mode ? null : (int) $security_context->GetExtranetAreaId();
 		$time_zone        = DateClaTimeZone::GetCurrentTZ();
 
-		$admin_mode       = (bool) ($attributes['admin_mode'] ?? null);
 		$can_create       = (bool) ($attributes['create'] ?? null);
 		$can_delete       = (bool) ($attributes['delete'] ?? null);
 		$can_edit         = (bool) ($attributes['edit'] ?? null);
