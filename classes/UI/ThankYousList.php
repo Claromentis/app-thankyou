@@ -183,6 +183,8 @@ class ThankYousList extends TemplaterComponentTmpl
 			$args['create.visible'] = 0;
 		}
 
+		$args['thank_you_user.placeholder'] = $lmsg('thankyou.thank.placeholder');
+
 		return $this->CallTemplater('thankyou/thank_yous_list.html', $args);
 	}
 }
