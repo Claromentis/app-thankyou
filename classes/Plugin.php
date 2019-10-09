@@ -264,11 +264,14 @@ class Plugin implements
 
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $app['lmsg']("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
-				$thank_yous     = $api->ThankYous()->GetUsersRecentThankYous($user_id, 20, 0, true);
 				$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
-				$thank_you_list_args = $api->ThankYous()->GetThankYousListArgs($thank_yous, $time_zone, false, true, true, true, true, $security_context, $thankable);
 
-				$thank_you_list = $this->CallTemplater('thankyou/pages_component.html', $thank_you_list_args);
+				$args                    = [];
+				$args['ty_list.limit']   = 20;
+				$args['ty_list.user_id'] = $user_id;
+				$args['ty_list.create']  = $api->ThankYous()->ConvertThankablesToArrays($thankable, $security_context->GetExtranetAreaId());
+
+				$thank_you_list = $this->CallTemplater('thankyou/pages_component.html', $args);
 
 				return '<div id="thanks">' . $thank_you_list . '</div>';
 		}
