@@ -23,15 +23,30 @@ class ThankYousList extends TemplaterComponentTmpl
 {
 	/**
 	 * @param array       $attributes :
-	 *                                admin_mode: 1 = Editing and Deleting Thank Yous ignores permissions
-	 *                                create: 1 = Creating Thank Yous is enabled
-	 *                                delete: 1 = Deleting Thank Yous is enabled (subject to permissions or admin_mode)
-	 *                                edit: 1 = Editing Thank Yous is enabled (subject to permissions or admin_mode)
-	 *                                thanked_images: 1 = Thanked will display as an image if available
-	 *                                links: 1 = Thanked will provide a link if available
-	 *                                limit: int = How many Thank Yous to display
-	 *                                offset: int = Offset of Thank Yous
-	 *                                user_id: int  = Only display Thank Yous associated with this User.
+	 *                                admin_mode:
+	 *                                1 = Editing and Deleting Thank Yous ignores permissions.
+	 *                                create:
+	 *                                0 = Creating Thank Yous is disabled.
+	 *                                1 = Creating Thank Yous is enabled.
+	 *                                array = Creating ThankYous is locked to the Thankable array given (Created with \Claromentis\ThankYou\View\ThanksListView::ConvertThankableToArray).
+	 *                                delete:
+	 *                                0 = Deleting Thank Yous is disabled.
+	 *                                1 = Deleting Thank Yous is enabled (subject to permissions or admin_mode).
+	 *                                edit:
+	 *                                0 = Editing Thank Yous is disabled.
+	 *                                1 = Editing Thank Yous is enabled (subject to permissions or admin_mode).
+	 *                                thanked_images:
+	 *                                0 = Thanked will never display as an image.
+	 *                                1 = Thanked will display as an image if available.
+	 *                                links:
+	 *                                0 = Thanked will never provide a link.
+	 *                                1 = Thanked will provide a link if available.
+	 *                                limit:
+	 *                                int = How many Thank Yous to display.
+	 *                                offset:
+	 *                                int = Offset of Thank Yous.
+	 *                                user_id:
+	 *                                int  = Only display Thank Yous associated with this User.
 	 * @param Application $app
 	 * @return string
 	 */
@@ -46,15 +61,16 @@ class ThankYousList extends TemplaterComponentTmpl
 		$extranet_area_id = (int) $security_context->GetExtranetAreaId();
 		$time_zone        = DateClaTimeZone::GetCurrentTZ();
 
-		$admin_mode     = (bool) ($attributes['admin_mode'] ?? null);
-		$can_create     = (bool) ($attributes['create'] ?? null);
-		$can_delete     = (bool) ($attributes['delete'] ?? null);
-		$can_edit       = (bool) ($attributes['edit'] ?? null);
-		$thanked_images = (bool) ($attributes['thanked_images'] ?? null);
-		$links_enabled  = (bool) ($attributes['links'] ?? null);
-		$limit          = (int) ($attributes['limit'] ?? 20);
-		$offset         = (int) ($attributes['offset'] ?? null);
-		$user_id        = (isset($attributes['user_id'])) ? (int) $attributes['user_id'] : null;
+		$admin_mode       = (bool) ($attributes['admin_mode'] ?? null);
+		$can_create       = (bool) ($attributes['create'] ?? null);
+		$can_delete       = (bool) ($attributes['delete'] ?? null);
+		$can_edit         = (bool) ($attributes['edit'] ?? null);
+		$create_thankable = (isset($attributes['create']) && is_array($attributes['create'])) ? $attributes['create'] : null;
+		$thanked_images   = (bool) ($attributes['thanked_images'] ?? null);
+		$links_enabled    = (bool) ($attributes['links'] ?? null);
+		$limit            = (int) ($attributes['limit'] ?? 20);
+		$offset           = (int) ($attributes['offset'] ?? null);
+		$user_id          = (isset($attributes['user_id'])) ? (int) $attributes['user_id'] : null;
 
 		if (isset($user_id))
 		{
@@ -158,10 +174,10 @@ class ThankYousList extends TemplaterComponentTmpl
 		if ($can_create)
 		{
 			$args['create.visible'] = 1;
-			/*	if (isset($preselected_thankable))
+				if (isset($create_thankable))
 				{
-					//	$args['preselected_thankable.json'] = $this->ConvertThankableToArray($preselected_thankable);
-				}*/
+					$args['preselected_thankable.json'] = $create_thankable;
+				}
 		} else
 		{
 			$args['create.visible'] = 0;
