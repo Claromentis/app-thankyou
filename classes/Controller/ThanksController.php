@@ -32,15 +32,13 @@ class ThanksController
 		$this->sugre_repository = $sugre_repository;
 	}
 
-	public function Admin(ServerRequestInterface $server_request, Application $app)
+	public function Admin(ServerRequestInterface $server_request)
 	{
+		$args = [];
 		$limit = 20;
 
 		$query_params = $server_request->getQueryParams();
 		$offset = (int) ($query_params['st'] ?? null);
-
-		$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, true);
-		$args = $this->api->ThankYous()->GetThankYousListArgs($thank_yous, DateClaTimeZone::GetCurrentTZ(), false, false, true, true, true);
 
 		$args['nav_messages.+class'] = 'active';
 
@@ -48,6 +46,8 @@ class ThanksController
 
 		$args['paging.body_html'] = get_navigation($server_request->getUri()->getPath(), $this->api->ThankYous()->GetTotalThankYousCount(), $offset, '', $limit);
 
+		$args['ty_list.limit'] = $limit;
+		$args['ty_list.offset'] = $offset;
 		return new TemplaterCallResponse('thankyou/admin/admin.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
 
