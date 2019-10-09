@@ -185,6 +185,17 @@ class ThankYousList extends TemplaterComponentTmpl
 
 		$args['thank_you_user.placeholder'] = $lmsg('thankyou.thank.placeholder');
 
+		foreach ($api->ThankYous()->GetThankableObjectTypes() as $object_type_id)
+		{
+			if (!isset($thankable_object_types))
+			{
+				$thankable_object_types = (string) $object_type_id;
+			} else {
+				$thankable_object_types .= "," . $object_type_id;
+			}
+		}
+		$args['thank_you_user.filter_perm_oclasses'] = $thankable_object_types;
+
 		return $this->CallTemplater('thankyou/thank_yous_list.html', $args);
 	}
 }
