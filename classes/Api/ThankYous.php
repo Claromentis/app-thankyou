@@ -276,6 +276,15 @@ class ThankYous
 		}
 	}
 
+	/**
+	 * @param int $user_id
+	 * @return int
+	 */
+	public function GetUsersThankYousCount(int $user_id): int
+	{
+		return $this->thank_yous_repository->GetUsersThankYousCount($user_id);
+	}
+
 	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
 	{
 		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
