@@ -39,11 +39,11 @@ class ThankYous
 
 	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous_repository, Config $config, ThankYouAcl $acl, ThanksListView $thank_yous_view)
 	{
-		$this->acl = $acl;
-		$this->config = $config;
+		$this->acl                   = $acl;
+		$this->config                = $config;
 		$this->line_manager_notifier = $line_manager_notifier;
 		$this->thank_yous_repository = $thank_yous_repository;
-		$this->thank_yous_view = $thank_yous_view;
+		$this->thank_yous_view       = $thank_yous_view;
 	}
 
 	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
@@ -54,6 +54,29 @@ class ThankYous
 	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
 	{
 		return $this->acl->CanEditThankYou($thank_you, $security_context);
+	}
+
+	/**
+	 * @param Thankable|Thankable[] $thankables
+	 * @param int|null              $viewing_ex_area_id
+	 * @return array
+	 */
+	public function ConvertThankablesToArrays($thankables, ?int $viewing_ex_area_id = null)
+	{
+		$array_return = true;
+		if (!is_array($thankables))
+		{
+			$array_return = false;
+			$thankables   = [$thankables];
+		}
+
+		$thankables_array = [];
+		foreach ($thankables as $thankable)
+		{
+			$thankables_array[] = $this->thank_yous_view->ConvertThankableToArray($thankable, $viewing_ex_area_id);
+		}
+
+		return $array_return ? $thankables_array : $thankables_array[0];
 	}
 
 	/**
@@ -73,7 +96,7 @@ class ThankYous
 		if (!is_array($thank_yous))
 		{
 			$array_return = false;
-			$thank_yous = [$thank_yous];
+			$thank_yous   = [$thank_yous];
 		}
 
 		$thank_yous_array = [];
@@ -97,7 +120,7 @@ class ThankYous
 		$this->thank_yous_repository->SaveToDb($thank_you);
 
 		$thanked_users = $thank_you->GetUsers();
-		$users_ids = [];
+		$users_ids     = [];
 		foreach ($thanked_users as $thanked_user)
 		{
 			$users_ids[] = $thanked_user->GetId();
@@ -137,7 +160,7 @@ class ThankYous
 	}
 
 	/**
-	 * @param ThankYou[]                $thank_yous
+	 * @param ThankYou[]           $thank_yous
 	 * @param DateTimeZone         $date_time_zone
 	 * @param bool                 $display_thanked_images
 	 * @param bool                 $allow_new
@@ -145,11 +168,11 @@ class ThankYous
 	 * @param bool                 $allow_delete
 	 * @param bool                 $links_enabled
 	 * @param SecurityContext|null $security_context
-	 * @param Thankable|null $preselected_thankable
+	 * @param Thankable|null       $preselected_thankable
 	 * @return array
 	 * @throws InvalidArgumentException
 	 */
-	public function GetThankYousListArgs(array $thank_yous, DateTimeZone $date_time_zone,  bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null)
+	public function GetThankYousListArgs(array $thank_yous, DateTimeZone $date_time_zone, bool $display_thanked_images = false, bool $allow_new = false, bool $allow_edit = true, bool $allow_delete = true, bool $links_enabled = true, ?SecurityContext $security_context = null, ?Thankable $preselected_thankable = null)
 	{
 		return $this->thank_yous_view->GetThankYousListArgs($thank_yous, $date_time_zone, $display_thanked_images, $allow_new, $allow_edit, $allow_delete, $links_enabled, $security_context, $preselected_thankable);
 	}
@@ -164,18 +187,18 @@ class ThankYous
 		$array_return = true;
 		if (!is_array($object_types_id))
 		{
-			$array_return = false;
+			$array_return    = false;
 			$object_types_id = [$object_types_id];
 		}
 
 		$names = $this->thank_yous_repository->GetThankableObjectTypesNamesFromIds($object_types_id);
 
-		return $array_return ?  $names : $names[0];
+		return $array_return ? $names : $names[0];
 	}
 
 	/**
 	 * @param int|int[] $ids
-	 * @param bool $thanked
+	 * @param bool      $thanked
 	 * @return ThankYou|ThankYou[]
 	 * @throws ThankYouRuntimeException
 	 * @throws ThankYouInvalidThankable
@@ -188,7 +211,7 @@ class ThankYous
 		if (!is_array($ids))
 		{
 			$array_return = false;
-			$ids = [$ids];
+			$ids          = [$ids];
 		}
 
 		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked);
