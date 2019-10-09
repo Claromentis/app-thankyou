@@ -144,18 +144,4 @@ class ThanksRepository
 
 		return $items;
 	}
-
-	/**
-	 * Returns number of "thanks" for user
-	 *
-	 * @param int $user_id
-	 *
-	 * @return int
-	 */
-	public function GetCountForUser($user_id)
-	{
-		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_user WHERE user_id=int:uid", $user_id);
-
-		return $count;
-	}
 }

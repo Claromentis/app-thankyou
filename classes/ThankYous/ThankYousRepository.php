@@ -541,6 +541,20 @@ class ThankYousRepository
 	}
 
 	/**
+	 * Returns total number of Thank Yous associated with a User
+	 *
+	 * @param int $user_id
+	 *
+	 * @return int
+	 */
+	public function GetUsersThankYousCount(int $user_id): int
+	{
+		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_user WHERE user_id=int:uid", $user_id);
+
+		return $count;
+	}
+
+	/**
 	 * @param int $user_id
 	 * @param int $limit
 	 * @param int $offset
