@@ -178,13 +178,8 @@ class ThanksListView
 	 * ]
 	 * @throws ThankYouRuntimeException
 	 */
-	public function ConvertThankYouToArray(ThankYou $thank_you, ?DateTimeZone $time_zone = null, ?int $viewing_ex_area_id = null): array
+	public function ConvertThankYouToArray(ThankYou $thank_you, DateTimeZone $time_zone, ?int $viewing_ex_area_id = null): array
 	{
-		if (!isset($time_zone))
-		{
-			$time_zone = DateClaTimeZone::GetDefaultTZ();
-		}
-
 		$date_created = clone $thank_you->GetDateCreated();
 		$date_created->setTimezone($time_zone);
 
