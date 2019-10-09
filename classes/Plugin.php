@@ -11,7 +11,6 @@ use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
-use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminMessagesController;
@@ -21,9 +20,7 @@ use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
-use Claromentis\ThankYou\UI\Say;
 use Claromentis\ThankYou\View\ThanksListView;
-use DateClaTimeZone;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Silex\Api\EventListenerProviderInterface;
@@ -66,11 +63,6 @@ class Plugin implements
 
 			return $panels;
 		});
-
-		// Templater component class key
-		$app['templater.ui.thankyou'] = function () {
-			return new Say();
-		};
 
 		$app['thankyou.admin_export_controller'] = function () {
 			return new AdminExportController();
