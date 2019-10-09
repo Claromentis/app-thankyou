@@ -1,24 +1,14 @@
 <?php
 namespace Claromentis\ThankYou\View;
 
-use AuthUser;
-use Carbon\Carbon;
 use Claromentis\Core\Admin\AdminPanel;
-use Claromentis\Core\CDN\CDNSystemException;
-use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
-use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
-use ClaText;
-use Date;
-use DateClaTimeZone;
 use DateTimeZone;
-use InvalidArgumentException;
 use User;
 
 /**
@@ -33,14 +23,6 @@ class ThanksListView
 	private $thank_yous_repository;
 
 	private $thank_you_acl;
-
-	/**
-	 * @var array
-	 */
-	protected $default_options = [
-		'admin'          => false,
-		'profile_images' => false
-	];
 
 	/**
 	 * Create a new list view for thank you notes.
