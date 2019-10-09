@@ -250,19 +250,17 @@ class Plugin implements
 		}
 
 		$api              = $app[Api::class];
+		$lmsg             = $app[Lmsg::class];
 		$security_context = $app[SecurityContext::class];
-		$time_zone        = DateClaTimeZone::GetCurrentTZ();
 
 		$user_id = (int) $attr['user_id'];
 
 		switch ($attr['page'])
 		{
 			case 'viewprofile.tab_nav':
-				/** @var ThanksRepository $repository */
-				$repository = $app['thankyou.repository'];
-				$count      = $repository->GetCountForUser($attr['user_id']);//TODO FIX!
+				$count = $api->ThankYous()->GetUsersThankYousCount($user_id);
 
-				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $app['lmsg']("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
+				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $lmsg("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
 				$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
 
