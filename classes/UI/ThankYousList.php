@@ -22,31 +22,33 @@ use User;
 class ThankYousList extends TemplaterComponentTmpl
 {
 	/**
-	 * @param array       $attributes :
-	 *                                admin_mode:
-	 *                                1 = Editing and Deleting Thank Yous ignores permissions. Thank Yous are not filtered by Thanked Extranet Area ID.
-	 *                                create:
-	 *                                0 = Creating Thank Yous is disabled.
-	 *                                1 = Creating Thank Yous is enabled.
-	 *                                array = Creating ThankYous is locked to the Thankable array given (Created with \Claromentis\ThankYou\View\ThanksListView::ConvertThankableToArray).
-	 *                                delete:
-	 *                                0 = Deleting Thank Yous is disabled.
-	 *                                1 = Deleting Thank Yous is enabled (subject to permissions or admin_mode).
-	 *                                edit:
-	 *                                0 = Editing Thank Yous is disabled.
-	 *                                1 = Editing Thank Yous is enabled (subject to permissions or admin_mode).
-	 *                                thanked_images:
-	 *                                0 = Thanked will never display as an image.
-	 *                                1 = Thanked will display as an image if available.
-	 *                                links:
-	 *                                0 = Thanked will never provide a link.
-	 *                                1 = Thanked will provide a link if available.
-	 *                                limit:
-	 *                                int = How many Thank Yous to display.
-	 *                                offset:
-	 *                                int = Offset of Thank Yous.
-	 *                                user_id:
-	 *                                int  = Only display Thank Yous associated with this User.
+	 * #Attributes
+	 * * admin_mode:
+	 *     * 1 = Editing and Deleting Thank Yous ignores permissions. Thank Yous are not filtered by Thanked Extranet Area ID.
+	 * * create:
+	 *     * 0 = Creating Thank Yous is disabled.
+	 *     * 1 = Creating Thank Yous is enabled.
+	 * * array = Creating ThankYous is locked to the Thankable array given (Created with \Claromentis\ThankYou\View\ThanksListView::ConvertThankableToArray).
+	 * * delete:
+	 *     * 0 = Deleting Thank Yous is disabled.
+	 *     * 1 = Deleting Thank Yous is enabled (subject to permissions or admin_mode).
+	 * * edit:
+	 *     * 0 = Editing Thank Yous is disabled.
+	 *     * 1 = Editing Thank Yous is enabled (subject to permissions or admin_mode).
+	 * * thanked_images:
+	 *     * 0 = Thanked will never display as an image.
+	 *     * 1 = Thanked will display as an image if available.
+	 * * links:
+	 *     * 0 = Thanked will never provide a link.
+	 *     * 1 = Thanked will provide a link if available.
+	 * * limit:
+	 *     * int = How many Thank Yous to display.
+	 * * offset:
+	 *     * int = Offset of Thank Yous.
+	 * * user_id:
+	 *     * int  = Only display Thank Yous associated with this User.
+	 *
+	 * @param array       $attributes
 	 * @param Application $app
 	 * @return string
 	 */
@@ -57,7 +59,7 @@ class ThankYousList extends TemplaterComponentTmpl
 		$lmsg             = $app[Lmsg::class];
 		$security_context = $app[SecurityContext::class];
 
-		$admin_mode       = (bool) ($attributes['admin_mode'] ?? null);
+		$admin_mode = (bool) ($attributes['admin_mode'] ?? null);
 
 		$extranet_area_id = $admin_mode ? null : (int) $security_context->GetExtranetAreaId();
 		$time_zone        = DateClaTimeZone::GetCurrentTZ();
@@ -160,7 +162,9 @@ class ThankYousList extends TemplaterComponentTmpl
 				'delete_thanks_link.data-id' => $thank_you->GetId(),
 
 				'date_created.body'  => Carbon::instance($date_created)->diffForHumans(),
-				'date_created.title' => $date_created->getDate(DateFormatter::LONG_DATE)
+				'date_created.title' => $date_created->getDate(DateFormatter::LONG_DATE),
+
+				'thank_you_comment.object_id' => $thank_you->GetId()
 			];
 		}
 
@@ -174,10 +178,10 @@ class ThankYousList extends TemplaterComponentTmpl
 		if ($can_create)
 		{
 			$args['create.visible'] = 1;
-				if (isset($create_thankable))
-				{
-					$args['preselected_thankable.json'] = $create_thankable;
-				}
+			if (isset($create_thankable))
+			{
+				$args['preselected_thankable.json'] = $create_thankable;
+			}
 		} else
 		{
 			$args['create.visible'] = 0;
@@ -190,7 +194,8 @@ class ThankYousList extends TemplaterComponentTmpl
 			if (!isset($thankable_object_types))
 			{
 				$thankable_object_types = (string) $object_type_id;
-			} else {
+			} else
+			{
 				$thankable_object_types .= "," . $object_type_id;
 			}
 		}
