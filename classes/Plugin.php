@@ -1,6 +1,7 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use Claromentis\Comments\CommentableFilterEvent;
 use Claromentis\Core\Admin\PanelsList;
 use Claromentis\Core\Aggregation\AggregationFilterEvent;
 use Claromentis\Core\Application;
@@ -12,6 +13,7 @@ use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\ThankYou\Api\ThankYous;
+use Claromentis\ThankYou\Comments\CommentableThankYou;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminMessagesController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
@@ -223,6 +225,19 @@ class Plugin implements
 	public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
 	{
 		$dispatcher->addListener('core.aggregations_filter', [$this, 'RegisterAggregation']);
+
+		$dispatcher->addListener('core.commentable_filter', [$this, 'RegisterCommentableObjects']);
+	}
+
+	/**
+	 * Register commentable object type in a handler of event 'core.commentable_filter'
+	 *
+	 * @param \Claromentis\Comments\CommentableFilterEvent $event
+	 */
+	public function RegisterCommentableObjects(CommentableFilterEvent $event)
+	{
+		$factory = $event->GetFactory();
+		$factory->AddCommentableInterface(ThanksItem::AGGREGATION, CommentableThankYou::class);
 	}
 
 	/**
