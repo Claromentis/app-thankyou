@@ -1,25 +1,23 @@
 <?php
 namespace Claromentis\ThankYou;
 
-use Claromentis\Comments\CommentableFilterEvent;
 use Claromentis\Core\Admin\PanelsList;
-use Claromentis\Core\Aggregation\AggregationFilterEvent;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\ControllerCollection;
+use Claromentis\Core\Event\LazyResolver;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\ThankYou\Api\ThankYous;
-use Claromentis\ThankYou\Comments\CommentableThankYou;
 use Claromentis\ThankYou\Controller\AdminExportController;
-use Claromentis\ThankYou\Controller\AdminMessagesController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
+use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -186,21 +184,6 @@ class Plugin implements
 	}
 
 	/**
-	 * Register the module's aggregation via an aggregation filter event.
-	 *
-	 * @param AggregationFilterEvent $event
-	 */
-	public function RegisterAggregation(AggregationFilterEvent $event)
-	{
-		$event->GetConfig()->AddAggregation(
-			ThanksItem::AGGREGATION,
-			'thanks',
-			lmsg('thankyou.common.thank_you_message'),
-			lmsg('thankyou.common.thank_you_messages')
-		);
-	}
-
-	/**
 	 * Instant Message types
 	 *
 	 * @return array
@@ -224,20 +207,7 @@ class Plugin implements
 	 */
 	public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
 	{
-		$dispatcher->addListener('core.aggregations_filter', [$this, 'RegisterAggregation']);
-
-		$dispatcher->addListener('core.commentable_filter', [$this, 'RegisterCommentableObjects']);
-	}
-
-	/**
-	 * Register commentable object type in a handler of event 'core.commentable_filter'
-	 *
-	 * @param \Claromentis\Comments\CommentableFilterEvent $event
-	 */
-	public function RegisterCommentableObjects(CommentableFilterEvent $event)
-	{
-		$factory = $event->GetFactory();
-		$factory->AddCommentableInterface(ThanksItem::AGGREGATION, CommentableThankYou::class);
+		(new LazyResolver($app, CommentsSubscriber::class, CommentsSubscriber::getSubscribedEvents()))->subscribe($dispatcher);
 	}
 
 	/**
