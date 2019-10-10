@@ -2,6 +2,7 @@
 namespace Claromentis\ThankYou;
 
 use ActiveRecord;
+use ClaAggregation;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Exception;
@@ -16,7 +17,7 @@ use ObjectsStorage;
  * @property-read int    $date_created
  * @property-read string $description
  */
-class ThanksItem extends ActiveRecord
+class ThanksItem extends ActiveRecord implements ClaAggregation
 {
 	//TODO: add constructor so that the object can only exist fully instantiated
 
@@ -254,5 +255,22 @@ class ThanksItem extends ActiveRecord
 		// potentially can load users from the database, if they are not loaded yet
 		// but not doing this now
 		return $this->users_ids;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function GetAggregation(): int
+	{
+		return self::AGGREGATION;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function GetUrl()
+	{
+		//TODO Add a URL if one ever exists...
+		return '';
 	}
 }
