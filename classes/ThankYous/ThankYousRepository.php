@@ -509,12 +509,12 @@ class ThankYousRepository
 	 */
 	public function GetRecentThankYousIdsFromDb(int $limit, int $offset, ?int $extranet_area_id = null)
 	{
-		$query = "SELECT DISTINCT(thankyou_item.id) FROM thankyou_item LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id = thankyou_item.id LEFT JOIN users ON users.id = thankyou_thanked.object_id AND thankyou_thanked.object_type = 1 LEFT JOIN groups ON groups.groupid = thankyou_thanked.object_id AND object_type = 3";
+		$query = "SELECT thankyou_item.id FROM thankyou_item LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id = thankyou_item.id LEFT JOIN users ON users.id = thankyou_thanked.object_id AND thankyou_thanked.object_type = 1 LEFT JOIN groups ON groups.groupid = thankyou_thanked.object_id AND object_type = 3";
 		if (isset($extranet_area_id))
 		{
 			$query .= " WHERE groups.ex_area_id = " . $extranet_area_id . " OR users.ex_area_id = " . $extranet_area_id;
 		}
-		$query .= " ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
+		$query .= " GROUP BY thankyou_item.id, thankyou_item.date_created ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
 
 		$result = $this->db->query($query, $limit, $offset);
 
