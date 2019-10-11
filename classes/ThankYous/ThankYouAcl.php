@@ -19,9 +19,9 @@ class ThankYouAcl
 	 * @param SecurityContext $security_context
 	 * @return bool
 	 */
-	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
+	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context): bool
 	{
-		return $thank_you->GetAuthor()->GetId() === $security_context->GetUser()->GetId() || $this->admin_panel->IsAccessible($security_context);
+		return $thank_you->GetAuthor()->GetId() === $security_context->GetUser()->GetId() || $this->IsAdmin($security_context);
 	}
 
 	/**
@@ -29,8 +29,17 @@ class ThankYouAcl
 	 * @param SecurityContext $security_context
 	 * @return bool
 	 */
-	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
+	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context): bool
 	{
-		return $thank_you->GetAuthor()->GetId() === $security_context->GetUser()->GetId() || $this->admin_panel->IsAccessible($security_context);
+		return $thank_you->GetAuthor()->GetId() === $security_context->GetUser()->GetId() || $this->IsAdmin($security_context);
+	}
+
+	/**
+	 * @param SecurityContext $security_context
+	 * @return bool
+	 */
+	public function IsAdmin(SecurityContext $security_context): bool
+	{
+		return $this->admin_panel->IsAccessible($security_context);
 	}
 }

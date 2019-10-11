@@ -275,11 +275,20 @@ class ThankYous
 		return $this->thank_yous_repository->GetUsersThankYousCount($user_id);
 	}
 
+	/**
+	 * @param SecurityContext $security_context
+	 * @return bool
+	 */
+	public function IsAdmin(SecurityContext $security_context): bool
+	{
+		return $this->acl->IsAdmin($security_context);
+	}
+
 	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
 	{
 		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
 
-		if (!$this->acl->CanEditThankYou($thank_you, $security_context))
+		if (!$this->CanEditThankYou($thank_you, $security_context))
 		{
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
@@ -310,7 +319,7 @@ class ThankYous
 	{
 		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
 
-		if (!$this->acl->CanDeleteThankYou($thank_you, $security_context))
+		if (!$this->CanDeleteThankYou($thank_you, $security_context))
 		{
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
