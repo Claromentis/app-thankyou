@@ -243,7 +243,7 @@ class ThankYous
 	/**
 	 * @return int[]
 	 */
-	public function GetThankableObjectTypes()
+	public function GetThankableObjectTypes(): array
 	{
 		return $this->thank_yous_repository::THANKABLES;
 	}
