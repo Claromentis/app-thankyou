@@ -72,8 +72,8 @@
                 $('#thank_you_modal').modal('show');
             });
 
-            if (cla_thank_you_modal.preselected_thankable !== null) {
-                var thankable = cla_thank_you_modal.preselected_thankable;
+            if (typeof cla_thank_yous_list !== 'undefined' && cla_thank_you_modal.preselected_thankable !== null) {
+                var thankable = cla_thank_yous_list.preselected_thankable;
                 var thank_name = null;
                 var thank_object_id = null;
                 var thank_object_type_id = null;
@@ -125,8 +125,7 @@
 
                 this.DisplayPicker(picker_display);
                 this.DisplayPreselected(preselected_display);
-            },
-            preselected_thankable: ${preselected_thankable.json}
+            }
         };
 	</script>
 </div>
