@@ -8,6 +8,7 @@ use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\ThankYou\ThanksRepository;
 use Claromentis\ThankYou\View\ThanksListView;
+use ClaText;
 
 /**
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
@@ -101,9 +102,9 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	 * Render component header with the specified options.
 	 * If null or empty string is returned, header is not displayed.
 	 *
-	 * @param string $id_string
+	 * @param string           $id_string
 	 * @param OptionsInterface $options
-	 * @param Application $app
+	 * @param Application      $app
 	 *
 	 * @return string
 	 */
@@ -128,12 +129,13 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		if ($options->Get('title') !== '')
 		{
-			$args['custom_title.body'] = $options->Get('title');
-			$args['custom_title.visible'] = 1;
+			$args['custom_title.body']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
+			$args['custom_title.visible']  = 1;
 			$args['default_title.visible'] = 0;
 		}
 
 		$template = 'thankyou/pages_component_header.html';
+
 		return $this->CallTemplater($template, $args);
 	}
 
@@ -184,10 +186,11 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function GetCoverInfo()
 	{
 		return [
-			'title' => lmsg('thankyou.component.cover_info.title'),
+			'title'       => lmsg('thankyou.component.cover_info.title'),
 			'description' => lmsg('thankyou.component.cover_info.desc'),
 			'application' => 'thankyou',
-			'icon_class' => 'glyphicons glyphicons-donate'
+			'icon_class'  => 'glyphicons glyphicons-donate',
+			'categories'  => ['people']
 		];
 	}
 

@@ -1,5 +1,11 @@
 # Change Log #
 
+## Version 3.3.0 ##
+* Core dependency updated **>=8.6**
+### Improvements
+* !37 CORE-973 Added Component `Thank You` to Category `People, Communication & Social`.
+* !37 CORE-974 Added Localized Titles to the `Thank You` Component.
+
 ## 3.2.4
 * Added Russian translations and twig template
 
