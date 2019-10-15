@@ -27,16 +27,16 @@
         Create: function () {
             var create = null;
             if (this.preselected_thankable !== null) {
-				create = {
+				create = [{
 				    id: this.preselected_thankable.id,
 					name: this.preselected_thankable.name,
 					object_type: {
 				        id: this.preselected_thankable.object_type.id,
 						name: this.preselected_thankable.object_type.name
 					}
-				};
+				}];
 			}
-            cla_thank_you_modal.Create([create]);
+            cla_thank_you_modal.Create(create);
 		},
         preselected_thankable: ${preselected_thankable.json}
     };
