@@ -162,18 +162,18 @@ class ThankYou extends TemplaterComponentTmpl
 			'description.body_html'   => $cla_text->ProcessPlain($thank_you->GetDescription()),
 			'has_description.visible' => strlen($thank_you->GetDescription()) > 0,
 
-			'like_component.object_id' => $thank_you->GetId(),
+			'like_component.object_id' => $id,
 			'like_component.visible'   => isset($id),
 
 			'delete_thanks.visible'      => $can_delete_thank_you,
 			'edit_thanks.visible'        => $can_edit_thank_you,
-			'edit_thanks_link.data-id'   => $thank_you->GetId(),
-			'delete_thanks_link.data-id' => $thank_you->GetId(),
+			'edit_thanks_link.data-id'   => $id,
+			'delete_thanks_link.data-id' => $id,
 
 			'date_created.body'  => Carbon::instance($date_created)->diffForHumans(),
 			'date_created.title' => $date_created->getDate(DateFormatter::LONG_DATE),
 
-			'thank_you_comment.object_id' => $thank_you->GetId(),
+			'thank_you_comment.object_id' => $id,
 
 			'thank_you_user.filter_perm_oclasses' => $thankable_object_types,
 			'thank_you_user.placeholder'          => $lmsg('thankyou.thank.placeholder')
