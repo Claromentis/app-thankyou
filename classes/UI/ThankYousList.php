@@ -84,8 +84,8 @@ class ThankYousList extends TemplaterComponentTmpl
 				'thank_you.admin_mode'     => $admin_mode,
 				'thank_you.delete'         => $can_delete,
 				'thank_you.edit'           => $can_edit,
-				'thank_you.links'         => $thanked_images,
-				'thank_you.thanked_images' => $links,
+				'thank_you.links'         => $links,
+				'thank_you.thanked_images' => $thanked_images,
 				'thank_you.thank_you'      => $thank_you
 			];
 		}
