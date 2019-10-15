@@ -27,18 +27,23 @@ class ThankYou extends TemplaterComponentTmpl
 	 *
 	 * ##Optional
 	 * * admin_mode:
+	 *     * 0 = Author and Thanked details will be hidden if the Viewer belongs to a different Extranet Area.(default)
 	 *     * 1 = Editing and Deleting the Thank You ignores permissions.
+	 *           Author and Thanked will display regardless of Viewers Extranet Area.
+	 * * comments:
+	 *     * 0 = Comments will not be displayed.(default)
+	 *     * 1 = Comments will be displayed.
 	 * * delete:
-	 *     * 0 = Deleting the Thank You is disabled.
+	 *     * 0 = Deleting the Thank You is disabled.(default)
 	 *     * 1 = Deleting the Thank You is enabled (subject to permissions or admin_mode).
 	 * * edit:
-	 *     * 0 = Editing the Thank You is disabled.
+	 *     * 0 = Editing the Thank You is disabled.(default)
 	 *     * 1 = Editing the Thank You is enabled (subject to permissions or admin_mode).
 	 * * links:
-	 *     * 0 = Thanked will never provide a link.
+	 *     * 0 = Thanked will never provide a link.(default)
 	 *     * 1 = Thanked will provide a link if available.
 	 * * thanked_images:
-	 *     * 0 = Thanked will never display as an image.
+	 *     * 0 = Thanked will never display as an image.(default)
 	 *     * 1 = Thanked will display as an image if available.
 	 *
 	 * @param             $attributes
@@ -54,11 +59,12 @@ class ThankYou extends TemplaterComponentTmpl
 		$security_context = $app[SecurityContext::class];
 		$time_zone        = DateClaTimeZone::GetCurrentTZ();
 
-		$admin_mode     = (bool) ($attributes['admin_mode'] ?? null);
-		$can_delete     = (bool) ($attributes['delete'] ?? null);
-		$can_edit       = (bool) ($attributes['edit'] ?? null);
-		$links_enabled  = (bool) ($attributes['links'] ?? null);
-		$thanked_images = (bool) ($attributes['thanked_images'] ?? null);
+		$admin_mode       = (bool) ($attributes['admin_mode'] ?? null);
+		$can_delete       = (bool) ($attributes['delete'] ?? null);
+		$can_edit         = (bool) ($attributes['edit'] ?? null);
+		$display_comments = (bool) ($attributes['comments'] ?? null);
+		$links_enabled    = (bool) ($attributes['links'] ?? null);
+		$thanked_images   = (bool) ($attributes['thanked_images'] ?? null);
 
 		$thank_you = $attributes['thank_you'] ?? null;
 		if (!isset($thank_you))
@@ -161,6 +167,8 @@ class ThankYou extends TemplaterComponentTmpl
 
 			'description.body_html'   => $cla_text->ProcessPlain($thank_you->GetDescription()),
 			'has_description.visible' => strlen($thank_you->GetDescription()) > 0,
+
+			'comments.visible' => $display_comments,
 
 			'like_component.object_id' => $id,
 			'like_component.visible'   => isset($id),
