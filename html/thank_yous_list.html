@@ -5,7 +5,7 @@
 -->
 <include file="includes/modal.html"/>
 <div class="thank-you-link-inline" name="create">
-	<a href="#thank_you_modal" class="js-thank-you-button btn btn-primary thank-you--button">
+	<a href="#thank_you_modal" class="btn btn-primary thank-you--button" onclick="cla_thank_yous_list.Create();">
 		<span class="glyphicons glyphicons-donate"></span>
 		<span class="thank-title">
 			<txt name="thankyou:component:say_thank_you">Say thank you</txt>
@@ -24,6 +24,20 @@
 </div>
 <script type="text/javascript">
     var cla_thank_yous_list = {
+        Create: function () {
+            var create = null;
+            if (this.preselected_thankable !== null) {
+				create = {
+				    id: this.preselected_thankable.id,
+					name: this.preselected_thankable.name,
+					object_type: {
+				        id: this.preselected_thankable.object_type.id,
+						name: this.preselected_thankable.object_type.name
+					}
+				};
+			}
+            cla_thank_you_modal.Create([create]);
+		},
         preselected_thankable: ${preselected_thankable.json}
     };
 </script>

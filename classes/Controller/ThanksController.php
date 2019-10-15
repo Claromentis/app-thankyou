@@ -68,7 +68,7 @@ class ThanksController
 		$redirect = $request->getServerParams()['HTTP_REFERER'];
 
 		$id          = (int) ($post['thank_you_id'] ?? null);
-		$thanked     = (array) ($post['thank_you_user'] ?? $post['thank_you_preselected'] ?? null);
+		$thanked     = (array) ($post['thank_you_user'] ?? null);
 		$description = (string) $post['thank_you_description'] ?? '';
 
 		if (isset($thanked))

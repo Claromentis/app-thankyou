@@ -17,7 +17,6 @@
 							</div>
 							<div id="thank_you_preselected" style="display:none;">
 								<span id="thank_you_preselected_name">John Smith</span>
-								<input type="hidden" id="thank_you_preselected_value" name="thank_you_preselected">
 							</div>
 						</div>
 					</div>
@@ -66,36 +65,25 @@
 
             // Clear and show the modal if the thank you button is clicked
             $('.js-thank-you-button').on('click', function () {
-                $('#thank_you_id').val(null);
-                $('#thank_you_user').val(null).trigger('change').html(null);
-                $('#thank_you_description').val(null);
-                $('#thank_you_modal').modal('show');
+                cla_thank_you_modal.SetObjectID(null);
+                cla_thank_you_modal.SetPicker(null);
+                cla_thank_you_modal.SetDescription(null);
+                cla_thank_you_modal.Show(true);
             });
-
-            if (typeof cla_thank_yous_list !== 'undefined' && cla_thank_you_modal.preselected_thankable !== null) {
-                var thankable = cla_thank_yous_list.preselected_thankable;
-                var thank_name = null;
-                var thank_object_id = null;
-                var thank_object_type_id = null;
-
-                if ('name' in thankable) {
-                    thank_name = thankable.name;
-                }
-                if ('id' in thankable) {
-                    thank_object_id = thankable.id;
-                }
-                if ('object_type' in thankable && 'id' in thankable.object_type) {
-                    thank_object_type_id = thankable.object_type.id;
-                }
-
-                if (thank_name !== null && thank_object_id !== null && thank_object_type_id !== null) {
-                    cla_thank_you_modal.SetPreselected(thank_name, cla_multi_object_picker.createOptionValue(thank_object_type_id, thank_object_id));
-                    cla_thank_you_modal.DisplayThankMethod('preselected');
-                }
-            }
         });
 
         var cla_thank_you_modal = {
+            Create: function (picked) {
+                this.SetObjectID(null);
+                this.SetPicker(picked);
+                this.SetDescription(null);
+
+                if (picked !== null) {
+                    this.LockPicker(true);
+				}
+
+                this.Show(true);
+			},
             DisplayPicker: function (display) {
                 if (display === true) {
                     $('#thank_you_picker').show();
@@ -110,22 +98,62 @@
                     $('#thank_you_preselected').hide();
                 }
             },
-            SetPreselected: function (name, value) {
+			GetModal: function () {
+              return $('#thank_you_modal');
+			},
+			GetPicker: function () {
+                return $('#thank_you_user');
+			},
+            SetPreselected: function (name) {
                 $('#thank_you_preselected_name').text(name);
-                $('#thank_you_preselected_value').val(value);
             },
-            DisplayThankMethod: function (method) {
-                var picker_display = false;
-                var preselected_display = false;
-                if (method === 'preselected') {
-                    preselected_display = true;
-                } else {
-                    picker_display = true;
-                }
+			SetObjectID: function(id) {
+                $('#thank_you_id').val(id);
+			},
+			SetDescription: function(description) {
+                $('#thank_you_description').val(description);
+			},
+			SetPicker: function (picked) {
+                var picker = this.GetPicker();
 
-                this.DisplayPicker(picker_display);
-                this.DisplayPreselected(preselected_display);
-            }
+                picker.val(null);
+                picker.html(null);
+
+                if (typeof picked === 'object') {
+					for (var i in picked) {
+                        cla_multi_object_picker.addOption(picked[i].object_type.id, picked[i].id, picked[i].object_type.name + ": " + picked[i].name, picker.attr('id'));
+					}
+				}
+
+                picker.trigger('change');
+			},
+			Show: function(display) {
+                var modal = this.GetModal();
+                if (display === true) {
+					modal.modal('show');
+				}
+                else {
+                    modal.modal('hide');
+				}
+			},
+			LockPicker: function (lock) {
+                if (lock) {
+                    this.DisplayPicker(false);
+
+                    var preselected = '';
+                    var options = cla_multi_object_picker.GetSelected(this.GetPicker());
+                    for (var i in options) {
+						preselected += options[i].text();
+                    }
+                    this.SetPreselected(preselected);
+                    this.DisplayPreselected(true);
+                }
+                else {
+                    this.DisplayPreselected(false);
+                    this.SetPreselected('');
+                    this.DisplayPicker(true);
+				}
+			}
         };
 	</script>
 </div>
