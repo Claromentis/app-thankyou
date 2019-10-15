@@ -18,3 +18,22 @@
 		</div>
 	</div>
 </div>
+<script type="text/javascript">
+	var cla_thank_you_delete_modal = {
+        GetModal: function () {
+            return $('#thank_you_delete_modal');
+        },
+        SetObjectID: function(id) {
+            $('#delete_thank_you_id').val(id);
+        },
+        Show: function(display) {
+            var modal = this.GetModal();
+            if (display === true) {
+                modal.modal('show');
+            }
+            else {
+                modal.modal('hide');
+            }
+        }
+	};
+</script>
