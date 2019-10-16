@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\UI;
 use Carbon\Carbon;
 use Claromentis\Core\Application;
 use Claromentis\Core\CDN\CDNSystemException;
+use Claromentis\Core\Config\Config;
 use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
@@ -53,8 +54,12 @@ class ThankYou extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app): string
 	{
-		$api              = $app[Api::class];
-		$cla_text         = $app[ClaText::class];
+		$api      = $app[Api::class];
+		$cla_text = $app[ClaText::class];
+		/**
+		 * @var Config $config
+		 */
+		$config           = $app['thankyou.config'];
 		$lmsg             = $app[Lmsg::class];
 		$security_context = $app[SecurityContext::class];
 		$time_zone        = DateClaTimeZone::GetCurrentTZ();
@@ -62,7 +67,7 @@ class ThankYou extends TemplaterComponentTmpl
 		$admin_mode       = (bool) ($attributes['admin_mode'] ?? null);
 		$can_delete       = (bool) ($attributes['delete'] ?? null);
 		$can_edit         = (bool) ($attributes['edit'] ?? null);
-		$display_comments = (bool) ($attributes['comments'] ?? null);
+		$display_comments = ((bool) ($attributes['comments'] ?? null) && (bool) $config->Get('thank_you_comments'));
 		$links_enabled    = (bool) ($attributes['links'] ?? null);
 		$thanked_images   = (bool) ($attributes['thanked_images'] ?? null);
 
