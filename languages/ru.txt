@@ -18,6 +18,8 @@ lm	thankyou.component.options.show_button		Показать кнопку "Ска
 lm	thankyou.component.options.show_header		Показать заголовок
 lm	thankyou.component.options.user_id		Фильтровать по пользователю
 lm	thankyou.component_heading		Спасибо
+lm	thankyou.configurations.notify_line_manager.title		
+lm	thankyou.configurations.thank_you_comments.title		
 lm	thankyou.error.invalid_users		
 lm	thankyou.error.no_edit_permission		У вас нет прав на изменение этого сообщения
 lm	thankyou.error.thanks_not_found		Сообщение благодарности не существует
