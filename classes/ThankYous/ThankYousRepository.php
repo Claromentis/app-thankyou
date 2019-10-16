@@ -392,10 +392,10 @@ class ThankYousRepository
 
 		if ($thanked === false)
 		{
-			$query = "SELECT thankyou_item.id, thankyou_item.author AS author_id,thankyou_item.date_created, thankyou_item.description FROM thankyou_item LEFT JOIN users AS author ON author.id=thankyou_item.author WHERE thankyou_item.id IN in:int:ids";
+			$query = "SELECT thankyou_item.id, thankyou_item.author AS author_id, thankyou_item.date_created, thankyou_item.description FROM thankyou_item WHERE thankyou_item.id IN in:int:ids";
 		} else
 		{
-			$query = "SELECT thankyou_item.id, thankyou_item.author AS author_id,thankyou_item.date_created, thankyou_item.description, thankyou_thanked.object_type AS thanked_object_type, thankyou_thanked.object_id AS thanked_object_id FROM thankyou_item LEFT JOIN users AS author ON author.id=thankyou_item.author LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id=thankyou_item.id WHERE thankyou_item.id IN in:int:ids";
+			$query = "SELECT thankyou_item.id, thankyou_item.author AS author_id, thankyou_item.date_created, thankyou_item.description, thankyou_thanked.object_type AS thanked_object_type, thankyou_thanked.object_id AS thanked_object_id FROM thankyou_item LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id=thankyou_item.id WHERE thankyou_item.id IN in:int:ids";
 		}
 		$result = $this->db->query($query, $ids);
 
