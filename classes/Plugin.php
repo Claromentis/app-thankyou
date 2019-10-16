@@ -11,6 +11,7 @@ use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
+use Claromentis\Core\Widget\Sugre\SugreRepository;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
@@ -111,6 +112,10 @@ class Plugin implements
 		$app[ThankYouAcl::class] = function ($app) {
 			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'));
 		};
+
+		$app[ThanksController::class] = function ($app) {
+			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreRepository::class], $app['thankyou.config']);
+		};
 	}
 
 	/**
@@ -155,6 +160,7 @@ class Plugin implements
 
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
 				$routes->get('/admin', ThanksController::class . ':Admin');
+				$routes->match('/admin/configuration', ThanksController::class . ':Configuration')->method('GET|POST');
 				$routes->get('/admin/export', 'thankyou.admin_export_controller:ShowExportPanel');
 				$routes->post('/admin/export', 'thankyou.admin_export_controller:ExportCsv');
 				$routes->get('/admin/notifications', 'thankyou.admin_notifications_controller:ShowNotificationsPanel');
