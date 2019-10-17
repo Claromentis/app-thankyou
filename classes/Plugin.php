@@ -10,6 +10,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Security\SecurityContext;
+use Claromentis\Core\Services;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\Widget\Sugre\SugreRepository;
 use Claromentis\ThankYou\Api\ThankYous;
@@ -203,6 +204,24 @@ class Plugin implements
 				Constants::IM_TYPE_THANKYOU
 			]
 		];
+	}
+
+	/**
+	 * This Method is required by ClaPlugins::IsObjectValid, in order for Sending Messages/Notifications to work.
+	 * It will be deprecated as soon as possible and should be not be
+	 *
+	 */
+	public function IsObjectValid(int $aggregation_id, int $object_id)
+	{
+		/**
+		 * @var ThanksItemFactory $thanks_item_factory
+		 */
+		$thanks_item_factory = Services::I()->{ThanksItemFactory::class};
+
+		$thanks_item = $thanks_item_factory->Create();
+		$thanks_item->Load($object_id);
+
+		return !$thanks_item->IsError();
 	}
 
 	/**
