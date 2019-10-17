@@ -98,8 +98,8 @@ class Plugin implements
 		};
 
 		// Pages component
-		$app['pages.component.thankyou'] = function () {
-			return new UI\PagesComponent();
+		$app['pages.component.thankyou'] = function ($app) {
+			return new UI\PagesComponent($app[Lmsg::class], $app['thankyou.config']);
 		};
 
 		$app['thankyou.config'] = function ($app) {

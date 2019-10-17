@@ -7,6 +7,8 @@ use Claromentis\Core\Component\Exception\ComponentRuntimeException;
 use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
+use Claromentis\Core\Config\Config;
+use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -19,6 +21,22 @@ use DateClaTimeZone;
 class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 {
 	use TemplaterTrait;
+
+	private $config;
+
+	private $lmsg;
+
+	/**
+	 * PagesComponent constructor.
+	 *
+	 * @param Lmsg   $lmsg
+	 * @param Config $config
+	 */
+	public function __construct(Lmsg $lmsg, Config $config)
+	{
+		$this->config = $config;
+		$this->lmsg   = $lmsg;
+	}
 
 	/**
 	 * Returns information about supported options for this component as array
@@ -36,12 +54,13 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function GetOptions()
 	{
 		return [
-			'title' => ['type' => 'string', 'title' => lmsg('thankyou.component.options.custom_title'), 'default' => '', 'placeholder' => lmsg('thankyou.component_heading')],
-			'show_header' => ['type' => 'bool', 'title' => lmsg('thankyou.component.options.show_header'), 'default' => true, 'mutate_on_change' => true],
-			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => lmsg('thankyou.component.options.show_button')],
-			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => lmsg('thankyou.component.options.profile_images')],
-			'limit' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50],
-		//	'user_id' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
+			'title'          => ['type' => 'string', 'title' => ($this->lmsg)('thankyou.component.options.custom_title'), 'default' => '', 'placeholder' => ($this->lmsg)('thankyou.component_heading')],
+			'show_header'    => ['type' => 'bool', 'title' => ($this->lmsg)('thankyou.component.options.show_header'), 'default' => true, 'mutate_on_change' => true],
+			'allow_new'      => ['type' => 'bool', 'default' => true, 'title' => ($this->lmsg)('thankyou.component.options.show_button')],
+			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('thankyou.component.options.profile_images')],
+			'comments'       => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('common.show_comments')],
+			//	'user_id' => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
+			'limit'          => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50]
 		];
 	}
 
@@ -66,6 +85,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		$args['ty_list.create']         = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
 		$args['ty_list.thanked_images'] = (bool) $options->Get('profile_images');
+		$args['ty_list.comments']       = (bool) $options->Get('comments');
 
 		return $this->CallTemplater('thankyou/pages_component.html', $args);
 	}
@@ -74,9 +94,9 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	 * Render component header with the specified options.
 	 * If null or empty string is returned, header is not displayed.
 	 *
-	 * @param string $id_string
+	 * @param string           $id_string
 	 * @param OptionsInterface $options
-	 * @param Application $app
+	 * @param Application      $app
 	 *
 	 * @return string
 	 */
@@ -99,12 +119,13 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		if ($options->Get('title') !== '')
 		{
-			$args['custom_title.body'] = $options->Get('title');
-			$args['custom_title.visible'] = 1;
+			$args['custom_title.body']     = $options->Get('title');
+			$args['custom_title.visible']  = 1;
 			$args['default_title.visible'] = 0;
 		}
 
 		$template = 'thankyou/pages_component_header.html';
+
 		return $this->CallTemplater($template, $args);
 	}
 
@@ -155,10 +176,10 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function GetCoverInfo()
 	{
 		return [
-			'title' => lmsg('thankyou.component.cover_info.title'),
-			'description' => lmsg('thankyou.component.cover_info.desc'),
+			'title'       => ($this->lmsg)('thankyou.component.cover_info.title'),
+			'description' => ($this->lmsg)('thankyou.component.cover_info.desc'),
 			'application' => 'thankyou',
-			'icon_class' => 'glyphicons glyphicons-donate'
+			'icon_class'  => 'glyphicons glyphicons-donate'
 		];
 	}
 
@@ -183,7 +204,15 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function MutateOptions($options)
 	{
 		if (empty($options['show_header']['value']))
+		{
 			unset($options['title']);
+		}
+
+		if ($this->config->Get('thank_you_comments') !== true)
+		{
+			unset($options['comments']);
+		}
+
 		return $options;
 	}
 }
