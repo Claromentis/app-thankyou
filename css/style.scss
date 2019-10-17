@@ -114,3 +114,20 @@
     }
   }
 }
+
+.comments-toggle-wrapper.comments-border {
+    border-left: 1px solid #e7e7e7;
+    margin-left: 3px;
+    padding-left: 6px;
+    display: inline-block;
+
+    .glyphicons-comments.glyphicons {
+        color: #595959;
+    }
+}
+
+.comments {
+    display: none;
+}
+
+

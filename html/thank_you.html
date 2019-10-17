@@ -5,7 +5,7 @@
 -->
 <include file="includes/delete_modal.html"/>
 <include file="includes/modal.html"/>
-<div>
+<div class="js-thank-you">
 	<div class="thank-you-note">
 		<txt name="thankyou:component:thankyou_users_name">Thank you</txt>
 		<datasrc name="thanked">
@@ -30,6 +30,9 @@
 		<div class="row small">
 			<div class="col-xs-6">
 				<component name="like_component" class_key="like_it" object_type="thanks" object_id=""/>
+				<span name="comments" class="comments-toggle-wrapper comments-border">
+					<a href="javascript:void(0)" class="js-comments-reveal"><span class="glyphicons-comments glyphicons"></span> <txt class="badge" name="comments_count">999</txt></a>
+				</span>
 			</div>
 			<div class="col-xs-6">
 				<span class="text-muted text-right edit-tools">
@@ -71,7 +74,9 @@
 		</div>
 	</div>
 	<div name="comments">
-		<component class="\Claromentis\Comments\UI\Comments" name="thank_you_comment" object_type="thanks" new_on_top="1" compact_mode="1"/>
+		<div class="js-comments comments">
+			<component class="\Claromentis\Comments\UI\Comments" name="thank_you_comment" object_type="thanks" new_on_top="1" compact_mode="1"/>
+		</div>
 	</div>
 </div>
 <script type="text/javascript">

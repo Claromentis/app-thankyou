@@ -18,7 +18,7 @@
 			<li name="no_thanks">No thanks</li>
 		</ifempty>
 		<li class="thank-you-item">
-			<component class="\Claromentis\ThankYou\UI\ThankYou" name="thank_you"/>
+			<component class="\Claromentis\ThankYou\UI\ThankYou" name="thank_you" comments="1"/>
 		</li>
 	</ul>
 </div>
@@ -40,4 +40,13 @@
 		},
         preselected_thankable: ${preselected_thankable.json}
     };
+
+    	require(['domReady', 'jquery'], function(domReady, $) {
+            domReady(function () {
+    			$('.js-comments-reveal').click(function(ev){
+    				var comments = $(this).closest($('.js-thank-you')).find($('.js-comments'))
+    				comments.toggle();
+    			})
+            })
+        })
 </script>
