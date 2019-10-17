@@ -12,12 +12,18 @@ use Claromentis\Comments\SupportedOptions;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
+use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\ThanksItem;
 use InvalidArgumentException;
 use LogicException;
 
 class CommentableThankYou implements CommentableInterface, CommentLocationInterface
 {
+	/**
+	 * @var ThanksItem|null $thanks_item
+	 */
 	private $thanks_item;
 
 	/**
@@ -113,10 +119,44 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @throws ThankYouRuntimeException
+	 * @throws LogicException
 	 */
 	public function Notify(Comment $comment, Notification $default_notification)
 	{
-		// TODO: Implement Notify() method.
+		if (!isset($this->thanks_item))
+		{
+			throw new ThankYouRuntimeException("Failed to send Notifications for Thank You Comment, Thank You Item has not been loaded");
+		}
+
+		/**
+		 * @var Api $api
+		 */
+		$api = Services::I()->{Api::class};
+
+		try
+		{
+			$thank_you = $api->ThankYous()->GetThankYous($this->thanks_item->GetId(), false, true);
+		} catch (InvalidArgumentException | ThankYouInvalidThankable | ThankYouNotFound $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", null, $exception);
+		}
+
+		$thanked_users = $thank_you->GetUsers();
+
+		if (isset($thanked_users))
+		{
+			$thanked_users_ids = [];
+			foreach ($thanked_users as $user)
+			{
+				$thanked_users_ids[] = $user->GetId();
+			}
+
+			$default_notification->AddRecipients($thanked_users_ids);
+		}
+
+		$default_notification->Send();
 	}
 
 	/**
