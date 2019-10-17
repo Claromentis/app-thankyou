@@ -20,10 +20,13 @@ class ThankYousList extends TemplaterComponentTmpl
 	 * #Attributes
 	 * * admin_mode:
 	 *     * 1 = Editing and Deleting Thank Yous ignores permissions. Thank Yous are not filtered by Thanked Extranet Area ID.
+	 * * comments:
+	 *     * 0 = Thank Yous Comments are hidden.
+	 *     * 1 = Thank Yous Comments are shown.
 	 * * create:
 	 *     * 0 = Creating Thank Yous is disabled.
 	 *     * 1 = Creating Thank Yous is enabled.
-	 * * array = Creating ThankYous is locked to the Thankable array given (Created with \Claromentis\ThankYou\View\ThanksListView::ConvertThankableToArray).
+	 *     * array = Creating ThankYous is locked to the Thankable array given (Created with \Claromentis\ThankYou\View\ThanksListView::ConvertThankableToArray).
 	 * * delete:
 	 *     * 0 = Deleting Thank Yous is disabled.
 	 *     * 1 = Deleting Thank Yous is enabled (subject to permissions or admin_mode).
@@ -62,6 +65,7 @@ class ThankYousList extends TemplaterComponentTmpl
 		$can_delete       = (bool) ($attributes['delete'] ?? null);
 		$can_edit         = (bool) ($attributes['edit'] ?? null);
 		$create_thankable = (isset($attributes['create']) && is_array($attributes['create'])) ? $attributes['create'] : null;
+		$display_comments = (bool) ($attributes['comments'] ?? null);
 		$thanked_images   = (bool) ($attributes['thanked_images'] ?? null);
 		$links            = (bool) ($attributes['links'] ?? null);
 		$limit            = (int) ($attributes['limit'] ?? 20);
@@ -82,9 +86,10 @@ class ThankYousList extends TemplaterComponentTmpl
 		{
 			$view_thank_yous[] = [
 				'thank_you.admin_mode'     => $admin_mode,
+				'thank_you.comments'       => $display_comments,
 				'thank_you.delete'         => $can_delete,
 				'thank_you.edit'           => $can_edit,
-				'thank_you.links'         => $links,
+				'thank_you.links'          => $links,
 				'thank_you.thanked_images' => $thanked_images,
 				'thank_you.thank_you'      => $thank_you
 			];
