@@ -139,6 +139,7 @@ class ThankYous
 
 			if ($this->config->Get('notify_line_manager'))
 			{
+				//TODO: Fix mad spam if a big group is thanked (build $user_ids from thanked users only, don't affect the notification code above
 				$this->line_manager_notifier->SendMessage($description, $users_ids);
 			}
 		} catch (Exception $exception)
@@ -181,6 +182,7 @@ class ThankYous
 	/**
 	 * @param int|int[] $ids
 	 * @param bool      $thanked
+	 * @param bool      $users
 	 * @return ThankYou|ThankYou[]
 	 * @throws InvalidArgumentException
 	 * @throws ThankYouRuntimeException
@@ -188,7 +190,7 @@ class ThankYous
 	 * @throws ThankYouNotFound
 	 * @throws LogicException
 	 */
-	public function GetThankYous($ids, bool $thanked = false)
+	public function GetThankYous($ids, bool $thanked = false, bool $users = false)
 	{
 		$array_return = true;
 		if (!is_array($ids))
@@ -197,7 +199,7 @@ class ThankYous
 			$ids          = [$ids];
 		}
 
-		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked);
+		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked, $users);
 
 		if (!$array_return && !array_key_exists($ids[0], $thank_yous))
 		{

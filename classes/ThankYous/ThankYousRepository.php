@@ -369,13 +369,14 @@ class ThankYousRepository
 	 *
 	 * @param int[] $ids
 	 * @param bool  $thanked
+	 * @param bool  $users
 	 * @return ThankYou[]
 	 * @throws ThankYouRuntimeException
 	 * @throws ThankYouInvalidThankable
 	 * @throws ThankYouNotFound
 	 * @throws LogicException
 	 */
-	public function GetThankYous(array $ids, bool $thanked = false)
+	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false)
 	{
 		if (count($ids) === 0)
 		{
@@ -390,13 +391,47 @@ class ThankYousRepository
 			}
 		}
 
-		if ($thanked === false)
+		$columns = ['thankyou_item.id', 'thankyou_item.author AS author_id', 'thankyou_item.date_created', 'thankyou_item.description'];
+
+		if ($thanked)
 		{
-			$query = "SELECT thankyou_item.id, thankyou_item.author AS author_id, thankyou_item.date_created, thankyou_item.description FROM thankyou_item WHERE thankyou_item.id IN in:int:ids";
-		} else
-		{
-			$query = "SELECT thankyou_item.id, thankyou_item.author AS author_id, thankyou_item.date_created, thankyou_item.description, thankyou_thanked.object_type AS thanked_object_type, thankyou_thanked.object_id AS thanked_object_id FROM thankyou_item LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id=thankyou_item.id WHERE thankyou_item.id IN in:int:ids";
+			array_push($columns, 'thankyou_thanked.object_type AS thanked_object_type', 'thankyou_thanked.object_id AS thanked_object_id');
 		}
+
+		if ($users)
+		{
+			array_push($columns, 'thankyou_user.user_id AS thanked_user_id');
+		}
+
+		$query = "SELECT ";
+
+		$first_column = true;
+		foreach ($columns as $column)
+		{
+			if ($first_column)
+			{
+				$query        .= $column;
+				$first_column = false;
+			} else
+			{
+				$query .= ", " . $column;
+			}
+		}
+
+		$query .= " FROM thankyou_item";
+
+		if ($thanked)
+		{
+			$query .= " LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id=thankyou_item.id";
+		}
+
+		if ($users)
+		{
+			$query .= " LEFT JOIN thankyou_user ON thankyou_user.thanks_id=thankyou_item.id";
+		}
+
+		$query .= " WHERE thankyou_item.id IN in:int:ids";
+
 		$result = $this->db->query($query, $ids);
 
 		$perm_oclasses  = [PERM_OCLASS_INDIVIDUAL => []];
@@ -407,35 +442,42 @@ class ThankYousRepository
 			$author_id    = (int) $row['author_id'];
 			$date_created = (string) $row['date_created'];
 
-			$perm_oclasses[PERM_OCLASS_INDIVIDUAL][$author_id] = null;
+			$perm_oclasses[PERM_OCLASS_INDIVIDUAL][$author_id] = true;
 
 			if (!isset($thankyou_items[$id]))
 			{
 				$thankyou_items[$id] = ['author_id' => $author_id, 'date_created' => $date_created, 'description' => $row['description']];
 			}
 
-			if ($thanked === true)
+			if (isset($row['thanked_object_type']) && isset($row['thanked_object_id']))
 			{
-				if (!isset($row['thanked_object_type']) || !isset($row['thanked_object_id']))
-				{
-					continue;
-				}
-
 				$thanked_object_type = (int) $row['thanked_object_type'];
 				$thanked_object_id   = (int) $row['thanked_object_id'];
 
-				if (!isset($thankyou_items[$id]['thankyou_thanked']))
+				if (!isset($thankyou_items[$id]['thanked'][$thanked_object_type][$thanked_object_id]))
 				{
-					$thankyou_items[$id]['thankyou_thanked'] = [];
-				}
-				$thankyou_items[$id]['thankyou_thanked'][] = ['object_type' => $thanked_object_type, 'object_id' => $thanked_object_id];
-
-				if (!isset($perm_oclasses[$thanked_object_type]))
-				{
-					$perm_oclasses[$thanked_object_type] = [];
+					$thankyou_items[$id]['thanked'][$thanked_object_type][$thanked_object_id] = true;
 				}
 
-				$perm_oclasses[$thanked_object_type][$thanked_object_id] = null;
+				if (!isset($perm_oclasses[$thanked_object_type][$thanked_object_id]))
+				{
+					$perm_oclasses[$thanked_object_type][$thanked_object_id] = true;
+				}
+			}
+
+			if (isset($row['thanked_user_id']))
+			{
+				$thanked_user_id = (int) $row['thanked_user_id'];
+
+				if (!isset($thankyou_items[$id]['thanked_users'][$thanked_user_id]))
+				{
+					$thankyou_items[$id]['thanked_users'][$thanked_user_id] = true;
+				}
+
+				if (!isset($perm_oclasses[PERM_OCLASS_INDIVIDUAL][$thanked_user_id]))
+				{
+					$perm_oclasses[PERM_OCLASS_INDIVIDUAL][$thanked_user_id] = true;
+				}
 			}
 		}
 
@@ -481,14 +523,27 @@ class ThankYousRepository
 				$thank_you = $this->Create($users[$thankyou_items[$id]['author_id']], $thankyou_items[$id]['description'], new Date($thankyou_items[$id]['date_created'], new DateTimeZone('UTC')));
 				$thank_you->SetId($id);
 
-				if (isset($thankyou_items[$id]['thankyou_thanked']))
+				if (isset($thankyou_items[$id]['thanked']))
 				{
 					$thankables = [];
-					foreach ($thankyou_items[$id]['thankyou_thanked'] as $thanked)
+					foreach ($thankyou_items[$id]['thanked'] as $thanked_object_type_id => $thanked_object_ids)
 					{
-						$thankables[] = $perm_oclasses[$thanked['object_type']][$thanked['object_id']];
+						foreach ($thanked_object_ids as $thanked_object_id => $true)
+						{
+							$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
+						}
 					}
 					$thank_you->SetThanked($thankables);
+				}
+
+				if (isset($thankyou_items[$id]['thanked_users']))
+				{
+					$thanked_users = [];
+					foreach ($thankyou_items[$id]['thanked_users'] as $user_id => $true)
+					{
+						$thanked_users[] = $users[$user_id];
+					}
+					$thank_you->SetUsers($thanked_users);
 				}
 			} catch (ThankYouRuntimeException $thank_you_runtime_exception)
 			{
@@ -561,7 +616,7 @@ class ThankYousRepository
 	 */
 	public function GetUsersRecentThankYousIdsFromDb(int $user_id, int $limit, int $offset)
 	{
-		$query = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
+		$query  = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
 		$result = $this->db->query($query, $user_id, $limit, $offset);
 
 		$thank_you_ids = [];
