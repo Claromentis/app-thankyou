@@ -13,7 +13,7 @@ use DateClaTimeZone;
  * Component displays list of recent thanks and allows submitting a new one.
  *
  **/
-//TODO Fix spacing around Say Thank You button
+//TODO: Add AJAX callback to populate template. Add pagination supported by it.
 class ThankYousList extends TemplaterComponentTmpl
 {
 	/**
