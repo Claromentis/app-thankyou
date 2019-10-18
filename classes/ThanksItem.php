@@ -122,6 +122,7 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 	}
 
 	/**
+	 * @return int
 	 * @throws ThankYouRuntimeException
 	 * @throws LogicException
 	 */
@@ -160,6 +161,8 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 				$db->query("INSERT INTO thankyou_thanked (item_id, object_type, object_id) VALUES (int:tyid, int:otid, int:oid)", $id, $thank['object_type'], $thank['object_id']);
 			}
 		}
+
+		return (int) $this->GetId();
 	}
 
 	/**
