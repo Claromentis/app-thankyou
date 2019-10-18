@@ -5,6 +5,7 @@ lm	thankyou.admin.panel.notifications		Notifications
 lm	thankyou.app_name		Thank you
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
+lm	thankyou.common.thank_yous		Thank Yous
 lm	thankyou.common.thanks_deleted		Thank you message successfully deleted
 lm	thankyou.communication.imessages		Thank You
 lm	thankyou.component.cover_info.desc		Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"
@@ -44,7 +45,8 @@ lt	thankyou:admin:notifications:notify_line_manager.body		Also notify the line m
 lt	thankyou:admin:notifications:save.body		Save
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		Users will be notified whenever they're being thanked.
-lt	thankyou:app_name	$lm['thankyou.app_name']	
+lt	thankyou:app_name.body	$lm['thankyou.app_name']	
+lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
 lt	thankyou:component:delete.body		Delete
 lt	thankyou:component:delete_confirm.body		Are you sure you want to delete this thank you message?
 lt	thankyou:component:delete_thank_you.body		Delete thank you
