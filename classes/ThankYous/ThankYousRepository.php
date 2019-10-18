@@ -263,6 +263,7 @@ class ThankYousRepository
 
 	/**
 	 * @param ThankYou $thank_you
+	 * @return int ID of saved Thank You
 	 * @throws ThankYouInvalidUsers
 	 * @throws ThankYouNotFound
 	 */
@@ -312,7 +313,7 @@ class ThankYousRepository
 			$thanks_item->SetThanked($thankyou_thanked);
 		}
 
-		$thanks_item->Save();
+		return $thanks_item->Save();
 	}
 
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)

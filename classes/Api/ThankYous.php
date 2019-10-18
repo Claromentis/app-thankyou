@@ -117,7 +117,7 @@ class ThankYous
 
 		$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 
-		$this->thank_yous_repository->SaveToDb($thank_you);
+		$id = $this->thank_yous_repository->SaveToDb($thank_you);
 
 		$thanked_users = $thank_you->GetUsers();
 		$users_ids     = [];
@@ -146,6 +146,8 @@ class ThankYous
 		{
 			throw new LogicException("Unexpected Exception thrown by NotificationMessage library", null, $exception);
 		}
+
+		return $id;
 	}
 
 	/**
@@ -312,7 +314,7 @@ class ThankYous
 			$thank_you->SetThanked($thankables);
 			$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 		}
-		$this->thank_yous_repository->SaveToDb($thank_you);
+		return $this->thank_yous_repository->SaveToDb($thank_you);
 	}
 
 	/**
