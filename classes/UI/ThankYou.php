@@ -46,6 +46,9 @@ class ThankYou extends TemplaterComponentTmpl
 	 * * thanked_images:
 	 *     * 0 = Thanked will never display as an image.(default)
 	 *     * 1 = Thanked will display as an image if available.
+	 * * thank_link:
+	 *     * 0 = The Thank will not provide a link to itself.(default)
+	 *     * 1 = The Thank will provide a linke to iteslf.
 	 *
 	 * @param             $attributes
 	 * @param Application $app
@@ -63,11 +66,9 @@ class ThankYou extends TemplaterComponentTmpl
 		$lmsg             = $app[Lmsg::class];
 		$security_context = $app[SecurityContext::class];
 		$time_zone        = DateClaTimeZone::GetCurrentTZ();
-
 		$admin_mode       = (bool) ($attributes['admin_mode'] ?? null);
 		$can_delete       = (bool) ($attributes['delete'] ?? null);
 		$can_edit         = (bool) ($attributes['edit'] ?? null);
-		$display_comments = ((bool) ($attributes['comments'] ?? null) && (bool) $config->Get('thank_you_comments'));
 		$links_enabled    = (bool) ($attributes['links'] ?? null);
 		$thanked_images   = (bool) ($attributes['thanked_images'] ?? null);
 
@@ -92,7 +93,9 @@ class ThankYou extends TemplaterComponentTmpl
 		$id                   = $thank_you->GetId();
 		$can_edit_thank_you   = isset($id) && $can_edit && $api->ThankYous()->CanEditThankYou($thank_you, $security_context);
 		$can_delete_thank_you = isset($id) && $can_delete && $api->ThankYous()->CanDeleteThankYou($thank_you, $security_context);
+		$display_comments = ((bool) isset($id) && ($attributes['comments'] ?? null) && (bool) $config->Get('thank_you_comments'));
 		$extranet_area_id     = $admin_mode ? null : (int) $security_context->GetExtranetAreaId();
+		$thank_link   = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
 
 		$author_hidden = false;
 		if (!$admin_mode && $extranet_area_id !== (int) $thank_you->GetAuthor()->GetExAreaId())
@@ -164,6 +167,10 @@ class ThankYou extends TemplaterComponentTmpl
 		}
 
 		$args = [
+			'thank_title.visible' => !$thank_link,
+			'thank_title_link.visible' => $thank_link,
+			'thank_title_link.href' => '/thankyou/thanks/' . $id,
+
 			'thanked.datasrc' => $thanked_args,
 
 			'author_name.body'  => $author_name,
@@ -174,6 +181,7 @@ class ThankYou extends TemplaterComponentTmpl
 			'has_description.visible' => strlen($thank_you->GetDescription()) > 0,
 
 			'comments.visible' => $display_comments,
+			'thank_you_comment.object_id' => $id,
 
 			'like_component.object_id' => $id,
 			'like_component.visible'   => isset($id),
@@ -185,8 +193,6 @@ class ThankYou extends TemplaterComponentTmpl
 
 			'date_created.body'  => Carbon::instance($date_created)->diffForHumans(),
 			'date_created.title' => $date_created->getDate(DateFormatter::LONG_DATE),
-
-			'thank_you_comment.object_id' => $id,
 
 			'thank_you_user.filter_perm_oclasses' => $thankable_object_types,
 			'thank_you_user.placeholder'          => $lmsg('thankyou.thank.placeholder')
