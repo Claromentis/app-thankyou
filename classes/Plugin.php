@@ -162,7 +162,7 @@ class Plugin implements
 		return [
 			'/thankyou' => function (ControllerCollection $routes) use ($app) {
 				$routes->secure('html', 'user');
-				$routes->get('/', ThanksController::class . ':View');
+				$routes->get('/thanks', ThanksController::class . ':View');
 				$routes->post('/thanks/create', ThanksController::class . ':CreateOrUpdate');
 				$routes->post('/thanks/delete', ThanksController::class . ':Delete');
 

@@ -44,6 +44,7 @@ lt	thankyou:admin:notifications:notify_line_manager.body
 lt	thankyou:admin:notifications:save.body		
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		
+lt	thankyou:app_name	$lm['thankyou.app_name']	
 lt	thankyou:component:delete.body		
 lt	thankyou:component:delete_confirm.body		
 lt	thankyou:component:delete_thank_you.body		
