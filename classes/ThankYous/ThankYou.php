@@ -38,6 +38,9 @@ class ThankYou
 		return $this->author;
 	}
 
+	/**
+	 * @return int|null
+	 */
 	public function GetId(): ?int
 	{
 		return $this->id;
