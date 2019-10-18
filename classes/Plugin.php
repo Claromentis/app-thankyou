@@ -269,6 +269,7 @@ class Plugin implements
 				$args                    = [];
 				$args['ty_list.limit']   = 20;
 				$args['ty_list.user_id'] = $user_id;
+				$args['ty_list.comments'] = true;
 				$args['ty_list.create']  = $api->ThankYous()->ConvertThankablesToArrays($thankable, $security_context->GetExtranetAreaId());
 
 				$thank_you_list = $this->CallTemplater('thankyou/pages_component.html', $args);
