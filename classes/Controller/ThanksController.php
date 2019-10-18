@@ -20,6 +20,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ThanksController
 {
+	const THANKS_HOMEPAGE = '/thankyou/thanks';
+
 	private $api;
 
 	private $config;
@@ -124,8 +126,6 @@ class ThanksController
 		$request_data->CheckToken();
 		$post = $request->getParsedBody();
 
-		$redirect = $request->getServerParams()['HTTP_REFERER'];
-
 		$id          = (int) ($post['thank_you_id'] ?? null);
 		$thanked     = (array) ($post['thank_you_user'] ?? null);
 		$description = (string) $post['thank_you_description'] ?? '';
@@ -139,7 +139,7 @@ class ThanksController
 		{
 			if ($id === 0)
 			{
-				$this->api->ThankYous()->CreateAndSave($security_context->GetUser(), $thanked, $description);
+				$id = $this->api->ThankYous()->CreateAndSave($security_context->GetUser(), $thanked, $description);
 			} else
 			{
 				try
@@ -147,18 +147,18 @@ class ThanksController
 					$this->api->ThankYous()->UpdateAndSave($security_context, $id, $thanked, $description);
 				} catch (ThankYouNotFound $thank_you_not_found)
 				{
-					return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.error.thanks_not_found'), true);
+					return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.thanks_not_found'), true);
 				} catch (ThankYouForbidden $thank_you_forbidden)
 				{
-					return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.error.no_edit_permission'), true);
+					return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.no_edit_permission'), true);
 				}
 			}
 		} catch (ThankYouInvalidUsers $thank_you_invalid_users)
 		{
-			return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.error.invalid_users'), true);
+			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.invalid_users'), true);
 		}
 
-		return RedirectResponse::httpRedirect($redirect);
+		return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE . '/' . $id);
 	}
 
 	/**
@@ -173,20 +173,19 @@ class ThanksController
 		$request_data->CheckToken();
 		$post     = $request->getParsedBody();
 		$id       = (int) ($post['thank_you_id'] ?? null);
-		$redirect = $request->getServerParams()['HTTP_REFERER'];
 
 		try
 		{
 			$this->api->ThankYous()->Delete($security_context, $id);
 		} catch (ThankYouNotFound $thank_you_not_found)
 		{
-			return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.error.thanks_not_found'), true);
+			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.thanks_not_found'), true);
 		} catch (ThankYouForbidden $thank_you_forbidden)
 		{
-			return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.error.no_edit_permission'), true);
+			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.no_edit_permission'), true);
 		}
 
-		return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.common.thanks_deleted'), false);
+		return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.common.thanks_deleted'), false);
 	}
 
 	public function View(ServerRequestInterface $request)
