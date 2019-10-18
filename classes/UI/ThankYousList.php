@@ -7,7 +7,6 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
-use DateClaTimeZone;
 
 /**
  * Component displays list of recent thanks and allows submitting a new one.
@@ -62,7 +61,6 @@ class ThankYousList extends TemplaterComponentTmpl
 		$admin_mode = (bool) ($attributes['admin_mode'] ?? null);
 
 		$extranet_area_id = $admin_mode ? null : (int) $security_context->GetExtranetAreaId();
-		$time_zone        = DateClaTimeZone::GetCurrentTZ();
 
 		$can_create       = (bool) ($attributes['create'] ?? null);
 		$can_delete       = (bool) ($attributes['delete'] ?? null);
