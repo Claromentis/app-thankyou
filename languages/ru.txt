@@ -32,8 +32,7 @@ lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
-lt	thankyou:admin:export:end_date.body		До тех пор
-lt	thankyou:admin:export:start_date.body		От:
+lt	thankyou:admin:export:period.body		
 lt	thankyou:admin:export_csv.body		Экспорт в *.csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
