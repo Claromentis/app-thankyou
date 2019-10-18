@@ -56,6 +56,12 @@ class Plugin implements
 			return $app['localization.domain_from_files_factory']('thankyou');
 		};
 
+		$app['menu.applications'] = $app->extend('menu.applications', function ($menu_items, $app) {
+			$menu_items['thankyou'] = ['name' => ($app[Lmsg::class])('thankyou.app_name'), 'css_class' => 'glyphicons-pages', 'url' => '/thankyou/thanks'];
+
+			return $menu_items;
+		});
+
 		// Admin panel
 		$app['admin.panels'] = $app->extend('admin.panels', function ($panels, $app) {
 			$panels['thankyou'] = [
@@ -156,6 +162,7 @@ class Plugin implements
 		return [
 			'/thankyou' => function (ControllerCollection $routes) use ($app) {
 				$routes->secure('html', 'user');
+				$routes->get('/', ThanksController::class . ':View');
 				$routes->post('/thanks/create', ThanksController::class . ':CreateOrUpdate');
 				$routes->post('/thanks/delete', ThanksController::class . ':Delete');
 

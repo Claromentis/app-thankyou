@@ -188,4 +188,11 @@ class ThanksController
 
 		return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.common.thanks_deleted'), false);
 	}
+
+	public function View()
+	{
+		$args = [];
+
+		return new TemplaterCallResponse('thankyou/view.html', $args, ($this->lmsg)('thankyou.app_name'));
+	}
 }
