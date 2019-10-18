@@ -36,6 +36,9 @@ class ThankYousList extends TemplaterComponentTmpl
 	 * * thanked_images:
 	 *     * 0 = Thanked will never display as an image.
 	 *     * 1 = Thanked will display as an image if available.
+	 * * thanks_links:
+	 *     * 0 = Thanks will not provide a link to themselves.(default)
+	 *     * 1 = Thanks will provide a link to themselves.
 	 * * links:
 	 *     * 0 = Thanked will never provide a link.
 	 *     * 1 = Thanked will provide a link if available.
@@ -70,6 +73,7 @@ class ThankYousList extends TemplaterComponentTmpl
 		$links            = (bool) ($attributes['links'] ?? null);
 		$limit            = (int) ($attributes['limit'] ?? 20);
 		$offset           = (int) ($attributes['offset'] ?? null);
+		$thanks_links     = (bool) ($attributes['thanks_links'] ?? null);
 		$user_id          = (isset($attributes['user_id'])) ? (int) $attributes['user_id'] : null;
 
 		if (isset($user_id))
@@ -91,6 +95,7 @@ class ThankYousList extends TemplaterComponentTmpl
 				'thank_you.edit'           => $can_edit,
 				'thank_you.links'          => $links,
 				'thank_you.thanked_images' => $thanked_images,
+				'thank_you.thank_link'     => $thanks_links,
 				'thank_you.thank_you'      => $thank_you
 			];
 		}
