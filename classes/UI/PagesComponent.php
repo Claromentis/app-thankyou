@@ -18,6 +18,7 @@ use DateClaTimeZone;
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
  * a button to allow adding a new "thank you"
  */
+//TODO fix redirecting away from Page when saying Thank You.
 class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 {
 	use TemplaterTrait;
