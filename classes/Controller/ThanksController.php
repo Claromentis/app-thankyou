@@ -189,10 +189,19 @@ class ThanksController
 		return RedirectResponse::httpRedirect($redirect, ($this->lmsg)('thankyou.common.thanks_deleted'), false);
 	}
 
-	public function View()
+	public function View(ServerRequestInterface $request)
 	{
+		$id = $request->getAttribute('id');
+
 		$args = [];
 
-		return new TemplaterCallResponse('thankyou/view.html', $args, ($this->lmsg)('thankyou.app_name'));
+		if (!isset($id))
+		{
+			return new TemplaterCallResponse('thankyou/view.html', $args, ($this->lmsg)('thankyou.app_name'));
+		}
+
+		$args['thank.thank_you'] = $id;
+
+		return new TemplaterCallResponse('thankyou/thank.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
 }

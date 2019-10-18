@@ -165,6 +165,7 @@ class Plugin implements
 				$routes->get('/thanks', ThanksController::class . ':View');
 				$routes->post('/thanks/create', ThanksController::class . ':CreateOrUpdate');
 				$routes->post('/thanks/delete', ThanksController::class . ':Delete');
+				$routes->get('/thanks/{id}', ThanksController::class . ':View');
 
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
 				$routes->get('/admin', ThanksController::class . ':Admin');

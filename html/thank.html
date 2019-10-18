@@ -1,0 +1,15 @@
+<block id="app_title">
+	<a href="/thankyou/thanks">
+		<loc name="thankyou:common:thank_yous"></loc>
+	</a>
+</block>
+<block id="app_buttons">
+</block>
+<block id="breadcrumb">
+	<li class="active"><txt name="thankyou:app_name">Task Details</txt></li>
+</block>
+<block id="page_body">
+	<component class="\Claromentis\ThankYou\UI\ThankYou" name="thank" edit="1" delete="1" links="1" comments="1"/>
+</block>
+
+<include file="../common/layouts/standard_page.html"/>
