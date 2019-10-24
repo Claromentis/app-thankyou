@@ -5,6 +5,8 @@ use Claromentis\Core\Admin\PanelsList;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\ControllerCollection;
+use Claromentis\Core\DAL\Interfaces\DbInterface;
+use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Event\LazyResolver;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
@@ -20,6 +22,8 @@ use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
+use Claromentis\ThankYou\Tags\TagFactory;
+use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -57,7 +61,7 @@ class Plugin implements
 		};
 
 		$app['menu.applications'] = $app->extend('menu.applications', function ($menu_items, $app) {
-			$menu_items['thankyou'] = ['name' => ($app[Lmsg::class])('thankyou.app_name'), 'css_class' => 'glyphicons-pages', 'url' => '/thankyou/thanks'];
+			$menu_items['thankyou'] = ['name' => ($app[Lmsg::class])('thankyou.app_name'), 'css_class' => 'glyphicons-donate', 'url' => '/thankyou/thanks'];
 
 			return $menu_items;
 		});
@@ -123,6 +127,14 @@ class Plugin implements
 		$app[ThanksController::class] = function ($app) {
 			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreRepository::class], $app['thankyou.config']);
 		};
+
+		$app[TagRepository::class] = function ($app) {
+			return new TagRepository($app[DbInterface::class], $app[QueryFactory::class], $app['logger_factory']->GetLogger('tags'), $app[TagFactory::class]);
+		};
+
+		$app[ThanksRestV2::class] = function ($app) {
+			return new ThanksRestV2($app[Api::class], $app['rest.formatter'], $app[Lmsg::class]);
+		};
 	}
 
 	/**
@@ -172,8 +184,7 @@ class Plugin implements
 				$routes->match('/admin/configuration', ThanksController::class . ':Configuration')->method('GET|POST');
 				$routes->get('/admin/export', 'thankyou.admin_export_controller:ShowExportPanel');
 				$routes->post('/admin/export', 'thankyou.admin_export_controller:ExportCsv');
-				$routes->get('/admin/notifications', 'thankyou.admin_notifications_controller:ShowNotificationsPanel');
-				$routes->post('/admin/notifications', 'thankyou.admin_notifications_controller:SubmitNotificationsConfig');
+				$routes->get('/admin/core_values', ThanksController::class . ':CoreValues');
 			}
 		];
 	}
@@ -194,6 +205,12 @@ class Plugin implements
 			'/thankyou/v2' => function (ControllerCollection $routes) {
 				$routes->get('/thanks/{id}', ThanksRestV2::class . ':GetThankYou')->assert('id', '\d+');
 				$routes->get('/thanks', ThanksRestV2::class . ':GetThankYous');
+				$routes->secure('rest', 'user');
+				$routes->get('/tags', ThanksRestV2::class . ':GetTags');
+				$routes->post('/tags', ThanksRestV2::class . ':CreateTag');
+				$routes->get('/tags/total', ThanksRestV2::class . ':GetTotalTags');
+				$routes->get('/tags/{id}', ThanksRestV2::class . ':GetTag')->assert('id', '\d+');
+				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');
 			}
 		];
 	}
