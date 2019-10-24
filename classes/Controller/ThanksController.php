@@ -112,6 +112,14 @@ class ThanksController
 		return $response;
 	}
 
+	public function CoreValues()
+	{
+		$this->api->Tag()->GetRecentTags(2, 0);
+		$args = [];
+
+		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));
+	}
+
 	/**
 	 * Create a new Thank You, or update an existing Thank You.
 	 *
@@ -171,8 +179,8 @@ class ThanksController
 	public function Delete(RequestData $request_data, SecurityContext $security_context, ServerRequestInterface $request)
 	{
 		$request_data->CheckToken();
-		$post     = $request->getParsedBody();
-		$id       = (int) ($post['thank_you_id'] ?? null);
+		$post = $request->getParsedBody();
+		$id   = (int) ($post['thank_you_id'] ?? null);
 
 		try
 		{

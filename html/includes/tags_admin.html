@@ -1,0 +1,34 @@
+<div>
+	<div id="tags_admin_list">
+	</div>
+	<div>
+		<span id="tags_admin_previous">Previous</span>
+		<span id="tags_admin_next">Next</span>
+	</div>
+	<div>
+		<span id="tags_admin_save" style="display:none;">Save</span>
+		<span id="tags_admin_cancel" style="display:none;">Cancel</span>
+	</div>
+</div>
+<script type="text/javascript">
+    require(['/intranet/thankyou/js/build/tags.bundle.js']);
+</script>
+<script type="text/template" id="template_tag_admin">
+	<div class="row js-tag-admin" data-id="{{=id}}">
+		<div class="col-md-4">{{=name}}</div>
+		<div class="col-md-4">
+			<span class="js-tag-admin-active">
+				{{ if (active) { }}
+					Hide
+				{{ } else { }}
+					Show
+				{{ } }}
+			</span>
+			<span class="js-tag-admin-edit">Edit</span>
+			<span>Delete</span>
+			{{ if (resetable){ }}
+			<span class="js-tag-admin-reset">Reset</span>
+			{{ } }}
+		</div>
+	</div>
+</script>
