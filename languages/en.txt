@@ -1,4 +1,5 @@
 .	.	.	en
+lm	thankyou.admin.core_values		Core Values
 lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
@@ -26,6 +27,11 @@ lm	thankyou.error.no_edit_permission		You do not have permission to modify this 
 lm	thankyou.error.thanks_not_found		Thank you message does not exist
 lm	thankyou.grammar.list.and		and
 lm	thankyou.notifications.saved		Settings saved
+lm	thankyou.tag.error.id.not_found		Tag could not be found
+lm	thankyou.tag.error.metadata.invalid		Metadata must be passed as an array if defined
+lm	thankyou.tag.error.name.invalid		Tag Name must be a string if defined
+lm	thankyou.tag.error.name.not_unique		This Tag Name has already been used
+lm	thankyou.tag.error.name.undefined		Tag Name must be defined
 lm	thankyou.thank.placeholder		Select user of group
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
 lm	thankyou.user_profile.tab_name		Thanks
@@ -33,6 +39,7 @@ lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:core_values.body	$lm['thankyou.admin.core_values']	
 lt	thankyou:admin:export:period.body		Period
 lt	thankyou:admin:export_csv.body		Export to *.csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	

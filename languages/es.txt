@@ -1,4 +1,5 @@
 .	.	.	es
+lm	thankyou.admin.core_values		
 lm	thankyou.admin.panel.export		
 lm	thankyou.admin.panel.messages		
 lm	thankyou.admin.panel.notifications		
@@ -26,6 +27,11 @@ lm	thankyou.error.no_edit_permission
 lm	thankyou.error.thanks_not_found		
 lm	thankyou.grammar.list.and		
 lm	thankyou.notifications.saved		
+lm	thankyou.tag.error.id.not_found		
+lm	thankyou.tag.error.metadata.invalid		
+lm	thankyou.tag.error.name.invalid		
+lm	thankyou.tag.error.name.not_unique		
+lm	thankyou.tag.error.name.undefined		
 lm	thankyou.thank.placeholder		
 lm	thankyou.thanks_list.no_thanks		
 lm	thankyou.user_profile.tab_name		
@@ -33,6 +39,7 @@ lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:core_values.body	$lm['thankyou.admin.core_values']	
 lt	thankyou:admin:export:period.body		
 lt	thankyou:admin:export_csv.body		
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
