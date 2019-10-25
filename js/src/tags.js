@@ -1,35 +1,39 @@
 define(['jquery'], function ($) {
     var Tags = function () {
-        this.button_class_active = '.js-tag-admin-active';
-        this.button_class_edit = '.js-tag-admin-edit';
+        this.class_editable_field = '.js-tag-editable-field';
+        this.class_row = '.js-tag-admin';
+        this.button_class_active = '.js-tag-admin-active-button';
+        this.button_class_edit = '.js-tag-admin-edit-button';
         this.button_class_reset = '.js-tag-admin-reset';
         this.button_next = $('#tags_admin_next');
         this.button_previous = $('#tags_admin_previous');
         this.button_save = $('#tags_admin_save');
         this.button_cancel = $('#tags_admin_cancel');
         this.displayed_tags = {};
-        this.limit = 1;
+        this.limit = 2;
         this.offset = 0;
         this.page = 1;
         this.page_count = 1;
         this.template_tag_admin = $('#template_tag_admin');
         this.tags_list = $('#tags_admin_list');
         this.loaded_tags = {};
+        this.unlocked_tags = {};
         this.modified_tags = {};
+        this.editable_field_names = [];
 
         this.tags_list.on('click', this.button_class_edit, function () {
-            tags_admin.editTag(this.closest('.js-tag-admin').getAttribute('data-id'));
+            tags_admin.toggleEditMode(this.closest(tags_admin.class_row).getAttribute('data-id'));
         });
 
         this.tags_list.on('click', this.button_class_active, function () {
-            var id = this.closest('.js-tag-admin').getAttribute('data-id');
+            var id = this.closest(tags_admin.class_row).getAttribute('data-id');
             var tag = JSON.parse(JSON.stringify(tags_admin.getTag(id)));
             tag.active = !tag.active;
             tags_admin.storeEdit(id, tag);
         });
 
         this.tags_list.on('click', this.button_class_reset, function () {
-            var id = this.closest('.js-tag-admin').getAttribute('data-id');
+            var id = this.closest(tags_admin.class_row).getAttribute('data-id');
             tags_admin.resetEdit(id);
         });
     };
@@ -47,17 +51,84 @@ define(['jquery'], function ($) {
     };
 
     Tags.prototype.createTag = function (id, tag) {
-        var args = {
-            id: id,
-            name: tag.name,
-            active: tag.active,
-            resetable: (id in this.modified_tags)
-        };
-        return _.template(this.template_tag_admin.html())(args);
+        var edit_mode = (id in this.unlocked_tags);
+        var active = tag.active;
+        var modified = (id in this.modified_tags);
+
+        //FIX ME!
+        var metadata = tag.metadata;
+        var bg_colour = null;
+        if (metadata !== null && 'bg_colour' in metadata) {
+            tag.bg_colour = metadata.bg_colour;
+        }
+
+        var template = $($.parseHTML(_.template(this.template_tag_admin.html())({})));
+
+        template.find(this.class_editable_field).prop('disabled', !edit_mode);
+        template.find(this.button_class_edit).text(edit_mode ? 'Save' : 'Edit');
+        template.find(this.button_class_active).text(active ? 'Disable' : 'Enable');
+        if (modified) {
+            template.find(this.button_class_reset).show();
+        } else {
+            template.find(this.button_class_reset).hide();
+        }
+
+        template.attr('data-id', id);
+
+        this.fillRowFields(template, tag);
+
+        return template;
     };
 
-    Tags.prototype.editTag = function (id) {
-        console.log(id);
+    Tags.prototype.fillRowFields = function (template, tag) {
+        template.find(this.class_editable_field).each(function () {
+            var field = $(this);
+            var type = field.attr('type');
+            var name = field.attr('data-name');
+            var value = (name in tag ? tag[name] : null);
+
+            if (type === 'text') {
+                field.val(value);
+            } else if (type === 'checkbox') {
+                field.attr('checked', value);
+            } else {
+                console.log('Unsupported field type ' + type);
+            }
+        });
+    };
+
+    Tags.prototype.fillTagFromRow = function (row, tag) {
+        row.find(this.class_editable_field).each(function () {
+            var field = $(this);
+            var type = field.attr('type');
+            var name = field.attr('data-name');
+
+            var value = null;
+            if (type === 'text') {
+                value = field.val();
+                field.val(value);
+            } else if (type === 'checkbox') {
+                value = field.prop('checked');
+            } else {
+                console.log('Unsupported field type ' + type);
+            }
+            console.log(value);
+
+            tag[name] = value;
+        });
+    };
+
+    Tags.prototype.toggleEditMode = function (id) {
+        if (id in this.unlocked_tags) {
+            this.updateTagFromForm(id);
+            delete this.unlocked_tags[id];
+        } else {
+            this.unlocked_tags[id] = true;
+        }
+
+        if (id in this.displayed_tags) {
+            this.setTags(this.displayed_tags);
+        }
     };
 
     Tags.prototype.loadTags = function (limit, offset, callback) {
@@ -71,7 +142,7 @@ define(['jquery'], function ($) {
     Tags.prototype.loadPageCount = function () {
         var self = this;
         $.ajax('/api/thankyou/v2/tags/total').done(function (total) {
-            self.page_count = Math.ceil(total/self.limit);
+            self.page_count = Math.ceil(total / self.limit);
             self.checkPageNavigation();
         });
     };
@@ -84,6 +155,31 @@ define(['jquery'], function ($) {
             tag = this.loaded_tags[id];
         }
         return tag;
+    };
+
+    Tags.prototype.getModifiedTag = function (id) {
+        if (!(id in this.modified_tags)) {
+            this.modified_tags[id] = JSON.parse(JSON.stringify(this.loaded_tags[id]));
+        }
+        return this.modified_tags[id];
+    };
+
+    Tags.prototype.updateTagFromForm = function (id) {
+        var row = $('.js-tag-admin[data-id=' + id + ']');
+        var tag = this.getModifiedTag(id);
+
+        this.fillTagFromRow(row, tag);
+        console.log(tag);
+        console.log(this.loaded_tags[id]);
+
+        if (_.isEqual(tag, this.loaded_tags[id])) {
+            this.resetEdit(id);
+        } else {
+            if (id in this.displayed_tags) {
+                this.setTags(this.displayed_tags);
+            }
+            this.checkModified();
+        }
     };
 
     Tags.prototype.resetAll = function () {
@@ -106,15 +202,14 @@ define(['jquery'], function ($) {
 
     Tags.prototype.setTags = function (tags) {
         this.displayed_tags = tags;
-        var tags_list_html = '';
+        this.tags_list.empty();
         for (var id in tags) {
             if (!(id in this.loaded_tags)) {
                 this.loaded_tags[id] = tags[id];
             }
             var tag = this.getTag(id);
-            tags_list_html += this.createTag(id, tag);
+            this.tags_list.append(this.createTag(id, tag));
         }
-        this.tags_list.html(tags_list_html);
     };
 
     Tags.prototype.storeEdit = function (id, tag) {
@@ -126,8 +221,8 @@ define(['jquery'], function ($) {
             if (id in this.displayed_tags) {
                 this.setTags(this.displayed_tags);
             }
-            this.checkModified();
         }
+        this.checkModified();
     };
 
     Tags.prototype.checkModified = function () {
@@ -155,7 +250,18 @@ define(['jquery'], function ($) {
         }
     };
 
+    Tags.prototype.getFieldsFromTemplate = function () {
+        var template = $($.parseHTML(this.template_tag_admin.html()));
+        var fields = [];
+        template.find(this.class_editable_field).each(function () {
+            fields.push($(this).attr('data-name'));
+        });
+        this.editable_field_names = fields;
+    };
+
     var tags_admin = new Tags();
+
+    tags_admin.getFieldsFromTemplate();
 
     tags_admin.loadPageCount();
 

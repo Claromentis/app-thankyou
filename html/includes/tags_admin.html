@@ -14,21 +14,18 @@
     require(['/intranet/thankyou/js/build/tags.bundle.js']);
 </script>
 <script type="text/template" id="template_tag_admin">
-	<div class="row js-tag-admin" data-id="{{=id}}">
-		<div class="col-md-4">{{=name}}</div>
+	<div class="row js-tag-admin">
 		<div class="col-md-4">
-			<span class="js-tag-admin-active">
-				{{ if (active) { }}
-					Hide
-				{{ } else { }}
-					Show
-				{{ } }}
-			</span>
-			<span class="js-tag-admin-edit">Edit</span>
+			<input class="js-tag-editable-field" data-name="name" type="text"/>
+		</div>
+		<div class="col-md-4">
+			<input class="js-tag-editable-field" type="text" data-name="bg_colour"/>
+		</div>
+		<div class="col-md-4">
+			<input class="js-tag-editable-field" type="checkbox" data-name="active" value="1"/>
+			<span class="js-tag-admin-edit-button"></span>
 			<span>Delete</span>
-			{{ if (resetable){ }}
 			<span class="js-tag-admin-reset">Reset</span>
-			{{ } }}
 		</div>
 	</div>
 </script>
