@@ -151,7 +151,7 @@ class ThanksRestV2
 
 		try
 		{
-			$tag = $this->api->Tag()->CreateAndSave($security_context->GetUser(), $post['name'], $post['metadata'] ?? null);
+			$tag      = $this->api->Tag()->CreateAndSave($security_context->GetUser(), $post['name'], $post['metadata'] ?? null);
 			$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
 		} catch (TagDuplicateNameException $exception)
 		{
@@ -241,6 +241,8 @@ class ThanksRestV2
 			$modified_date->setTimezone(DateClaTimeZone::GetCurrentTZ());
 			$modified_date = $this->rest_format->Date($modified_date);
 
+			$metadata = $tag->GetMetadata();
+
 			$display_tags[$offset] = [
 				'id'            => $tag->GetId(),
 				'active'        => $tag->GetActive(),
@@ -249,7 +251,7 @@ class ThanksRestV2
 				'created_date'  => $created_date,
 				'modified_by'   => $tag->GetModifiedBy()->GetFullname(),
 				'modified_date' => $modified_date,
-				'metadata'      => $tag->GetMetadata()
+				'bg_colour'     => $metadata['bg_colour'] ?? null
 			];
 		}
 
