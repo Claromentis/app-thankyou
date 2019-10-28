@@ -1,31 +1,35 @@
-<div>
-	<div id="tags_admin_list">
+<div class="js-listable-item-admin-container">
+	<div>
+		<span id="js-listable-item-admin-create">Create</span>
+	</div>
+	<div id="js-listable-item-admin-list">
 	</div>
 	<div>
-		<span id="tags_admin_previous">Previous</span>
-		<span id="tags_admin_next">Next</span>
+		<span id="js-listable-item-admin-nav-previous">Previous</span>
+		<span id="js-listable-item-admin-nav-next">Next</span>
 	</div>
 	<div>
-		<span id="tags_admin_save" style="display:none;">Save</span>
-		<span id="tags_admin_cancel" style="display:none;">Cancel</span>
+		<span id="js-listable-item-admin-save">Save</span>
+		<span id="js-listable-item-admin-cancel">Cancel</span>
 	</div>
 </div>
 <script type="text/javascript">
     require(['/intranet/thankyou/js/build/tags.bundle.js']);
 </script>
-<script type="text/template" id="template_tag_admin">
-	<div class="row js-tag-admin">
+<script type="text/template" id="js-listable-item-admin-item-template">
+	<div class="row js-listable-item-admin-row">
 		<div class="col-md-4">
-			<input class="js-tag-editable-field" data-name="name" type="text"/>
+			<input class="js-listable-item-admin-editable-field" data-name="name" type="text"/>
 		</div>
 		<div class="col-md-4">
-			<input class="js-tag-editable-field" type="text" data-name="bg_colour"/>
+			<input class="js-listable-item-admin-editable-field" type="text" data-name="bg_colour"/>
 		</div>
 		<div class="col-md-4">
-			<input class="js-tag-editable-field" type="checkbox" data-name="active" value="1"/>
-			<span class="js-tag-admin-edit-button"></span>
-			<span>Delete</span>
-			<span class="js-tag-admin-reset">Reset</span>
+			<input class="js-listable-item-admin-editable-field" type="checkbox" data-name="active" checked="1"
+				   value="1"/>
+			<span class="js-listable-item-admin-edit-button"></span>
+			<span class="js-listable-item-admin-delete-button"></span>
+			<span class="js-listable-item-admin-reset-button">Reset</span>
 		</div>
 	</div>
 </script>
