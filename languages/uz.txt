@@ -1,0 +1,53 @@
+.	.	.	uz
+lm	thankyou.admin.panel.export		Eksport
+lm	thankyou.admin.panel.messages		Xabarlar
+lm	thankyou.admin.panel.notifications		Bildirishnomalar
+lm	thankyou.app_name		rahmat
+lm	thankyou.common.thank_you_message		Rahmat xabar
+lm	thankyou.common.thank_you_messages		Rahmat xabar
+lm	thankyou.common.thanks_deleted		Rahmatnoma muvaffaqiyatli o'chirildi
+lm	thankyou.communication.imessages		Rahmat
+lm	thankyou.component.cover_info.desc		Foydalanuvchilarga bir nechta teglar qo'yish va jamoatchilikka rahmat aytish imkonini beradi. Oxirgi "rahmat" ro'yxatini ko'rsatadi
+lm	thankyou.component.cover_info.title		rahmat
+lm	thankyou.component.no_thanks_all		Hech kimga hali hech qanday minnatdorchilik bildirilmagan
+lm	thankyou.component.no_thanks_user		 %s hali ko'rsatilmagan
+lm	thankyou.component.options.custom_title		Sarlavha
+lm	thankyou.component.options.num_items		Ko'rsatiladigan ob'ektlar soni
+lm	thankyou.component.options.profile_images		Profil rasmlarini ko'rsatish
+lm	thankyou.component.options.show_button		"Rahmat " tugmasini bosing
+lm	thankyou.component.options.show_header		Sarlavha ko'rsatish
+lm	thankyou.component.options.user_id		Foydalanuvchi tomonidan filtrlash
+lm	thankyou.component_heading		rahmat
+lm	thankyou.error.no_edit_permission		Ushbu rahmat xabarini o'zgartirishga sizda ruxsat yo'q
+lm	thankyou.error.thanks_not_found		Rahmat sizga xabar yo'q
+lm	thankyou.grammar.list.and		va
+lm	thankyou.notifications.saved		Sozlamalar saqlandi
+lm	thankyou.user_profile.tab_name		Rahmat
+lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
+lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
+lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
+lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:export:end_date.body		qadar
+lt	thankyou:admin:export:start_date.body		Dan
+lt	thankyou:admin:export_csv.body		* .Csv eksport qilinsin
+lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
+lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
+lt	thankyou:admin:menu:messages.body	$lm['thankyou.admin.panel.messages']	
+lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:messages_heading.body		Xabarlaringiz uchun rahmat
+lt	thankyou:admin:messages_help.body		Foydalanuvchilarni joylashtirgan minnatdorchilik xabarlarini boshqarish. Shuni esda tutingki, bu yerda amalga oshirilgan har qanday o'zgarishlar Rahmat sizga Komponentda va har bir foydalanuvchining profilida aks etadi.
+lt	thankyou:admin:notifications:notify_line_manager.body		Shuningdek, minnatdorchilik bildirgan shaxsning boshlig'iga xabar berilsin
+lt	thankyou:admin:notifications:save.body		Saqlash
+lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:notifications_help.body		Foydalanuvchilarga minnatdorchilik bildirilganda ularga xabar beriladi.
+lt	thankyou:component:delete.body		O'chir
+lt	thankyou:component:delete_confirm.body		Ushbu rahmat xabarini o'chirib tashlamoqchimisiz?
+lt	thankyou:component:delete_thank_you.body		Yo'q qiling rahmat
+lt	thankyou:component:edit.body		Tahrirlash
+lt	thankyou:component:modal:close.body		Yoping
+lt	thankyou:component:modal:comment.body		Izoh
+lt	thankyou:component:modal:submit.body		Yuboring
+lt	thankyou:component:modal:to.body		uchun
+lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
+lt	thankyou:component:say_thank_you.body		Rahmat ayt
+lt	thankyou:component:thankyou_users_name.body		rahmat
