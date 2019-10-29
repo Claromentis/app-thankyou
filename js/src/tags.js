@@ -1,5 +1,7 @@
 define(['jquery', '../../css/style.scss'], function ($) {
     var ListableItemsAdmin = function () {
+        this.column_headings = [];
+
         this.new_item_key_preface = 'new-';
         this.row_new_class = 'listable-item-admin-new';
         this.row_modified_class = 'listable-item-admin-modified';
@@ -21,6 +23,7 @@ define(['jquery', '../../css/style.scss'], function ($) {
         this.page_count = 1;
 
         this.html_template = $('#js-listable-item-admin-item-template');
+        this.template_heading = $('#js-lia-template-heading');
 
         this.localised_edit = $('#js-lia-loc-edit').text();
         this.localised_delete = $('#js-lia-loc-delete').text();
@@ -298,6 +301,12 @@ define(['jquery', '../../css/style.scss'], function ($) {
 
     ListableItemsAdmin.prototype.refreshDisplay = function () {
         this.items_list.empty();
+
+        for (var offset in this.column_headings) {
+            var heading = $($.parseHTML(_.template(this.template_heading.html())({})));
+            heading.append(this.column_headings[offset]);
+            this.items_list.append(heading);
+        }
 
         if (Object.keys(this.item_errors).length > 0) {
             this.errors_banner.show();
