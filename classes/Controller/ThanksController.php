@@ -114,7 +114,9 @@ class ThanksController
 
 	public function CoreValues()
 	{
-		$args = [];
+		$args = [
+			'nav_tags.+class'  => 'active'
+		];
 
 		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
