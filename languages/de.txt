@@ -1,5 +1,7 @@
 .	.	.	de
 lm	thankyou.admin.core_values		
+lm	thankyou.admin.core_values.empty		
+lm	thankyou.admin.core_values.error.saving		
 lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Mitteilungen
 lm	thankyou.admin.panel.notifications		
@@ -26,7 +28,11 @@ lm	thankyou.error.invalid_users
 lm	thankyou.error.no_edit_permission		Sie sind nicht berechtigt, diese Dankesnachricht zu ändern
 lm	thankyou.error.thanks_not_found		Dankesnachricht existiert nicht
 lm	thankyou.grammar.list.and		
+lm	thankyou.lia.error.saving		
+lm	thankyou.lia.no_results		
 lm	thankyou.notifications.saved		
+lm	thankyou.tag.error.active.invalid		
+lm	thankyou.tag.error.background.undefined		
 lm	thankyou.tag.error.id.not_found		
 lm	thankyou.tag.error.metadata.invalid		
 lm	thankyou.tag.error.name.invalid		
@@ -40,6 +46,8 @@ lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:core_values.body	$lm['thankyou.admin.core_values']	
+lt	thankyou:admin:core_values:empty.body	$lm['thankyou.admin.core_values.empty']	
+lt	thankyou:admin:core_values:error:saving.body	$lm['thankyou.admin.core_values.error.saving']	
 lt	thankyou:admin:export:period.body		
 lt	thankyou:admin:export_csv.body		Exportieren nach * .csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
@@ -65,3 +73,5 @@ lt	thankyou:component:modal:to.body		Zu
 lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		Sag Danke
 lt	thankyou:component:thankyou_users_name.body		Vielen Dank
+lt	thankyou:lia:error:saving.body	$lm['thankyou.lia.error.saving']	
+lt	thankyou:lia:no_results.body	$lm['thankyou.lia.no_results']	

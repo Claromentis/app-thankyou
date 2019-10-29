@@ -206,8 +206,9 @@ class Plugin implements
 				$routes->get('/thanks/{id}', ThanksRestV2::class . ':GetThankYou')->assert('id', '\d+');
 				$routes->get('/thanks', ThanksRestV2::class . ':GetThankYous');
 				$routes->secure('rest', 'user');
+				$routes->post('/tag', ThanksRestV2::class . ':CreateTag');
 				$routes->get('/tags', ThanksRestV2::class . ':GetTags');
-				$routes->post('/tags', ThanksRestV2::class . ':CreateTag');
+				$routes->post('/tags', ThanksRestV2::class . ':ListableItemsAdminSave');
 				$routes->get('/tags/total', ThanksRestV2::class . ':GetTotalTags');
 				$routes->get('/tags/{id}', ThanksRestV2::class . ':GetTag')->assert('id', '\d+');
 				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');

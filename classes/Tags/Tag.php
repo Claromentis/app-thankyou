@@ -2,7 +2,9 @@
 
 namespace Claromentis\ThankYou\Tags;
 
+use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Date;
+use InvalidArgumentException;
 use User;
 
 class Tag
@@ -23,6 +25,13 @@ class Tag
 
 	private $name;
 
+	/**
+	 * Tag constructor.
+	 *
+	 * @param string $name
+	 * @param bool   $active
+	 * @throws TagInvalidNameException
+	 */
 	public function __construct(string $name, bool $active)
 	{
 		$this->SetActive($active);
@@ -104,8 +113,16 @@ class Tag
 		$this->modified_date = $date;
 	}
 
+	/**
+	 * @param string $name
+	 * @throws TagInvalidNameException
+	 */
 	public function SetName(string $name)
 	{
+		if (trim($name) === '')
+		{
+			throw new TagInvalidNameException("Failed to Set Tag's Name, cannot use an empty string");
+		}
 		$this->name = $name;
 	}
 }

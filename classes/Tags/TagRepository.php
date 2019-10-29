@@ -8,11 +8,13 @@ use Claromentis\Core\DAL\ResultInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
+use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Date;
 use DateTimeZone;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use User;
 
 class TagRepository
@@ -144,6 +146,14 @@ class TagRepository
 		}
 	}
 
+	/**
+	 * @param int $id
+	 */
+	public function Delete(int $id)
+	{
+		$this->db->query("DELETE FROM thankyou_tag WHERE id=int:id", $id);
+	}
+
 	public function IsTagNameUnique(string $name, ?int $id): bool
 	{
 		if (!isset($id))
@@ -179,6 +189,7 @@ class TagRepository
 	/**
 	 * @param ResultInterface $results
 	 * @return Tag[]
+	 * @throws LogicException
 	 */
 	private function GetTagsFromDbQuery(ResultInterface $results): array
 	{
@@ -197,7 +208,19 @@ class TagRepository
 		$tags = [];
 		foreach ($rows as $id => $row)
 		{
-			$tag = $this->tag_factory->Create($row['name'], $row['active']);
+			if (!isset($row['name']) || !is_string($row['name']))
+			{
+				$this->log->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
+				continue;
+			}
+			try
+			{
+				$tag = $this->tag_factory->Create($row['name'], $row['active']);
+			} catch (TagInvalidNameException $exception)
+			{
+				$this->log->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
+				continue;
+			}
 			$tag->SetCreatedBy($users[(int) $row['created_by']] ?? null);
 			$tag->SetCreatedDate(new Date($row['created_date'], new DateTimeZone('UTC')));
 			$tag->SetId($id);

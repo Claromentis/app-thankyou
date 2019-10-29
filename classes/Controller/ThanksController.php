@@ -114,7 +114,6 @@ class ThanksController
 
 	public function CoreValues()
 	{
-		$this->api->Tag()->GetRecentTags(2, 0);
 		$args = [];
 
 		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));

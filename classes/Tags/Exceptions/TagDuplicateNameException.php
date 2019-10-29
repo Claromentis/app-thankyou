@@ -2,9 +2,7 @@
 
 namespace Claromentis\ThankYou\Tags\Exceptions;
 
-use RuntimeException;
-
-class TagDuplicateNameException extends RuntimeException
+class TagDuplicateNameException extends TagInvalidNameException
 {
 
 }

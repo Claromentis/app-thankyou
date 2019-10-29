@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\Api;
 
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
+use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Date;
@@ -28,10 +29,9 @@ class Tag
 	 * @param string     $name
 	 * @param array|null $metadata
 	 * @return \Claromentis\ThankYou\Tags\Tag
-	 * @throws LogicException
-	 * @throws TagDuplicateNameException
+	 * @throws TagInvalidNameException
 	 */
-	public function CreateAndSave(User $user, string $name, ?array $metadata): \Claromentis\ThankYou\Tags\Tag
+	public function Create(User $user, string $name, ?array $metadata): \Claromentis\ThankYou\Tags\Tag
 	{
 		//TODO: Add Permissions.
 		$tag = $this->factory->Create($name);
@@ -41,15 +41,15 @@ class Tag
 		$tag->SetModifiedBy($user);
 		$tag->SetModifiedDate(new Date());
 
-		try
-		{
-			$this->Save($tag);
+		return $tag;
+	}
 
-			return $tag;
-		} catch (InvalidArgumentException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown when Saving Tag to database", null, $exception);
-		}
+	/**
+	 * @param int $id
+	 */
+	public function Delete(int $id)
+	{
+		$this->repository->Delete($id);
 	}
 
 	/**

@@ -7,6 +7,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
+use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Tag;
 use Date;
 use DateClaTimeZone;
@@ -15,6 +16,7 @@ use LogicException;
 use OutOfBoundsException;
 use Psr\Http\Message\ServerRequestInterface;
 use RestExBadRequest;
+use RestExError;
 use RestExNotFound;
 use RestFormat;
 
@@ -151,11 +153,18 @@ class ThanksRestV2
 
 		try
 		{
-			$tag      = $this->api->Tag()->CreateAndSave($security_context->GetUser(), $post['name'], $post['metadata'] ?? null);
+			$tag      = $this->api->Tag()->Create($security_context->GetUser(), $post['name'], $post['metadata'] ?? null);
+			$this->api->Tag()->Save($tag);
 			$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
 		} catch (TagDuplicateNameException $exception)
 		{
 			$response['errors']['name'][] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
+		} catch (TagInvalidNameException $exception)
+		{
+			$response['errors']['name'][] = ($this->lmsg)('thankyou.tag.error.name.invalid');
+		} catch (InvalidArgumentException $exception)
+		{
+			throw new LogicException("Failed to Create Tag, an unexpected Exception was thrown when saving", null, $exception);
 		}
 
 		return new JsonPrettyResponse($response);
@@ -179,6 +188,8 @@ class ThanksRestV2
 			throw new RestExBadRequest();
 		}
 
+		$response=[];
+
 		try
 		{
 			$tag = $this->api->Tag()->GetTag($id);
@@ -194,7 +205,13 @@ class ThanksRestV2
 
 		if (isset($post['name']) && is_string($post['name']))
 		{
-			$tag->SetName($post['name']);
+			try
+			{
+				$tag->SetName($post['name']);
+			} catch (TagInvalidNameException $exception)
+			{
+				$response['errors']['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
+			}
 		}
 
 		if (array_key_exists('metadata', $post) && (!isset($post['metadata']) || is_array($post['metadata'])))
@@ -205,15 +222,164 @@ class ThanksRestV2
 		$tag->SetModifiedBy($security_context->GetUser());
 		$tag->SetModifiedDate(new Date());
 
-		try
+		if (!isset($response['errors']))
 		{
-			$this->api->Tag()->Save($tag);
-		} catch (TagDuplicateNameException $exception)
-		{
-			$response['errors']['name'] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
+			try
+			{
+				$this->api->Tag()->Save($tag);
+
+				$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
+			} catch (TagDuplicateNameException $exception)
+			{
+				$response['errors']['name'] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
+			}
 		}
 
-		$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
+		return new JsonPrettyResponse($response);
+	}
+
+	/**
+	 * @param ServerRequestInterface $request
+	 * @param SecurityContext        $security_context
+	 * @return JsonPrettyResponse
+	 * @throws RestExBadRequest
+	 * @throws RestExError
+	 */
+	public function ListableItemsAdminSave(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
+	{
+		$post = $this->rest_format->GetJson($request);
+
+		$response = [];
+		try
+		{
+			if (isset($post['created']))
+			{
+				foreach ($post['created'] as $form_id => $item)
+				{
+					$name = $item['name'] ?? null;
+					$bg_colour = $item['bg_colour'] ?? null;
+					$active = $item['active'] ?? null;
+
+					if (!isset($name) || !is_string($name))
+					{
+						$response['errors'][$form_id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
+						continue;
+					}
+
+					if (!isset($bg_colour) || !is_string($bg_colour))
+					{
+						$response['errors'][$form_id]['bg_colour'] = ($this->lmsg)('thankyou.tag.error.background.undefined');
+						continue;
+					}
+
+					try
+					{
+						//TODO read Active also!
+						$tag = $this->api->Tag()->Create($security_context->GetUser(), $name, ['bg_colour' => $item['bg_colour']]);
+
+						if (isset($active))
+						{
+							if (!is_bool($active))
+							{
+								$response['errors'][$form_id]['active'] = ($this->lmsg)('thankyou.tag.error.active.invalid');
+								continue;
+							}
+							$tag->SetActive($active);
+						}
+
+						$this->api->Tag()->Save($tag);
+					} catch (TagDuplicateNameException $exception)
+					{
+						$response['errors'][$form_id]['name'] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
+					} catch (TagInvalidNameException $exception)
+					{
+						$response['errors'][$form_id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
+					} catch (InvalidArgumentException $exception)
+					{
+						throw new RestExError($exception->getMessage(), 500, "Internal Server Error", $exception);
+					}
+				}
+			}
+
+			if (isset($post['modified']))
+			{
+				foreach ($post['modified'] as $id => $item)
+				{
+					try
+					{
+						$tag = $this->api->Tag()->GetTag($id);
+					} catch (OutOfBoundsException $exception)
+					{
+						$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.id.not_found');
+						continue;
+					}
+
+					$active = $item['active'] ?? null;
+					$name   = $item['name'] ?? null;
+					$bg_colour   = $item['bg_colour'] ?? null;
+
+					if (isset($active))
+					{
+						if (!is_bool($active))
+						{
+							$response['errors'][$id]['active'] = ($this->lmsg)('thankyou.tag.error.active.invalid');
+							continue;
+						}
+						$tag->SetActive($active);
+					}
+
+					if (isset($name))
+					{
+						if (!is_string($name))
+						{
+							$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
+							continue;
+						}
+						try
+						{
+							$tag->SetName($name);
+						} catch (TagInvalidNameException $exception)
+						{
+							$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
+							continue;
+						}
+					}
+
+					if (isset($bg_colour))
+					{
+						if(!is_string($bg_colour))
+						{
+							$response['errors'][$id]['bg_colour'] = ($this->lmsg)('thankyou.tag.error.background.undefined');
+							continue;
+						}
+						$tag->SetMetadata(['bg_colour' => $bg_colour]);
+					}
+
+					$tag->SetModifiedBy($security_context->GetUser());
+					$tag->SetModifiedDate(new Date());
+
+					try
+					{
+						$this->api->Tag()->Save($tag);
+					} catch (TagDuplicateNameException $exception)
+					{
+						$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
+						continue;
+					}
+				}
+			}
+
+			if (isset($post['deleted']))
+			{
+				foreach ($post['deleted'] as $id)
+				{
+					$this->api->Tag()->Delete($id);
+				}
+			}
+		} catch (LogicException $exception)
+		{
+			throw new RestExError($exception->getMessage(), 500, "Internal Server Error", $exception);
+		}
 
 		return new JsonPrettyResponse($response);
 	}
