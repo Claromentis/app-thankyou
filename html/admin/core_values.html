@@ -21,7 +21,7 @@
 <script type="text/javascript">
     require(['/intranet/thankyou/js/build/tags.bundle.js'], function (listable_items_admin) {
         listable_items_admin.no_results_banner.text('<loc name="thankyou:admin:core_values:empty"></loc>');
-   //     listable_items_admin.errors_banner.text('<loc name="thankyou:admin:core_values:error:saving"></loc>');
+        listable_items_admin.errors_banner.text('<loc name="thankyou:admin:core_values:error:saving"></loc>');
     });
 </script>
 <script type="text/template" id="js-listable-item-admin-item-template">
@@ -39,8 +39,8 @@
 				   value="1"/>
 			<span class="js-listable-item-admin-editable-field-error"></span>
 			<span class="js-listable-item-admin-edit-button"></span>
-			<span class="js-listable-item-admin-delete-button">Delete</span>
-			<span class="js-listable-item-admin-reset-button">Reset</span>
+			<span class="js-listable-item-admin-delete-button"></span>
+			<span class="js-listable-item-admin-reset-button"></span>
 		</div>
 	</div>
 </script>

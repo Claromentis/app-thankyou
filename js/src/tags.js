@@ -1,9 +1,9 @@
 define(['jquery', '../../css/style.scss'], function ($) {
     var ListableItemsAdmin = function () {
         this.new_item_key_preface = 'new-';
-        this.row_new_class = 'js-listable-item-admin-new';
-        this.row_modified_class = 'js-listable-item-admin-modified';
-        this.row_deleted_class = 'js-listable-item-admin-deleted';
+        this.row_new_class = 'listable-item-admin-new';
+        this.row_modified_class = 'listable-item-admin-modified';
+        this.row_deleted_class = 'listable-item-admin-deleted';
         this.class_editable_field = 'js-listable-item-admin-editable-field';
         this.class_editable_field_error = 'js-listable-item-admin-editable-field-error';
         this.row_class = 'js-listable-item-admin-row';
@@ -15,11 +15,18 @@ define(['jquery', '../../css/style.scss'], function ($) {
         this.button_previous = $('#js-listable-item-admin-nav-previous');
         this.button_save = $('#js-listable-item-admin-save');
         this.button_cancel = $('#js-listable-item-admin-cancel');
-        this.limit = 2;
+        this.limit = 20;
         this.offset = 0;
         this.page = 1;
         this.page_count = 1;
+
         this.html_template = $('#js-listable-item-admin-item-template');
+
+        this.localised_edit = $('#js-lia-loc-edit').text();
+        this.localised_delete = $('#js-lia-loc-delete').text();
+        this.localised_save_edit = $('#js-lia-loc-save-edit').text();
+        this.localised_reset = $('#js-lia-loc-reset').text();
+
         this.items_list = $('#js-listable-item-admin-list');
         //TODO merge the items and store statuses as properties
         this.loaded_items = {};
@@ -334,7 +341,10 @@ define(['jquery', '../../css/style.scss'], function ($) {
         var delete_button = template.find('.' + this.button_class_delete);
 
         template.find('.' + this.class_editable_field).prop('disabled', !edit_mode);
-        edit_button.text(edit_mode ? 'Save' : 'Edit');
+
+        edit_button.text(edit_mode ? this.localised_save_edit : this.localised_edit);
+        delete_button.text(this.localised_delete);
+        reset_button.text(this.localised_reset);
 
         edit_button.hide();
         reset_button.hide();
