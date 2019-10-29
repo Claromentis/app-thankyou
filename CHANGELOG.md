@@ -1,7 +1,11 @@
 #Change Log
-##Version 3.3.0 - 18th October 2019
+
+## Version 3.3.1 - 29th October 2019
+* Added Uzbek translation
+
+## Version 3.3.0 - 18th October 2019
 * Core dependency updated **>=8.6**
-###Improvements
+### Improvements
 * !37 CORE-973 Added Component `Thank You` to Category `People, Communication & Social`.
 * !37 CORE-974 Added Localized Titles to the `Thank You` Component.
 ## 3.2.4
