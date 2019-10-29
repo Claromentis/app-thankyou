@@ -95,7 +95,6 @@ define(['jquery', '../../css/style.scss'], function ($) {
     };
 
     ListableItemsAdmin.prototype.loadItems = function (limit, offset, callback) {
-        var self = this;
         $.ajax('/api/thankyou/v2/tags?limit=' + limit + '&offset=' + offset).done(function (items) {
             if (typeof callback === 'function') {
                 callback(items);
@@ -217,7 +216,8 @@ define(['jquery', '../../css/style.scss'], function ($) {
 
     ListableItemsAdmin.prototype.resetAll = function () {
 
-        for (var offset in this.new_item_ids) {
+        var offset;
+        for (offset in this.new_item_ids) {
             this.forgetItem(this.new_item_ids[offset]);
         }
 
@@ -225,7 +225,7 @@ define(['jquery', '../../css/style.scss'], function ($) {
             this.resetEdit(id);
         }
 
-        for (var offset in this.deleted_items_ids) {
+        for (offset in this.deleted_items_ids) {
             this.resetEdit(this.deleted_items_ids[offset]);
         }
 
