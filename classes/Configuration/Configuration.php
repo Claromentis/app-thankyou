@@ -26,6 +26,16 @@ class Configuration
 				'title'   => ($this->lmsg)('thankyou.configurations.thank_you_comments.title'),
 				'type'    => 'bool',
 				'default' => true
+			],
+			'thankyou_core_values_enabled' => [
+				'title' => ($this->lmsg)('thankyou.admin.core_values.description'),
+				'type' => 'bool',
+				'default' => false
+			],
+			'thankyou_core_values_mandatory' => [
+				'title' => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
+				'type' => 'bool',
+				'default' => false
 			]
 		];
 	}
