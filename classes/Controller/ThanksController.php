@@ -125,7 +125,7 @@ class ThanksController
 			'core_values_enabled.ontext'    => ($this->lmsg)('common.enabled'),
 			'core_values_enabled.body'      => ($this->lmsg)('thankyou.admin.core_values.description'),
 			'core_values_mandatory.body'    => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
-			'core_values_enabled.json'      => $core_values_enabled
+			'core_values_enabled_body.style' => $core_values_enabled ? '' : 'display:none;'
 		];
 
 		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));

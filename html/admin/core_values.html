@@ -17,7 +17,7 @@
 	<div>
 		<cla-toggle-switch name="core_values_enabled" large=""></cla-toggle-switch>
 	</div>
-	<div id="core_values_enabled_body" style="display:none;">
+	<div id="core_values_enabled_body" name="core_values_enabled_body">
 		<cla-toggle-switch name="core_values_mandatory"></cla-toggle-switch>
 		<include file="../includes/listable_items_admin.html"/>
 	</div>
@@ -37,12 +37,6 @@
         ];
     });
 
-    require(['domReady'], function (domReady) {
-        domReady(function () {
-            toggle_core_values_body(core_values_enabled);
-        });
-    });
-
     $('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
         var checked = $(this).find('input').prop('checked');
 
@@ -58,7 +52,11 @@
             data: JSON.stringify(body)
         }).done(function (response) {
             if (response) {
-                toggle_core_values_body(checked);
+                if (checked) {
+                    $('#core_values_enabled_body').show();
+                } else {
+                    $('#core_values_enabled_body').hide();
+                }
             }
         });
     });
@@ -78,15 +76,6 @@
             data: JSON.stringify(body)
         });
     });
-
-    var core_values_enabled = ${core_values_enabled.json};
-    var toggle_core_values_body = function (show) {
-        if (show) {
-            $('#core_values_enabled_body').show();
-        } else {
-            $('#core_values_enabled_body').hide();
-        }
-    };
 
 </script>
 <script type="text/template" id="js-listable-item-admin-item-template">
