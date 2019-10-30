@@ -26,6 +26,7 @@ use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
+use Claromentis\ThankYou\UI\ThankYou;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
@@ -134,6 +135,10 @@ class Plugin implements
 
 		$app[ThanksRestV2::class] = function ($app) {
 			return new ThanksRestV2($app[Api::class], $app['rest.formatter'], $app[Lmsg::class],  $app['thankyou.config']);
+		};
+
+		$app['templater.ui.thankyou.thank'] = function ($app) {
+			return new ThankYou($app['logger_factory']->GetLogger('thankyou'));
 		};
 	}
 

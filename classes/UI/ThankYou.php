@@ -14,10 +14,17 @@ use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
 use DateClaTimeZone;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use User;
 
 class ThankYou extends TemplaterComponentTmpl
 {
+	private $logger;
+
+	public function __construct(LoggerInterface $logger)
+	{
+		$this->logger = $logger;
+	}
 
 	/**
 	 * #Attributes
@@ -110,7 +117,7 @@ class ThankYou extends TemplaterComponentTmpl
 			$author_image_url = $author_hidden ? null : User::GetPhotoUrl($thank_you->GetAuthor()->GetId(), false);//TODO: Replace with a non-static post People API update
 		} catch (CDNSystemException $cdn_system_exception)
 		{
-			//TODO: Logging
+			$this->logger->error("Error thrown when getting User's Photo's URL in Thank Templater Component: " . $cdn_system_exception->getMessage());
 			$author_image_url = null;
 		}
 
