@@ -25,7 +25,18 @@ class Configuration
 	 */
 	public function GetConfigDialog(WritableConfig $config): ConfigDialog
 	{
-		return new ConfigDialog($this->config_options->GetOptions(), $config); //TODO: Replace with Factory.
+		$options = $this->config_options->GetOptions();
+
+		foreach ($options as $config_name => $config_options)
+		{
+			$display = (bool) ($config_options['display'] ?? true);
+			if ($display === false)
+			{
+				unset($options[$config_name]);
+			}
+		}
+
+		return new ConfigDialog($options, $config); //TODO: Replace with Factory.
 	}
 
 	/**
