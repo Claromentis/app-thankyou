@@ -33,7 +33,6 @@ class Tag
 	 */
 	public function Create(User $user, string $name, ?array $metadata): \Claromentis\ThankYou\Tags\Tag
 	{
-		//TODO: Add Permissions.
 		$tag = $this->factory->Create($name);
 		$tag->SetCreatedBy($user);
 		$tag->SetCreatedDate(new Date());

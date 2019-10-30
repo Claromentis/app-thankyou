@@ -203,17 +203,17 @@ class Plugin implements
 				$routes->get('/thanks/{id}', 'thankyou.rest_controller:GetThanksItem')->assert('id', '\d+');
 			},
 			'/thankyou/v2' => function (ControllerCollection $routes) {
-				$routes->get('/thanks/{id}', ThanksRestV2::class . ':GetThankYou')->assert('id', '\d+');
-				$routes->get('/thanks', ThanksRestV2::class . ':GetThankYous');
-				$routes->secure('rest', 'user');
-				$routes->post('/tag', ThanksRestV2::class . ':CreateTag');
-				$routes->get('/tags', ThanksRestV2::class . ':GetTags');
-				$routes->post('/tags', ThanksRestV2::class . ':ListableItemsAdminSave');
 				$routes->get('/tags/total', ThanksRestV2::class . ':GetTotalTags');
+				$routes->secure('rest', 'user');
+				$routes->get('/thanks', ThanksRestV2::class . ':GetThankYous');
+				$routes->get('/thanks/{id}', ThanksRestV2::class . ':GetThankYou')->assert('id', '\d+');
+				$routes->get('/tags', ThanksRestV2::class . ':GetTags');
 				$routes->get('/tags/{id}', ThanksRestV2::class . ':GetTag')->assert('id', '\d+');
 				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');
 
 				$routes->secure('rest', 'admin', ['panel_code' => 'thankyou']);
+				$routes->post('/tag', ThanksRestV2::class . ':CreateTag');
+				$routes->post('/tags', ThanksRestV2::class . ':ListableItemsAdminSave');
 				$routes->post('/admin/config', ThanksRestV2::class . ':SetConfig');
 			}
 		];
