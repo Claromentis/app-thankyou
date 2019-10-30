@@ -14,6 +14,7 @@ use Claromentis\Core\RouteProviderInterface;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Services;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
+use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreRepository;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
@@ -138,7 +139,7 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
-			return new TemplaterComponentThank($app['logger_factory']->GetLogger('thankyou'));
+			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'), $app[SecurityContext::class]);
 		};
 	}
 
