@@ -9,6 +9,8 @@ use Claromentis\Comments\Model\Comment;
 use Claromentis\Comments\Notification\Notification;
 use Claromentis\Comments\Rights;
 use Claromentis\Comments\SupportedOptions;
+use Claromentis\Core\Http\HttpUtil;
+use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Api;
@@ -138,7 +140,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 		try
 		{
 			$thank_you = $api->ThankYous()->GetThankYous($this->thanks_item->GetId(), false, true);
-		} catch (InvalidArgumentException | ThankYouInvalidThankable | ThankYouNotFound $exception)
+		} catch (ThankYouInvalidThankable | ThankYouNotFound $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", null, $exception);
 		}
@@ -162,8 +164,23 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 	/**
 	 * {@inheritDoc}
 	 */
-	public function GetBreadcrumbs(int $object_id)
+	public function GetBreadcrumbs(int $object_id): array
 	{
-		// TODO: Implement GetBreadcrumbs() method.
+		$lmsg = Services::I()->{Lmsg::class};
+		/**
+		 * @var HttpUtil $http_util
+		 */
+		$http_util = Services::I()->{HttpUtil::class};
+
+		return [
+			[
+				'name' => $lmsg('thankyou.app_name'),
+				'url'  => $http_util->CreateInternalLink('/thankyou/thanks')
+			],
+			[
+				'name' => $lmsg('thankyou.app_name'),
+				'url'  => $http_util->CreateInternalLink('/thankyou/thanks/' . $object_id)
+			]
+		];
 	}
 }
