@@ -17,7 +17,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use User;
 
-class ThankYou extends TemplaterComponentTmpl
+class TemplaterComponentThank extends TemplaterComponentTmpl
 {
 	private $logger;
 
