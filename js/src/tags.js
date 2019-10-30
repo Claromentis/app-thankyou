@@ -1,64 +1,89 @@
 define(['jquery', '../../css/style.scss'], function ($) {
     var ListableItemsAdmin = function () {
-        this.column_headings = [];
 
-        this.new_item_key_preface = 'new-';
-        this.row_new_class = 'listable-item-admin-new';
-        this.row_modified_class = 'listable-item-admin-modified';
-        this.row_deleted_class = 'listable-item-admin-deleted';
-        this.class_editable_field = 'js-listable-item-admin-editable-field';
-        this.class_editable_field_error = 'js-listable-item-admin-editable-field-error';
-        this.row_class = 'js-listable-item-admin-row';
-        this.button_create = $('#js-listable-item-admin-create');
-        this.button_class_edit = 'js-listable-item-admin-edit-button';
-        this.button_class_reset = 'js-listable-item-admin-reset-button';
-        this.button_class_delete = 'js-listable-item-admin-delete-button';
-        this.button_next = $('#js-listable-item-admin-nav-next');
-        this.button_previous = $('#js-listable-item-admin-nav-previous');
-        this.button_save = $('#js-listable-item-admin-save');
-        this.button_cancel = $('#js-listable-item-admin-cancel');
-        this.limit = 20;
-        this.offset = 0;
-        this.page = 1;
-        this.page_count = 1;
+        var self = this;
 
-        this.html_template = $('#js-listable-item-admin-item-template');
-        this.template_heading = $('#js-lia-template-heading');
+        self.column_headings = [];
 
-        this.localised_edit = $('#js-lia-loc-edit').text();
-        this.localised_delete = $('#js-lia-loc-delete').text();
-        this.localised_save_edit = $('#js-lia-loc-save-edit').text();
-        this.localised_reset = $('#js-lia-loc-reset').text();
+        self.new_item_key_preface = 'new-';
+        self.row_new_class = 'listable-item-admin-new';
+        self.row_modified_class = 'listable-item-admin-modified';
+        self.row_deleted_class = 'listable-item-admin-deleted';
+        self.class_editable_field = 'js-listable-item-admin-editable-field';
+        self.class_editable_field_error = 'js-listable-item-admin-editable-field-error';
+        self.row_class = 'js-listable-item-admin-row';
+        self.button_create = $('#js-listable-item-admin-create');
+        self.button_class_edit = 'js-listable-item-admin-edit-button';
+        self.button_class_reset = 'js-listable-item-admin-reset-button';
+        self.button_class_delete = 'js-listable-item-admin-delete-button';
+        self.button_next = $('#js-listable-item-admin-nav-next');
+        self.button_previous = $('#js-listable-item-admin-nav-previous');
+        self.button_save = $('#js-listable-item-admin-save');
+        self.button_cancel = $('#js-listable-item-admin-cancel');
+        self.limit = 20;
+        self.offset = 0;
+        self.page = 1;
+        self.page_count = 1;
 
-        this.items_list = $('#js-listable-item-admin-list');
+        self.html_template = $('#js-listable-item-admin-item-template');
+        self.template_heading = $('#js-lia-template-heading');
+
+        self.localised_edit = $('#js-lia-loc-edit').text();
+        self.localised_delete = $('#js-lia-loc-delete').text();
+        self.localised_save_edit = $('#js-lia-loc-save-edit').text();
+        self.localised_reset = $('#js-lia-loc-reset').text();
+
+        self.items_list = $('#js-listable-item-admin-list');
         //TODO merge the items and store statuses as properties
-        this.loaded_items = {};
-        this.unlocked_items = {};
-        this.modified_items = {};
-        this.item_errors = {};
-        this.displayed_ids = [];
-        this.deleted_items_ids = [];
-        this.new_item_ids = [];
-        this.editable_field_names = [];
-        this.new_offset = 1;
-        this.saveUrl = '/api/thankyou/v2/tags';
-        this.errors_banner = $('#js-listable-item-admin-errors');
-        this.no_results_banner = $('#js-listable-item-admin-no-results');
+        self.loaded_items = {};
+        self.unlocked_items = {};
+        self.modified_items = {};
+        self.item_errors = {};
+        self.displayed_ids = [];
+        self.deleted_items_ids = [];
+        self.new_item_ids = [];
+        self.editable_field_names = [];
+        self.new_offset = 1;
+        self.saveUrl = '/api/thankyou/v2/tags';
+        self.errors_banner = $('#js-listable-item-admin-errors');
+        self.no_results_banner = $('#js-listable-item-admin-no-results');
 
-        this.items_list.on('click', '.' + this.button_class_edit, function () {
-            items_admin.toggleEditMode(this.closest('.' + items_admin.row_class).getAttribute('data-id'));
+        self.items_list.on('click', '.' + self.button_class_edit, function () {
+            self.toggleEditMode(this.closest('.' + self.row_class).getAttribute('data-id'));
         });
 
-        this.items_list.on('click', '.' + this.button_class_reset, function () {
-            var id = this.closest('.' + items_admin.row_class).getAttribute('data-id');
-            items_admin.resetEdit(id);
-            items_admin.refreshDisplay();
+        self.items_list.on('click', '.' + self.button_class_reset, function () {
+            var id = this.closest('.' + self.row_class).getAttribute('data-id');
+            self.resetEdit(id);
+            self.refreshDisplay();
         });
 
-        this.items_list.on('click', '.' + this.button_class_delete, function () {
-            var id = this.closest('.' + items_admin.row_class).getAttribute('data-id');
-            items_admin.deleteItem(id);
+        self.items_list.on('click', '.' + self.button_class_delete, function () {
+            var id = this.closest('.' + self.row_class).getAttribute('data-id');
+            self.deleteItem(id);
         });
+
+        self.button_create.click(function () {
+            self.createNew();
+        });
+
+        self.button_next.click(function () {
+            self.changePage(self.page + 1)
+        });
+
+        self.button_previous.click(function () {
+            self.changePage(self.page - 1)
+        });
+
+        self.button_save.click(function () {
+            self.save();
+        });
+
+        self.button_cancel.click(function () {
+            self.resetAll();
+        });
+
+        self.loadPageCount();
     };
 
     ListableItemsAdmin.prototype.createNew = function () {
@@ -437,26 +462,6 @@ define(['jquery', '../../css/style.scss'], function ($) {
     };
 
     var items_admin = new ListableItemsAdmin();
-
-    items_admin.getFieldsFromTemplate();
-
-    items_admin.loadPageCount();
-
-    items_admin.button_create.click(function () {
-        items_admin.createNew();
-    });
-    items_admin.button_next.click(function () {
-        items_admin.changePage(items_admin.page + 1)
-    });
-    items_admin.button_previous.click(function () {
-        items_admin.changePage(items_admin.page - 1)
-    });
-    items_admin.button_save.click(function () {
-        items_admin.save();
-    });
-    items_admin.button_cancel.click(function () {
-        items_admin.resetAll();
-    });
 
     return items_admin;
 });
