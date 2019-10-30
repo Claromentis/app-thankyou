@@ -186,7 +186,6 @@ class ThankYous
 	 * @param bool      $thanked
 	 * @param bool      $users
 	 * @return ThankYou|ThankYou[]
-	 * @throws InvalidArgumentException
 	 * @throws ThankYouRuntimeException
 	 * @throws ThankYouInvalidThankable
 	 * @throws ThankYouNotFound
@@ -202,11 +201,6 @@ class ThankYous
 		}
 
 		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked, $users);
-
-		if (!$array_return && !array_key_exists($ids[0], $thank_yous))
-		{
-			throw new InvalidArgumentException("Failed to Get Thank You, Thank You with ID '" . (string) $ids . "' could not be found");
-		}
 
 		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
 	}

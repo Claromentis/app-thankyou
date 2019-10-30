@@ -12,9 +12,13 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
+use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use DateClaTimeZone;
 use InvalidArgumentException;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use User;
 
@@ -116,7 +120,23 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		}
 		if (is_int($thank_you))
 		{
-			$thank_you = $this->api->ThankYous()->GetThankYous($thank_you, true);
+			try
+			{
+				$thank_you = $this->api->ThankYous()->GetThankYous($thank_you, true);
+			} catch (ThankYouInvalidThankable $exception)
+			{
+				$this->logger->error("Failed to display Thank in Templater Component Thank, ThankYouInvalidThankable thrown: " . $exception->getMessage());
+
+				return ($this->lmsg)('thankyou.thank.error.display') . ': ' . ($this->lmsg)('thankyou.thanked.malformed');
+			} catch (ThankYouNotFound $exception)
+			{
+				return ($this->lmsg)('thankyou.error.thanks_not_found');
+			} catch (ThankYouRuntimeException | LogicException $exception)
+			{
+				$this->logger->error("Failed to display Thank in Templater Component Thank, an unexpected exception was thrown: " . $exception->getMessage());
+
+				return ($this->lmsg)('thankyou.thank.error.display');
+			}
 		}
 		if (!($thank_you instanceof ThankYou))
 		{
