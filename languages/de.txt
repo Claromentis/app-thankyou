@@ -1,5 +1,6 @@
 .	.	.	de
 lm	thankyou.admin.core_values		
+lm	thankyou.admin.core_values.description		
 lm	thankyou.admin.core_values.empty		
 lm	thankyou.admin.core_values.error.saving		
 lm	thankyou.admin.panel.export		Export
@@ -22,6 +23,7 @@ lm	thankyou.component.options.show_button		"Danke" -Schaltfläche anzeigen
 lm	thankyou.component.options.show_header		Titel anzeigen
 lm	thankyou.component.options.user_id		Dankesnachricht auf einen Benutzer einschränken
 lm	thankyou.component_heading		Vielen Dank
+lm	thankyou.configuration.core_values_mandatory.description		
 lm	thankyou.configurations.notify_line_manager.title		
 lm	thankyou.configurations.thank_you_comments.title		
 lm	thankyou.error.invalid_users		

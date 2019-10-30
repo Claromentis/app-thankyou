@@ -1,4 +1,4 @@
-.	.	.	nl
+.	.	.	uz
 lm	thankyou.admin.core_values		
 lm	thankyou.admin.core_values.description		
 lm	thankyou.admin.core_values.empty		
