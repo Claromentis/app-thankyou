@@ -2,10 +2,12 @@
 
 namespace Claromentis\ThankYou\Controller\Rest;
 
+use Claromentis\Core\Config\WritableConfig;
 use Claromentis\Core\Http\JsonPrettyResponse;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Configuration\Configuration;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Tag;
@@ -25,13 +27,16 @@ class ThanksRestV2
 	//TODO: Catch the exceptions
 	private $api;
 
+	private $config;
+
 	private $lmsg;
 
 	private $rest_format;
 
-	public function __construct(Api $api, RestFormat $rest_format, Lmsg $lmsg)
+	public function __construct(Api $api, RestFormat $rest_format, Lmsg $lmsg, WritableConfig $config)
 	{
 		$this->api         = $api;
+		$this->config      = $config;
 		$this->lmsg        = $lmsg;
 		$this->rest_format = $rest_format;
 	}
@@ -153,7 +158,7 @@ class ThanksRestV2
 
 		try
 		{
-			$tag      = $this->api->Tag()->Create($security_context->GetUser(), $post['name'], $post['metadata'] ?? null);
+			$tag = $this->api->Tag()->Create($security_context->GetUser(), $post['name'], $post['metadata'] ?? null);
 			$this->api->Tag()->Save($tag);
 			$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
 		} catch (TagDuplicateNameException $exception)
@@ -188,7 +193,7 @@ class ThanksRestV2
 			throw new RestExBadRequest();
 		}
 
-		$response=[];
+		$response = [];
 
 		try
 		{
@@ -256,9 +261,9 @@ class ThanksRestV2
 			{
 				foreach ($post['created'] as $form_id => $item)
 				{
-					$name = $item['name'] ?? null;
+					$name      = $item['name'] ?? null;
 					$bg_colour = $item['bg_colour'] ?? null;
-					$active = $item['active'] ?? null;
+					$active    = $item['active'] ?? null;
 
 					if (!isset($name) || !is_string($name))
 					{
@@ -314,9 +319,9 @@ class ThanksRestV2
 						continue;
 					}
 
-					$active = $item['active'] ?? null;
-					$name   = $item['name'] ?? null;
-					$bg_colour   = $item['bg_colour'] ?? null;
+					$active    = $item['active'] ?? null;
+					$name      = $item['name'] ?? null;
+					$bg_colour = $item['bg_colour'] ?? null;
 
 					if (isset($active))
 					{
@@ -347,7 +352,7 @@ class ThanksRestV2
 
 					if (isset($bg_colour))
 					{
-						if(!is_string($bg_colour))
+						if (!is_string($bg_colour))
 						{
 							$response['errors'][$id]['bg_colour'] = ($this->lmsg)('thankyou.tag.error.background.undefined');
 							continue;
@@ -382,6 +387,40 @@ class ThanksRestV2
 		}
 
 		return new JsonPrettyResponse($response);
+	}
+
+	/**
+	 * @param ServerRequestInterface $request
+	 * @param Configuration          $configuration
+	 * @return JsonPrettyResponse
+	 * @throws RestExBadRequest
+	 */
+	public function SetConfig(ServerRequestInterface $request, Configuration $configuration): JsonPrettyResponse
+	{
+		$post = $this->rest_format->GetJson($request);
+
+		$options = $configuration->GetOptions();
+
+		foreach ($post as $config_name => $value)
+		{
+			if (!isset($options[$config_name]))
+			{
+				throw new RestExBadRequest();
+			}
+
+			$config = $options[$config_name];
+
+			if (isset($config['type']) && $config['type'] === 'bool' && !is_bool($value))
+			{
+				throw new RestExBadRequest();
+			}
+
+			$this->config->Set($config_name, $value);
+		}
+
+		$this->api->Configuration()->SaveConfig($this->config);
+
+		return new JsonPrettyResponse(true);
 	}
 
 	/**

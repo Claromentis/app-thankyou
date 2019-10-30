@@ -133,7 +133,7 @@ class Plugin implements
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
-			return new ThanksRestV2($app[Api::class], $app['rest.formatter'], $app[Lmsg::class]);
+			return new ThanksRestV2($app[Api::class], $app['rest.formatter'], $app[Lmsg::class],  $app['thankyou.config']);
 		};
 	}
 
@@ -212,6 +212,9 @@ class Plugin implements
 				$routes->get('/tags/total', ThanksRestV2::class . ':GetTotalTags');
 				$routes->get('/tags/{id}', ThanksRestV2::class . ':GetTag')->assert('id', '\d+');
 				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');
+
+				$routes->secure('rest', 'admin', ['panel_code' => 'thankyou']);
+				$routes->post('/admin/config', ThanksRestV2::class . ':SetConfig');
 			}
 		];
 	}
