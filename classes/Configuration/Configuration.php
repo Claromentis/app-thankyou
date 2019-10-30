@@ -30,12 +30,14 @@ class Configuration
 			'thankyou_core_values_enabled' => [
 				'title' => ($this->lmsg)('thankyou.admin.core_values.description'),
 				'type' => 'bool',
-				'default' => false
+				'default' => false,
+				'display' => false
 			],
 			'thankyou_core_values_mandatory' => [
 				'title' => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
 				'type' => 'bool',
-				'default' => false
+				'default' => false,
+				'display' => false
 			]
 		];
 	}
