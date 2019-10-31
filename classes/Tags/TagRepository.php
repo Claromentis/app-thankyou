@@ -39,6 +39,7 @@ class TagRepository
 	 * @param int $limit
 	 * @param int $offset
 	 * @return Tag[]
+	 * @throws LogicException
 	 */
 	public function GetActiveAlphabeticTags(int $limit, int $offset): array
 	{
