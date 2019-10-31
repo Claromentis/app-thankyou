@@ -24,6 +24,7 @@ use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
+use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
@@ -91,6 +92,9 @@ class Plugin implements
 		$app['thankyou.rest_controller'] = function ($app) {
 			return new ThanksRestController($app['thankyou.repository']);
 		};
+
+		// Data source
+		$app['thankyou.datatable.tags'] = TagDataTableSource::class;
 
 		// Notification
 		/*$app['thankyou.line_manager_notifier'] = function () {
