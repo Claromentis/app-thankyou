@@ -19,24 +19,13 @@
 	</div>
 	<div id="core_values_enabled_body" name="core_values_enabled_body">
 		<cla-toggle-switch name="core_values_mandatory"></cla-toggle-switch>
-		<include file="../includes/listable_items_admin.html"/>
+		<component class_key="data_table" name="core_values" service="\Claromentis\ThankYou\Tags\TagDataTableSource"/>
 	</div>
 </block>
 
 <include file="../../common/layouts/admin_with_info_panel.html"/>
 
 <script type="text/javascript">
-    require(['/intranet/thankyou/js/build/tags.bundle.js'], function (listable_items_admin) {
-        listable_items_admin.no_results_banner.text('<loc name="thankyou:admin:core_values:empty"></loc>');
-        listable_items_admin.errors_banner.text('<loc name="thankyou:admin:core_values:error:saving"></loc>');
-        listable_items_admin.column_headings = [
-            '<loc name="common:name"></loc>',
-            '<loc name="common:background_colour"></loc>',
-            '<loc name="common:active"></loc>',
-            '<loc name="common:administrate"></loc>'
-        ];
-    });
-
     $('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
         var checked = $(this).find('input').prop('checked');
 
@@ -77,26 +66,4 @@
         });
     });
 
-</script>
-<script type="text/template" id="js-listable-item-admin-item-template">
-	<tr class="js-listable-item-admin-row">
-		<td>
-			<input class="js-listable-item-admin-editable-field" data-name="name" type="text"/>
-			<span class="js-listable-item-admin-editable-field-error"></span>
-		</td>
-		<td>
-			<input class="js-listable-item-admin-editable-field" type="text" data-name="bg_colour"/>
-			<span class="js-listable-item-admin-editable-field-error"></span>
-		</td>
-		<td>
-			<input class="js-listable-item-admin-editable-field" type="checkbox" data-name="active" checked="1"
-				   value="1"/>
-			<span class="js-listable-item-admin-editable-field-error"></span>
-		</td>
-		<td>
-			<span class="js-listable-item-admin-edit-button"></span>
-			<span class="js-listable-item-admin-delete-button"></span>
-			<span class="js-listable-item-admin-reset-button"></span>
-		</td>
-	</tr>
 </script>
