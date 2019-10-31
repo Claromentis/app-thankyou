@@ -149,7 +149,7 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
-			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'), $app[SecurityContext::class]);
+			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
 		};
 	}
 
