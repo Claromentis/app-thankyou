@@ -6,6 +6,7 @@ use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\Exception\InvalidSubjectException;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\CDN\CDNSystemException;
+use Claromentis\Core\DAL;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
@@ -51,8 +52,13 @@ class ThankYousRepository
 	 */
 	private $thank_you_factory;
 
-	public function __construct(ThankYouFactory $thank_you_factory, ThanksItemFactory $thanks_item_factory, AclRepository $acl_repository, DbInterface $db_interface, LoggerInterface $logger)
-	{
+	public function __construct(
+		ThankYouFactory $thank_you_factory,
+		ThanksItemFactory $thanks_item_factory,
+		AclRepository $acl_repository,
+		DbInterface $db_interface,
+		LoggerInterface $logger
+	) {
 		$this->acl_repository      = $acl_repository;
 		$this->db                  = $db_interface;
 		$this->thanks_item_factory = $thanks_item_factory;
@@ -228,7 +234,7 @@ class ThankYousRepository
 
 			$user_profile_url = User::GetProfileUrl($user->GetId(), false);//TODO: Replace with a non-static post People API update
 
-			$users[$user_offset] = new Thankable($user->GetFullname(), PERM_OCLASS_INDIVIDUAL, $user->GetId(), $user->GetExAreaId(), $user_image_url, $user_profile_url);
+			$users[$user_offset] = new Thankable($user->GetFullname(), PermOClass::INDIVIDUAL, $user->GetId(), $user->GetExAreaId(), $user_image_url, $user_profile_url);
 		}
 
 		return $users;
@@ -315,13 +321,13 @@ class ThankYousRepository
 			$thanks_item->SetUsers($users_ids);
 		}
 
-		$thanked = $thank_you->GetThanked();
+		$thanked = $thank_you->GetThankable();
 		if (isset($thanked))
 		{
 			$thankyou_thanked = [];
 			foreach ($thanked as $thank)
 			{
-				$object_type = $thank->GetObjectTypeId();
+				$object_type = $thank->GetOwnerClass();
 				$object_id   = $thank->GetId();
 
 				if (isset($object_type) && isset($object_id))
@@ -348,7 +354,7 @@ class ThankYousRepository
 	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
 	{
-		$thankables = $thank_you->GetThanked();
+		$thankables = $thank_you->GetThankable();
 
 		if (!isset($thankables))
 		{
@@ -368,7 +374,7 @@ class ThankYousRepository
 		foreach ($thankables as $thankable)
 		{
 			$id        = $thankable->GetId();
-			$oclass_id = $thankable->GetObjectTypeId();
+			$oclass_id = $thankable->GetOwnerClass();
 
 			if (!isset($id) || !isset($oclass_id))
 			{
@@ -602,19 +608,27 @@ class ThankYousRepository
 	/**
 	 * @param int      $limit
 	 * @param int      $offset
-	 * @param int|null $extranet_area_id
 	 * @return int[]
 	 */
-	public function GetRecentThankYousIdsFromDb(int $limit, int $offset, ?int $extranet_area_id = null)
+	public function GetRecentThankYousIds(int $limit, int $offset)
 	{
-		$query = "SELECT thankyou_item.id FROM thankyou_item LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id = thankyou_item.id LEFT JOIN users ON users.id = thankyou_thanked.object_id AND thankyou_thanked.object_type = 1 LEFT JOIN groups ON groups.groupid = thankyou_thanked.object_id AND object_type = 3";
-		if (isset($extranet_area_id))
-		{
-			$query .= " WHERE groups.ex_area_id = " . $extranet_area_id . " OR users.ex_area_id = " . $extranet_area_id;
-		}
-		$query .= " GROUP BY thankyou_item.id, thankyou_item.date_created ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
+		$query = "
+			SELECT thankyou_item.id
+			FROM thankyou_item
+			LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id = thankyou_item.id
+			LEFT JOIN users
+				ON users.id = thankyou_thanked.object_id
+				AND thankyou_thanked.object_type = 1
+			LEFT JOIN groups
+				ON groups.groupid = thankyou_thanked.object_id
+				AND object_type = 3
+			GROUP BY thankyou_item.id, thankyou_item.date_created
+			ORDER BY thankyou_item.date_created DESC";
 
-		$result = $this->db->query($query, $limit, $offset);
+		$query = new DAL\Query($query);
+		$query->setLimit($limit, $offset);
+
+		$result = $this->db->query($query);
 
 		$thank_you_ids = [];
 		while ($row = $result->fetchArray())

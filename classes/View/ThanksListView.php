@@ -3,6 +3,7 @@ namespace Claromentis\ThankYou\View;
 
 use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
@@ -10,6 +11,7 @@ use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use DateTimeZone;
 use User;
+use UserExtranetArea;
 
 /**
  * Displays list of "thank you" items
@@ -67,9 +69,9 @@ class ThanksListView
 	}
 
 	/**
-	 * @param ThankYou          $thank_you
-	 * @param DateTimeZone|null $time_zone
-	 * @param int|null $viewing_ex_area_id
+	 * @param ThankYou             $thank_you
+	 * @param DateTimeZone|null    $time_zone
+	 * @param SecurityContext|null $security_context
 	 * @return array[
 	 *     author => [
 	 *         id => int,
@@ -86,12 +88,19 @@ class ThanksListView
 	 * ]
 	 * @throws ThankYouRuntimeException
 	 */
-	public function ConvertThankYouToArray(ThankYou $thank_you, DateTimeZone $time_zone, ?int $viewing_ex_area_id = null): array
+	public function ConvertThankYouToArray(ThankYou $thank_you, DateTimeZone $time_zone, ?SecurityContext $security_context = null): array
 	{
 		$date_created = clone $thank_you->GetDateCreated();
 		$date_created->setTimezone($time_zone);
 
-		if (isset($viewing_ex_area_id) && $thank_you->GetAuthor()->GetExAreaId() !== $viewing_ex_area_id)
+		$author_extranet_id = $thank_you->GetAuthor()->GetExAreaId();
+
+		$author_hidden = isset($security_context) &&
+			!$security_context->IsPrimaryExtranet()
+			&& $author_extranet_id !== UserExtranetArea::GetPrimaryId()
+			&& $author_extranet_id !== $security_context->GetExtranetAreaId();
+
+		if ($author_hidden)
 		{
 			$author_name = ($this->lmsg)('common.perms.hidden_name');
 		} else
@@ -109,12 +118,12 @@ class ThanksListView
 			'id'           => $thank_you->GetId()
 		];
 
-		$thanked = $thank_you->GetThanked();
+		$thanked = $thank_you->GetThankable();
 		if (isset($thanked))
 		{
 			foreach ($thanked as $offset => $thank)
 			{
-				$thanked[$offset] = $this->ConvertThankableToArray($thank, $viewing_ex_area_id);
+				$thanked[$offset] = $this->ConvertThankableToArray($thank, $security_context);
 			}
 		}
 		$output['thanked'] = $thanked;
@@ -133,8 +142,8 @@ class ThanksListView
 	}
 
 	/**
-	 * @param Thankable $thankable
-	 * @param int|null $viewing_ex_area_id
+	 * @param Thankable            $thankable
+	 * @param SecurityContext|null $security_context
 	 * @return array:
 	 * [
 	 *     id => int|null,
@@ -147,18 +156,23 @@ class ThanksListView
 	 * ]
 	 * @throws ThankYouRuntimeException
 	 */
-	public function ConvertThankableToArray(Thankable $thankable, ?int $viewing_ex_area_id = null): array
+	public function ConvertThankableToArray(Thankable $thankable, ?SecurityContext $security_context = null): array
 	{
 		$object_type    = null;
-		$object_type_id = $thankable->GetObjectTypeId();
+		$object_type_id = $thankable->GetOwnerClass();
 		if (isset($object_type_id))
 		{
 			$object_type = ['id' => $object_type_id, 'name' => $this->thank_yous_repository->GetThankableObjectTypesNamesFromIds([$object_type_id])[0]];
 		}
 
-		$ex_area_id = $thankable->GetExtranetAreaId();
+		$thankable_extranet_id = $thankable->GetExtranetId();
 
-		if (isset($viewing_ex_area_id) && isset($ex_area_id) && $viewing_ex_area_id !== $ex_area_id)
+		$thankable_hidden = isset($security_context) &&
+			!$security_context->IsPrimaryExtranet()
+			&& $thankable_extranet_id !== UserExtranetArea::GetPrimaryId()
+			&& $thankable_extranet_id !== $security_context->GetExtranetAreaId();
+
+		if ($thankable_hidden)
 		{
 			$name = ($this->lmsg)('common.perms.hidden_name');
 		} else
@@ -168,7 +182,7 @@ class ThanksListView
 
 		$output = [
 			'id'               => $thankable->GetId(),
-			'extranet_area_id' => $ex_area_id,
+			'extranet_area_id' => $thankable_extranet_id,
 			'name'             => $name,
 			'object_type'      => $object_type
 		];

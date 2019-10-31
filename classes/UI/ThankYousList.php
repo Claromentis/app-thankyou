@@ -17,8 +17,6 @@ class ThankYousList extends TemplaterComponentTmpl
 {
 	/**
 	 * #Attributes
-	 * * admin_mode:
-	 *     * 1 = Editing and Deleting Thank Yous ignores permissions. Thank Yous are not filtered by Thanked Extranet Area ID.
 	 * * comments:
 	 *     * 0 = Thank Yous Comments are hidden.
 	 *     * 1 = Thank Yous Comments are shown.
@@ -56,11 +54,6 @@ class ThankYousList extends TemplaterComponentTmpl
 	{
 		$api              = $app[Api::class];
 		$lmsg             = $app[Lmsg::class];
-		$security_context = $app[SecurityContext::class];
-
-		$admin_mode = (bool) ($attributes['admin_mode'] ?? null);
-
-		$extranet_area_id = $admin_mode ? null : (int) $security_context->GetExtranetAreaId();
 
 		$can_create       = (bool) ($attributes['create'] ?? null);
 		$can_delete       = (bool) ($attributes['delete'] ?? null);
@@ -79,7 +72,7 @@ class ThankYousList extends TemplaterComponentTmpl
 			$thank_yous = $api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true);
 		} else
 		{
-			$thank_yous = $api->ThankYous()->GetRecentThankYous($limit, $offset, true, $extranet_area_id);
+			$thank_yous = $api->ThankYous()->GetRecentThankYous($limit, $offset, true);
 		}
 
 		$args            = [];
@@ -87,7 +80,6 @@ class ThankYousList extends TemplaterComponentTmpl
 		foreach ($thank_yous as $thank_you)
 		{
 			$view_thank_yous[] = [
-				'thank_you.admin_mode'     => $admin_mode,
 				'thank_you.comments'       => $display_comments,
 				'thank_you.delete'         => $can_delete,
 				'thank_you.edit'           => $can_edit,
