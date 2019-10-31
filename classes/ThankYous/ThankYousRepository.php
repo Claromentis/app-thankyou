@@ -19,27 +19,45 @@ use Date;
 use DateTimeZone;
 use InvalidArgumentException;
 use LogicException;
-use RuntimeException;
+use Psr\Log\LoggerInterface;
 use User;
 
 class ThankYousRepository
 {
 	const THANKABLES = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
 
-	private $db;
-
+	/**
+	 * @var AclRepository
+	 */
 	private $acl_repository;
 
+	/**
+	 * @var DbInterface
+	 */
+	private $db;
+
+	/**
+	 * @var LoggerInterface
+	 */
+	private $logger;
+
+	/**
+	 * @var ThanksItemFactory
+	 */
 	private $thanks_item_factory;
 
+	/**
+	 * @var ThankYouFactory
+	 */
 	private $thank_you_factory;
 
-	public function __construct(ThankYouFactory $thank_you_factory, ThanksItemFactory $thanks_item_factory, AclRepository $acl_repository, DbInterface $db_interface)
+	public function __construct(ThankYouFactory $thank_you_factory, ThanksItemFactory $thanks_item_factory, AclRepository $acl_repository, DbInterface $db_interface, LoggerInterface $logger)
 	{
 		$this->acl_repository      = $acl_repository;
 		$this->db                  = $db_interface;
 		$this->thanks_item_factory = $thanks_item_factory;
 		$this->thank_you_factory   = $thank_you_factory;
+		$this->logger              = $logger;
 	}
 
 	/**
@@ -80,7 +98,6 @@ class ThankYousRepository
 
 	/**
 	 * @param int $id
-	 * @throws ThankYouNotFound
 	 * @throws LogicException
 	 */
 	public function DeleteFromDb(int $id)
@@ -130,6 +147,7 @@ class ThankYousRepository
 	 * @return Thankable[]
 	 * @throws InvalidArgumentException
 	 * @throws ThankYouInvalidUsers
+	 * @throws LogicException
 	 */
 	public function CreateThankablesFromOClasses(array $o_classes)
 	{
@@ -199,13 +217,13 @@ class ThankYousRepository
 				throw new ThankYouInvalidUsers("Failed to Create Thankables From Users, invalid object passed");
 			}
 
-			$user_image_url = null;
 			try
 			{
 				$user_image_url = User::GetPhotoUrl($user->GetId());//TODO: Replace with a non-static post People API update
 			} catch (CDNSystemException $cdn_system_exception)
 			{
-				//TODO: add logging.
+				$this->logger->error("Failed to Get User's Photo URL when Creating Thankable: " . $cdn_system_exception->getMessage());
+				$user_image_url = null;
 			}
 
 			$user_profile_url = User::GetProfileUrl($user->GetId(), false);//TODO: Replace with a non-static post People API update
@@ -264,8 +282,9 @@ class ThankYousRepository
 	/**
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
-	 * @throws ThankYouInvalidUsers
 	 * @throws ThankYouNotFound
+	 * @throws ThankYouRuntimeException
+	 * @throws LogicException
 	 */
 	public function SaveToDb(ThankYou $thank_you)
 	{
@@ -310,19 +329,36 @@ class ThankYousRepository
 					$thankyou_thanked[] = ['object_type' => $object_type, 'object_id' => $object_id];
 				}
 			}
-			$thanks_item->SetThanked($thankyou_thanked);
+			try
+			{
+				$thanks_item->SetThanked($thankyou_thanked);
+			} catch (ThankYouRuntimeException $exception)
+			{
+				throw new LogicException("Unexpected Runtime Exception thrown when setting Thanks Item's Thanked", null, $exception);
+			}
 		}
 
 		return $thanks_item->Save();
 	}
 
+	/**
+	 * @param ThankYou $thank_you
+	 * @throws LogicException
+	 * @throws ThankYouRuntimeException
+	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
 	{
 		$thankables = $thank_you->GetThanked();
 
 		if (!isset($thankables))
 		{
-			$thank_you->SetThanked(null);
+			try
+			{
+				$thank_you->SetThanked(null);
+			} catch (ThankYouInvalidThankable $exception)
+			{
+				throw new LogicException("Unexpected ThankYouInvalidThankable Exception thrown when setting ThankYou's Thanked", null, $exception);
+			}
 
 			return;
 		}
@@ -361,7 +397,13 @@ class ThankYousRepository
 			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
 		}
 
-		$thank_you->SetUsers($users);
+		try
+		{
+			$thank_you->SetUsers($users);
+		} catch (ThankYouInvalidUsers $exception)
+		{
+			throw new LogicException("Unexpected ThankYouInvalidUsers Exception thrown when setting ThankYou's Users", null, $exception);
+		}
 	}
 
 	/**
@@ -500,9 +542,9 @@ class ThankYousRepository
 					try
 					{
 						$perm_oclasses[$object_type_id] = $this->CreateThankablesFromGroupIds(array_keys($object_type_objects));
-					} catch (ThankYouRuntimeException $thank_you_runtime_exception)
+					} catch (InvalidArgumentException $exception)
 					{
-						throw new LogicException("Unexpected ThankYouRuntimeException thrown by CreateThankablesFromUsers", null, $thank_you_runtime_exception);
+						throw new LogicException("Unexpected InvalidArgumentException thrown when Creating Thankables from Group IDs", null, $exception);
 					}
 					break;
 				default:

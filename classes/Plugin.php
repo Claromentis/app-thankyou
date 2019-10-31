@@ -1,6 +1,7 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Admin\PanelsList;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\TemplaterTrait;
@@ -26,6 +27,7 @@ use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
+use Claromentis\ThankYou\ThankYous\ThankYouFactory;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\UI\TemplaterComponentThank;
 use Claromentis\ThankYou\View\ThanksListView;
@@ -98,6 +100,10 @@ class Plugin implements
 		// Repositories
 		$app['thankyou.repository'] = function ($app) {
 			return new ThanksRepository($app->db);
+		};
+
+		$app[ThankYousRepository::class] = function ($app) {
+			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'));
 		};
 
 		$app[ThanksListView::class] = function ($app) {
@@ -245,6 +251,9 @@ class Plugin implements
 	 * This Method is required by ClaPlugins::IsObjectValid, in order for Sending Messages/Notifications to work.
 	 * It will be deprecated as soon as possible and should be not be
 	 *
+	 * @param int $aggregation_id
+	 * @param int $object_id
+	 * @return bool
 	 */
 	public function IsObjectValid(int $aggregation_id, int $object_id)
 	{
