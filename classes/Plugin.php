@@ -16,7 +16,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Services;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
-use Claromentis\Core\Widget\Sugre\SugreRepository;
+use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
@@ -133,7 +133,7 @@ class Plugin implements
 		};
 
 		$app[ThanksController::class] = function ($app) {
-			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreRepository::class], $app['thankyou.config']);
+			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config']);
 		};
 
 		$app[TagRepository::class] = function ($app) {
