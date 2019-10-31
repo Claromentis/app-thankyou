@@ -21,6 +21,7 @@ use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
 use User;
+use UserExtranetArea;
 
 class TemplaterComponentThank extends TemplaterComponentTmpl
 {
@@ -49,19 +50,18 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 	 */
 	private $logger;
 
-	/**
-	 * @var SecurityContext
-	 */
-	private $security_context;
-
-	public function __construct(Api $api, ClaText $cla_text, Config $config, Lmsg $lmsg, LoggerInterface $logger, SecurityContext $security_context)
-	{
+	public function __construct(
+		Api $api,
+		ClaText $cla_text,
+		Config $config,
+		Lmsg $lmsg,
+		LoggerInterface $logger
+	) {
 		$this->api              = $api;
 		$this->cla_text         = $cla_text;
 		$this->config           = $config;
 		$this->lmsg             = $lmsg;
 		$this->logger           = $logger;
-		$this->security_context = $security_context;
 	}
 
 	/**
@@ -72,19 +72,15 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 	 *     * \Claromentis\ThankYou\ThankYous\ThankYou = The Thank You to display.
 	 *
 	 * ##Optional
-	 * * admin_mode:
-	 *     * 0 = Author and Thanked details will be hidden if the Viewer belongs to a different Extranet Area.(default)
-	 *     * 1 = Editing and Deleting the Thank You ignores permissions.
-	 *           Author and Thanked will display regardless of Viewers Extranet Area.
 	 * * comments:
 	 *     * 0 = Comments will not be displayed.(default)
 	 *     * 1 = Comments will be displayed.
 	 * * delete:
 	 *     * 0 = Deleting the Thank You is disabled.(default)
-	 *     * 1 = Deleting the Thank You is enabled (subject to permissions or admin_mode).
+	 *     * 1 = Deleting the Thank You is enabled (subject to permissions).
 	 * * edit:
 	 *     * 0 = Editing the Thank You is disabled.(default)
-	 *     * 1 = Editing the Thank You is enabled (subject to permissions or admin_mode).
+	 *     * 1 = Editing the Thank You is enabled (subject to permissions).
 	 * * links:
 	 *     * 0 = Thanked will never provide a link.(default)
 	 *     * 1 = Thanked will provide a link if available.
@@ -102,6 +98,10 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app): string
 	{
+		/**
+		 * @var SecurityContext $context
+		 */
+		$context        = $app[SecurityContext::class];
 		$time_zone      = DateClaTimeZone::GetCurrentTZ();
 		$admin_mode     = (bool) ($attributes['admin_mode'] ?? null);
 		$can_delete     = (bool) ($attributes['delete'] ?? null);
@@ -144,26 +144,23 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		}
 
 		$id                   = $thank_you->GetId();
-		$can_edit_thank_you   = isset($id) && $can_edit && $this->api->ThankYous()->CanEditThankYou($thank_you, $this->security_context);
-		$can_delete_thank_you = isset($id) && $can_delete && $this->api->ThankYous()->CanDeleteThankYou($thank_you, $this->security_context);
+		$can_edit_thank_you   = isset($id) && $can_edit && $this->api->ThankYous()->CanEditThankYou($thank_you, $context);
+		$can_delete_thank_you = isset($id) && $can_delete && $this->api->ThankYous()->CanDeleteThankYou($thank_you, $context);
 		$display_comments     = ((bool) isset($id) && ($attributes['comments'] ?? null) && (bool) $this->config->Get('thank_you_comments'));
-		$extranet_area_id     = $admin_mode ? null : (int) $this->security_context->GetExtranetAreaId();
+		$extranet_area_id     = (int) $context->GetExtranetAreaId();
 		$thank_link           = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
 
-		$author_hidden = false;
-		if (!$admin_mode && $extranet_area_id !== (int) $thank_you->GetAuthor()->GetExAreaId())
-		{
-			$author_hidden = true;
-		}
-		$author_link = $author_hidden ? null : User::GetProfileUrl($thank_you->GetAuthor()->GetId(), false);//TODO: Replace with a non-static post People API update
-		$author_name = $author_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thank_you->GetAuthor()->GetFullname();
+		$author_id = $thank_you->GetAuthor()->GetId();
+		$author_context = SecurityContext::CreateForUser($author_id);
+		$author_link = User::GetProfileUrl($author_id, true); // TODO: Replace with a non-static call when People API is available
+		$author_name = User::GetNameById($author_id, true); // TODO: Replace with a non-static call when People API is available
 
 		try
 		{
-			$author_image_url = $author_hidden ? null : User::GetPhotoUrl($thank_you->GetAuthor()->GetId(), false);//TODO: Replace with a non-static post People API update
-		} catch (CDNSystemException $cdn_system_exception)
+			$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->GetId(), true); // TODO: Replace with a non-static call when People API is available
+		} catch (CDNSystemException $exception)
 		{
-			$this->logger->error("Error thrown when getting User's Photo's URL in Thank Templater Component: " . $cdn_system_exception->getMessage());
+			$this->logger->error("Error thrown when getting User's Photo's URL in Thank Templater Component: " . $exception->getMessage(), [$exception]);
 			$author_image_url = null;
 		}
 
@@ -171,25 +168,29 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		$date_created->setTimezone($time_zone);
 
 		$thanked_args = [];
-		$thankeds     = $thank_you->GetThanked();
-		if (isset($thankeds))
-		{
-			$total_thanked = count($thankeds);
-			foreach ($thankeds as $offset => $thanked)
-			{
-				$thanked_ex_area_id = $thanked->GetExtranetAreaId();
-				$thanked_hidden     = false;
-				if (!$admin_mode && isset($thanked_ex_area_id) && $extranet_area_id !== $thanked_ex_area_id)
-				{
-					$thanked_hidden = true;
-				}
+		$thankables     = $thank_you->GetThankable();
 
-				$image_url             = $thanked_hidden ? null : $thanked->GetImageUrl();
-				$thanked_link          = $thanked_hidden ? null : $thanked->GetProfileUrl();
-				$display_thanked_image = !$thanked_hidden && $thanked_images && isset($image_url);
-				$thanked_tooltip       = $display_thanked_image ? $thanked->GetName() : '';
-				$thanked_link_enabled  = !$thanked_hidden && $links_enabled && isset($thanked_link);
-				$thanked_name          = $thanked_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thanked->GetName();
+		if (isset($thankables))
+		{
+			$context_is_primary_extranet = $context->IsPrimaryExtranet();
+			$primary_extranet_id = (int) UserExtranetArea::GetPrimaryId();
+			$total_thanked       = count($thankables);
+
+			foreach ($thankables as $offset => $thankable)
+			{
+				$thankable_extranet_id = $thankable->GetExtranetId();
+
+				$thankable_hidden = isset($thankable_extranet_id)
+					&& !$context_is_primary_extranet
+					&& $thankable_extranet_id !== $primary_extranet_id
+					&& $extranet_area_id !== $thankable_extranet_id;
+
+				$image_url             = $thankable_hidden ? null : $thankable->GetImageUrl();
+				$thanked_link          = $thankable_hidden ? null : $thankable->GetProfileUrl();
+				$display_thanked_image = !$thankable_hidden && $thanked_images && isset($image_url);
+				$thanked_tooltip       = $display_thanked_image ? $thankable->GetName() : '';
+				$thanked_link_enabled  = !$thankable_hidden && $links_enabled && isset($thanked_link);
+				$thanked_name          = $thankable_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thankable->GetName();
 
 				$thanked_args[] = [
 					'thanked_name.body'         => $thanked_name,

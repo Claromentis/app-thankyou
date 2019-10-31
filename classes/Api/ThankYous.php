@@ -58,10 +58,10 @@ class ThankYous
 
 	/**
 	 * @param Thankable|Thankable[] $thankables
-	 * @param int|null              $viewing_ex_area_id
+	 * @param SecurityContext|null  $security_context
 	 * @return array
 	 */
-	public function ConvertThankablesToArrays($thankables, ?int $viewing_ex_area_id = null)
+	public function ConvertThankablesToArrays($thankables, ?SecurityContext $security_context = null)
 	{
 		$array_return = true;
 		if (!is_array($thankables))
@@ -73,19 +73,19 @@ class ThankYous
 		$thankables_array = [];
 		foreach ($thankables as $thankable)
 		{
-			$thankables_array[] = $this->thank_yous_view->ConvertThankableToArray($thankable, $viewing_ex_area_id);
+			$thankables_array[] = $this->thank_yous_view->ConvertThankableToArray($thankable, $security_context);
 		}
 
 		return $array_return ? $thankables_array : $thankables_array[0];
 	}
 
 	/**
-	 * @param ThankYou|ThankYou[] $thank_yous
-	 * @param DateTimeZone|null   $time_zone
-	 * @param int|null            $viewing_ex_area_id
+	 * @param ThankYou|ThankYou[]  $thank_yous
+	 * @param DateTimeZone|null    $time_zone
+	 * @param SecurityContext|null $security_context
 	 * @return array
 	 */
-	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?int $viewing_ex_area_id = null)
+	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null)
 	{
 		if (!isset($time_zone))
 		{
@@ -102,7 +102,7 @@ class ThankYous
 		$thank_yous_array = [];
 		foreach ($thank_yous as $thank_you)
 		{
-			$thank_yous_array[] = $this->thank_yous_view->ConvertThankYouToArray($thank_you, $time_zone, $viewing_ex_area_id);
+			$thank_yous_array[] = $this->thank_yous_view->ConvertThankYouToArray($thank_you, $time_zone, $security_context);
 		}
 
 		return $array_return ? $thank_yous_array : $thank_yous_array[0];
@@ -216,18 +216,17 @@ class ThankYous
 	}
 
 	/**
-	 * @param int      $limit
-	 * @param int      $offset
-	 * @param bool     $thanked
-	 * @param int|null $extranet_area_id
+	 * @param int  $limit
+	 * @param int  $offset
+	 * @param bool $thanked
 	 * @return ThankYou[]
 	 * @throws ThankYouInvalidThankable
 	 * @throws ThankYouRuntimeException
 	 * @throws LogicException
 	 */
-	public function GetRecentThankYous(int $limit, int $offset = 0, bool $thanked = false, ?int $extranet_area_id = null)
+	public function GetRecentThankYous(int $limit, int $offset = 0, bool $thanked = false)
 	{
-		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIdsFromDb($limit, $offset, $extranet_area_id);
+		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset);
 
 		try
 		{
@@ -308,6 +307,7 @@ class ThankYous
 			$thank_you->SetThanked($thankables);
 			$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 		}
+
 		return $this->thank_yous_repository->SaveToDb($thank_you);
 	}
 

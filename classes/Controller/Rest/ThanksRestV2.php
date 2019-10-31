@@ -55,14 +55,13 @@ class ThanksRestV2
 	{
 		$extranet_area_id  = (int) $security_context->GetExtranetAreaId();
 		$thank_you         = $this->api->ThankYous()->GetThankYous($id, true);
-		$display_thank_you = $this->api->ThankYous()->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $extranet_area_id);
+		$display_thank_you = $this->api->ThankYous()->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
 		return new JsonPrettyResponse($display_thank_you);
 	}
 
 	/**
 	 * @param ServerRequestInterface $request
-	 * @param SecurityContext        $security_context
 	 * @return JsonPrettyResponse
 	 * @throws LogicException
 	 * @throws \Claromentis\ThankYou\Exception\ThankYouInvalidThankable
@@ -70,14 +69,13 @@ class ThanksRestV2
 	 */
 	public function GetThankYous(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
 	{
-		$extranet_area_id = (int) $security_context->GetExtranetAreaId();
 		$query_params     = $request->getQueryParams();
 		$limit            = $query_params['limit'] ?? 20;
 		$offset           = $query_params['offset'] ?? 0;
 		$thanked          = (bool) (int) ($query_params['thanked'] ?? null);
 
-		$thank_yous         = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked, $extranet_area_id);
-		$display_thank_yous = $this->api->ThankYous()->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $extranet_area_id);
+		$thank_yous         = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked);
+		$display_thank_yous = $this->api->ThankYous()->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
 		return new JsonPrettyResponse($display_thank_yous);
 	}
