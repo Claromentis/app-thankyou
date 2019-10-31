@@ -11,7 +11,7 @@ use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\Exception\AccessDeniedException;
 use Claromentis\Core\Security\SecurityContext;
-use Claromentis\Core\Widget\Sugre\SugreRepository;
+use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
@@ -30,7 +30,7 @@ class ThanksController
 
 	private $sugre_repository;
 
-	public function __construct(Lmsg $lmsg, Api $api, SugreRepository $sugre_repository, WritableConfig $config)
+	public function __construct(Lmsg $lmsg, Api $api, SugreUtility $sugre_repository, WritableConfig $config)
 	{
 		$this->api              = $api;
 		$this->config           = $config;
