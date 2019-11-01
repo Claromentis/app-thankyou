@@ -18,11 +18,6 @@ class ThankYouFactory
 	 * @param User|int $author
 	 * @param string $description
 	 * @param Date|null $date_created
-	 * @param null $users
-	 * @throws ThankYouRuntimeException
-	 * @throws ThankYouInvalidAuthor
-	 * @throws LogicException
-	 * @throws ThankYouInvalidUsers
 	 * @return ThankYou
 	 */
 	public function Create(User $author, Date $date_created, string $description)

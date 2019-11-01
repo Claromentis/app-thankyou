@@ -74,8 +74,6 @@ class ThankYousRepository
 	 * @param Date|null $date_created
 	 * @return ThankYou
 	 * @throws ThankYouInvalidAuthor
-	 * @throws LogicException
-	 * @throws ThankYouRuntimeException
 	 */
 	public function Create($author, string $description, $date_created = null)
 	{
@@ -152,10 +150,9 @@ class ThankYousRepository
 	 * @param array $o_classes
 	 * @return Thankable[]
 	 * @throws InvalidArgumentException
-	 * @throws ThankYouInvalidUsers
 	 * @throws LogicException
 	 */
-	public function CreateThankablesFromOClasses(array $o_classes)
+	public function CreateThankablesFromOClasses(array $o_classes): array
 	{
 		//TODO: Expand accepted objects to include all PERM_OCLASS_*
 
@@ -200,11 +197,16 @@ class ThankYousRepository
 	 * @param array $user_ids
 	 * @return Thankable[]
 	 * @throws LogicException
-	 * @throws ThankYouInvalidUsers
 	 */
 	public function CreateThankablesFromUserIds(array $user_ids)
 	{
-		return $this->CreateThankablesFromUsers($this->GetUsers($user_ids));
+		try
+		{
+			return $this->CreateThankablesFromUsers($this->GetUsers($user_ids));
+		} catch (ThankYouInvalidUsers $exception)
+		{
+			throw new LogicException("Unexpected exception thrown by CreateThankablesFromUsers", null, $exception);
+		}
 	}
 
 	/**
@@ -212,7 +214,7 @@ class ThankYousRepository
 	 *
 	 * @param array $users
 	 * @return Thankable[]
-	 * @throws ThankYouInvalidUsers
+	 * @throws ThankYouInvalidUsers - If the array given is not made up of User objects.
 	 */
 	public function CreateThankablesFromUsers(array $users)
 	{
@@ -271,7 +273,7 @@ class ThankYousRepository
 	 * @return User[]
 	 * @throws LogicException
 	 */
-	public function GetUsers(array $user_ids)
+	public function GetUsers(array $user_ids): array
 	{
 		$users_list_provider = new UsersListProvider();
 		$users_list_provider->SetFilterProtectExtranets(false);

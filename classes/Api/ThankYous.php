@@ -6,6 +6,7 @@ use Claromentis\Core\Config\Config;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Constants;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
+use Claromentis\ThankYou\Exception\ThankYouInvalidAuthor;
 use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
 use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
@@ -60,8 +61,9 @@ class ThankYous
 	 * @param Thankable|Thankable[] $thankables
 	 * @param SecurityContext|null  $security_context
 	 * @return array
+	 * @throws ThankYouRuntimeException
 	 */
-	public function ConvertThankablesToArrays($thankables, ?SecurityContext $security_context = null)
+	public function ConvertThankablesToArrays($thankables, ?SecurityContext $security_context = null): array
 	{
 		$array_return = true;
 		if (!is_array($thankables))
@@ -84,8 +86,9 @@ class ThankYous
 	 * @param DateTimeZone|null    $time_zone
 	 * @param SecurityContext|null $security_context
 	 * @return array
+	 * @throws ThankYouRuntimeException
 	 */
-	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null)
+	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null): array
 	{
 		if (!isset($time_zone))
 		{
@@ -108,16 +111,45 @@ class ThankYous
 		return $array_return ? $thank_yous_array : $thank_yous_array[0];
 	}
 
+	/**
+	 * @param User      $user
+	 * @param array     $thanked
+	 * @param string    $description
+	 * @param Date|null $date_created
+	 * @return int
+	 * @throws InvalidArgumentException
+	 * @throws LogicException
+	 * @throws ThankYouRuntimeException
+	 */
 	public function CreateAndSave(User $user, array $thanked, string $description, ?Date $date_created = null)
 	{
-		$thank_you = $this->thank_yous_repository->Create($user, $description, $date_created);
+		try
+		{
+			$thank_you = $this->thank_yous_repository->Create($user, $description, $date_created);
+		} catch (ThankYouInvalidAuthor $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by Create", null, $exception);
+		}
 
 		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses($thanked);
-		$thank_you->SetThanked($thankables);
+
+		try
+		{
+			$thank_you->SetThanked($thankables);
+		} catch (ThankYouInvalidThankable $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by SetThanked", null, $exception);
+		}
 
 		$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 
-		$id = $this->thank_yous_repository->SaveToDb($thank_you);
+		try
+		{
+			$id = $this->thank_yous_repository->SaveToDb($thank_you);
+		} catch (ThankYouNotFound $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by SaveToDb", null, $exception);
+		}
 
 		$thanked_users = $thank_you->GetUsers();
 		$users_ids     = [];
@@ -155,11 +187,11 @@ class ThankYous
 	 * @param int $id
 	 * @return Thankable
 	 * @throws InvalidArgumentException
-	 * @throws ThankYouInvalidUsers
+	 * @throws LogicException
 	 */
 	public function CreateThankableFromOClass(int $o_class, int $id)
 	{
-		return $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
+			return $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
 	}
 
 	/**
@@ -287,6 +319,20 @@ class ThankYous
 		return $this->acl->IsAdmin($security_context);
 	}
 
+	/**
+	 * @param SecurityContext $security_context
+	 * @param int             $id
+	 * @param array|null      $thanked
+	 * @param string|null     $description
+	 * @return int
+	 * @throws InvalidArgumentException
+	 * @throws LogicException
+	 * @throws ThankYouForbidden
+	 * @throws ThankYouInvalidThankable
+	 * @throws ThankYouInvalidUsers
+	 * @throws ThankYouNotFound
+	 * @throws ThankYouRuntimeException
+	 */
 	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
 	{
 		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
@@ -316,12 +362,20 @@ class ThankYous
 	 * @param int             $id
 	 * @throws ThankYouForbidden
 	 * @throws ThankYouNotFound
-	 * @throws ThankYouNotFound
 	 * @throws LogicException
 	 */
 	public function Delete(SecurityContext $security_context, int $id)
 	{
-		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
+		try
+		{
+			$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
+		} catch (ThankYouNotFound $exception)
+		{
+			throw $exception;
+		} catch (ThankYouRuntimeException $exception)
+		{
+			throw new LogicException("An unexpected Exception was thrown by GetThankYous", null, $exception);
+		}
 
 		if (!$this->CanDeleteThankYou($thank_you, $security_context))
 		{
@@ -330,5 +384,4 @@ class ThankYous
 
 		$this->thank_yous_repository->DeleteFromDb($id);
 	}
-
 }
