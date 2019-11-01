@@ -26,6 +26,7 @@ lm	thankyou.component_heading
 lm	thankyou.configuration.core_values_mandatory.description		
 lm	thankyou.configurations.notify_line_manager.title		
 lm	thankyou.configurations.thank_you_comments.title		
+lm	thankyou.error.delete.failure		
 lm	thankyou.error.invalid_users		
 lm	thankyou.error.no_edit_permission		
 lm	thankyou.error.thanks_not_found		
