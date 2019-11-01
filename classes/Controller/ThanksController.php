@@ -16,7 +16,9 @@ use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 class ThanksController
 {
@@ -28,13 +30,16 @@ class ThanksController
 
 	private $lmsg;
 
+	private $logger;
+
 	private $sugre_repository;
 
-	public function __construct(Lmsg $lmsg, Api $api, SugreUtility $sugre_repository, WritableConfig $config)
+	public function __construct(Lmsg $lmsg, Api $api, SugreUtility $sugre_repository, WritableConfig $config, LoggerInterface $logger)
 	{
 		$this->api              = $api;
 		$this->config           = $config;
 		$this->lmsg             = $lmsg;
+		$this->logger           = $logger;
 		$this->sugre_repository = $sugre_repository;
 	}
 
@@ -118,13 +123,13 @@ class ThanksController
 		$core_values_mandatory = (bool) $this->config->Get('thankyou_core_values_mandatory');
 
 		$args = [
-			'nav_tags.+class'               => 'active',
-			'core_values_enabled.checked'   => $core_values_enabled,
-			'core_values_mandatory.checked' => $core_values_mandatory,
-			'core_values_enabled.offtext'   => ($this->lmsg)('common.disabled'),
-			'core_values_enabled.ontext'    => ($this->lmsg)('common.enabled'),
-			'core_values_enabled.body'      => ($this->lmsg)('thankyou.admin.core_values.description'),
-			'core_values_mandatory.body'    => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
+			'nav_tags.+class'                => 'active',
+			'core_values_enabled.checked'    => $core_values_enabled,
+			'core_values_mandatory.checked'  => $core_values_mandatory,
+			'core_values_enabled.offtext'    => ($this->lmsg)('common.disabled'),
+			'core_values_enabled.ontext'     => ($this->lmsg)('common.enabled'),
+			'core_values_enabled.body'       => ($this->lmsg)('thankyou.admin.core_values.description'),
+			'core_values_mandatory.body'     => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
 			'core_values_enabled_body.style' => $core_values_enabled ? '' : 'display:none;'
 		];
 
@@ -202,6 +207,10 @@ class ThanksController
 		} catch (ThankYouForbidden $thank_you_forbidden)
 		{
 			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.no_edit_permission'), true);
+		} catch (LogicException $exception)
+		{
+			$this->logger->error("Logic Exception thrown in '" . get_class(). "': " . $exception->getMessage(), [$exception]);
+			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.delete.failure'), true);
 		}
 
 		return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.common.thanks_deleted'), false);

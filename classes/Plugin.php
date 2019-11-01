@@ -137,7 +137,7 @@ class Plugin implements
 		};
 
 		$app[ThanksController::class] = function ($app) {
-			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config']);
+			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config'], $app['logger_factory']->GetLogger('thankyou'));
 		};
 
 		$app[TagRepository::class] = function ($app) {
