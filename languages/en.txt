@@ -7,6 +7,7 @@ lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
 lm	thankyou.app_name		Thank you
+lm	thankyou.common.actions		Actions
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
 lm	thankyou.common.thank_yous		Thank Yous
@@ -35,7 +36,9 @@ lm	thankyou.lia.error.saving		One or more Items could not be saved
 lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
 lm	thankyou.tag.error.active.invalid		Invalid Core Value Active status
+lm	thankyou.tag.error.background.invalid		Invalid Background
 lm	thankyou.tag.error.background.undefined		Core Value Background Colour must be set
+lm	thankyou.tag.error.create		Could not create Core Value
 lm	thankyou.tag.error.id.not_found		Core Value could not be found
 lm	thankyou.tag.error.metadata.invalid		Metadata must be passed as an array if defined
 lm	thankyou.tag.error.name.invalid		Core Value Name must be a string if defined
@@ -64,6 +67,7 @@ lt	thankyou:admin:notifications:save.body		Save
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		Users will be notified whenever they're being thanked.
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
+lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
 lt	thankyou:component:delete.body		Delete
 lt	thankyou:component:delete_confirm.body		Are you sure you want to delete this thank you message?
