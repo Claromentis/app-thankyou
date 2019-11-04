@@ -4,20 +4,19 @@ namespace Claromentis\ThankYou\Tags;
 
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Date;
-use InvalidArgumentException;
 use User;
 
 class Tag
 {
 	private $active;
 
+	private $bg_colour;
+
 	private $created_by;
 
 	private $created_date;
 
 	private $id;
-
-	private $metadata;
 
 	private $modified_by;
 
@@ -43,6 +42,11 @@ class Tag
 		return $this->active;
 	}
 
+	public function GetBackgroundColour(): ?string
+	{
+		return $this->bg_colour;
+	}
+
 	public function GetCreatedBy(): ?User
 	{
 		return $this->created_by;
@@ -56,11 +60,6 @@ class Tag
 	public function GetId(): ?int
 	{
 		return $this->id;
-	}
-
-	public function GetMetadata(): ?array
-	{
-		return $this->metadata;
 	}
 
 	public function GetModifiedBy(): ?User
@@ -83,6 +82,11 @@ class Tag
 		$this->active = $active;
 	}
 
+	public function SetBackgroundColour(?string $colour)
+	{
+		$this->bg_colour = $colour;
+	}
+
 	public function SetCreatedBy(?User $user)
 	{
 		$this->created_by = $user;
@@ -96,11 +100,6 @@ class Tag
 	public function SetCreatedDate(?Date $date)
 	{
 		$this->created_date = $date;
-	}
-
-	public function SetMetadata(?array $metadata)
-	{
-		$this->metadata = $metadata;
 	}
 
 	public function SetModifiedBy(?User $user)

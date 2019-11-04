@@ -41,8 +41,24 @@ class TagRepository
 	 * @return Tag[]
 	 * @throws LogicException
 	 */
+	public function GetAlphabeticTags(int $limit, int $offset): array
+	{
+		//TODO: User DAL QUery
+		$query   = "SELECT * FROM thankyou_tag ORDER BY name ASC LIMIT int:limit OFFSET int:offset";
+		$results = $this->db->query($query, $limit, $offset);
+
+		return $this->GetTagsFromDbQuery($results);
+	}
+
+	/**
+	 * @param int $limit
+	 * @param int $offset
+	 * @return Tag[]
+	 * @throws LogicException
+	 */
 	public function GetActiveAlphabeticTags(int $limit, int $offset): array
 	{
+		//TODO: User DAL QUery
 		$query   = "SELECT * FROM thankyou_tag ORDER BY active DESC, name ASC LIMIT int:limit OFFSET int:offset";
 		$results = $this->db->query($query, $limit, $offset);
 
@@ -56,6 +72,7 @@ class TagRepository
 	 */
 	public function GetRecentTags(int $limit, int $offset): array
 	{
+		//TODO: User DAL QUery
 		$query   = "SELECT * FROM thankyou_tag ORDER BY modified_date DESC LIMIT int:limit OFFSET int:offset";
 		$results = $this->db->query($query, $limit, $offset);
 
@@ -117,11 +134,13 @@ class TagRepository
 		}
 		$db_fields['int:modified_date'] = $modified_date->format('YmdHis');
 
-		$metadata = $tag->GetMetadata();
-		if (isset($metadata))
+		$metadata = null;
+		$bg_colour = $tag->GetBackgroundColour();
+		if (isset($bg_colour))
 		{
-			$metadata = json_encode($metadata);
+			$metadata = json_encode([$bg_colour]);
 		}
+
 		$db_fields['clob:metadata'] = $metadata;
 
 		if (!isset($id))
@@ -222,12 +241,18 @@ class TagRepository
 				$this->log->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
 				continue;
 			}
+			$tag->SetId($id);
 			$tag->SetCreatedBy($users[(int) $row['created_by']] ?? null);
 			$tag->SetCreatedDate(new Date($row['created_date'], new DateTimeZone('UTC')));
-			$tag->SetId($id);
-			$tag->SetMetadata(json_decode($row['metadata'], true));
 			$tag->SetModifiedBy($users[(int) $row['modified_by']] ?? null);
 			$tag->SetModifiedDate(new Date($row['created_date'], new DateTimeZone('UTC')));
+
+			$metadata = json_decode($row['metadata'], true);
+			if (isset($metadata['bg_colour']) && is_string($metadata['bg_colour']))
+			{
+				$tag->SetBackgroundColour($metadata['bg_colour']);
+			}
+
 			$tags[$id] = $tag;
 		}
 

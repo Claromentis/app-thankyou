@@ -9,6 +9,7 @@ use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Event\LazyResolver;
+use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
@@ -34,6 +35,7 @@ use Claromentis\ThankYou\UI\TemplaterComponentThank;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Psr\Log\LoggerInterface;
 use Silex\Api\EventListenerProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -145,7 +147,7 @@ class Plugin implements
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
-			return new ThanksRestV2($app[Api::class], $app['rest.formatter'], $app[Lmsg::class],  $app['thankyou.config']);
+			return new ThanksRestV2($app[Api::class], $app[ResponseFactory::class], $app['logger_factory']->GetLogger('tags'), $app['rest.formatter'], $app[Lmsg::class],  $app['thankyou.config']);
 		};
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
@@ -225,11 +227,10 @@ class Plugin implements
 				$routes->get('/thanks/{id}', ThanksRestV2::class . ':GetThankYou')->assert('id', '\d+');
 				$routes->get('/tags', ThanksRestV2::class . ':GetTags');
 				$routes->get('/tags/{id}', ThanksRestV2::class . ':GetTag')->assert('id', '\d+');
-				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');
 
 				$routes->secure('rest', 'admin', ['panel_code' => 'thankyou']);
-				$routes->post('/tag', ThanksRestV2::class . ':CreateTag');
-				$routes->post('/tags', ThanksRestV2::class . ':ListableItemsAdminSave');
+				$routes->post('/tags', ThanksRestV2::class . ':CreateTag');
+				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');
 				$routes->post('/admin/config', ThanksRestV2::class . ':SetConfig');
 			}
 		];

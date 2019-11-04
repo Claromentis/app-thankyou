@@ -19,51 +19,240 @@
 	</div>
 	<div id="core_values_enabled_body" name="core_values_enabled_body">
 		<cla-toggle-switch name="core_values_mandatory"></cla-toggle-switch>
+		<div>
+			<span class="js-core_values-datatable-create"><loc name="common:create"></loc></span>
+		</div>
 		<component class_key="data_table" name="core_values" service="thankyou.datatable.tags"/>
 	</div>
 </block>
 
 <include file="../../common/layouts/admin_with_info_panel.html"/>
 
+<div id="core_values_modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" class="form-horizontal js-core_values-modal-form">
+				<input type="hidden" name="tag_id"/>
+				<input type="hidden" name="csrf_token">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+						aria-hidden="true">&times;</span></button>
+					<h4 name="thankyou:admin:core_values" class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="js-form-error" data-name="problem_details-title" style="text-align: center;"></div>
+					<div class="form-group">
+						<label name="common:name" class="control-label col-sm-4"></label>
+						<div class="form-control-static pt-0 col-sm-8">
+							<input name="tag_name">
+							<div class="js-form-error" data-name="name">
+								<span class="text-danger js-form-error" data-name="name">SOME ERROR</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">
+							<loc name="common:background_colour"></loc>
+						</label>
+						<div class="col-sm-8">
+							<input name="tag_bg_colour">
+							<div>
+								<span class="text-danger js-form-error" data-name="bg_colour">SOME ERROR</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal"
+							aria-hidden="true">Close
+					</button>
+					<button name="thankyou:component:modal:submit" class="btn btn-primary js-core_values-modal-submit">Submit</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script type="text/template" id="js_modal_error_template">
+	<span class="text-danger"></span>
+</script>
 <script type="text/javascript">
-    $('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
-        var checked = $(this).find('input').prop('checked');
+	(function ($) {
+        $('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
+            var checked = $(this).find('input').prop('checked');
 
-        var body = {
-            'thankyou_core_values_enabled': checked
-        };
+            var body = {
+                'thankyou_core_values_enabled': checked
+            };
 
-        $.ajax({
-            url: '/api/thankyou/v2/admin/config',
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(body)
-        }).done(function (response) {
-            if (response) {
-                if (checked) {
-                    $('#core_values_enabled_body').show();
-                } else {
-                    $('#core_values_enabled_body').hide();
+            $.ajax({
+                url: '/api/thankyou/v2/admin/config',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(body)
+            }).done(function (response) {
+                if (response) {
+                    if (checked) {
+                        $('#core_values_enabled_body').show();
+                    } else {
+                        $('#core_values_enabled_body').hide();
+                    }
                 }
-            }
+            });
         });
-    });
 
-    $('cla-toggle-switch[name="core_values_mandatory"]').on('change', function () {
-        var checked = $(this).find('input').prop('checked');
+        $('cla-toggle-switch[name="core_values_mandatory"]').on('change', function () {
+            var checked = $(this).find('input').prop('checked');
 
-        var body = {
-            'thankyou_core_values_mandatory': checked
-        };
+            var body = {
+                'thankyou_core_values_mandatory': checked
+            };
 
-        $.ajax({
-            url: '/api/thankyou/v2/admin/config',
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(body)
+            $.ajax({
+                url: '/api/thankyou/v2/admin/config',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(body)
+            });
         });
-    });
 
+        var core_values = $('#core_values_enabled_body');
+
+        core_values.on('click', '.js-core_values-datatable-active', function () {
+            core_values_modal.setActive($(this).parent().attr('data-id'), $(this).attr('data-value'));
+		});
+
+        core_values.on('click', '.js-core_values-datatable-edit', function () {
+            core_values_modal.populateFromId($(this).parent().attr('data-id'));
+		});
+
+        core_values.on('click', '.js-core_values-datatable-create', function () {
+            core_values_modal.resetForm();
+            core_values_modal.showModal(true);
+		});
+
+
+        $('.js-core_values-modal-form').on('submit', function (event) {
+            event.preventDefault();
+            core_values_modal.submit();
+		});
+
+        var core_values_modal = {
+            modal_body: $('#core_values_modal'),
+			error_template: $('#js_modal_error_template'),
+            setActive: function (id, active) {
+                var self = this;
+                active = !(active === "0" || active === 0);
+                $.ajax({
+					url: '/api/thankyou/v2/tags/' + id,
+					type: 'POST',
+					dataType: 'json',
+					contentType: 'application/json',
+					data: JSON.stringify({active: active})
+				}).done(function () {
+				    self.reloadDataTable();
+                });
+            },
+			populateFromId: function (id) {
+                var self = this;
+                $.ajax({
+					url: '/api/thankyou/v2/tags/' + id
+				}).done(function(data){
+                    self.populateFromTag(data);
+                })
+			},
+			populateFromTag: function (tag) {
+                this.modal_body.find('input[name="tag_id"]').val(+tag.id);
+                this.modal_body.find('input[name="tag_name"]').val(tag.name);
+                this.modal_body.find('input[name="tag_bg_colour"]').val(tag.bg_colour);
+                this.resetErrors();
+                this.showModal(true);
+			},
+			showModal: function (show) {
+                if (show === true) {
+                    this.modal_body.modal('show');
+				} else {
+                    this.modal_body.modal('hide');
+				}
+			},
+			reloadDataTable: function () {
+                $('#core_values table').dataTable().api().ajax.reload();
+			},
+			resetForm: function () {
+                this.modal_body.find('input[name="tag_id"]').val(null);
+                this.modal_body.find('input[name="tag_name"]').val(null);
+                this.modal_body.find('input[name="tag_bg_colour"]').val(null);
+
+                this.resetErrors();
+			},
+			resetErrors: function () {
+                var form_errors = this.modal_body.find('.js-form-error');
+                form_errors.empty();
+			},
+			submit: function () {
+                var self = this;
+
+                self.resetErrors();
+
+                var id = +this.modal_body.find('input[name="tag_id"]').val();
+                if (!(id > 0)) {
+                    id = null;
+				}
+                var name = this.modal_body.find('input[name="tag_name"]').val();
+                var bg_colour = this.modal_body.find('input[name="tag_bg_colour"]').val();
+
+                var body = {
+                    name: name,
+					bg_colour: bg_colour
+				};
+
+                var url = '/api/thankyou/v2/tags';
+                if (id !== null) {
+                    url += '/' + id;
+				}
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(body),
+					error: function (response) {
+                        var body = response.responseJSON;
+
+                        var form_errors = self.modal_body.find('.js-form-error');
+                        var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
+                        if (problem_details_title_error.length > 0 && 'title' in body) {
+                            self.addError(problem_details_title_error, body.title);
+						}
+
+                        if ('invalid-params' in body) {
+                            for (var offset in body['invalid-params']) {
+                                var invalid_param = body['invalid-params'][offset];
+                                if ('name' in invalid_param) {
+                                    var error_container = form_errors.filter('[data-name="' + invalid_param.name + '"]');
+                                    if (error_container.length > 0 && 'reason' in invalid_param) {
+                                        self.addError(error_container, invalid_param.reason);
+									}
+								}
+							}
+						}
+                       /* var place_holder_title_error = form_error_containers.find('[data-name="problem_details-title"]');
+                        place_holder_title_error.html('DA BEESSSSS!');
+                        place_holder_title_error.show();
+                        console.log(body);*/
+					}
+                });
+			},
+			addError: function (container, message) {
+                var error = $(_.template(this.error_template.html())({}));
+                error.text(message);
+                container.append(error);
+			}
+		};
+
+    })(jQuery);
 </script>

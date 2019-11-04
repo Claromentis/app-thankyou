@@ -27,16 +27,14 @@ class Tag
 	/**
 	 * @param User       $user
 	 * @param string     $name
-	 * @param array|null $metadata
 	 * @return \Claromentis\ThankYou\Tags\Tag
 	 * @throws TagInvalidNameException
 	 */
-	public function Create(User $user, string $name, ?array $metadata): \Claromentis\ThankYou\Tags\Tag
+	public function Create(User $user, string $name): \Claromentis\ThankYou\Tags\Tag
 	{
 		$tag = $this->factory->Create($name);
 		$tag->SetCreatedBy($user);
 		$tag->SetCreatedDate(new Date());
-		$tag->SetMetadata($metadata);
 		$tag->SetModifiedBy($user);
 		$tag->SetModifiedDate(new Date());
 
@@ -49,6 +47,16 @@ class Tag
 	public function Delete(int $id)
 	{
 		$this->repository->Delete($id);
+	}
+
+	/**
+	 * @param int $limit
+	 * @param int $offset
+	 * @return Tag[]
+	 */
+	public function GetAlphabeticTags(int $limit, int $offset): array
+	{
+		return $this->repository->GetAlphabeticTags($limit, $offset);
 	}
 
 	/**

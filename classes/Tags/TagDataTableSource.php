@@ -32,7 +32,7 @@ class TagDataTableSource implements DataSource
 		$columns = [
 			['name', ($this->lmsg)('common.name')],
 			['bg_colour', ($this->lmsg)('common.background_colour')],
-			['active', ($this->lmsg)('common.active')]
+			['actions', ($this->lmsg)('thankyou.common.actions'), new ActionsDataTableDecorator()]
 		];
 
 		return $this->CreateWithColumns($columns);
@@ -47,18 +47,17 @@ class TagDataTableSource implements DataSource
 		$offset = (int) $params->GetOffset();
 		$limit  = (int) $params->GetLimit();
 
-		$tags = $this->repository->GetActiveAlphabeticTags($limit, $offset);
+		$tags = $this->repository->GetAlphabeticTags($limit, $offset);
 
 		$rows = [];
 		foreach ($tags as $tag)
 		{
-			$metadata  = $tag->GetMetadata();
-			$bg_colour = $metadata['bg_colour'] ?? '';
+			$bg_colour = $tag->GetBackgroundColour();
 
 			$rows[] = [
 				'name'      => $tag->GetName(),
 				'bg_colour' => $bg_colour,
-				'active'    => $tag->GetActive() ? ($this->lmsg)('common.yes') : ($this->lmsg)('common.no')
+				'actions'    => ['active' => $tag->GetActive(), 'id' => $tag->GetId()]
 			];
 		}
 

@@ -571,7 +571,7 @@ class ThankYousRepository
 
 			try
 			{
-				$thank_you = $this->Create($users[$thankyou_items[$id]['author_id']], $thankyou_items[$id]['description'], new Date($thankyou_items[$id]['date_created'], new DateTimeZone('UTC')));
+				$thank_you = $this->Create($users[$thankyou_items[$id]['author_id']], (string) $thankyou_items[$id]['description'], new Date($thankyou_items[$id]['date_created'], new DateTimeZone('UTC')));
 				$thank_you->SetId($id);
 
 				if (isset($thankyou_items[$id]['thanked']))
@@ -675,6 +675,7 @@ class ThankYousRepository
 	 */
 	public function GetUsersRecentThankYousIdsFromDb(int $user_id, int $limit, int $offset)
 	{
+		//TODO: User DAL QUery
 		$query  = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
 		$result = $this->db->query($query, $user_id, $limit, $offset);
 

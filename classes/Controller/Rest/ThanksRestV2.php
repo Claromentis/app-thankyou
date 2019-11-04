@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou\Controller\Rest;
 
 use Claromentis\Core\Config\WritableConfig;
 use Claromentis\Core\Http\JsonPrettyResponse;
+use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
@@ -17,6 +18,7 @@ use InvalidArgumentException;
 use LogicException;
 use OutOfBoundsException;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use RestExBadRequest;
 use RestExError;
 use RestExNotFound;
@@ -31,13 +33,19 @@ class ThanksRestV2
 
 	private $lmsg;
 
+	private $log;
+
+	private $response;
+
 	private $rest_format;
 
-	public function __construct(Api $api, RestFormat $rest_format, Lmsg $lmsg, WritableConfig $config)
+	public function __construct(Api $api, ResponseFactory $response_factory, LoggerInterface $logger, RestFormat $rest_format, Lmsg $lmsg, WritableConfig $config)
 	{
 		$this->api         = $api;
 		$this->config      = $config;
 		$this->lmsg        = $lmsg;
+		$this->log         = $logger;
+		$this->response    = $response_factory;
 		$this->rest_format = $rest_format;
 	}
 
@@ -57,7 +65,7 @@ class ThanksRestV2
 		$thank_you         = $this->api->ThankYous()->GetThankYous($id, true);
 		$display_thank_you = $this->api->ThankYous()->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
-		return new JsonPrettyResponse($display_thank_you);
+		return $this->response->GetJsonPrettyResponse($display_thank_you);
 	}
 
 	/**
@@ -69,15 +77,15 @@ class ThanksRestV2
 	 */
 	public function GetThankYous(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
 	{
-		$query_params     = $request->getQueryParams();
-		$limit            = $query_params['limit'] ?? 20;
-		$offset           = $query_params['offset'] ?? 0;
-		$thanked          = (bool) (int) ($query_params['thanked'] ?? null);
+		$query_params = $request->getQueryParams();
+		$limit        = $query_params['limit'] ?? 20;
+		$offset       = $query_params['offset'] ?? 0;
+		$thanked      = (bool) (int) ($query_params['thanked'] ?? null);
 
 		$thank_yous         = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked);
 		$display_thank_yous = $this->api->ThankYous()->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
-		return new JsonPrettyResponse($display_thank_yous);
+		return $this->response->GetJsonPrettyResponse($display_thank_yous);
 	}
 
 	/**
@@ -99,7 +107,7 @@ class ThanksRestV2
 
 		$tag_display = $this->ConvertTagsToArray([$tag])[0];
 
-		return new JsonPrettyResponse($tag_display);
+		return $this->response->GetJsonPrettyResponse($tag_display);
 	}
 
 	/**
@@ -113,11 +121,11 @@ class ThanksRestV2
 		$limit        = (int) ($query_params['limit'] ?? 20);
 		$offset       = (int) ($query_params['offset'] ?? 0);
 
-		$tags = $this->api->Tag()->GetActiveAlphabeticTags($limit, $offset);
+		$tags = $this->api->Tag()->GetAlphabeticTags($limit, $offset);
 
 		$tags_display = $this->ConvertTagsToArray($tags);
 
-		return new JsonPrettyResponse($tags_display);
+		return $this->response->GetJsonPrettyResponse($tags_display);
 	}
 
 	/**
@@ -125,7 +133,7 @@ class ThanksRestV2
 	 */
 	public function GetTotalTags(): JsonPrettyResponse
 	{
-		return new JsonPrettyResponse($this->api->Tag()->GetTotalTags());
+		return $this->response->GetJsonPrettyResponse($this->api->Tag()->GetTotalTags());
 	}
 
 	/**
@@ -144,33 +152,67 @@ class ThanksRestV2
 			throw new RestExBadRequest();
 		}
 
-		if (!isset($post['name']) || !is_string($post['name']))
+		$invalid_params = [];
+
+		$name      = $post['name'] ?? null;
+		$bg_colour = $post['bg_colour'] ?? null;
+
+		if (!isset($name))
 		{
-			throw new RestExBadRequest(($this->lmsg)('thankyou.tag.error.name.undefined'));
+			$invalid_params[] = ['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.undefined')];
+		} elseif (!is_string($name))
+		{
+			$invalid_params[] = ['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.invalid')];
 		}
 
-		if (isset($post['metadata']) && !is_array($post['metadata']))
+		if (isset($bg_colour) && !is_string($bg_colour))
 		{
-			throw new RestExBadRequest(($this->lmsg)('thankyou.tag.error.metadata.invalid'));
+			$invalid_params[] = ['name' => 'background_colour', 'reason' => ($this->lmsg)('thankyou.tag.error.background.invalid')];
+		}
+
+		if (count($invalid_params) > 0)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.tag.error.create'),
+				'status'         => 400,
+				'invalid-params' => $invalid_params
+			], 400);
 		}
 
 		try
 		{
-			$tag = $this->api->Tag()->Create($security_context->GetUser(), $post['name'], $post['metadata'] ?? null);
+			$tag = $this->api->Tag()->Create($security_context->GetUser(), $name);
+			$tag->SetBackgroundColour($bg_colour);
 			$this->api->Tag()->Save($tag);
 			$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
 		} catch (TagDuplicateNameException $exception)
 		{
-			$response['errors']['name'][] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.tag.error.create'),
+				'status'         => 400,
+				'invalid-params' => [['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.not_unique')]]
+			], 400);
 		} catch (TagInvalidNameException $exception)
 		{
-			$response['errors']['name'][] = ($this->lmsg)('thankyou.tag.error.name.invalid');
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.tag.error.create'),
+				'status'         => 400,
+				'invalid-params' => [['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.invalid')]]
+			], 400);
 		} catch (InvalidArgumentException $exception)
 		{
-			throw new LogicException("Failed to Create Tag, an unexpected Exception was thrown when saving", null, $exception);
+			$this->log->error("An unexpected Exception was thrown", [$exception]);
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.tag.error.create'),
+				'status' => 500
+			], 500);
 		}
 
-		return new JsonPrettyResponse($response);
+		return $this->response->GetJsonPrettyResponse($response, 200);
 	}
 
 	/**
@@ -217,9 +259,9 @@ class ThanksRestV2
 			}
 		}
 
-		if (array_key_exists('metadata', $post) && (!isset($post['metadata']) || is_array($post['metadata'])))
+		if (isset($post['bg_colour']) && is_string($post['bg_colour']))
 		{
-			$tag->SetMetadata($post['metadata']);
+			$tag->SetBackgroundColour($post['bg_colour']);
 		}
 
 		$tag->SetModifiedBy($security_context->GetUser());
@@ -238,153 +280,7 @@ class ThanksRestV2
 			}
 		}
 
-		return new JsonPrettyResponse($response);
-	}
-
-	/**
-	 * @param ServerRequestInterface $request
-	 * @param SecurityContext        $security_context
-	 * @return JsonPrettyResponse
-	 * @throws RestExBadRequest
-	 * @throws RestExError
-	 */
-	public function ListableItemsAdminSave(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
-	{
-		$post = $this->rest_format->GetJson($request);
-
-		$response = [];
-		try
-		{
-			if (isset($post['created']))
-			{
-				foreach ($post['created'] as $form_id => $item)
-				{
-					$name      = $item['name'] ?? null;
-					$bg_colour = $item['bg_colour'] ?? null;
-					$active    = $item['active'] ?? null;
-
-					if (!isset($name) || !is_string($name))
-					{
-						$response['errors'][$form_id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
-						continue;
-					}
-
-					if (!isset($bg_colour) || !is_string($bg_colour))
-					{
-						$response['errors'][$form_id]['bg_colour'] = ($this->lmsg)('thankyou.tag.error.background.undefined');
-						continue;
-					}
-
-					try
-					{
-						//TODO read Active also!
-						$tag = $this->api->Tag()->Create($security_context->GetUser(), $name, ['bg_colour' => $item['bg_colour']]);
-
-						if (isset($active))
-						{
-							if (!is_bool($active))
-							{
-								$response['errors'][$form_id]['active'] = ($this->lmsg)('thankyou.tag.error.active.invalid');
-								continue;
-							}
-							$tag->SetActive($active);
-						}
-
-						$this->api->Tag()->Save($tag);
-					} catch (TagDuplicateNameException $exception)
-					{
-						$response['errors'][$form_id]['name'] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
-					} catch (TagInvalidNameException $exception)
-					{
-						$response['errors'][$form_id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
-					} catch (InvalidArgumentException $exception)
-					{
-						throw new RestExError($exception->getMessage(), 500, "Internal Server Error", $exception);
-					}
-				}
-			}
-
-			if (isset($post['modified']))
-			{
-				foreach ($post['modified'] as $id => $item)
-				{
-					try
-					{
-						$tag = $this->api->Tag()->GetTag($id);
-					} catch (OutOfBoundsException $exception)
-					{
-						$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.id.not_found');
-						continue;
-					}
-
-					$active    = $item['active'] ?? null;
-					$name      = $item['name'] ?? null;
-					$bg_colour = $item['bg_colour'] ?? null;
-
-					if (isset($active))
-					{
-						if (!is_bool($active))
-						{
-							$response['errors'][$id]['active'] = ($this->lmsg)('thankyou.tag.error.active.invalid');
-							continue;
-						}
-						$tag->SetActive($active);
-					}
-
-					if (isset($name))
-					{
-						if (!is_string($name))
-						{
-							$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
-							continue;
-						}
-						try
-						{
-							$tag->SetName($name);
-						} catch (TagInvalidNameException $exception)
-						{
-							$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.name.invalid');
-							continue;
-						}
-					}
-
-					if (isset($bg_colour))
-					{
-						if (!is_string($bg_colour))
-						{
-							$response['errors'][$id]['bg_colour'] = ($this->lmsg)('thankyou.tag.error.background.undefined');
-							continue;
-						}
-						$tag->SetMetadata(['bg_colour' => $bg_colour]);
-					}
-
-					$tag->SetModifiedBy($security_context->GetUser());
-					$tag->SetModifiedDate(new Date());
-
-					try
-					{
-						$this->api->Tag()->Save($tag);
-					} catch (TagDuplicateNameException $exception)
-					{
-						$response['errors'][$id]['name'] = ($this->lmsg)('thankyou.tag.error.name.not_unique');
-						continue;
-					}
-				}
-			}
-
-			if (isset($post['deleted']))
-			{
-				foreach ($post['deleted'] as $id)
-				{
-					$this->api->Tag()->Delete($id);
-				}
-			}
-		} catch (LogicException $exception)
-		{
-			throw new RestExError($exception->getMessage(), 500, "Internal Server Error", $exception);
-		}
-
-		return new JsonPrettyResponse($response);
+		return $this->response->GetJsonPrettyResponse($response);
 	}
 
 	/**
@@ -418,7 +314,7 @@ class ThanksRestV2
 
 		$this->api->Configuration()->SaveConfig($this->config);
 
-		return new JsonPrettyResponse(true);
+		return $this->response->GetJsonPrettyResponse(true);
 	}
 
 	/**
@@ -444,8 +340,6 @@ class ThanksRestV2
 			$modified_date->setTimezone(DateClaTimeZone::GetCurrentTZ());
 			$modified_date = $this->rest_format->Date($modified_date);
 
-			$metadata = $tag->GetMetadata();
-
 			$display_tags[$offset] = [
 				'id'            => $tag->GetId(),
 				'active'        => $tag->GetActive(),
@@ -454,7 +348,7 @@ class ThanksRestV2
 				'created_date'  => $created_date,
 				'modified_by'   => $tag->GetModifiedBy()->GetFullname(),
 				'modified_date' => $modified_date,
-				'bg_colour'     => $metadata['bg_colour'] ?? null
+				'bg_colour'     => $tag->GetBackgroundColour()
 			];
 		}
 
