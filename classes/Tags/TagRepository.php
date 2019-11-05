@@ -7,14 +7,17 @@ use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\DAL\ResultInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
+use Claromentis\ThankYou\Tags\Exceptions\TagCreatedByException;
+use Claromentis\ThankYou\Tags\Exceptions\TagCreatedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
+use Claromentis\ThankYou\Tags\Exceptions\TagModifiedByException;
+use Claromentis\ThankYou\Tags\Exceptions\TagModifiedDateException;
 use Date;
 use DateTimeZone;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use User;
 
 class TagRepository
@@ -39,7 +42,6 @@ class TagRepository
 	 * @param int $limit
 	 * @param int $offset
 	 * @return Tag[]
-	 * @throws LogicException
 	 */
 	public function GetAlphabeticTags(int $limit, int $offset): array
 	{
@@ -54,7 +56,6 @@ class TagRepository
 	 * @param int $limit
 	 * @param int $offset
 	 * @return Tag[]
-	 * @throws LogicException
 	 */
 	public function GetActiveAlphabeticTags(int $limit, int $offset): array
 	{
@@ -89,11 +90,11 @@ class TagRepository
 
 	/**
 	 * @param Tag $tag
-	 * @throws TagDuplicateNameException if the Tags Name is not unique to the database.
-	 * @throws InvalidArgumentException if the Tags Modified By is null.
-	 * @throws InvalidArgumentException if the Tags Modified Date is null.
-	 * @throws InvalidArgumentException if the Tags Created By and ID are null.
-	 * @throws InvalidArgumentException if the Tags Created Date and ID are null.
+	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
+	 * @throws TagModifiedByException - If the Tag's Modified By has not been defined.
+	 * @throws TagModifiedDateException - If the Tag's Modified Date has not been defined.
+	 * @throws TagCreatedByException - If the Tag's Created By has not been defined.
+	 * @throws TagCreatedDateException - If the Tag's Created Date has not been defined.
 	 */
 	public function Save(Tag $tag)
 	{
@@ -123,22 +124,22 @@ class TagRepository
 		$modified_by = $tag->GetModifiedBy();
 		if (!isset($modified_by))
 		{
-			throw new InvalidArgumentException("Failed to Save Tag, Modified By undefined");
+			throw new TagModifiedByException("Failed to Save Tag, Modified By undefined");
 		}
 		$db_fields['int:modified_by'] = $modified_by->GetId();
 
 		$modified_date = $tag->GetModifiedDate();
 		if (!isset($modified_date))
 		{
-			throw new InvalidArgumentException("Failed to Save Tag, Modified Date undefined");
+			throw new TagModifiedDateException("Failed to Save Tag, Modified Date undefined");
 		}
 		$db_fields['int:modified_date'] = $modified_date->format('YmdHis');
 
-		$metadata = null;
+		$metadata  = null;
 		$bg_colour = $tag->GetBackgroundColour();
 		if (isset($bg_colour))
 		{
-			$metadata = json_encode([$bg_colour]);
+			$metadata = json_encode(['bg_colour' => $bg_colour]);
 		}
 
 		$db_fields['clob:metadata'] = $metadata;
@@ -147,12 +148,12 @@ class TagRepository
 		{
 			if (!isset($created_by))
 			{
-				throw new InvalidArgumentException("Failed to Save new Tag, Created By undefined");
+				throw new TagCreatedByException("Failed to Save new Tag, Created By undefined");
 			}
 
 			if (!isset($created_date))
 			{
-				throw new InvalidArgumentException("Failed to Save new Tag, Created Date undefined");
+				throw new TagCreatedDateException("Failed to Save new Tag, Created Date undefined");
 			}
 
 			$query = $this->query_factory->GetQueryInsert('thankyou_tag', $db_fields);
@@ -188,7 +189,6 @@ class TagRepository
 	/**
 	 * @param int[] $ids
 	 * @return Tag[]
-	 * @throws InvalidArgumentException
 	 */
 	public function Load(array $ids): array
 	{
@@ -209,7 +209,6 @@ class TagRepository
 	/**
 	 * @param ResultInterface $results
 	 * @return Tag[]
-	 * @throws LogicException
 	 */
 	private function GetTagsFromDbQuery(ResultInterface $results): array
 	{
@@ -264,7 +263,6 @@ class TagRepository
 	 *
 	 * @param array $user_ids
 	 * @return User[]
-	 * @throws LogicException
 	 */
 	private function GetUsers(array $user_ids)
 		//TODO: Get rid of this method when possible, this class should be able to use something else to mass build Users really.
