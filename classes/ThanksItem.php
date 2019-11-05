@@ -4,8 +4,9 @@ namespace Claromentis\ThankYou;
 use ActiveRecord;
 use ClaAggregation;
 use Claromentis\Core\Services;
-use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
+use Claromentis\ThankYou\Exception\ThankYouException;
 use Exception;
+use InvalidArgumentException;
 use LogicException;
 use ObjectsStorage;
 
@@ -27,6 +28,10 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	private $thanked;
 
+	/**
+	 * @return bool|void
+	 * @throws ThankYouException
+	 */
 	public function Delete()
 	{
 		try
@@ -39,7 +44,7 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 		if (!isset($id))
 		{
-			throw new ThankYouRuntimeException("Failed to delete Thank You, ID unknown");
+			throw new ThankYouException("Failed to delete Thank You, ID unknown");
 		}
 
 		$id = (int) $id;
@@ -53,7 +58,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @return int|null
-	 * @throws LogicException
 	 */
 	public function GetAuthor()
 	{
@@ -68,7 +72,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @return string|null
-	 * @throws LogicException
 	 */
 	public function GetDateCreated()
 	{
@@ -83,7 +86,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @return string|null
-	 * @throws LogicException
 	 */
 	public function GetDescription()
 	{
@@ -123,14 +125,13 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @return int
-	 * @throws ThankYouRuntimeException
-	 * @throws LogicException
+	 * @throws ThankYouException
 	 */
 	public function Save()
 	{
 		if (!parent::Save())
 		{
-			throw new ThankYouRuntimeException("Failed to Save Thank You");
+			throw new ThankYouException("Failed to Save Thank You");
 		}
 
 		$db = Services::I()->GetDb();
@@ -167,7 +168,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @param int $value
-	 * @throws LogicException
 	 */
 	public function SetAuthor(int $value)
 	{
@@ -182,7 +182,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @param string $value
-	 * @throws LogicException
 	 */
 	public function SetDateCreated(string $value)
 	{
@@ -197,7 +196,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @param $value
-	 * @throws LogicException
 	 */
 	public function SetDescription($value)
 	{
@@ -212,7 +210,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @param int $id
-	 * @throws LogicException
 	 */
 	public function SetId(int $id)
 	{
@@ -225,18 +222,24 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 		}
 	}
 
+	/**
+	 * @param array $thanked
+	 */
 	public function SetThanked(array $thanked)
 	{
 		foreach ($thanked as $thank)
 		{
 			if (!is_array($thank) || !isset($thank['object_type']) || !is_int($thank['object_type']) || !isset($thank['object_id']) || !is_int($thank['object_id']))
 			{
-				throw new ThankYouRuntimeException("Failed to Set Thanked, invalid Thank provided");
+				throw new InvalidArgumentException("Failed to Set Thanked, invalid Thank provided");
 			}
 		}
 		$this->thanked = $thanked;
 	}
 
+	/**
+	 * @param $users_ids
+	 */
 	public function SetUsers($users_ids)
 	{
 		//TODO: Validate Users
