@@ -86,7 +86,7 @@ class Tag
 	/**
 	 * @param int $id
 	 * @return \Claromentis\ThankYou\Tags\Tag
-	 * @throws TagNotFound
+	 * @throws TagNotFound - If the Tag could not be found in the Repository.
 	 */
 	public function GetTag(int $id): \Claromentis\ThankYou\Tags\Tag
 	{
