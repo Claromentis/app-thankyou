@@ -10,7 +10,7 @@ class TagFactory
 	 * @param string    $name
 	 * @param bool|null $active
 	 * @return Tag
-	 * @throws TagInvalidNameException
+	 * @throws TagInvalidNameException - If the Name is an empty string.
 	 */
 	public function Create(string $name, ?bool $active = null)
 	{
