@@ -24,6 +24,7 @@ use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
+use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
@@ -31,11 +32,11 @@ use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYouFactory;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
+use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Claromentis\ThankYou\UI\TemplaterComponentThank;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use Psr\Log\LoggerInterface;
 use Silex\Api\EventListenerProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -118,7 +119,7 @@ class Plugin implements
 			 */
 			$panels = $app['admin.panels_list'];
 
-			return new ThanksListView($panels->GetOne('thankyou'), $app[ThankYousRepository::class], $app[ThankYouAcl::class], $app[Lmsg::class]);
+			return new ThanksListView($panels->GetOne('thankyou'), $app[ThankYouUtility::class], $app[ThankYouAcl::class], $app[Lmsg::class]);
 		};
 
 		// Pages component
@@ -131,7 +132,7 @@ class Plugin implements
 		};
 
 		$app[ThankYous::class] = function ($app) {
-			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class], $app[ThanksListView::class]);
+			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class], $app[ThanksListView::class], $app[ThankYouUtility::class]);
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
@@ -147,7 +148,7 @@ class Plugin implements
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
-			return new ThanksRestV2($app[Api::class], $app[ResponseFactory::class], $app['logger_factory']->GetLogger('tags'), $app['rest.formatter'], $app[Lmsg::class],  $app['thankyou.config']);
+			return new ThanksRestV2($app[Api::class], $app[ResponseFactory::class], $app['logger_factory']->GetLogger('tags'), $app['rest.formatter'], $app[Lmsg::class], $app['thankyou.config']);
 		};
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
@@ -313,13 +314,20 @@ class Plugin implements
 
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $lmsg("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
-				$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
+				try
+				{
+					$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
+					$create    = $api->ThankYous()->ConvertThankablesToArrays($thankable, $security_context);
+				} catch (ThankYouOClass $exception)
+				{
+					$create = 0;
+				}
 
-				$args                    = [];
-				$args['ty_list.limit']   = 20;
-				$args['ty_list.user_id'] = $user_id;
+				$args                     = [];
+				$args['ty_list.limit']    = 20;
+				$args['ty_list.user_id']  = $user_id;
 				$args['ty_list.comments'] = true;
-				$args['ty_list.create']  = $api->ThankYous()->ConvertThankablesToArrays($thankable, $security_context);
+				$args['ty_list.create']   = $create;
 
 				$thank_you_list = $this->CallTemplater('thankyou/pages_component.html', $args);
 
