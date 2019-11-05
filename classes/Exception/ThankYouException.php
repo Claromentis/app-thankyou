@@ -2,7 +2,10 @@
 
 namespace Claromentis\ThankYou\Exception;
 
-interface ThankYouException
+
+use Exception;
+
+class ThankYouException extends Exception
 {
 
 }
