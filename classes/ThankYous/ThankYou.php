@@ -2,18 +2,22 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
-use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
-use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Date;
+use InvalidArgumentException;
 use User;
 
 class ThankYou
 {
 	private $author;
+
 	private $date_created;
+
 	private $description;
+
 	private $id;
+
 	private $thanked;
+
 	private $users;
 
 	/**
@@ -96,7 +100,6 @@ class ThankYou
 
 	/**
 	 * @param Thankable[] $thanked
-	 * @throws ThankYouInvalidThankable
 	 */
 	public function SetThanked(?array $thanked)
 	{
@@ -106,7 +109,7 @@ class ThankYou
 			{
 				if (!($thanked_object instanceof Thankable))
 				{
-					throw new ThankYouInvalidThankable("Failed to Set Thank You's Thanked, invalid Thankable provided");
+					throw new InvalidArgumentException("Failed to Set Thank You's Thanked, invalid Thankable provided");
 				}
 			}
 		}
@@ -115,8 +118,6 @@ class ThankYou
 
 	/**
 	 * @param User[] $users
-	 * @throws ThankYouInvalidUsers
-	 *
 	 */
 	public function SetUsers(array $users)
 	{
@@ -124,7 +125,7 @@ class ThankYou
 		{
 			if (!($user instanceof User))
 			{
-				throw new ThankYouInvalidUsers("Failed to Set Thank You's Users, invalid User provided");
+				throw new InvalidArgumentException("Failed to Set Thank You's Users, invalid User provided");
 			}
 		}
 
