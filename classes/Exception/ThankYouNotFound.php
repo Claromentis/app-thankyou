@@ -2,7 +2,7 @@
 
 namespace Claromentis\ThankYou\Exception;
 
-class ThankYouNotFound extends ThankYouRuntimeException implements ThankYouException
+class ThankYouNotFound extends ThankYouException
 {
 
 }
