@@ -10,11 +10,9 @@ use Claromentis\Core\DAL;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
-use Claromentis\ThankYou\Exception\ThankYouInvalidAuthor;
+use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
-use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
@@ -67,42 +65,21 @@ class ThankYousRepository
 	}
 
 	/**
-	 * Create a Thank you with
+	 * Create a Thank You object.
 	 *
 	 * @param User|int  $author
 	 * @param string    $description
 	 * @param Date|null $date_created
 	 * @return ThankYou
-	 * @throws ThankYouInvalidAuthor
+	 * @throws ThankYouException - If the Author could not be loaded.
 	 */
-	public function Create($author, string $description, $date_created = null)
+	public function Create($author, string $description, ?Date $date_created = null)
 	{
-		if (is_int($author))
-		{
-			$author = new User($author);
-		}
-
-		if (!($author instanceof User))
-		{
-			throw new ThankYouInvalidAuthor("Failed to Create Thank You, invalid Author");
-		}
-
-		if (!$author->IsLoaded())
-		{
-			$author->Load();
-		}
-
-		if (!isset($date_created))
-		{
-			$date_created = new Date();
-		}
-
 		return $this->thank_you_factory->Create($author, $date_created, $description);
 	}
 
 	/**
 	 * @param int $id
-	 * @throws LogicException
 	 */
 	public function DeleteFromDb(int $id)
 	{
@@ -111,9 +88,9 @@ class ThankYousRepository
 		try
 		{
 			$thanks_item->Delete();
-		} catch (ThankYouRuntimeException $thank_you_runtime_exception)
+		} catch (ThankYouException $exception)
 		{
-			throw new LogicException("Unexpected ThankYouRuntimeException thrown by ThanksItem:Delete", null, $thank_you_runtime_exception);
+			throw new LogicException("Unexpected Exception thrown when deleting Thank You", null, $exception);
 		}
 	}
 
@@ -122,7 +99,6 @@ class ThankYousRepository
 	 *
 	 * @param array $groups_ids
 	 * @return Thankable[]
-	 * @throws InvalidArgumentException
 	 */
 	public function CreateThankablesFromGroupIds(array $groups_ids): array
 	{
@@ -149,8 +125,7 @@ class ThankYousRepository
 	/**
 	 * @param array $o_classes
 	 * @return Thankable[]
-	 * @throws InvalidArgumentException
-	 * @throws LogicException
+	 * @throws ThankYouException - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $o_classes): array
 	{
@@ -161,9 +136,14 @@ class ThankYousRepository
 		$o_classes_object_ids = [];
 		foreach ($o_classes as $o_class)
 		{
-			if (!isset($o_class['oclass']) || !in_array($o_class['oclass'], $supported_o_class_ids))
+			if (!isset($o_class['oclass']))
 			{
-				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified or is not supported");
+				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified");
+			}
+
+			if (!in_array($o_class['oclass'], $supported_o_class_ids))
+			{
+				throw new ThankYouException("Failed to Get Permission Object Classes Names, Object class is not supported");
 			}
 
 			if (!isset($o_class['id']) || !is_int($o_class['id']))
@@ -196,16 +176,15 @@ class ThankYousRepository
 	/**
 	 * @param array $user_ids
 	 * @return Thankable[]
-	 * @throws LogicException
 	 */
 	public function CreateThankablesFromUserIds(array $user_ids)
 	{
 		try
 		{
 			return $this->CreateThankablesFromUsers($this->GetUsers($user_ids));
-		} catch (ThankYouInvalidUsers $exception)
+		} catch (ThankYouException $exception)
 		{
-			throw new LogicException("Unexpected exception thrown by CreateThankablesFromUsers", null, $exception);
+			throw new LogicException("Unexpected Exception thrown by CreateThankablesFromUsers in CreateThankablesFromUserIds", null, $exception);
 		}
 	}
 
@@ -214,15 +193,20 @@ class ThankYousRepository
 	 *
 	 * @param array $users
 	 * @return Thankable[]
-	 * @throws ThankYouInvalidUsers - If the array given is not made up of User objects.
+	 * @throws ThankYouException - If the Users given have not been loaded.
 	 */
 	public function CreateThankablesFromUsers(array $users)
 	{
 		foreach ($users as $user_offset => $user)
 		{
-			if (!($user instanceof User) || !$user->IsLoaded())
+			if (!($user instanceof User))
 			{
-				throw new ThankYouInvalidUsers("Failed to Create Thankables From Users, invalid object passed");
+				throw new InvalidArgumentException("Failed to Create Thankables From Users, invalid object passed");
+			}
+
+			if (!$user->IsLoaded())
+			{
+				throw new ThankYouException("Failed to Create Thankables From Users, one or more Users are not loaded");
 			}
 
 			try
@@ -243,35 +227,10 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param int[] $ids
-	 * @return string[]
-	 * @throws ThankYouRuntimeException
-	 */
-	public function GetThankableObjectTypesNamesFromIds(array $ids): array
-	{
-		$names = [];
-		foreach ($ids as $offset => $id)
-		{
-			if (!is_int($id))
-			{
-				throw new ThankYouRuntimeException("Failed to Get Thankable Object Type's Name From ID, non-integer value given");
-			}
-			$names[$offset] = PermOClass::GetName($id);
-			if (!is_string($names[$offset]))
-			{
-				throw new ThankYouRuntimeException("Failed to Get Thankable Object Type's Name From ID, oClass did not return string");
-			}
-		}
-
-		return $names;
-	}
-
-	/**
 	 * Returns an array of Users indexed by their ID.
 	 *
 	 * @param array $user_ids
 	 * @return User[]
-	 * @throws LogicException
 	 */
 	public function GetUsers(array $user_ids): array
 	{
@@ -291,10 +250,10 @@ class ThankYousRepository
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
 	 * @throws ThankYouNotFound
-	 * @throws ThankYouRuntimeException
-	 * @throws LogicException
+	 * @throws ThankYouException
 	 */
 	public function SaveToDb(ThankYou $thank_you)
+		//TODO : Rename to Save
 	{
 		$thanks_item = $this->thanks_item_factory->Create();
 
@@ -337,13 +296,8 @@ class ThankYousRepository
 					$thankyou_thanked[] = ['object_type' => $object_type, 'object_id' => $object_id];
 				}
 			}
-			try
-			{
-				$thanks_item->SetThanked($thankyou_thanked);
-			} catch (ThankYouRuntimeException $exception)
-			{
-				throw new LogicException("Unexpected Runtime Exception thrown when setting Thanks Item's Thanked", null, $exception);
-			}
+
+			$thanks_item->SetThanked($thankyou_thanked);
 		}
 
 		return $thanks_item->Save();
@@ -351,8 +305,7 @@ class ThankYousRepository
 
 	/**
 	 * @param ThankYou $thank_you
-	 * @throws LogicException
-	 * @throws ThankYouRuntimeException
+	 * @throws ThankYouException
 	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
 	{
@@ -360,13 +313,7 @@ class ThankYousRepository
 
 		if (!isset($thankables))
 		{
-			try
-			{
-				$thank_you->SetThanked(null);
-			} catch (ThankYouInvalidThankable $exception)
-			{
-				throw new LogicException("Unexpected ThankYouInvalidThankable Exception thrown when setting ThankYou's Thanked", null, $exception);
-			}
+			$thank_you->SetUsers(null);
 
 			return;
 		}
@@ -388,7 +335,7 @@ class ThankYousRepository
 				$acl->Add(0, $oclass_id, $id);
 			} catch (InvalidSubjectException $invalid_subject_exception)
 			{
-				throw new ThankYouRuntimeException("Failed to Populate Thank You's Users, invalid oclass object", null, $invalid_subject_exception);
+				throw new ThankYouException("Failed to Populate Thank You's Users, invalid oclass object", null, $invalid_subject_exception);
 			}
 		}
 
@@ -405,13 +352,7 @@ class ThankYousRepository
 			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
 		}
 
-		try
-		{
-			$thank_you->SetUsers($users);
-		} catch (ThankYouInvalidUsers $exception)
-		{
-			throw new LogicException("Unexpected ThankYouInvalidUsers Exception thrown when setting ThankYou's Users", null, $exception);
-		}
+		$thank_you->SetUsers($users);
 	}
 
 	/**
@@ -422,10 +363,8 @@ class ThankYousRepository
 	 * @param bool  $thanked
 	 * @param bool  $users
 	 * @return ThankYou[]
-	 * @throws ThankYouRuntimeException
 	 * @throws ThankYouInvalidThankable
 	 * @throws ThankYouNotFound
-	 * @throws LogicException
 	 */
 	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false)
 	{
@@ -438,7 +377,7 @@ class ThankYousRepository
 		{
 			if (!is_int($id))
 			{
-				throw new ThankYouRuntimeException("Failed to Get Thank Yous, invalid ID given");
+				throw new InvalidArgumentException("Failed to Get Thank Yous, invalid ID given");
 			}
 		}
 
@@ -541,19 +480,13 @@ class ThankYousRepository
 					try
 					{
 						$perm_oclasses[$object_type_id] = $this->CreateThankablesFromUsers($users);
-					} catch (ThankYouRuntimeException $thank_you_runtime_exception)
+					} catch (ThankYouException $exception)
 					{
-						throw new LogicException("Unexpected ThankYouRuntimeException thrown by CreateThankablesFromUsers", null, $thank_you_runtime_exception);
+						throw new LogicException("Unexpected Exception thrown by CreateThankablesFromUsers in GetThankYous", null, $exception);
 					}
 					break;
 				case PERM_OCLASS_GROUP:
-					try
-					{
-						$perm_oclasses[$object_type_id] = $this->CreateThankablesFromGroupIds(array_keys($object_type_objects));
-					} catch (InvalidArgumentException $exception)
-					{
-						throw new LogicException("Unexpected InvalidArgumentException thrown when Creating Thankables from Group IDs", null, $exception);
-					}
+					$perm_oclasses[$object_type_id] = $this->CreateThankablesFromGroupIds(array_keys($object_type_objects));
 					break;
 				default:
 					throw new ThankYouInvalidThankable("Unable to create Thankable for Permission OClass '" . (string) $object_type_id . "'");
@@ -572,33 +505,34 @@ class ThankYousRepository
 			try
 			{
 				$thank_you = $this->Create($users[$thankyou_items[$id]['author_id']], (string) $thankyou_items[$id]['description'], new Date($thankyou_items[$id]['date_created'], new DateTimeZone('UTC')));
-				$thank_you->SetId($id);
-
-				if (isset($thankyou_items[$id]['thanked']))
-				{
-					$thankables = [];
-					foreach ($thankyou_items[$id]['thanked'] as $thanked_object_type_id => $thanked_object_ids)
-					{
-						foreach ($thanked_object_ids as $thanked_object_id => $true)
-						{
-							$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
-						}
-					}
-					$thank_you->SetThanked($thankables);
-				}
-
-				if (isset($thankyou_items[$id]['thanked_users']))
-				{
-					$thanked_users = [];
-					foreach ($thankyou_items[$id]['thanked_users'] as $user_id => $true)
-					{
-						$thanked_users[] = $users[$user_id];
-					}
-					$thank_you->SetUsers($thanked_users);
-				}
-			} catch (ThankYouRuntimeException $thank_you_runtime_exception)
+			} catch (ThankYouException $exception)
 			{
-				throw new LogicException("Failed to Get Thank Yous, unexpected Runtime Exception thrown when creating a ThankYou", null, $thank_you_runtime_exception);
+				throw new LogicException("Unexpected Runtime Exception thrown when creating a ThankYou", null, $exception);
+			}
+
+			$thank_you->SetId($id);
+
+			if (isset($thankyou_items[$id]['thanked']))
+			{
+				$thankables = [];
+				foreach ($thankyou_items[$id]['thanked'] as $thanked_object_type_id => $thanked_object_ids)
+				{
+					foreach ($thanked_object_ids as $thanked_object_id => $true)
+					{
+						$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
+					}
+				}
+				$thank_you->SetThanked($thankables);
+			}
+
+			if (isset($thankyou_items[$id]['thanked_users']))
+			{
+				$thanked_users = [];
+				foreach ($thankyou_items[$id]['thanked_users'] as $user_id => $true)
+				{
+					$thanked_users[] = $users[$user_id];
+				}
+				$thank_you->SetUsers($thanked_users);
 			}
 
 			$thank_yous[$id] = $thank_you;
