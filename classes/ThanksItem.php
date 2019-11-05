@@ -5,6 +5,7 @@ use ActiveRecord;
 use ClaAggregation;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Exception\ThankYouException;
+use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Exception;
 use InvalidArgumentException;
 use LogicException;
@@ -125,13 +126,13 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 	/**
 	 * @return int
-	 * @throws ThankYouException
+	 * @throws ThankYouRepository - On failure to save to database.
 	 */
 	public function Save()
 	{
 		if (!parent::Save())
 		{
-			throw new ThankYouException("Failed to Save Thank You");
+			throw new ThankYouRepository("Failed to Save Thank You");
 		}
 
 		$db = Services::I()->GetDb();
