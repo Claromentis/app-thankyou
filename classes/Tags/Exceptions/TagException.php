@@ -2,7 +2,9 @@
 
 namespace Claromentis\ThankYou\Tags\Exceptions;
 
-class TagInvalidNameException extends TagException
+use Exception;
+
+class TagException extends Exception
 {
 
 }
