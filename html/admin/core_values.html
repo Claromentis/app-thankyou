@@ -240,10 +240,10 @@
 								}
 							}
 						}
-                       /* var place_holder_title_error = form_error_containers.find('[data-name="problem_details-title"]');
-                        place_holder_title_error.html('DA BEESSSSS!');
-                        place_holder_title_error.show();
-                        console.log(body);*/
+					},
+					success: function () {
+                        self.showModal(false);
+                        self.reloadDataTable();
 					}
                 });
 			},
