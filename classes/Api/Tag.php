@@ -2,14 +2,18 @@
 
 namespace Claromentis\ThankYou\Api;
 
+use Claromentis\ThankYou\Tags\Exceptions\TagCreatedByException;
+use Claromentis\ThankYou\Tags\Exceptions\TagCreatedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
+use Claromentis\ThankYou\Tags\Exceptions\TagModifiedByException;
+use Claromentis\ThankYou\Tags\Exceptions\TagModifiedDateException;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Date;
 use InvalidArgumentException;
 use LogicException;
-use OutOfBoundsException;
 use User;
 
 class Tag
@@ -25,8 +29,8 @@ class Tag
 	}
 
 	/**
-	 * @param User       $user
-	 * @param string     $name
+	 * @param User   $user
+	 * @param string $name
 	 * @return \Claromentis\ThankYou\Tags\Tag
 	 * @throws TagInvalidNameException
 	 */
@@ -82,8 +86,7 @@ class Tag
 	/**
 	 * @param int $id
 	 * @return \Claromentis\ThankYou\Tags\Tag
-	 * @throws LogicException
-	 * @throws OutOfBoundsException
+	 * @throws TagNotFound
 	 */
 	public function GetTag(int $id): \Claromentis\ThankYou\Tags\Tag
 	{
@@ -97,7 +100,7 @@ class Tag
 
 		if (!isset($tag[$id]))
 		{
-			throw new OutOfBoundsException("Failed to Get Tag, Tag with ID '" . $id . "' could not be found");
+			throw new TagNotFound("Failed to Get Tag, Tag with ID '" . $id . "' could not be found");
 		}
 
 		return $tag[$id];
@@ -113,8 +116,11 @@ class Tag
 
 	/**
 	 * @param \Claromentis\ThankYou\Tags\Tag $tag
-	 * @throws InvalidArgumentException
-	 * @throws TagDuplicateNameException
+	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
+	 * @throws TagModifiedByException - If the Tag's Modified By has not been defined.
+	 * @throws TagModifiedDateException - If the Tag's Modified Date has not been defined.
+	 * @throws TagCreatedByException - If the Tag's Created By has not been defined.
+	 * @throws TagCreatedDateException - If the Tag's Created Date has not been defined.
 	 */
 	public function Save(\Claromentis\ThankYou\Tags\Tag $tag)
 	{
