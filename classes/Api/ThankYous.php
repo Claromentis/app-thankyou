@@ -5,17 +5,17 @@ namespace Claromentis\ThankYou\Api;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Constants;
+use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
-use Claromentis\ThankYou\Exception\ThankYouInvalidAuthor;
-use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
-use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
+use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
+use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Claromentis\ThankYou\View\ThanksListView;
 use Date;
 use DateClaTimeZone;
@@ -38,20 +38,33 @@ class ThankYous
 
 	private $thank_yous_view;
 
-	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous_repository, Config $config, ThankYouAcl $acl, ThanksListView $thank_yous_view)
+	private $utility;
+
+	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous_repository, Config $config, ThankYouAcl $acl, ThanksListView $thank_yous_view, ThankYouUtility $thank_you_utility)
 	{
 		$this->acl                   = $acl;
 		$this->config                = $config;
 		$this->line_manager_notifier = $line_manager_notifier;
 		$this->thank_yous_repository = $thank_yous_repository;
 		$this->thank_yous_view       = $thank_yous_view;
+		$this->utility               = $thank_you_utility;
 	}
 
+	/**
+	 * @param ThankYou        $thank_you
+	 * @param SecurityContext $security_context
+	 * @return bool
+	 */
 	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
 	{
 		return $this->acl->CanDeleteThankYou($thank_you, $security_context);
 	}
 
+	/**
+	 * @param ThankYou        $thank_you
+	 * @param SecurityContext $security_context
+	 * @return bool
+	 */
 	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
 	{
 		return $this->acl->CanEditThankYou($thank_you, $security_context);
@@ -61,7 +74,6 @@ class ThankYous
 	 * @param Thankable|Thankable[] $thankables
 	 * @param SecurityContext|null  $security_context
 	 * @return array
-	 * @throws ThankYouRuntimeException
 	 */
 	public function ConvertThankablesToArrays($thankables, ?SecurityContext $security_context = null): array
 	{
@@ -78,6 +90,7 @@ class ThankYous
 			$thankables_array[] = $this->thank_yous_view->ConvertThankableToArray($thankable, $security_context);
 		}
 
+//TODO: Tighten inputs and outputs
 		return $array_return ? $thankables_array : $thankables_array[0];
 	}
 
@@ -86,7 +99,6 @@ class ThankYous
 	 * @param DateTimeZone|null    $time_zone
 	 * @param SecurityContext|null $security_context
 	 * @return array
-	 * @throws ThankYouRuntimeException
 	 */
 	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null): array
 	{
@@ -105,6 +117,10 @@ class ThankYous
 		$thank_yous_array = [];
 		foreach ($thank_yous as $thank_you)
 		{
+			if (!($thank_you instanceof ThankYou))
+			{
+				throw new InvalidArgumentException("Failed to Convert Thank Yous to array, 1st argument must be an array of ThankYous");
+			}
 			$thank_yous_array[] = $this->thank_yous_view->ConvertThankYouToArray($thank_you, $time_zone, $security_context);
 		}
 
@@ -112,34 +128,34 @@ class ThankYous
 	}
 
 	/**
-	 * @param User      $user
+	 * @param User      $author
 	 * @param array     $thanked
 	 * @param string    $description
 	 * @param Date|null $date_created
 	 * @return int
-	 * @throws InvalidArgumentException
-	 * @throws LogicException
-	 * @throws ThankYouRuntimeException
+	 * @throws ThankYouAuthor - If the Author could not be loaded.
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 * @throws ThankYouOClass - If one or more of the Owner Classes is not recognised.
+	 * @throws ThankYouRepository - On failure to save to database.
 	 */
-	public function CreateAndSave(User $user, array $thanked, string $description, ?Date $date_created = null)
+	public function CreateAndSave(User $author, array $thanked, string $description, ?Date $date_created = null)
 	{
+		if (!$author->IsLoaded() && !$author->Load())
+		{
+			throw new ThankYouAuthor("Failed to create Thank You, could not load Author");
+		}
+
 		try
 		{
-			$thank_you = $this->thank_yous_repository->Create($user, $description, $date_created);
-		} catch (ThankYouInvalidAuthor $exception)
+			$thank_you = $this->thank_yous_repository->Create($author, $description, $date_created);
+		} catch (ThankYouAuthor $exception)
 		{
-			throw new LogicException("Unexpected Exception thrown by Create", null, $exception);
+			throw new LogicException("Unexpected Exception thrown by Create in CreateAndSave", null, $exception);
 		}
 
 		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses($thanked);
 
-		try
-		{
-			$thank_you->SetThanked($thankables);
-		} catch (ThankYouInvalidThankable $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by SetThanked", null, $exception);
-		}
+		$thank_you->SetThanked($thankables);
 
 		$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 
@@ -163,7 +179,7 @@ class ThankYous
 			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
 
 			$params = [
-				'author'              => $user->GetFullName(),
+				'author'              => $author->GetFullName(),
 				'other_people_number' => count($users_ids) - 1,
 				'description'         => $description,
 			];
@@ -186,31 +202,21 @@ class ThankYous
 	 * @param int $o_class
 	 * @param int $id
 	 * @return Thankable
-	 * @throws InvalidArgumentException
-	 * @throws LogicException
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankableFromOClass(int $o_class, int $id)
 	{
-			return $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
+		return $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
 	}
 
 	/**
 	 * @param int|int[] $object_types_id
 	 * @return string|string[]
-	 * @throws ThankYouRuntimeException
+	 * @throws ThankYouOClass
 	 */
-	public function GetThankableObjectTypesNamesFromIds($object_types_id)
+	public function GetOwnerClassNamesFromIds(array $object_types_id)
 	{
-		$array_return = true;
-		if (!is_array($object_types_id))
-		{
-			$array_return    = false;
-			$object_types_id = [$object_types_id];
-		}
-
-		$names = $this->thank_yous_repository->GetThankableObjectTypesNamesFromIds($object_types_id);
-
-		return $array_return ? $names : $names[0];
+		return $this->utility->GetOwnerClassNamesFromIds($object_types_id);
 	}
 
 	/**
@@ -218,10 +224,8 @@ class ThankYous
 	 * @param bool      $thanked
 	 * @param bool      $users
 	 * @return ThankYou|ThankYou[]
-	 * @throws ThankYouRuntimeException
-	 * @throws ThankYouInvalidThankable
-	 * @throws ThankYouNotFound
-	 * @throws LogicException
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
+	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
 	public function GetThankYous($ids, bool $thanked = false, bool $users = false)
 	{
@@ -252,9 +256,7 @@ class ThankYous
 	 * @param int  $offset
 	 * @param bool $thanked
 	 * @return ThankYou[]
-	 * @throws ThankYouInvalidThankable
-	 * @throws ThankYouRuntimeException
-	 * @throws LogicException
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
 	public function GetRecentThankYous(int $limit, int $offset = 0, bool $thanked = false)
 	{
@@ -283,10 +285,7 @@ class ThankYous
 	 * @param int  $offset
 	 * @param bool $thanked
 	 * @return ThankYou[]
-	 * @throws ThankYouRuntimeException
-	 * @throws ThankYouInvalidThankable
-	 * @throws ThankYouNotFound
-	 * @throws LogicException
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
 	public function GetUsersRecentThankYous(int $user_id, int $limit, int $offset = 0, bool $thanked = false)
 	{
@@ -325,13 +324,12 @@ class ThankYous
 	 * @param array|null      $thanked
 	 * @param string|null     $description
 	 * @return int
-	 * @throws InvalidArgumentException
-	 * @throws LogicException
-	 * @throws ThankYouForbidden
-	 * @throws ThankYouInvalidThankable
-	 * @throws ThankYouInvalidUsers
-	 * @throws ThankYouNotFound
-	 * @throws ThankYouRuntimeException
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
+	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 * @throws ThankYouOClass - If one or more of the Owner Classes is not recognised.
+	 * @throws ThankYouRepository - On failure to save to database.
+	 * @throws ThankYouForbidden - If the Security Context's User does not have permission.
 	 */
 	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
 	{
@@ -354,27 +352,29 @@ class ThankYous
 			$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
 		}
 
-		return $this->thank_yous_repository->SaveToDb($thank_you);
+		try
+		{
+			return $this->thank_yous_repository->SaveToDb($thank_you);
+		} catch (ThankYouNotFound $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by SaveToDb in UpdateAndSave", null, $exception);
+		}
 	}
 
 	/**
 	 * @param SecurityContext $security_context
 	 * @param int             $id
-	 * @throws ThankYouForbidden
-	 * @throws ThankYouNotFound
-	 * @throws LogicException
+	 * @throws ThankYouNotFound - If the Thank You could not be found.
+	 * @throws ThankYouForbidden - If the Security Context's User does not have permission.
 	 */
 	public function Delete(SecurityContext $security_context, int $id)
 	{
 		try
 		{
 			$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
-		} catch (ThankYouNotFound $exception)
+		} catch (ThankYouOClass $exception)
 		{
-			throw $exception;
-		} catch (ThankYouRuntimeException $exception)
-		{
-			throw new LogicException("An unexpected Exception was thrown by GetThankYous", null, $exception);
+			throw new LogicException("Unexpected Exception thrown by GetThankYous in Delete", null, $exception);
 		}
 
 		if (!$this->CanDeleteThankYou($thank_you, $security_context))
