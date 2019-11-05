@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Date;
 use InvalidArgumentException;
@@ -14,7 +15,7 @@ class ThankYouFactory
 	 * @param string    $description
 	 * @param Date|null $date_created
 	 * @return ThankYou
-	 * @throws ThankYouException - If the Author could not be loaded.
+	 * @throws ThankYouAuthor - If the Author could not be loaded.
 	 */
 	public function Create($author, ?Date $date_created, string $description)
 	{
@@ -30,7 +31,7 @@ class ThankYouFactory
 
 		if (!$author->IsLoaded() && !$author->Load())
 		{
-			throw new ThankYouException("Failed to create Thank You, could not load Author");
+			throw new ThankYouAuthor("Failed to create Thank You, could not load Author");
 		}
 
 		if (!isset($date_created))
