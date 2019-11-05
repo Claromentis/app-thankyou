@@ -4,7 +4,7 @@ namespace Claromentis\ThankYou\View;
 use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
-use Claromentis\ThankYou\Exception\ThankYouException;
+use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
@@ -163,7 +163,7 @@ class ThanksListView
 			try
 			{
 				$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$object_type_id])[0];
-			} catch (ThankYouException $exception)
+			} catch (ThankYouOClass $exception)
 			{
 				$owner_class_name = '';
 			}
