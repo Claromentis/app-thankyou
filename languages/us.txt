@@ -41,7 +41,9 @@ lm	thankyou.tag.error.background.undefined
 lm	thankyou.tag.error.create		
 lm	thankyou.tag.error.id.not_found		
 lm	thankyou.tag.error.metadata.invalid		
+lm	thankyou.tag.error.modify		
 lm	thankyou.tag.error.name.invalid		
+lm	thankyou.tag.error.name.not_empty		
 lm	thankyou.tag.error.name.not_unique		
 lm	thankyou.tag.error.name.undefined		
 lm	thankyou.thank.placeholder		

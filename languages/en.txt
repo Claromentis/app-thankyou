@@ -41,7 +41,9 @@ lm	thankyou.tag.error.background.undefined		Core Value Background Colour must be
 lm	thankyou.tag.error.create		Could not create Core Value
 lm	thankyou.tag.error.id.not_found		Core Value could not be found
 lm	thankyou.tag.error.metadata.invalid		Metadata must be passed as an array if defined
+lm	thankyou.tag.error.modify		Could not modify Core Value
 lm	thankyou.tag.error.name.invalid		Core Value Name must be a string if defined
+lm	thankyou.tag.error.name.not_empty		Core Value's Name cannot be empty
 lm	thankyou.tag.error.name.not_unique		This Core Value Name has already been used
 lm	thankyou.tag.error.name.undefined		Core Value Name must be defined
 lm	thankyou.thank.placeholder		Select user of group
