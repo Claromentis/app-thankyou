@@ -2,26 +2,42 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
-use Claromentis\Core\Acl\AclRepository;
-use Claromentis\People\InvalidFieldIsNotSingle;
-use Claromentis\People\UsersListProvider;
-use Claromentis\ThankYou\Exception\ThankYouInvalidAuthor;
-use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
-use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
+use Claromentis\ThankYou\Exception\ThankYouException;
 use Date;
-use LogicException;
+use InvalidArgumentException;
 use User;
 
 class ThankYouFactory
 {
 	/**
-	 * @param User|int $author
-	 * @param string $description
+	 * @param User|int  $author
+	 * @param string    $description
 	 * @param Date|null $date_created
 	 * @return ThankYou
+	 * @throws ThankYouException - If the Author could not be loaded.
 	 */
-	public function Create(User $author, Date $date_created, string $description)
+	public function Create($author, ?Date $date_created, string $description)
 	{
+		if (is_int($author))
+		{
+			$author = new User($author);
+		}
+
+		if (!($author instanceof User))
+		{
+			throw new InvalidArgumentException("Failed to Create Thank You, invalid Author");
+		}
+
+		if (!$author->IsLoaded() && !$author->Load())
+		{
+			throw new ThankYouException("Failed to create Thank You, could not load Author");
+		}
+
+		if (!isset($date_created))
+		{
+			$date_created = new Date();
+		}
+
 		return new ThankYou($author, $date_created, $description);
 	}
 }
