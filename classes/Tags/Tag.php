@@ -29,7 +29,7 @@ class Tag
 	 *
 	 * @param string $name
 	 * @param bool   $active
-	 * @throws TagInvalidNameException
+	 * @throws TagInvalidNameException - If the Name is an empty string.
 	 */
 	public function __construct(string $name, bool $active)
 	{
@@ -114,7 +114,7 @@ class Tag
 
 	/**
 	 * @param string $name
-	 * @throws TagInvalidNameException
+	 * @throws TagInvalidNameException - If the Name is an empty string.
 	 */
 	public function SetName(string $name)
 	{
