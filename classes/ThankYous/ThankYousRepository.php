@@ -10,9 +10,11 @@ use Claromentis\Core\DAL;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
+use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
-use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
@@ -71,7 +73,7 @@ class ThankYousRepository
 	 * @param string    $description
 	 * @param Date|null $date_created
 	 * @return ThankYou
-	 * @throws ThankYouException - If the Author could not be loaded.
+	 * @throws ThankYouAuthor - If the Author could not be loaded.
 	 */
 	public function Create($author, string $description, ?Date $date_created = null)
 	{
@@ -125,7 +127,7 @@ class ThankYousRepository
 	/**
 	 * @param array $o_classes
 	 * @return Thankable[]
-	 * @throws ThankYouException - If one or more of the Owner Classes given is not supported.
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $o_classes): array
 	{
@@ -143,7 +145,7 @@ class ThankYousRepository
 
 			if (!in_array($o_class['oclass'], $supported_o_class_ids))
 			{
-				throw new ThankYouException("Failed to Get Permission Object Classes Names, Object class is not supported");
+				throw new ThankYouOClass("Failed to Get Permission Object Classes Names, Object class is not supported");
 			}
 
 			if (!isset($o_class['id']) || !is_int($o_class['id']))
@@ -250,7 +252,7 @@ class ThankYousRepository
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
 	 * @throws ThankYouNotFound
-	 * @throws ThankYouException
+	 * @throws ThankYouRepository - On failure to save to database.
 	 */
 	public function SaveToDb(ThankYou $thank_you)
 		//TODO : Rename to Save
@@ -305,7 +307,7 @@ class ThankYousRepository
 
 	/**
 	 * @param ThankYou $thank_you
-	 * @throws ThankYouException
+	 * @throws ThankYouOClass - If one or more of the Owner Classes is not recognised.
 	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
 	{
@@ -335,7 +337,7 @@ class ThankYousRepository
 				$acl->Add(0, $oclass_id, $id);
 			} catch (InvalidSubjectException $invalid_subject_exception)
 			{
-				throw new ThankYouException("Failed to Populate Thank You's Users, invalid oclass object", null, $invalid_subject_exception);
+				throw new ThankYouOClass("Failed to Populate Thank You's Users, invalid oclass object", null, $invalid_subject_exception);
 			}
 		}
 
@@ -363,8 +365,8 @@ class ThankYousRepository
 	 * @param bool  $thanked
 	 * @param bool  $users
 	 * @return ThankYou[]
-	 * @throws ThankYouInvalidThankable
-	 * @throws ThankYouNotFound
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
+	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
 	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false)
 	{
@@ -489,7 +491,7 @@ class ThankYousRepository
 					$perm_oclasses[$object_type_id] = $this->CreateThankablesFromGroupIds(array_keys($object_type_objects));
 					break;
 				default:
-					throw new ThankYouInvalidThankable("Unable to create Thankable for Permission OClass '" . (string) $object_type_id . "'");
+					throw new ThankYouOClass("Unable to create Thankable for Owner Class '" . (string) $object_type_id . "'");
 					break;
 			}
 		}
@@ -505,7 +507,7 @@ class ThankYousRepository
 			try
 			{
 				$thank_you = $this->Create($users[$thankyou_items[$id]['author_id']], (string) $thankyou_items[$id]['description'], new Date($thankyou_items[$id]['date_created'], new DateTimeZone('UTC')));
-			} catch (ThankYouException $exception)
+			} catch (ThankYouAuthor $exception)
 			{
 				throw new LogicException("Unexpected Runtime Exception thrown when creating a ThankYou", null, $exception);
 			}
@@ -542,8 +544,8 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param int      $limit
-	 * @param int      $offset
+	 * @param int $limit
+	 * @param int $offset
 	 * @return int[]
 	 */
 	public function GetRecentThankYousIds(int $limit, int $offset)
