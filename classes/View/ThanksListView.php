@@ -4,11 +4,11 @@ namespace Claromentis\ThankYou\View;
 use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
-use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
+use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
-use Claromentis\ThankYou\ThankYous\ThankYousRepository;
+use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use DateTimeZone;
 use User;
 use UserExtranetArea;
@@ -22,23 +22,23 @@ class ThanksListView
 
 	protected $panel;
 
-	private $thank_yous_repository;
+	private $utility;
 
 	private $thank_you_acl;
 
 	/**
 	 * Create a new list view for thank you notes.
 	 *
-	 * @param AdminPanel          $panel
-	 * @param ThankYousRepository $thank_yous_repository
-	 * @param ThankYouAcl         $thank_you_acl
-	 * @param Lmsg                $lmsg
+	 * @param AdminPanel      $panel
+	 * @param ThankYouUtility $utility
+	 * @param ThankYouAcl     $thank_you_acl
+	 * @param Lmsg            $lmsg
 	 */
-	public function __construct(AdminPanel $panel, ThankYousRepository $thank_yous_repository, ThankYouAcl $thank_you_acl, Lmsg $lmsg)
+	public function __construct(AdminPanel $panel, ThankYouUtility $utility, ThankYouAcl $thank_you_acl, Lmsg $lmsg)
 	{
-		$this->lmsg                  = $lmsg;
-		$this->panel                 = $panel;
-		$this->thank_yous_repository = $thank_yous_repository;
+		$this->lmsg          = $lmsg;
+		$this->panel         = $panel;
+		$this->utility       = $utility;
 		$this->thank_you_acl = $thank_you_acl;
 	}
 
@@ -73,20 +73,19 @@ class ThanksListView
 	 * @param DateTimeZone|null    $time_zone
 	 * @param SecurityContext|null $security_context
 	 * @return array[
-	 *     author => [
+	 *         author => [
 	 *         id => int,
 	 *         name => string
-	 *     ],
-	 *     date_created => Date,
-	 *     description => string,
-	 *     id => int|null,
-	 *     thanked => null|array(see ConvertThankableToArray),
-	 *     users => null|array[
+	 *         ],
+	 *         date_created => Date,
+	 *         description => string,
+	 *         id => int|null,
+	 *         thanked => null|array(see ConvertThankableToArray),
+	 *         users => null|array[
 	 *         id => int,
 	 *         name => string
-	 *     ]
-	 * ]
-	 * @throws ThankYouRuntimeException
+	 *         ]
+	 *         ]
 	 */
 	public function ConvertThankYouToArray(ThankYou $thank_you, DateTimeZone $time_zone, ?SecurityContext $security_context = null): array
 	{
@@ -145,16 +144,15 @@ class ThanksListView
 	 * @param Thankable            $thankable
 	 * @param SecurityContext|null $security_context
 	 * @return array:
-	 * [
-	 *     id => int|null,
-	 *     extranet_area_id => int|null,
-	 *     name    => string,
-	 *     object_type => null|[
+	 *         [
+	 *         id => int|null,
+	 *         extranet_area_id => int|null,
+	 *         name    => string,
+	 *         object_type => null|[
 	 *         id  =>  int,
 	 *         name => string
-	 *     ]
-	 * ]
-	 * @throws ThankYouRuntimeException
+	 *         ]
+	 *         ]
 	 */
 	public function ConvertThankableToArray(Thankable $thankable, ?SecurityContext $security_context = null): array
 	{
@@ -162,7 +160,14 @@ class ThanksListView
 		$object_type_id = $thankable->GetOwnerClass();
 		if (isset($object_type_id))
 		{
-			$object_type = ['id' => $object_type_id, 'name' => $this->thank_yous_repository->GetThankableObjectTypesNamesFromIds([$object_type_id])[0]];
+			try
+			{
+				$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$object_type_id])[0];
+			} catch (ThankYouException $exception)
+			{
+				$owner_class_name = '';
+			}
+			$object_type = ['id' => $object_type_id, 'name' => $owner_class_name];
 		}
 
 		$thankable_extranet_id = $thankable->GetExtranetId();
