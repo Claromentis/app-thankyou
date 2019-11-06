@@ -8,6 +8,7 @@ lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
 lm	thankyou.app_name		Thank you
 lm	thankyou.common.actions		Actions
+lm	thankyou.common.select_core_values		Select Core Values
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
 lm	thankyou.common.thank_yous		Thank Yous
@@ -73,6 +74,7 @@ lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notificat
 lt	thankyou:admin:notifications_help.body		Users will be notified whenever they're being thanked.
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
+lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
 lt	thankyou:component:delete.body		Delete
 lt	thankyou:component:delete_confirm.body		Are you sure you want to delete this thank you message?

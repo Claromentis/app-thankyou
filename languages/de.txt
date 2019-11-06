@@ -8,6 +8,7 @@ lm	thankyou.admin.panel.messages		Mitteilungen
 lm	thankyou.admin.panel.notifications		
 lm	thankyou.app_name		Vielen Dank
 lm	thankyou.common.actions		
+lm	thankyou.common.select_core_values		
 lm	thankyou.common.thank_you_message		Dankesnachricht
 lm	thankyou.common.thank_you_messages		Dankesnachricht
 lm	thankyou.common.thank_yous		
@@ -73,6 +74,7 @@ lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notificat
 lt	thankyou:admin:notifications_help.body		
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
+lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
 lt	thankyou:component:delete.body		Löschen
 lt	thankyou:component:delete_confirm.body		Möchten Sie diese Dankesnachricht wirklich löschen?
