@@ -439,13 +439,27 @@ class ThanksRestV2
 			$modified_date->setTimezone(DateClaTimeZone::GetCurrentTZ());
 			$modified_date = $this->rest_format->Date($modified_date);
 
+			$created_by_name = null;
+			$created_by = $tag->GetCreatedBy();
+			if ($created_by)
+			{
+				$created_by_name = $created_by->GetFullname();
+			}
+
+			$modified_by_name = null;
+			$modified_by = $tag->GetModifiedBy();
+			if ($modified_by)
+			{
+				$modified_by_name = $modified_by->GetFullname();
+			}
+
 			$display_tags[$offset] = [
 				'id'            => $tag->GetId(),
 				'active'        => $tag->GetActive(),
 				'name'          => $tag->GetName(),
-				'created_by'    => $tag->GetCreatedBy()->GetFullname(),
+				'created_by'    => $created_by_name,
 				'created_date'  => $created_date,
-				'modified_by'   => $tag->GetModifiedBy()->GetFullname(),
+				'modified_by'   => $modified_by_name,
 				'modified_date' => $modified_date,
 				'bg_colour'     => $tag->GetBackgroundColour()
 			];
