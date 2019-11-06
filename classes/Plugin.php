@@ -229,6 +229,7 @@ class Plugin implements
 				$routes->get('/thanks/{id}', ThanksRestV2::class . ':GetThankYou')->assert('id', '\d+');
 				$routes->get('/tags', ThanksRestV2::class . ':GetTags');
 				$routes->get('/tags/{id}', ThanksRestV2::class . ':GetTag')->assert('id', '\d+');
+				$routes->post('/thankyou', ThanksRestV2::class . ':CreateThankYou');
 
 				$routes->secure('rest', 'admin', ['panel_code' => 'thankyou']);
 				$routes->post('/tags', ThanksRestV2::class . ':CreateTag');

@@ -9,8 +9,10 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Configuration\Configuration;
+use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\Exceptions\TagCreatedByException;
 use Claromentis\ThankYou\Tags\Exceptions\TagCreatedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
@@ -131,6 +133,49 @@ class ThanksRestV2
 		$display_thank_yous = $this->api->ThankYous()->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
 		return $this->response->GetJsonPrettyResponse($display_thank_yous);
+	}
+
+	/**
+	 * @param ServerRequestInterface $request
+	 * @param SecurityContext        $context
+	 * @return JsonPrettyResponse
+	 * @throws RestExBadRequest
+	 */
+	public function CreateThankYou(ServerRequestInterface $request, SecurityContext $context)
+	{
+		$post = $this->rest_format->GetJson($request);
+
+		if (!isset($post))
+		{
+			throw new RestExBadRequest();
+		}
+
+		$thanked     = (array) ($post['thanked'] ?? null);
+		$description = (string) ($post['description'] ?? null);
+
+		try
+		{
+			$this->api->ThankYous()->CreateAndSave($context->GetUser(), $thanked, $description);
+		} catch (ThankYouOClass $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
+				'status'         => 400,
+				'invalid-params' => [['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankable.error.unsuitable_owner_classes')]]
+			], 400);
+		} catch (ThankYouAuthor | ThankYouRepository $exception)
+		{
+			$this->log->error("CreateThankYou Failed unexpectedly", [$exception]);
+
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.thankyou.error.create'),
+				'status' => 500
+			], 500);
+		}
+
+		return $this->response->GetJsonPrettyResponse(true);
 	}
 
 	/**
