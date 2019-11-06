@@ -18,6 +18,7 @@ use Claromentis\Core\Services;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
+use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
@@ -136,7 +137,7 @@ class Plugin implements
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
-			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'));
+			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'), $app[UserExtranetService::class]);
 		};
 
 		$app[ThanksController::class] = function ($app) {
