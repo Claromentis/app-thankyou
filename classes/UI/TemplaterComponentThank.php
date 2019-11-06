@@ -12,13 +12,11 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
+use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use DateClaTimeZone;
 use InvalidArgumentException;
-use LogicException;
 use Psr\Log\LoggerInterface;
 use User;
 
@@ -56,11 +54,11 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		Lmsg $lmsg,
 		LoggerInterface $logger
 	) {
-		$this->api              = $api;
-		$this->cla_text         = $cla_text;
-		$this->config           = $config;
-		$this->lmsg             = $lmsg;
-		$this->logger           = $logger;
+		$this->api      = $api;
+		$this->cla_text = $cla_text;
+		$this->config   = $config;
+		$this->lmsg     = $lmsg;
+		$this->logger   = $logger;
 	}
 
 	/**
@@ -121,19 +119,14 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			try
 			{
 				$thank_you = $this->api->ThankYous()->GetThankYous($thank_you, true);
-			} catch (ThankYouInvalidThankable $exception)
+			} catch (ThankYouOClass $exception)
 			{
-				$this->logger->error("Failed to display Thank in Templater Component Thank, ThankYouInvalidThankable thrown: " . $exception->getMessage());
+				$this->logger->error("Failed to display Thank in Templater Component Thank", [$exception]);
 
 				return ($this->lmsg)('thankyou.thank.error.display') . ': ' . ($this->lmsg)('thankyou.thanked.malformed');
 			} catch (ThankYouNotFound $exception)
 			{
 				return ($this->lmsg)('thankyou.error.thanks_not_found');
-			} catch (ThankYouRuntimeException | LogicException $exception)
-			{
-				$this->logger->error("Failed to display Thank in Templater Component Thank, an unexpected exception was thrown: " . $exception->getMessage());
-
-				return ($this->lmsg)('thankyou.thank.error.display');
 			}
 		}
 		if (!($thank_you instanceof ThankYou))
@@ -147,7 +140,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		$display_comments     = ((bool) isset($id) && ($attributes['comments'] ?? null) && (bool) $this->config->Get('thank_you_comments'));
 		$thank_link           = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
 
-		$author_id = $thank_you->GetAuthor()->GetId();
+		$author_id   = $thank_you->GetAuthor()->GetId();
 		$author_link = User::GetProfileUrl($author_id, true); // TODO: Replace with a non-static call when People API is available
 		$author_name = User::GetNameById($author_id, true); // TODO: Replace with a non-static call when People API is available
 
@@ -164,11 +157,11 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		$date_created->setTimezone($time_zone);
 
 		$thanked_args = [];
-		$thankables     = $thank_you->GetThankable();
+		$thankables   = $thank_you->GetThankable();
 
 		if (isset($thankables))
 		{
-			$total_thanked       = count($thankables);
+			$total_thanked = count($thankables);
 
 			foreach ($thankables as $offset => $thankable)
 			{

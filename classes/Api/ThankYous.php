@@ -248,6 +248,7 @@ class ThankYous
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
 	public function GetThankYous($ids, bool $thanked = false, bool $users = false)
+		//TODO: Tighten inputs and outputs to be more specific.
 	{
 		$array_return = true;
 		if (!is_array($ids))
