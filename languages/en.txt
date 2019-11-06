@@ -47,7 +47,10 @@ lm	thankyou.tag.error.name.not_empty		Core Value's Name cannot be empty
 lm	thankyou.tag.error.name.not_unique		This Core Value Name has already been used
 lm	thankyou.tag.error.name.undefined		Core Value Name must be defined
 lm	thankyou.thank.placeholder		Select user of group
+lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
+lm	thankyou.thankyou.error.create		Could not create Thank You
+lm	thankyou.thankyou.error.server		The Thank You you've requested could not be loaded due to a server error
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
