@@ -111,7 +111,7 @@ class Plugin implements
 		};
 
 		$app[ThankYousRepository::class] = function ($app) {
-			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'));
+			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'), $app[QueryFactory::class]);
 		};
 
 		$app[ThanksListView::class] = function ($app) {

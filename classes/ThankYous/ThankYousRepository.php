@@ -6,8 +6,8 @@ use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\Exception\InvalidSubjectException;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\CDN\CDNSystemException;
-use Claromentis\Core\DAL;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
+use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
@@ -18,6 +18,7 @@ use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
+use Exception;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -52,18 +53,25 @@ class ThankYousRepository
 	 */
 	private $thank_you_factory;
 
+	/**
+	 * @var QueryFactory
+	 */
+	private $query_factory;
+
 	public function __construct(
 		ThankYouFactory $thank_you_factory,
 		ThanksItemFactory $thanks_item_factory,
 		AclRepository $acl_repository,
 		DbInterface $db_interface,
-		LoggerInterface $logger
+		LoggerInterface $logger,
+		QueryFactory $query_factory
 	) {
 		$this->acl_repository      = $acl_repository;
 		$this->db                  = $db_interface;
 		$this->thanks_item_factory = $thanks_item_factory;
 		$this->thank_you_factory   = $thank_you_factory;
 		$this->logger              = $logger;
+		$this->query_factory       = $query_factory;
 	}
 
 	/**
@@ -563,7 +571,14 @@ class ThankYousRepository
 			GROUP BY thankyou_item.id, thankyou_item.date_created
 			ORDER BY thankyou_item.date_created DESC";
 
-		$query = new DAL\Query($query);
+		try
+		{
+			$query = $this->query_factory->GetQuery($query);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown", null, $exception);
+		}
+
 		$query->setLimit($limit, $offset);
 
 		$result = $this->db->query($query);
@@ -611,9 +626,19 @@ class ThankYousRepository
 	 */
 	public function GetUsersRecentThankYousIdsFromDb(int $user_id, int $limit, int $offset)
 	{
-		//TODO: User DAL QUery
-		$query  = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC LIMIT int:limit OFFSET int:offset";
-		$result = $this->db->query($query, $user_id, $limit, $offset);
+		$query = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC";
+
+		try
+		{
+			$query = $this->query_factory->GetQuery($query, $user_id);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown", null, $exception);
+		}
+
+		$query->setLimit($limit, $offset);
+
+		$result = $this->db->query($query);
 
 		$thank_you_ids = [];
 		while ($row = $result->fetchArray())
