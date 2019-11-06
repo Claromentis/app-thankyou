@@ -8,12 +8,8 @@ use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\DAL\ResultInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
-use Claromentis\ThankYou\Tags\Exceptions\TagCreatedByException;
-use Claromentis\ThankYou\Tags\Exceptions\TagCreatedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagModifiedByException;
-use Claromentis\ThankYou\Tags\Exceptions\TagModifiedDateException;
 use Date;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -88,10 +84,6 @@ class TagRepository
 	/**
 	 * @param Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
-	 * @throws TagModifiedByException - If the Tag's Modified By has not been defined.
-	 * @throws TagModifiedDateException - If the Tag's Modified Date has not been defined.
-	 * @throws TagCreatedByException - If the Tag's Created By has not been defined.
-	 * @throws TagCreatedDateException - If the Tag's Created Date has not been defined.
 	 */
 	public function Save(Tag $tag)
 	{
@@ -104,7 +96,14 @@ class TagRepository
 			throw new TagDuplicateNameException("Failed to save Tag, Tag's Name is not unique");
 		}
 
-		$db_fields = ['str(255):name' => $name, 'int:active' => (int) $tag->GetActive()];
+		$db_fields = [
+			'str(255):name' => $name,
+			'int:active' => (int) $tag->GetActive(),
+			'int:created_by' => null,
+			'int:created_date' => null,
+			'int:modified_by' => null,
+			'int:modified_date' => null,
+		];
 
 		$created_by = $tag->GetCreatedBy();
 		if (isset($created_by))
@@ -119,18 +118,16 @@ class TagRepository
 		}
 
 		$modified_by = $tag->GetModifiedBy();
-		if (!isset($modified_by))
+		if (isset($modified_by))
 		{
-			throw new TagModifiedByException("Failed to Save Tag, Modified By undefined");
+			$db_fields['int:modified_by'] = $modified_by->GetId();
 		}
-		$db_fields['int:modified_by'] = $modified_by->GetId();
 
 		$modified_date = $tag->GetModifiedDate();
 		if (!isset($modified_date))
 		{
-			throw new TagModifiedDateException("Failed to Save Tag, Modified Date undefined");
+			$db_fields['int:modified_date'] = $modified_date->format('YmdHis');
 		}
-		$db_fields['int:modified_date'] = $modified_date->format('YmdHis');
 
 		$metadata  = null;
 		$bg_colour = $tag->GetBackgroundColour();
@@ -143,16 +140,6 @@ class TagRepository
 
 		if (!isset($id))
 		{
-			if (!isset($created_by))
-			{
-				throw new TagCreatedByException("Failed to Save new Tag, Created By undefined");
-			}
-
-			if (!isset($created_date))
-			{
-				throw new TagCreatedDateException("Failed to Save new Tag, Created Date undefined");
-			}
-
 			$query = $this->query_factory->GetQueryInsert(self::TABLE_NAME, $db_fields);
 			$this->db->query($query);
 			$tag->SetId($this->db->insertId());
@@ -241,7 +228,7 @@ class TagRepository
 			$tag->SetCreatedBy($users[(int) $row['created_by']] ?? null);
 			$tag->SetCreatedDate(new Date($row['created_date'], new DateTimeZone('UTC')));
 			$tag->SetModifiedBy($users[(int) $row['modified_by']] ?? null);
-			$tag->SetModifiedDate(new Date($row['created_date'], new DateTimeZone('UTC')));
+			$tag->SetModifiedDate(new Date($row['modified_date'], new DateTimeZone('UTC')));
 
 			$metadata = json_decode($row['metadata'], true);
 			if (isset($metadata['bg_colour']) && is_string($metadata['bg_colour']))

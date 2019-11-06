@@ -13,19 +13,13 @@ use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
-use Claromentis\ThankYou\Tags\Exceptions\TagCreatedByException;
-use Claromentis\ThankYou\Tags\Exceptions\TagCreatedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagModifiedByException;
-use Claromentis\ThankYou\Tags\Exceptions\TagModifiedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Tags\Tag;
 use Date;
 use DateClaTimeZone;
 use InvalidArgumentException;
-use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use RestExBadRequest;
@@ -289,9 +283,6 @@ class ThanksRestV2
 				'status'         => 400,
 				'invalid-params' => [['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.invalid')]]
 			], 400);
-		} catch (TagException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown during CreateTag", null, $exception);
 		}
 
 		return $this->response->GetJsonPrettyResponse($response, 200);
@@ -387,18 +378,6 @@ class ThanksRestV2
 				'status'         => 400,
 				'invalid-params' => [['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.not_unique')]]
 			], 400);
-		} catch (TagCreatedByException | TagCreatedDateException $exception)
-		{
-			$this->log->error("Failed to Update Tag with ID '" . $tag->GetId() . "', missing Created Date or Created By", [$exception]);
-
-			return $this->response->GetJsonPrettyResponse([
-				'type'   => 'https://developer.claromentis.com',
-				'title'  => ($this->lmsg)('thankyou.tag.error.modify'),
-				'status' => 500
-			], 500);
-		} catch (TagModifiedByException | TagModifiedDateException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by Save", null, $exception);
 		}
 
 		return $this->response->GetJsonPrettyResponse($response, 200);

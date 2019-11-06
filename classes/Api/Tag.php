@@ -2,12 +2,8 @@
 
 namespace Claromentis\ThankYou\Api;
 
-use Claromentis\ThankYou\Tags\Exceptions\TagCreatedByException;
-use Claromentis\ThankYou\Tags\Exceptions\TagCreatedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagModifiedByException;
-use Claromentis\ThankYou\Tags\Exceptions\TagModifiedDateException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
@@ -98,10 +94,6 @@ class Tag
 	/**
 	 * @param \Claromentis\ThankYou\Tags\Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
-	 * @throws TagModifiedByException - If the Tag's Modified By has not been defined.
-	 * @throws TagModifiedDateException - If the Tag's Modified Date has not been defined.
-	 * @throws TagCreatedByException - If the Tag's Created By has not been defined.
-	 * @throws TagCreatedDateException - If the Tag's Created Date has not been defined.
 	 */
 	public function Save(\Claromentis\ThankYou\Tags\Tag $tag)
 	{
