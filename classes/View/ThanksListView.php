@@ -18,13 +18,25 @@ use UserExtranetArea;
  */
 class ThanksListView
 {
+	/**
+	 * @var ThankYouAcl
+	 */
+	private $acl;
+
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
+	/**
+	 * @var AdminPanel
+	 */
 	protected $panel;
 
+	/**
+	 * @var ThankYouUtility
+	 */
 	private $utility;
-
-	private $thank_you_acl;
 
 	/**
 	 * Create a new list view for thank you notes.
@@ -36,10 +48,10 @@ class ThanksListView
 	 */
 	public function __construct(AdminPanel $panel, ThankYouUtility $utility, ThankYouAcl $thank_you_acl, Lmsg $lmsg)
 	{
-		$this->lmsg          = $lmsg;
-		$this->panel         = $panel;
-		$this->utility       = $utility;
-		$this->thank_you_acl = $thank_you_acl;
+		$this->acl     = $thank_you_acl;
+		$this->lmsg    = $lmsg;
+		$this->panel   = $panel;
+		$this->utility = $utility;
 	}
 
 	/**
@@ -92,14 +104,7 @@ class ThanksListView
 		$date_created = clone $thank_you->GetDateCreated();
 		$date_created->setTimezone($time_zone);
 
-		$author_extranet_id = $thank_you->GetAuthor()->GetExAreaId();
-
-		$author_hidden = isset($security_context) &&
-			!$security_context->IsPrimaryExtranet()
-			&& $author_extranet_id !== UserExtranetArea::GetPrimaryId()
-			&& $author_extranet_id !== $security_context->GetExtranetAreaId();
-
-		if ($author_hidden)
+		if (isset($security_context) && !$this->acl->CanSeeThankYouAuthor($security_context, $thank_you))
 		{
 			$author_name = ($this->lmsg)('common.perms.hidden_name');
 		} else
@@ -170,14 +175,7 @@ class ThanksListView
 			$object_type = ['id' => $object_type_id, 'name' => $owner_class_name];
 		}
 
-		$thankable_extranet_id = $thankable->GetExtranetId();
-
-		$thankable_hidden = isset($security_context) &&
-			!$security_context->IsPrimaryExtranet()
-			&& $thankable_extranet_id !== UserExtranetArea::GetPrimaryId()
-			&& $thankable_extranet_id !== $security_context->GetExtranetAreaId();
-
-		if ($thankable_hidden)
+		if (isset($security_context) && !$this->acl->CanSeeThankableName($security_context, $thankable))
 		{
 			$name = ($this->lmsg)('common.perms.hidden_name');
 		} else
@@ -187,7 +185,7 @@ class ThanksListView
 
 		$output = [
 			'id'               => $thankable->GetId(),
-			'extranet_area_id' => $thankable_extranet_id,
+			'extranet_area_id' => $thankable->GetExtranetId(),
 			'name'             => $name,
 			'object_type'      => $object_type
 		];
