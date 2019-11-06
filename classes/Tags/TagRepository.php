@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\Tags;
 
 use Claromentis\Core\DAL\Interfaces\DbInterface;
+use Claromentis\Core\DAL\Query;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\DAL\ResultInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
@@ -22,6 +23,8 @@ use User;
 
 class TagRepository
 {
+	const TABLE_NAME = 'thankyou_tag';
+
 	private $db;
 
 	protected $log;
@@ -39,43 +42,37 @@ class TagRepository
 	}
 
 	/**
-	 * @param int $limit
-	 * @param int $offset
+	 * @param int         $limit
+	 * @param int         $offset
+	 * @param string|null $name
+	 * @param array|null  $orders
 	 * @return Tag[]
 	 */
-	public function GetAlphabeticTags(int $limit, int $offset): array
+	public function GetTags(int $limit, int $offset, ?string $name = null, ?array $orders = null): array
 	{
-		//TODO: User DAL QUery
-		$query   = "SELECT * FROM thankyou_tag ORDER BY name ASC LIMIT int:limit OFFSET int:offset";
-		$results = $this->db->query($query, $limit, $offset);
+		$query_string = "SELECT * FROM " . self::TABLE_NAME;
+		if (isset($name))
+		{
+			$query_string .= " WHERE name LIKE \"" . $name . "%\"";
+		}
+		if (isset($orders) && count($orders) > 0)
+		{
+			$query_string .= " ORDER BY";
+			foreach ($orders as $offset => $order)
+			{
+				$column    = $order['column'] ?? null;
+				$direction = (isset($order['desc']) && $order['desc'] === true) ? 'DESC' : 'ASC';
+				if (!isset($column) || !is_string($column))
+				{
+					throw new InvalidArgumentException("Failed to GetTags, one or more Orders does not have a column");
+				}
+				$query_string .= " " . $column . " " . $direction;
+			}
+		}
 
-		return $this->GetTagsFromDbQuery($results);
-	}
-
-	/**
-	 * @param int $limit
-	 * @param int $offset
-	 * @return Tag[]
-	 */
-	public function GetActiveAlphabeticTags(int $limit, int $offset): array
-	{
-		//TODO: User DAL QUery
-		$query   = "SELECT * FROM thankyou_tag ORDER BY active DESC, name ASC LIMIT int:limit OFFSET int:offset";
-		$results = $this->db->query($query, $limit, $offset);
-
-		return $this->GetTagsFromDbQuery($results);
-	}
-
-	/**
-	 * @param int $limit
-	 * @param int $offset
-	 * @return Tag[]
-	 */
-	public function GetRecentTags(int $limit, int $offset): array
-	{
-		//TODO: User DAL QUery
-		$query   = "SELECT * FROM thankyou_tag ORDER BY modified_date DESC LIMIT int:limit OFFSET int:offset";
-		$results = $this->db->query($query, $limit, $offset);
+		$query = new Query($query_string);
+		$query->setLimit($limit, $offset);
+		$results = $this->db->query($query);
 
 		return $this->GetTagsFromDbQuery($results);
 	}
@@ -85,7 +82,7 @@ class TagRepository
 	 */
 	public function GetTotalTags(): int
 	{
-		return (int) $this->db->query_row("SELECT COUNT(1) FROM thankyou_tag")[0];
+		return (int) $this->db->query_row("SELECT COUNT(1) FROM " . self::TABLE_NAME)[0];
 	}
 
 	/**
@@ -156,12 +153,12 @@ class TagRepository
 				throw new TagCreatedDateException("Failed to Save new Tag, Created Date undefined");
 			}
 
-			$query = $this->query_factory->GetQueryInsert('thankyou_tag', $db_fields);
+			$query = $this->query_factory->GetQueryInsert(self::TABLE_NAME, $db_fields);
 			$this->db->query($query);
 			$tag->SetId($this->db->insertId());
 		} else
 		{
-			$query = $this->query_factory->GetQueryUpdate('thankyou_tag', "id=int:id", $db_fields);
+			$query = $this->query_factory->GetQueryUpdate(self::TABLE_NAME, "id=int:id", $db_fields);
 			$query->Bind('id', $id);
 			$this->db->query($query);
 		}
@@ -172,17 +169,17 @@ class TagRepository
 	 */
 	public function Delete(int $id)
 	{
-		$this->db->query("DELETE FROM thankyou_tag WHERE id=int:id", $id);
+		$this->db->query("DELETE FROM " . self::TABLE_NAME . " WHERE id=int:id", $id);
 	}
 
 	public function IsTagNameUnique(string $name, ?int $id): bool
 	{
 		if (!isset($id))
 		{
-			return !(bool) $this->db->query_row("SELECT COUNT(1) FROM thankyou_tag WHERE name=str:name", $name)[0];
+			return !(bool) $this->db->query_row("SELECT COUNT(1) FROM " . self::TABLE_NAME . " WHERE name=str:name", $name)[0];
 		} else
 		{
-			return !(bool) $this->db->query_row("SELECT COUNT(1) FROM thankyou_tag WHERE name=str:name AND id!=int:id", $name, $id)[0];
+			return !(bool) $this->db->query_row("SELECT COUNT(1) FROM " . self::TABLE_NAME . " WHERE name=str:name AND id!=int:id", $name, $id)[0];
 		}
 	}
 
@@ -200,7 +197,7 @@ class TagRepository
 			}
 		}
 
-		$query   = "SELECT * FROM thankyou_tag WHERE id IN in:int:ids";
+		$query   = "SELECT * FROM " . self::TABLE_NAME . " WHERE id IN in:int:ids";
 		$results = $this->db->query($query, $ids);
 
 		return $this->GetTagsFromDbQuery($results);

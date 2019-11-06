@@ -161,9 +161,10 @@ class ThanksRestV2
 	{
 		$query_params = $request->getQueryParams();
 		$limit        = (int) ($query_params['limit'] ?? 20);
+		$name         = $query_params['name'] ?? null;
 		$offset       = (int) ($query_params['offset'] ?? 0);
 
-		$tags = $this->api->Tag()->GetAlphabeticTags($limit, $offset);
+		$tags = $this->api->Tag()->GetTags($limit, $offset, $name, [['column' => 'name']]);
 
 		$tags_display = $this->ConvertTagsToArray($tags);
 

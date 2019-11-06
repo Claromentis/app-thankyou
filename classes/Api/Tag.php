@@ -54,33 +54,14 @@ class Tag
 	}
 
 	/**
-	 * @param int $limit
-	 * @param int $offset
+	 * @param int         $limit
+	 * @param int         $offset
+	 * @param string|null $name
 	 * @return Tag[]
 	 */
-	public function GetAlphabeticTags(int $limit, int $offset): array
+	public function GetTags(int $limit, int $offset, ?string $name = null, ?array $orders = null): array
 	{
-		return $this->repository->GetAlphabeticTags($limit, $offset);
-	}
-
-	/**
-	 * @param int $limit
-	 * @param int $offset
-	 * @return Tag[]
-	 */
-	public function GetActiveAlphabeticTags(int $limit, int $offset): array
-	{
-		return $this->repository->GetActiveAlphabeticTags($limit, $offset);
-	}
-
-	/**
-	 * @param int $limit
-	 * @param int $offset
-	 * @return Tag[]
-	 */
-	public function GetRecentTags(int $limit, int $offset): array
-	{
-		return $this->repository->GetRecentTags($limit, $offset);
+		return $this->repository->GetTags($limit, $offset, $name, $orders);
 	}
 
 	/**
