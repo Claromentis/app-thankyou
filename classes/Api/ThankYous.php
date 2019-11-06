@@ -71,6 +71,26 @@ class ThankYous
 	}
 
 	/**
+	 * @param SecurityContext $security_context
+	 * @param ThankYou        $thank_you
+	 * @return bool
+	 */
+	public function CanSeeThankYouAuthor(SecurityContext $security_context, ThankYou $thank_you): bool
+	{
+		return $this->acl->CanSeeThankYouAuthor($security_context, $thank_you);
+	}
+
+	/**
+	 * @param SecurityContext $security_context
+	 * @param Thankable       $thankable
+	 * @return bool
+	 */
+	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool
+	{
+		return $this->acl->CanSeeThankableName($security_context, $thankable);
+	}
+
+	/**
 	 * @param Thankable|Thankable[] $thankables
 	 * @param SecurityContext|null  $security_context
 	 * @return array

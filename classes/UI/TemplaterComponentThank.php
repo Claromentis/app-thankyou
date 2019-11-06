@@ -21,7 +21,6 @@ use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
 use User;
-use UserExtranetArea;
 
 class TemplaterComponentThank extends TemplaterComponentTmpl
 {
@@ -103,7 +102,6 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		 */
 		$context        = $app[SecurityContext::class];
 		$time_zone      = DateClaTimeZone::GetCurrentTZ();
-		$admin_mode     = (bool) ($attributes['admin_mode'] ?? null);
 		$can_delete     = (bool) ($attributes['delete'] ?? null);
 		$can_edit       = (bool) ($attributes['edit'] ?? null);
 		$links_enabled  = (bool) ($attributes['links'] ?? null);
@@ -147,11 +145,9 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		$can_edit_thank_you   = isset($id) && $can_edit && $this->api->ThankYous()->CanEditThankYou($thank_you, $context);
 		$can_delete_thank_you = isset($id) && $can_delete && $this->api->ThankYous()->CanDeleteThankYou($thank_you, $context);
 		$display_comments     = ((bool) isset($id) && ($attributes['comments'] ?? null) && (bool) $this->config->Get('thank_you_comments'));
-		$extranet_area_id     = (int) $context->GetExtranetAreaId();
 		$thank_link           = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
 
 		$author_id = $thank_you->GetAuthor()->GetId();
-		$author_context = SecurityContext::CreateForUser($author_id);
 		$author_link = User::GetProfileUrl($author_id, true); // TODO: Replace with a non-static call when People API is available
 		$author_name = User::GetNameById($author_id, true); // TODO: Replace with a non-static call when People API is available
 
@@ -172,18 +168,11 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 
 		if (isset($thankables))
 		{
-			$context_is_primary_extranet = $context->IsPrimaryExtranet();
-			$primary_extranet_id = (int) UserExtranetArea::GetPrimaryId();
 			$total_thanked       = count($thankables);
 
 			foreach ($thankables as $offset => $thankable)
 			{
-				$thankable_extranet_id = $thankable->GetExtranetId();
-
-				$thankable_hidden = isset($thankable_extranet_id)
-					&& !$context_is_primary_extranet
-					&& $thankable_extranet_id !== $primary_extranet_id
-					&& $extranet_area_id !== $thankable_extranet_id;
+				$thankable_hidden = !$this->api->ThankYous()->CanSeeThankableName($context, $thankable);
 
 				$image_url             = $thankable_hidden ? null : $thankable->GetImageUrl();
 				$thanked_link          = $thankable_hidden ? null : $thankable->GetProfileUrl();

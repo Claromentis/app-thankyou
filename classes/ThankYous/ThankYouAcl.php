@@ -80,6 +80,8 @@ class ThankYouAcl
 	}
 
 	/**
+	 * Determines whether a Security Context can view a Thank You Author's Name.
+	 *
 	 * @param SecurityContext $security_context
 	 * @param ThankYou        $thank_you
 	 * @return bool
