@@ -147,6 +147,28 @@ class ThanksRestV2
 		$thanked     = (array) ($post['thanked'] ?? null);
 		$description = (string) ($post['description'] ?? null);
 
+		$invalid_params = [];
+
+		if (count($thanked) === 0)
+		{
+			$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
+		}
+
+		if ($description === '')
+		{
+			$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
+		}
+
+		if (count($invalid_params) > 0)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
+				'status'         => 400,
+				'invalid-params' => $invalid_params
+			], 400);
+		}
+
 		try
 		{
 			$this->api->ThankYous()->CreateAndSave($context->GetUser(), $thanked, $description);
