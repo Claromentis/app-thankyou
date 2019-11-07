@@ -50,8 +50,17 @@ lm	thankyou.tag.error.name.undefined
 lm	thankyou.thank.placeholder		
 lm	thankyou.thankable.error.unsuitable_owner_classes		
 lm	thankyou.thanks_list.no_thanks		
+lm	thankyou.thankyou.description.error.empty		
+lm	thankyou.thankyou.description.error.not_string		
 lm	thankyou.thankyou.error.create		
+lm	thankyou.thankyou.error.modify		
 lm	thankyou.thankyou.error.server		
+lm	thankyou.thankyou.thanked.error.empty		
+lm	thankyou.thankyou.thanked.error.not_array		
+lm	thankyou.thankyou.thanked.id.error.not_integer		
+lm	thankyou.thankyou.thanked.id.error.undefined		
+lm	thankyou.thankyou.thanked.oclass.error.not_integer		
+lm	thankyou.thankyou.thanked.oclass.error.undefined		
 lm	thankyou.user_profile.tab_name		Vielen Dank
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	

@@ -50,8 +50,17 @@ lm	thankyou.tag.error.name.undefined		Core Value Name must be defined
 lm	thankyou.thank.placeholder		Select user of group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
+lm	thankyou.thankyou.description.error.empty		A description must be given
+lm	thankyou.thankyou.description.error.not_string		A Thank You's Description must be a string
 lm	thankyou.thankyou.error.create		Could not create Thank You
+lm	thankyou.thankyou.error.modify		Could not modify Thank You
 lm	thankyou.thankyou.error.server		The Thank You you've requested could not be loaded due to a server error
+lm	thankyou.thankyou.thanked.error.empty		Nothing has been thanked
+lm	thankyou.thankyou.thanked.error.not_array		A Thank You's Thanked must be an array if defined
+lm	thankyou.thankyou.thanked.id.error.not_integer		Thanked ID must be an integer
+lm	thankyou.thankyou.thanked.id.error.undefined		Thanked must contain an ID
+lm	thankyou.thankyou.thanked.oclass.error.not_integer		Thanked oclass must be an integer
+lm	thankyou.thankyou.thanked.oclass.error.undefined		Thanked must contain an oclass
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
