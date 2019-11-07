@@ -44,6 +44,13 @@
             margin-left: -8px;
             right: 8px;
         }
+
+        .thankyou-link-border {
+            border-left: 1px solid #e7e7e7;
+            margin-left: 3px;
+            padding-left: 6px;
+            display: inline-block;
+        }
     }
 
     .thank-you-meta {
@@ -105,13 +112,6 @@
     right: 23px;
     top: 14px;
 }
-
-.thank-you-link-inline {
-    text-align: right;
-    padding: 8px 10px 0 0;
-    font-weight: bold;
-}
-
 
 .tile-thank-you.grid-stack-item-6[data-gs-width="1"] {
     .thank-title {

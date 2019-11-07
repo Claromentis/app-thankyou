@@ -4,24 +4,34 @@
 </unique_section>
 -->
 <include file="includes/modal.html"/>
-<div class="thank-you-link-inline" name="create">
-	<div class="btn btn-primary thank-you--button js-thank-you-create" name="thank_you_create_button">
-		<span class="glyphicons glyphicons-donate"></span>
-		<span class="thank-title">
-			<txt name="thankyou:component:say_thank_you">Say thank you</txt>
-		</span>
+<div class="row">
+	<div class="col-md-12">
+		<div class="btn-toolbar pull-right" name="create">
+			<a href="#thank_you_modal" class="btn btn-primary thank-you--button js-thank-you-create"
+			   name="thank_you_create_button">
+				<span class="glyphicons glyphicons-donate"></span>
+				<span class="thank-title">
+					<txt name="thankyou:component:say_thank_you">Say thank you</txt>
+				</span>
+			</a>
+		</div>
 	</div>
 </div>
-<div>
-	<ul name="thank_yous" datasrc="" class="list-unstyled thank-you js-thank-you-list">
-		<ifempty>
-			<li name="no_thanks">No thanks</li>
-		</ifempty>
-		<li class="thank-you-item">
-			<component class_key="thankyou.thank" name="thank_you" comments="1"/>
-		</li>
-	</ul>
+<div class="row">
+	<div class="col-md-12">
+		<div>
+			<ul name="thank_yous" datasrc="" class="list-unstyled thank-you js-thank-you-list">
+				<ifempty>
+					<li name="no_thanks">No thanks</li>
+				</ifempty>
+				<li class="thank-you-item">
+					<component class_key="thankyou.thank" name="thank_you" comments="1"/>
+				</li>
+			</ul>
+		</div>
+	</div>
 </div>
+
 <script type="text/javascript">
     require(['domReady', 'jquery'], function (domReady, $) {
         domReady(function () {

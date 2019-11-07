@@ -7,12 +7,9 @@
 <include file="includes/modal.html"/>
 <div class="js-thank-you thank-you">
 	<div class="thank-you-note">
-		<span name="thank_title">
+		<span>
 			<loc name="thankyou:component:thankyou_users_name"></loc>
 		</span>
-		<a name="thank_title_link">
-			<loc name="thankyou:component:thankyou_users_name"></loc>
-		</a>
 		<datasrc name="thanked">
 			<a name="thanked_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
 				<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
@@ -40,6 +37,11 @@
 					   onclick="$(this).closest($('.js-thank-you')).find($('.js-comments')).toggle();"><span
 						class="glyphicons-comments glyphicons"></span> <txt class="badge"
 																			name="comments_count">999</txt></a>
+				</span>
+				<span class="thankyou-link-border" style="">
+					<a name="thank_title_link">
+						<span class="glyphicons glyphicons-link"></span>
+					</a>
 				</span>
 			</div>
 			<div class="col-xs-6">
@@ -80,6 +82,7 @@
 		</div>
 	</div>
 	<div name="comments">
+
 		<div class="js-comments comments mt-10">
 			<component class="\Claromentis\Comments\UI\Comments" name="thank_you_comment" object_type="thanks"
 					   new_on_top="1" compact_mode="1"/>
