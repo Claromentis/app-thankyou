@@ -52,8 +52,8 @@ class ThankYousList extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app): string
 	{
-		$api              = $app[Api::class];
-		$lmsg             = $app[Lmsg::class];
+		$api  = $app[Api::class];
+		$lmsg = $app[Lmsg::class];
 
 		$can_create       = (bool) ($attributes['create'] ?? null);
 		$can_delete       = (bool) ($attributes['delete'] ?? null);
@@ -102,7 +102,7 @@ class ThankYousList extends TemplaterComponentTmpl
 			$args['create.visible'] = 1;
 			if (isset($create_thankable))
 			{
-				$args['preselected_thankable.json'] = $create_thankable;
+				$args['thank_you_create_button.data-preselected_thanked'] = json_encode($create_thankable);
 			}
 		} else
 		{

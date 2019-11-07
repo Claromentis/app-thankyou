@@ -25,6 +25,7 @@ use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\ThanksController;
+use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\TagDataTableSource;
@@ -195,8 +196,6 @@ class Plugin implements
 			'/thankyou' => function (ControllerCollection $routes) use ($app) {
 				$routes->secure('html', 'user');
 				$routes->get('/thanks', ThanksController::class . ':View');
-				$routes->post('/thanks/create', ThanksController::class . ':CreateOrUpdate');
-				$routes->post('/thanks/delete', ThanksController::class . ':Delete');
 				$routes->get('/thanks/{id}', ThanksController::class . ':View');
 
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
@@ -230,6 +229,8 @@ class Plugin implements
 				$routes->get('/tags', ThanksRestV2::class . ':GetTags');
 				$routes->get('/tags/{id}', ThanksRestV2::class . ':GetTag')->assert('id', '\d+');
 				$routes->post('/thankyou', ThanksRestV2::class . ':CreateThankYou');
+				$routes->post('/thankyou/{id}', ThanksRestV2::class . ':UpdateThankYou')->assert('id', '\d+');
+				$routes->delete('/thankyou/{id}', ThanksRestV2::class . ':DeleteThankYou')->assert('id', '\d+');
 
 				$routes->secure('rest', 'admin', ['panel_code' => 'thankyou']);
 				$routes->post('/tags', ThanksRestV2::class . ':CreateTag');
@@ -320,7 +321,7 @@ class Plugin implements
 				{
 					$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
 					$create    = $api->ThankYous()->ConvertThankablesToArrays($thankable, $security_context);
-				} catch (ThankYouOClass $exception)
+				} catch (ThankYouOClass | ThankableNotFound $exception)
 				{
 					$create = 0;
 				}

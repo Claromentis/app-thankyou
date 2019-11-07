@@ -9,7 +9,9 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Configuration\Configuration;
+use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
+use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
@@ -135,7 +137,7 @@ class ThanksRestV2
 	 * @return JsonPrettyResponse
 	 * @throws RestExBadRequest
 	 */
-	public function CreateThankYou(ServerRequestInterface $request, SecurityContext $context)
+	public function CreateThankYou(ServerRequestInterface $request, SecurityContext $context): JsonPrettyResponse
 	{
 		$post = $this->rest_format->GetJson($request);
 
@@ -189,6 +191,173 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.thankyou.error.create'),
 				'status' => 500
 			], 500);
+		}
+
+		return $this->response->GetJsonPrettyResponse(true);
+	}
+
+	/**
+	 * @param int                    $id
+	 * @param ServerRequestInterface $request
+	 * @param SecurityContext        $context
+	 * @return JsonPrettyResponse
+	 * @throws RestExBadRequest
+	 */
+	public function UpdateThankYou(int $id, ServerRequestInterface $request, SecurityContext $context): JsonPrettyResponse
+	{
+		$post = $this->rest_format->GetJson($request);
+
+		if (!isset($post))
+		{
+			throw new RestExBadRequest();
+		}
+
+		$invalid_params = [];
+
+		try
+		{
+			$thank_you = $this->api->ThankYous()->GetThankYou($id, false, false);
+
+			if (!$this->api->ThankYous()->CanEditThankYou($thank_you, $context))
+			{
+				return $this->response->GetJsonPrettyResponse([
+					'type'   => 'https://developer.claromentis.com',
+					'title'  => ($this->lmsg)('thankyou.error.no_edit_permission'),
+					'status' => 401
+				], 401);
+			}
+
+			$description = $post['description'] ?? null;
+
+			if (isset($description))
+			{
+				if (!is_string($description))
+				{
+					$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.not_string')];
+				} elseif ($description === '')
+				{
+					$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
+				} else
+				{
+					$thank_you->SetDescription($description);
+				}
+			}
+
+			$thanked = $post['thanked'] ?? null;
+
+			if (isset($thanked))
+			{
+				if (!is_array($thanked))
+				{
+					$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.not_array')];
+				} elseif (count($thanked) === 0)
+				{
+					$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
+				} else
+				{
+					$thankables = [];
+					foreach ($thanked as $offset => $thank)
+					{
+						$thank_error = false;
+						$owner_class = $thank['oclass'] ?? null;
+						$thanked_id  = $thank['id'] ?? null;
+
+						if (!isset($owner_class))
+						{
+							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.oclass.error.undefined')];
+							$thank_error      = true;
+						} elseif (!is_int($owner_class))
+						{
+							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.oclass.error.not_integer')];
+							$thank_error      = true;
+						}
+
+						if (!isset($thanked_id))
+						{
+							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.id.error.undefined')];
+							$thank_error      = true;
+						} elseif (!is_int($thanked_id))
+						{
+							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.id.error.not_integer')];
+							$thank_error      = true;
+						}
+
+						if ($thank_error)
+						{
+							break;
+						}
+
+						$thankables[] = $this->api->ThankYous()->CreateThankableFromOClass($owner_class, $thanked_id);
+					}
+
+					$thank_you->SetThanked($thankables);
+				}
+			}
+
+			if (count($invalid_params) > 0)
+			{
+				return $this->response->GetJsonPrettyResponse([
+					'type'           => 'https://developer.claromentis.com',
+					'title'          => ($this->lmsg)('thankyou.thankyou.error.modify'),
+					'status'         => 400,
+					'invalid-params' => $invalid_params
+				], 400);
+			}
+
+			$this->api->ThankYous()->Save($thank_you);
+		} catch (ThankYouNotFound $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.error.thanks_not_found'),
+				'status' => 404
+			], 404);
+		} catch (ThankYouOClass | ThankableNotFound $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.thankyou.error.modify'),
+				'status'         => 400,
+				'invalid-params' => [['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankable.error.unsuitable_owner_classes')]]
+			], 400);
+		} catch (ThankYouRepository $exception)
+		{
+			$this->log->error("CreateThankYou Failed unexpectedly", [$exception]);
+
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.thankyou.error.modify'),
+				'status' => 500
+			], 500);
+		}
+
+		return $this->response->GetJsonPrettyResponse(true);
+	}
+
+	/**
+	 * @param int             $id
+	 * @param SecurityContext $context
+	 * @return JsonPrettyResponse
+	 */
+	public function DeleteThankYou(int $id, SecurityContext $context): JsonPrettyResponse
+	{
+		try
+		{
+			$this->api->ThankYous()->Delete($context, $id);
+		} catch (ThankYouForbidden $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.error.no_edit_permission'),
+				'status' => 401
+			], 401);
+		} catch (ThankYouNotFound $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.error.thanks_not_found'),
+				'status' => 404
+			], 404);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);
@@ -462,14 +631,14 @@ class ThanksRestV2
 			$modified_date = $this->rest_format->Date($modified_date);
 
 			$created_by_name = null;
-			$created_by = $tag->GetCreatedBy();
+			$created_by      = $tag->GetCreatedBy();
 			if ($created_by)
 			{
 				$created_by_name = $created_by->GetFullname();
 			}
 
 			$modified_by_name = null;
-			$modified_by = $tag->GetModifiedBy();
+			$modified_by      = $tag->GetModifiedBy();
 			if ($modified_by)
 			{
 				$modified_by_name = $modified_by->GetFullname();

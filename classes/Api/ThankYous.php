@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\Api;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Constants;
+use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
@@ -222,11 +223,18 @@ class ThankYous
 	 * @param int $o_class
 	 * @param int $id
 	 * @return Thankable
-	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 * @throws ThankYouOClass - If the Owner Class given is not supported.
+	 * @throws ThankableNotFound - If the Thankable could not be found.
 	 */
 	public function CreateThankableFromOClass(int $o_class, int $id)
 	{
-		return $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
+		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]]);
+		if (!isset($thankables[0]))
+		{
+			throw new ThankableNotFound("Thankable could not be found with Owner Class '" . $o_class . "' and ID '" . $id . "'");
+		}
+
+		return $thankables[0];
 	}
 
 	/**
@@ -237,6 +245,19 @@ class ThankYous
 	public function GetOwnerClassNamesFromIds(array $object_types_id)
 	{
 		return $this->utility->GetOwnerClassNamesFromIds($object_types_id);
+	}
+
+	/**
+	 * @param int  $id
+	 * @param bool $thanked
+	 * @param bool $users
+	 * @return ThankYou
+	 * @throws ThankYouNotFound - If the Thank You could not be found.
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
+	 */
+	public function GetThankYou(int $id, bool $thanked = false, bool $users = false): ThankYou
+	{
+		return $this->GetThankYous([$id], $thanked, $users)[$id];
 	}
 
 	/**
@@ -340,46 +361,13 @@ class ThankYous
 	}
 
 	/**
-	 * @param SecurityContext $security_context
-	 * @param int             $id
-	 * @param array|null      $thanked
-	 * @param string|null     $description
-	 * @return int
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
-	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
-	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
-	 * @throws ThankYouOClass - If one or more of the Owner Classes is not recognised.
+	 * @param ThankYou $thank_you
+	 * @throws ThankYouNotFound
 	 * @throws ThankYouRepository - On failure to save to database.
-	 * @throws ThankYouForbidden - If the Security Context's User does not have permission.
 	 */
-	public function UpdateAndSave(SecurityContext $security_context, int $id, ?array $thanked = null, ?string $description = null)
+	public function Save(ThankYou $thank_you)
 	{
-		$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
-
-		if (!$this->CanEditThankYou($thank_you, $security_context))
-		{
-			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
-		}
-
-		if (isset($description))
-		{
-			$thank_you->SetDescription($description);
-		}
-
-		if (isset($thanked))
-		{
-			$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses($thanked);
-			$thank_you->SetThanked($thankables);
-			$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
-		}
-
-		try
-		{
-			return $this->thank_yous_repository->SaveToDb($thank_you);
-		} catch (ThankYouNotFound $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by SaveToDb in UpdateAndSave", null, $exception);
-		}
+		$this->thank_yous_repository->SaveToDb($thank_you);
 	}
 
 	/**

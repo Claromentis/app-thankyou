@@ -4,7 +4,6 @@ namespace Claromentis\ThankYou\Controller;
 
 use Claromentis\Core\Config\Exception\DialogException;
 use Claromentis\Core\Config\WritableConfig;
-use Claromentis\Core\Http\RedirectResponse;
 use Claromentis\Core\Http\RequestData;
 use Claromentis\Core\Http\RequestDataTokenException;
 use Claromentis\Core\Http\TemplaterCallResponse;
@@ -13,17 +12,11 @@ use Claromentis\Core\Security\Exception\AccessDeniedException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouForbidden;
-use Claromentis\ThankYou\Exception\ThankYouInvalidUsers;
-use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 class ThanksController
 {
-	const THANKS_HOMEPAGE = '/thankyou/thanks';
-
 	private $api;
 
 	private $config;
@@ -134,86 +127,6 @@ class ThanksController
 		];
 
 		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));
-	}
-
-	/**
-	 * Create a new Thank You, or update an existing Thank You.
-	 *
-	 * @param RequestData            $request_data
-	 * @param ServerRequestInterface $request
-	 * @param SecurityContext        $security_context
-	 * @return RedirectResponse
-	 * @throws
-	 */
-	public function CreateOrUpdate(RequestData $request_data, ServerRequestInterface $request, SecurityContext $security_context)
-	{
-		$request_data->CheckToken();
-		$post = $request->getParsedBody();
-
-		$id          = (int) ($post['thank_you_id'] ?? null);
-		$thanked     = (array) ($post['thank_you_user'] ?? null);
-		$description = (string) $post['thank_you_description'] ?? '';
-
-		if (isset($thanked))
-		{
-			$thanked = $this->sugre_repository->DecodeOutput($thanked);
-		}
-
-		try
-		{
-			if ($id === 0)
-			{
-				$id = $this->api->ThankYous()->CreateAndSave($security_context->GetUser(), $thanked, $description);
-			} else
-			{
-				try
-				{
-					$this->api->ThankYous()->UpdateAndSave($security_context, $id, $thanked, $description);
-				} catch (ThankYouNotFound $thank_you_not_found)
-				{
-					return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.thanks_not_found'), true);
-				} catch (ThankYouForbidden $thank_you_forbidden)
-				{
-					return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.no_edit_permission'), true);
-				}
-			}
-		} catch (ThankYouInvalidUsers $thank_you_invalid_users)
-		{
-			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.invalid_users'), true);
-		}
-
-		return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE . '/' . $id);
-	}
-
-	/**
-	 * @param RequestData            $request_data
-	 * @param SecurityContext        $security_context
-	 * @param ServerRequestInterface $request
-	 * @return RedirectResponse
-	 * @throws RequestDataTokenException
-	 */
-	public function Delete(RequestData $request_data, SecurityContext $security_context, ServerRequestInterface $request)
-	{
-		$request_data->CheckToken();
-		$post = $request->getParsedBody();
-		$id   = (int) ($post['thank_you_id'] ?? null);
-
-		try
-		{
-			$this->api->ThankYous()->Delete($security_context, $id);
-		} catch (ThankYouNotFound $thank_you_not_found)
-		{
-			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.thanks_not_found'), true);
-		} catch (ThankYouForbidden $thank_you_forbidden)
-		{
-			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.no_edit_permission'), true);
-		} catch (LogicException $exception)
-		{
-			$this->logger->error("Logic Exception thrown in '" . get_class(). "': " . $exception->getMessage(), [$exception]);
-			return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.error.delete.failure'), true);
-		}
-
-		return RedirectResponse::httpRedirect(self::THANKS_HOMEPAGE, ($this->lmsg)('thankyou.common.thanks_deleted'), false);
 	}
 
 	public function View(ServerRequestInterface $request)

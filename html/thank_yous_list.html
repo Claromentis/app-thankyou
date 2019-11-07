@@ -5,12 +5,12 @@
 -->
 <include file="includes/modal.html"/>
 <div class="thank-you-link-inline" name="create">
-	<a href="#thank_you_modal" class="btn btn-primary thank-you--button" onclick="cla_thank_yous_list.Create();">
+	<div class="btn btn-primary thank-you--button js-thank-you-create" name="thank_you_create_button">
 		<span class="glyphicons glyphicons-donate"></span>
 		<span class="thank-title">
 			<txt name="thankyou:component:say_thank_you">Say thank you</txt>
 		</span>
-	</a>
+	</div>
 </div>
 <div>
 	<ul name="thank_yous" datasrc="" class="list-unstyled thank-you js-thank-you-list">
@@ -23,30 +23,12 @@
 	</ul>
 </div>
 <script type="text/javascript">
-    var cla_thank_yous_list = {
-        Create: function () {
-            var create = null;
-            if (this.preselected_thankable !== null) {
-				create = [{
-				    id: this.preselected_thankable.id,
-					name: this.preselected_thankable.name,
-					object_type: {
-				        id: this.preselected_thankable.object_type.id,
-						name: this.preselected_thankable.object_type.name
-					}
-				}];
-			}
-            cla_thank_you_modal.Create(create);
-		},
-        preselected_thankable: ${preselected_thankable.json}
-    };
-
-    	require(['domReady', 'jquery'], function(domReady, $) {
-            domReady(function () {
-    			$('.js-comments-reveal').click(function(ev){
-    				var comments = $(this).closest($('.js-thank-you')).find($('.js-comments'))
-    				comments.toggle();
-    			})
+    require(['domReady', 'jquery'], function (domReady, $) {
+        domReady(function () {
+            $('.js-comments-reveal').click(function (ev) {
+                var comments = $(this).closest($('.js-thank-you')).find($('.js-comments'))
+                comments.toggle();
             })
         })
+    })
 </script>

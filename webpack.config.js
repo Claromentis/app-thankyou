@@ -21,6 +21,9 @@ var tags = {
     entry: {
         'tags': [
             './js/src/tags.js'
+        ],
+        'thankyou': [
+            './js/src/thankyou.js'
         ]
     },
     output: {

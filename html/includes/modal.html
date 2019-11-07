@@ -1,44 +1,58 @@
 <include file="../../common/select2_inc.html"/>
-<div id="thank_you_modal" class="modal fade" tabindex="-1" role="dialog">
+<div id="thank_you_modal" class="modal fade js-thank_you-modal" tabindex="-1" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form action="/thankyou/thanks/create" method="post" class="form-horizontal">
-				<input type="hidden" name="thank_you_id" id="thank_you_id" />
+			<form method="post" class="form-horizontal js-thank_you-form">
+				<input type="hidden" name="id"/>
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+						aria-hidden="true">&times;</span></button>
 					<h4 name="thankyou:component:say_thank_you" class="modal-title">Say thank you</h4>
 				</div>
 				<div class="modal-body">
+					<div class="js-form-error" data-name="problem_details-title" style="text-align: center;"></div>
 					<div id="thank_you_user_row" class="form-group">
-						<label name="thankyou:component:modal:to" class="control-label col-sm-2" for="thank_you_user">To</label>
+						<label name="thankyou:component:modal:to" class="control-label col-sm-2"
+							   for="thank_you_user">To</label>
 
 						<div class="form-control-static pt-0 col-sm-10">
-							<div id="thank_you_picker">
-								<component class_key="sugre_picker" name="thank_you_user" multiple="1" id="thank_you_user" allow_unset="1"/>
+							<div class="js-thank_you-picker-container">
+								<component class_key="sugre_picker" name="thank_you_user" multiple="1"
+										   id="thank_you_user" allow_unset="1"/>
 							</div>
-							<div id="thank_you_preselected" style="display:none;">
-								<span id="thank_you_preselected_name">John Smith</span>
+							<div class="js-thank_you-thanked-names-container" style="display:none;">
+								<span class="js-thank_you-thanked-names">John Smith</span>
 							</div>
+							<div class="js-form-error" data-name="thanked"></div>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-sm-2"><loc name="thankyou:admin:core_values"></loc></label>
+						<label class="control-label col-sm-2">
+							<loc name="thankyou:admin:core_values"></loc>
+						</label>
 						<div class="col-sm-10">
-							<select name="thank_you_core_values[]" id="thank_you_core_values" datasrc="" multiple="multiple" class="form-control"></select>
+							<select name="thank_you_tags[]" id="thank_you_tags" datasrc="" multiple="multiple"
+									class="form-control"></select>
+							<div class="js-form-error" data-name="tags"></div>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label name="thankyou:component:modal:comment" class="control-label col-sm-2" for="thank_you_description">Comment</label>
+						<label name="thankyou:component:modal:comment" class="control-label col-sm-2"
+							   for="thank_you_description">Comment</label>
 
 						<div class="col-sm-10">
-							<textarea name="thank_you_description" id="thank_you_description" class="form-control"></textarea>
+							<textarea name="thank_you_description" id="thank_you_description"
+									  class="form-control"></textarea>
+							<div class="js-form-error" data-name="description"></div>
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+					<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal"
+							aria-hidden="true">Close
+					</button>
 					<button name="thankyou:component:modal:submit" class="btn btn-primary">Submit</button>
 				</div>
 
@@ -46,122 +60,13 @@
 			</form>
 		</div>
 	</div>
-	<script type="text/javascript">
-        requirejs(['jquery', '/intranet/js/jquery.validate.min.js'], function ($, validate) {
-            var modal = $('#thank_you_modal');
-
-            // Validate the modal form
-            modal.find('form').validate({
-                rules: {
-                    thank_you_description: {
-                        required: true,
-                        minlength: {param: 3}
-                    },
-                    'thank_you_user[]': {
-                        required: true
-                    }
-                },
-                errorPlacement: function (error, element) {
-                    if (element.attr("name") == "thank_you_user[]") {
-                        error.insertAfter("#thank_you_user_row .form-control, #thank_you_user_row .select2-container");
-                    } else {
-                        error.insertAfter(element);
-                    }
-                },
-                errorClass: 'text-error'
-            });
-
-            // Clear and show the modal if the thank you button is clicked
-            $('.js-thank-you-button').on('click', function () {
-                cla_thank_you_modal.SetObjectID(null);
-                cla_thank_you_modal.SetPicker(null);
-                cla_thank_you_modal.SetDescription(null);
-                cla_thank_you_modal.Show(true);
-            });
-        });
-
-        var cla_thank_you_modal = {
-            Create: function (picked) {
-                this.SetObjectID(null);
-                this.SetPicker(picked);
-                this.SetDescription(null);
-
-                if (picked !== null) {
-                    this.LockPicker(true);
-				}
-
-                this.Show(true);
-			},
-            DisplayPicker: function (display) {
-                if (display === true) {
-                    $('#thank_you_picker').show();
-                } else {
-                    $('#thank_you_picker').hide();
-                }
-            },
-            DisplayPreselected: function (display) {
-                if (display === true) {
-                    $('#thank_you_preselected').show();
-                } else {
-                    $('#thank_you_preselected').hide();
-                }
-            },
-			GetModal: function () {
-              return $('#thank_you_modal');
-			},
-			GetPicker: function () {
-                return $('#thank_you_user');
-			},
-            SetPreselected: function (name) {
-                $('#thank_you_preselected_name').text(name);
-            },
-			SetObjectID: function(id) {
-                $('#thank_you_id').val(id);
-			},
-			SetDescription: function(description) {
-                $('#thank_you_description').val(description);
-			},
-			SetPicker: function (picked) {
-                var picker = this.GetPicker();
-
-                picker.val(null);
-                picker.html(null);
-
-                if (typeof picked === 'object') {
-					for (var i in picked) {
-                        cla_multi_object_picker.addOption(picked[i].object_type.id, picked[i].id, picked[i].object_type.name + ": " + picked[i].name, picker.attr('id'));
-					}
-				}
-
-                picker.trigger('change');
-			},
-			Show: function(display) {
-                var modal = this.GetModal();
-                if (display === true) {
-					modal.modal('show');
-				}
-                else {
-                    modal.modal('hide');
-				}
-			},
-			LockPicker: function (lock) {
-                if (lock) {
-                    this.DisplayPicker(false);
-
-                    var preselected = '';
-                    var options = cla_multi_object_picker.GetSelected(this.GetPicker());
-                    for (var i in options) {
-						preselected += options[i].text();
-                    }
-                    this.SetPreselected(preselected);
-                    this.DisplayPreselected(true);
-                }
-                else {
-                    this.DisplayPreselected(false);
-                    this.SetPreselected('');
-                    this.DisplayPicker(true);
-				}
-			}
-        };
+	<script type="text/template" class="js-form-error-template">
+		<span class="text-danger"></span>
 	</script>
 </div>
+<script type="text/javascript">
+    require(["/intranet/thankyou/js/build/thankyou.bundle.js"], function (thank_you) {
+        thank_you.tags_config.placeholder = '<loc name="thankyou:common:select_core_values"></loc>';
+        thank_you.configureTags();
+    });
+</script>
