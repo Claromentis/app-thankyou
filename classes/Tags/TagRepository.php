@@ -3,7 +3,7 @@
 namespace Claromentis\ThankYou\Tags;
 
 use Claromentis\Core\DAL\Interfaces\DbInterface;
-use Claromentis\Core\DAL\Query;
+use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\DAL\ResultInterface;
 use Claromentis\People\InvalidFieldIsNotSingle;
@@ -47,10 +47,6 @@ class TagRepository
 	public function GetTags(int $limit, int $offset, ?string $name = null, ?array $orders = null): array
 	{
 		$query_string = "SELECT * FROM " . self::TABLE_NAME;
-		if (isset($name))
-		{
-			$query_string .= " WHERE name LIKE \"" . $name . "%\"";
-		}
 		if (isset($orders) && count($orders) > 0)
 		{
 			$query_string .= " ORDER BY";
@@ -66,9 +62,13 @@ class TagRepository
 			}
 		}
 
-		$query = new Query($query_string);
+		$query = new QueryBuilder($query_string);
+		if (isset($name))
+		{
+			$query->AddSubstringFilter('name', $name);
+		}
 		$query->setLimit($limit, $offset);
-		$results = $this->db->query($query);
+		$results = $this->db->query($query->GetQuery());
 
 		return $this->GetTagsFromDbQuery($results);
 	}
