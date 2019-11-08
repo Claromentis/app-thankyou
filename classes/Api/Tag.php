@@ -83,6 +83,11 @@ class Tag
 		return $tag[$id];
 	}
 
+	public function GetTagsById(array $ids): array
+	{
+		return $this->repository->Load($ids);
+	}
+
 	/**
 	 * @return int
 	 */
