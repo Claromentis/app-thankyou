@@ -19,6 +19,7 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
+use Claromentis\ThankYou\Api\Tag;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
@@ -112,7 +113,7 @@ class Plugin implements
 		};
 
 		$app[ThankYousRepository::class] = function ($app) {
-			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'), $app[QueryFactory::class]);
+			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'), $app[QueryFactory::class], $app[Tag::class]);
 		};
 
 		$app[ThanksListView::class] = function ($app) {

@@ -10,6 +10,7 @@ use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
+use Claromentis\ThankYou\Api\Tag;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
@@ -59,13 +60,19 @@ class ThankYousRepository
 	 */
 	private $query_factory;
 
+	/**
+	 * @var Tag
+	 */
+	private $tags;
+
 	public function __construct(
 		ThankYouFactory $thank_you_factory,
 		ThanksItemFactory $thanks_item_factory,
 		AclRepository $acl_repository,
 		DbInterface $db_interface,
 		LoggerInterface $logger,
-		QueryFactory $query_factory
+		QueryFactory $query_factory,
+		Tag $tag_api
 	) {
 		$this->acl_repository      = $acl_repository;
 		$this->db                  = $db_interface;
@@ -73,6 +80,7 @@ class ThankYousRepository
 		$this->thank_you_factory   = $thank_you_factory;
 		$this->logger              = $logger;
 		$this->query_factory       = $query_factory;
+		$this->tags                = $tag_api;
 	}
 
 	/**
@@ -377,11 +385,12 @@ class ThankYousRepository
 	 * @param int[] $ids
 	 * @param bool  $thanked
 	 * @param bool  $users
+	 * @param bool  $tags
 	 * @return ThankYou[]
 	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
-	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false)
+	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false, bool $tags = false)
 	{
 		if (count($ids) === 0)
 		{
@@ -406,6 +415,11 @@ class ThankYousRepository
 		if ($users)
 		{
 			array_push($columns, 'thankyou_user.user_id AS thanked_user_id');
+		}
+
+		if ($tags)
+		{
+			array_push($columns, self::THANK_YOU_TAGS_TABLE . ".tag_id AS tag_id");
 		}
 
 		$query = "SELECT ";
@@ -435,12 +449,18 @@ class ThankYousRepository
 			$query .= " LEFT JOIN thankyou_user ON thankyou_user.thanks_id=thankyou_item.id";
 		}
 
+		if ($tags)
+		{
+			$query .= " LEFT JOIN " . self::THANK_YOU_TAGS_TABLE . " ON " . self::THANK_YOU_TAGS_TABLE . ".thankyou_id=thankyou_item.id";
+		}
+
 		$query .= " WHERE thankyou_item.id IN in:int:ids";
 
 		$result = $this->db->query($query, $ids);
 
 		$perm_oclasses  = [PERM_OCLASS_INDIVIDUAL => []];
 		$thankyou_items = [];
+		$tags           = [];
 		while ($row = $result->fetchArray())
 		{
 			$id           = (int) $row['id'];
@@ -484,6 +504,15 @@ class ThankYousRepository
 					$perm_oclasses[PERM_OCLASS_INDIVIDUAL][$thanked_user_id] = true;
 				}
 			}
+
+			if (isset($row['tag_id']))
+			{
+				$tag_id = (int) $row['tag_id'];
+
+				$thankyou_items[$id]['tags'][$tag_id] = true;
+
+				$tags[$tag_id] = true;
+			}
 		}
 
 		foreach ($perm_oclasses as $object_type_id => $object_type_objects)
@@ -508,6 +537,8 @@ class ThankYousRepository
 					break;
 			}
 		}
+
+		$tags = $this->tags->GetTagsById(array_keys($tags));
 
 		$thank_yous = [];
 		foreach ($ids as $id)
@@ -548,6 +579,19 @@ class ThankYousRepository
 					$thanked_users[] = $users[$user_id];
 				}
 				$thank_you->SetUsers($thanked_users);
+			}
+
+			if (isset($thankyou_items[$id]['tags']))
+			{
+				$thankyou_tags = [];
+				foreach ($thankyou_items[$id]['tags'] as $tag_id => $true)
+				{
+					if (isset($tags[$tag_id]))
+					{
+						$thankyou_tags[] = $tags[$tag_id];
+					}
+				}
+				$thank_you->SetTags($thankyou_tags);
 			}
 
 			$thank_yous[$id] = $thank_you;

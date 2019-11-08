@@ -171,6 +171,8 @@ class TagRepository
 	}
 
 	/**
+	 * Returns an array of Tags indexed by their ID.
+	 *
 	 * @param int[] $ids
 	 * @return Tag[]
 	 */
@@ -191,6 +193,8 @@ class TagRepository
 	}
 
 	/**
+	 * Returns an array of Tags indexed by their ID.
+	 *
 	 * @param ResultInterface $results
 	 * @return Tag[]
 	 */

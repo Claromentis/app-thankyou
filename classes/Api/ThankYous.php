@@ -251,24 +251,26 @@ class ThankYous
 	 * @param int  $id
 	 * @param bool $thanked
 	 * @param bool $users
+	 * @param bool $tags
 	 * @return ThankYou
 	 * @throws ThankYouNotFound - If the Thank You could not be found.
 	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
-	public function GetThankYou(int $id, bool $thanked = false, bool $users = false): ThankYou
+	public function GetThankYou(int $id, bool $thanked = false, bool $users = false, bool $tags = false): ThankYou
 	{
-		return $this->GetThankYous([$id], $thanked, $users)[$id];
+		return $this->GetThankYous([$id], $thanked, $users, $tags)[$id];
 	}
 
 	/**
 	 * @param int|int[] $ids
 	 * @param bool      $thanked
 	 * @param bool      $users
+	 * @param bool      $tags
 	 * @return ThankYou|ThankYou[]
 	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
-	public function GetThankYous($ids, bool $thanked = false, bool $users = false)
+	public function GetThankYous($ids, bool $thanked = false, bool $users = false, bool $tags = false)
 		//TODO: Tighten inputs and outputs to be more specific.
 	{
 		$array_return = true;
@@ -278,7 +280,7 @@ class ThankYous
 			$ids          = [$ids];
 		}
 
-		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked, $users);
+		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked, $users, $tags);
 
 		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
 	}

@@ -83,6 +83,12 @@ class Tag
 		return $tag[$id];
 	}
 
+	/**
+	 * Returns an array of Tags indexed by their ID.
+	 *
+	 * @param int[] $ids
+	 * @return Tag[]
+	 */
 	public function GetTagsById(array $ids): array
 	{
 		return $this->repository->Load($ids);
