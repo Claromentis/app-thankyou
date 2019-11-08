@@ -2,23 +2,47 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Claromentis\ThankYou\Tags\Tag;
 use Date;
 use InvalidArgumentException;
 use User;
 
 class ThankYou
 {
+	/**
+	 * @var User $author
+	 */
 	private $author;
 
+	/**
+	 * @var Date $date_created
+	 */
 	private $date_created;
 
+	/**
+	 * @var string $description
+	 */
 	private $description;
 
+	/**
+	 * @var int|null $id
+	 */
 	private $id;
 
+	/**
+	 * @var Thankable[]|null $thanked
+	 */
 	private $thanked;
 
+	/**
+	 * @var User[]|null $users
+	 */
 	private $users;
+
+	/**
+	 * @var Tag[]|null $tag
+	 */
+	private $tags;
 
 	/**
 	 * ThankYou constructor.
@@ -83,6 +107,14 @@ class ThankYou
 	}
 
 	/**
+	 * @return Tag[]|null
+	 */
+	public function GetTags(): ?array
+	{
+		return $this->tags;
+	}
+
+	/**
 	 * @param string $description
 	 */
 	public function SetDescription(string $description)
@@ -119,17 +151,39 @@ class ThankYou
 	/**
 	 * @param User[] $users
 	 */
-	public function SetUsers(array $users)
+	public function SetUsers(?array $users)
 	{
-		foreach ($users as $user)
+		if (is_array($users))
 		{
-			if (!($user instanceof User))
+			foreach ($users as $user)
 			{
-				throw new InvalidArgumentException("Failed to Set Thank You's Users, invalid User provided");
+				if (!($user instanceof User))
+				{
+					throw new InvalidArgumentException("Failed to Set Thank You's Users, invalid User provided");
+				}
 			}
 		}
 
 		$this->users = $users;
+	}
+
+	/**
+	 * @param Tag[]|null $tags
+	 */
+	public function SetTags(?array $tags)
+	{
+		if (is_array($tags))
+		{
+			foreach ($tags as $tag)
+			{
+				if (!($tag instanceof Tag))
+				{
+					throw new InvalidArgumentException("Failed to Set Thank You Tags, invalid Tag provided");
+				}
+			}
+		}
+
+		$this->tags = $tags;
 	}
 
 	/**
