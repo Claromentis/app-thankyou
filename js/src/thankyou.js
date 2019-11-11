@@ -156,8 +156,7 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
 
         if (typeof values === 'object') {
             for (var offset in values) {
-                var option = new Option(values[offset].name, values[offset].value);
-                tags.append(option);
+                tags.append('<option selected value="' + values[offset].id + '">' + values[offset].name + '</option>');
             }
         }
 

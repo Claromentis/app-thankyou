@@ -24,7 +24,7 @@ class TagFormatter
 	}
 
 	/**
-	 * @param array $tags
+	 * @param Tag[] $tags
 	 * @return array
 	 */
 	public function FormatTags(array $tags): array

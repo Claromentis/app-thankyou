@@ -4,17 +4,48 @@ namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\ThankYous\Thankable;
+use Psr\Log\LoggerInterface;
 
 /**
- * Component displays list of recent thanks and allows submitting a new one.
+ * Templater Component displays list of recent thanks and allows submitting a new one.
  *
  **/
 //TODO: Add AJAX callback to populate template. Add pagination supported by it.
 class ThankYousList extends TemplaterComponentTmpl
 {
+	/**
+	 * @var Api $api
+	 */
+	private $api;
+
+	/**
+	 * @var Lmsg $lmsg
+	 */
+	private $lmsg;
+
+	/**
+	 * @var LoggerInterface $log
+	 */
+	private $log;
+
+	/**
+	 * ThankYousList constructor.
+	 *
+	 * @param Api             $api
+	 * @param Lmsg            $lmsg
+	 * @param LoggerInterface $logger
+	 */
+	public function __construct(Api $api, Lmsg $lmsg, LoggerInterface $logger)
+	{
+		$this->api  = $api;
+		$this->lmsg = $lmsg;
+		$this->log  = $logger;
+	}
+
 	/**
 	 * #Attributes
 	 * * comments:
@@ -52,13 +83,13 @@ class ThankYousList extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app): string
 	{
-		$api  = $app[Api::class];
-		$lmsg = $app[Lmsg::class];
-
-		$can_create       = (bool) ($attributes['create'] ?? null);
-		$can_delete       = (bool) ($attributes['delete'] ?? null);
-		$can_edit         = (bool) ($attributes['edit'] ?? null);
-		$create_thankable = (isset($attributes['create']) && is_array($attributes['create'])) ? $attributes['create'] : null;
+		$can_create = (bool) ($attributes['create'] ?? null);
+		$can_delete = (bool) ($attributes['delete'] ?? null);
+		$can_edit   = (bool) ($attributes['edit'] ?? null);
+		/**
+		 * @var Thankable $create_thankable
+		 */
+		$create_thankable = (isset($attributes['create']) && ($attributes['create'] instanceof Thankable)) ? $attributes['create'] : null;
 		$display_comments = (bool) ($attributes['comments'] ?? null);
 		$thanked_images   = (bool) ($attributes['thanked_images'] ?? null);
 		$links            = (bool) ($attributes['links'] ?? null);
@@ -67,12 +98,19 @@ class ThankYousList extends TemplaterComponentTmpl
 		$thanks_links     = (bool) ($attributes['thanks_links'] ?? null);
 		$user_id          = (isset($attributes['user_id'])) ? (int) $attributes['user_id'] : null;
 
-		if (isset($user_id))
+		$thank_yous = [];
+		try
 		{
-			$thank_yous = $api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true);
-		} else
+			if (isset($user_id))
+			{
+				$thank_yous = $this->api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true);
+			} else
+			{
+				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, true);
+			}
+		} catch (ThankYouOClass $exception)
 		{
-			$thank_yous = $api->ThankYous()->GetRecentThankYous($limit, $offset, true);
+			$this->log->error("Failed to display Thank Yous in Templater Component 'thankyou.list'", [$exception]);
 		}
 
 		$args            = [];
@@ -94,7 +132,7 @@ class ThankYousList extends TemplaterComponentTmpl
 
 		if (count($args['thank_yous.datasrc']) === 0)
 		{
-			$args['no_thanks.body'] = $lmsg('thankyou.thanks_list.no_thanks');
+			$args['no_thanks.body'] = ($this->lmsg)('thankyou.thanks_list.no_thanks');
 		}
 
 		if ($can_create)
@@ -102,7 +140,22 @@ class ThankYousList extends TemplaterComponentTmpl
 			$args['create.visible'] = 1;
 			if (isset($create_thankable))
 			{
-				$args['thank_you_create_button.data-preselected_thanked'] = json_encode($create_thankable);
+				$owner_class_name = '';
+				try
+				{
+					$owner_class_name = $this->api->ThankYous()->GetOwnerClassNamesFromIds([$create_thankable->GetOwnerClass()])[0];
+				} catch (ThankYouOClass $exception)
+				{
+					$this->log->error("Failed to Get Owner Class Name for ID '" . (string) $create_thankable->GetOwnerClass() . "'", [$exception]);
+				}
+				$args['thank_you_create_button.data-preselected_thanked'] = json_encode([
+					'id'          => $create_thankable->GetId(),
+					'name'        => $create_thankable->GetName(),
+					'object_type' => [
+						'id'   => $create_thankable->GetOwnerClass(),
+						'name' => $owner_class_name
+					]
+				]);
 			}
 		} else
 		{

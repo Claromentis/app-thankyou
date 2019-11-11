@@ -19,10 +19,10 @@ use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
-use Claromentis\ThankYou\Tags\Tag;
+use Claromentis\ThankYou\Tags\Format\TagFormatter;
+use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Date;
 use DateClaTimeZone;
-use InvalidArgumentException;
 use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -64,23 +64,45 @@ class ThanksRestV2
 	private $rest_format;
 
 	/**
+	 * @var TagFormatter $tag_formatter
+	 */
+	private $tag_formatter;
+
+	/**
+	 * @var ThankYouFormatter $thank_you_formatter
+	 */
+	private $thank_you_formatter;
+
+	/**
 	 * ThanksRestV2 constructor.
 	 *
-	 * @param Api             $api
-	 * @param ResponseFactory $response_factory
-	 * @param LoggerInterface $logger
-	 * @param RestFormat      $rest_format
-	 * @param Lmsg            $lmsg
-	 * @param WritableConfig  $config
+	 * @param Api               $api
+	 * @param ResponseFactory   $response_factory
+	 * @param LoggerInterface   $logger
+	 * @param RestFormat        $rest_format
+	 * @param Lmsg              $lmsg
+	 * @param WritableConfig    $config
+	 * @param ThankYouFormatter $thank_you_formatter
+	 * @param TagFormatter      $tag_formatter
 	 */
-	public function __construct(Api $api, ResponseFactory $response_factory, LoggerInterface $logger, RestFormat $rest_format, Lmsg $lmsg, WritableConfig $config)
-	{
-		$this->api         = $api;
-		$this->config      = $config;
-		$this->lmsg        = $lmsg;
-		$this->log         = $logger;
-		$this->response    = $response_factory;
-		$this->rest_format = $rest_format;
+	public function __construct(
+		Api $api,
+		ResponseFactory $response_factory,
+		LoggerInterface $logger,
+		RestFormat $rest_format,
+		Lmsg $lmsg,
+		WritableConfig $config,
+		ThankYouFormatter $thank_you_formatter,
+		TagFormatter $tag_formatter
+	) {
+		$this->api                 = $api;
+		$this->config              = $config;
+		$this->lmsg                = $lmsg;
+		$this->log                 = $logger;
+		$this->response            = $response_factory;
+		$this->rest_format         = $rest_format;
+		$this->tag_formatter       = $tag_formatter;
+		$this->thank_you_formatter = $thank_you_formatter;
 	}
 
 	/**
@@ -94,9 +116,9 @@ class ThanksRestV2
 	public function GetThankYou(int $id, SecurityContext $security_context, ServerRequestInterface $request): JsonPrettyResponse
 	{
 		$query_params = $request->getQueryParams();
-		$thanked = (bool) ($query_params['thanked'] ?? null);
-		$users = (bool) ($query_params['users'] ?? null);
-		$tags = (bool) ($query_params['tags'] ?? null);
+		$thanked      = (bool) ($query_params['thanked'] ?? null);
+		$users        = (bool) ($query_params['users'] ?? null);
+		$tags         = (bool) ($query_params['tags'] ?? null);
 
 		try
 		{
@@ -109,7 +131,7 @@ class ThanksRestV2
 			throw new RestExError(($this->lmsg)('thankyou.thankyou.error.server'), "Internal Server Error", $exception);
 		}
 
-		$display_thank_you = $this->api->ThankYous()->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
+		$display_thank_you = $this->thank_you_formatter->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
 		return $this->response->GetJsonPrettyResponse($display_thank_you);
 	}
@@ -134,7 +156,7 @@ class ThanksRestV2
 		{
 			throw new RestExError(($this->lmsg)('thankyou.thankyou.error.server'), "Internal Server Error", $exception);
 		}
-		$display_thank_yous = $this->api->ThankYous()->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $security_context);
+		$display_thank_yous = $this->thank_you_formatter->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
 		return $this->response->GetJsonPrettyResponse($display_thank_yous);
 	}
@@ -439,9 +461,7 @@ class ThanksRestV2
 			throw new RestExNotFound(($this->lmsg)('thankyou.tag.error.id.not_found', $id), "Not Found", $exception);
 		}
 
-		$tag_display = $this->ConvertTagsToArray([$tag])[0];
-
-		return $this->response->GetJsonPrettyResponse($tag_display);
+		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag));
 	}
 
 	/**
@@ -457,9 +477,7 @@ class ThanksRestV2
 
 		$tags = $this->api->Tag()->GetTags($limit, $offset, $name, [['column' => 'name']]);
 
-		$tags_display = $this->ConvertTagsToArray($tags);
-
-		return $this->response->GetJsonPrettyResponse($tags_display);
+		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTags($tags));
 	}
 
 	/**
@@ -518,7 +536,6 @@ class ThanksRestV2
 			$tag = $this->api->Tag()->Create($security_context->GetUser(), $name);
 			$tag->SetBackgroundColour($bg_colour);
 			$this->api->Tag()->Save($tag);
-			$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
 		} catch (TagDuplicateNameException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -537,7 +554,7 @@ class ThanksRestV2
 			], 400);
 		}
 
-		return $this->response->GetJsonPrettyResponse($response, 200);
+		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag), 200);
 	}
 
 	/**
@@ -613,8 +630,6 @@ class ThanksRestV2
 			}
 
 			$this->api->Tag()->Save($tag);
-
-			$response = $this->ConvertTagsToArray([$tag->GetId() => $tag]);
 		} catch (TagNotFound $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -632,7 +647,7 @@ class ThanksRestV2
 			], 400);
 		}
 
-		return $this->response->GetJsonPrettyResponse($response, 200);
+		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag), 200);
 	}
 
 	//TODO: Add a Delete route for tags...
@@ -669,56 +684,5 @@ class ThanksRestV2
 		$this->api->Configuration()->SaveConfig($this->config);
 
 		return $this->response->GetJsonPrettyResponse(true);
-	}
-
-	/**
-	 * @param Tag[] $tags
-	 * @return array
-	 */
-	private function ConvertTagsToArray(array $tags): array
-	{
-		$display_tags = [];
-		foreach ($tags as $offset => $tag)
-		{
-			if (!($tag instanceof Tag))
-			{
-				throw new InvalidArgumentException("Failed to Convert Tags to an array, input must be an array of Tags only");
-			}
-
-			$created_date = clone $tag->GetCreatedDate();
-			$created_date->setTimezone(DateClaTimeZone::GetCurrentTZ());
-			$created_date = $this->rest_format->Date($created_date);
-
-			$modified_date = clone $tag->GetModifiedDate();
-			$modified_date->setTimezone(DateClaTimeZone::GetCurrentTZ());
-			$modified_date = $this->rest_format->Date($modified_date);
-
-			$created_by_name = null;
-			$created_by      = $tag->GetCreatedBy();
-			if ($created_by)
-			{
-				$created_by_name = $created_by->GetFullname();
-			}
-
-			$modified_by_name = null;
-			$modified_by      = $tag->GetModifiedBy();
-			if ($modified_by)
-			{
-				$modified_by_name = $modified_by->GetFullname();
-			}
-
-			$display_tags[$offset] = [
-				'id'            => $tag->GetId(),
-				'active'        => $tag->GetActive(),
-				'name'          => $tag->GetName(),
-				'created_by'    => $created_by_name,
-				'created_date'  => $created_date,
-				'modified_by'   => $modified_by_name,
-				'modified_date' => $modified_date,
-				'bg_colour'     => $tag->GetBackgroundColour()
-			];
-		}
-
-		return $display_tags;
 	}
 }

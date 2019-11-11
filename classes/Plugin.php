@@ -33,14 +33,17 @@ use Claromentis\ThankYou\Tags\Format\TagFormatter;
 use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
+use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYouFactory;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Claromentis\ThankYou\UI\TemplaterComponentThank;
+use Claromentis\ThankYou\UI\ThankYousList;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Psr\Log\LoggerInterface;
 use Silex\Api\EventListenerProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -136,7 +139,7 @@ class Plugin implements
 		};
 
 		$app[ThankYous::class] = function ($app) {
-			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class], $app[ThanksListView::class], $app[ThankYouUtility::class]);
+			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class], $app[ThankYouUtility::class]);
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
@@ -152,7 +155,20 @@ class Plugin implements
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
-			return new ThanksRestV2($app[Api::class], $app[ResponseFactory::class], $app['logger_factory']->GetLogger('tags'), $app['rest.formatter'], $app[Lmsg::class], $app['thankyou.config']);
+			return new ThanksRestV2(
+				$app[Api::class],
+				$app[ResponseFactory::class],
+				$app['logger_factory']->GetLogger('tags'),
+				$app['rest.formatter'],
+				$app[Lmsg::class],
+				$app['thankyou.config'],
+				$app[ThankYouFormatter::class],
+				$app[TagFormatter::class]
+			);
+		};
+
+		$app['templater.ui.thankyou.list'] = function ($app) {
+			return new ThankYousList($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
 		};
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
@@ -310,9 +326,13 @@ class Plugin implements
 			return '';
 		}
 
-		$api              = $app[Api::class];
-		$lmsg             = $app[Lmsg::class];
-		$security_context = $app[SecurityContext::class];
+		$api     = $app[Api::class];
+		$lmsg    = $app[Lmsg::class];
+		$context = $app[SecurityContext::class];
+		/**
+		 * @var LoggerInterface $log
+		 */
+		$log = $app['logger_factory']->GetLogger('thankyou');
 
 		$user_id = (int) $attr['user_id'];
 
@@ -323,13 +343,17 @@ class Plugin implements
 
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $lmsg("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
+				$create = 0;
 				try
 				{
 					$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
-					$create    = $api->ThankYous()->ConvertThankablesToArrays($thankable, $security_context);
+					if ($api->ThankYous()->CanSeeThankableName($context, $thankable))
+					{
+						$create = $thankable;
+					}
 				} catch (ThankYouOClass | ThankableNotFound $exception)
 				{
-					$create = 0;
+					$log->error("Failed to lock Thank You Creation to User Id '" . $user_id . "' on User's Profile", [$exception]);
 				}
 
 				$args                     = [];

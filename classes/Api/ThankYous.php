@@ -18,12 +18,8 @@ use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
-use Claromentis\ThankYou\View\ThanksListView;
 use Date;
-use DateClaTimeZone;
-use DateTimeZone;
 use Exception;
-use InvalidArgumentException;
 use LogicException;
 use NotificationMessage;
 use User;
@@ -38,17 +34,19 @@ class ThankYous
 
 	private $thank_yous_repository;
 
-	private $thank_yous_view;
-
 	private $utility;
 
-	public function __construct(LineManagerNotifier $line_manager_notifier, ThankYousRepository $thank_yous_repository, Config $config, ThankYouAcl $acl, ThanksListView $thank_yous_view, ThankYouUtility $thank_you_utility)
-	{
+	public function __construct(
+		LineManagerNotifier $line_manager_notifier,
+		ThankYousRepository $thank_yous_repository,
+		Config $config,
+		ThankYouAcl $acl,
+		ThankYouUtility $thank_you_utility
+	) {
 		$this->acl                   = $acl;
 		$this->config                = $config;
 		$this->line_manager_notifier = $line_manager_notifier;
 		$this->thank_yous_repository = $thank_yous_repository;
-		$this->thank_yous_view       = $thank_yous_view;
 		$this->utility               = $thank_you_utility;
 	}
 
@@ -90,63 +88,6 @@ class ThankYous
 	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool
 	{
 		return $this->acl->CanSeeThankableName($security_context, $thankable);
-	}
-
-	/**
-	 * @param Thankable|Thankable[] $thankables
-	 * @param SecurityContext|null  $security_context
-	 * @return array
-	 */
-	public function ConvertThankablesToArrays($thankables, ?SecurityContext $security_context = null): array
-	{
-		$array_return = true;
-		if (!is_array($thankables))
-		{
-			$array_return = false;
-			$thankables   = [$thankables];
-		}
-
-		$thankables_array = [];
-		foreach ($thankables as $thankable)
-		{
-			$thankables_array[] = $this->thank_yous_view->ConvertThankableToArray($thankable, $security_context);
-		}
-
-//TODO: Tighten inputs and outputs
-		return $array_return ? $thankables_array : $thankables_array[0];
-	}
-
-	/**
-	 * @param ThankYou|ThankYou[]  $thank_yous
-	 * @param DateTimeZone|null    $time_zone
-	 * @param SecurityContext|null $security_context
-	 * @return array
-	 */
-	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null): array
-	{
-		if (!isset($time_zone))
-		{
-			$time_zone = DateClaTimeZone::GetCurrentTZ();
-		}
-
-		$array_return = true;
-		if (!is_array($thank_yous))
-		{
-			$array_return = false;
-			$thank_yous   = [$thank_yous];
-		}
-
-		$thank_yous_array = [];
-		foreach ($thank_yous as $thank_you)
-		{
-			if (!($thank_you instanceof ThankYou))
-			{
-				throw new InvalidArgumentException("Failed to Convert Thank Yous to array, 1st argument must be an array of ThankYous");
-			}
-			$thank_yous_array[] = $this->thank_yous_view->ConvertThankYouToArray($thank_you, $time_zone, $security_context);
-		}
-
-		return $array_return ? $thank_yous_array : $thank_yous_array[0];
 	}
 
 	/**
@@ -261,7 +202,7 @@ class ThankYous
 	/**
 	 * @param int|int[] $object_types_id
 	 * @return string|string[]
-	 * @throws ThankYouOClass
+	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
 	 */
 	public function GetOwnerClassNamesFromIds(array $object_types_id)
 	{
