@@ -73,7 +73,7 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
 
     ThankYou.prototype.edit = function (id) {
         var self = this;
-        $.ajax('/api/thankyou/v2/thanks/' + id, {
+        $.ajax('/api/thankyou/v2/thanks/' + id + '?thanked=1&tags=1', {
             success: function (data) {
                 self.populateForm(data);
                 self.lockThanked(false);
