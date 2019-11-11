@@ -54,7 +54,8 @@ class Tag
 	 * @param int         $limit
 	 * @param int         $offset
 	 * @param string|null $name
-	 * @return Tag[]
+	 * @param array|null  $orders
+	 * @return \Claromentis\ThankYou\Tags\Tag[]
 	 */
 	public function GetTags(int $limit, int $offset, ?string $name = null, ?array $orders = null): array
 	{
@@ -88,7 +89,7 @@ class Tag
 	 * Returns an array of Tags indexed by their ID.
 	 *
 	 * @param int[] $ids
-	 * @return Tag[]
+	 * @return \Claromentis\ThankYou\Tags\Tag[]
 	 * @throws TagException
 	 */
 	public function GetTagsById(array $ids): array
@@ -100,6 +101,7 @@ class Tag
 				throw new TagException("Failed to Get Tags By ID, one or more IDs is not an integer");
 			}
 		}
+
 		return $this->repository->Load($ids);
 	}
 
