@@ -84,17 +84,23 @@ class ThanksRestV2
 	}
 
 	/**
-	 * @param int             $id
-	 * @param SecurityContext $security_context
+	 * @param int                    $id
+	 * @param SecurityContext        $security_context
+	 * @param ServerRequestInterface $request
 	 * @return JsonPrettyResponse
-	 * @throws RestExNotFound - If the Thank You could not be found.
 	 * @throws RestExError - If the Thank You could not be created.
+	 * @throws RestExNotFound - If the Thank You could not be found.
 	 */
-	public function GetThankYou(int $id, SecurityContext $security_context): JsonPrettyResponse
+	public function GetThankYou(int $id, SecurityContext $security_context, ServerRequestInterface $request): JsonPrettyResponse
 	{
+		$query_params = $request->getQueryParams();
+		$thanked = (bool) ($query_params['thanked'] ?? null);
+		$users = (bool) ($query_params['users'] ?? null);
+		$tags = (bool) ($query_params['tags'] ?? null);
+
 		try
 		{
-			$thank_you = $this->api->ThankYous()->GetThankYous($id, true);
+			$thank_you = $this->api->ThankYous()->GetThankYous($id, $thanked, $users, $tags);
 		} catch (ThankYouNotFound $exception)
 		{
 			throw new RestExNotFound(($this->lmsg)('thankyou.error.thanks_not_found'), "Not found", $exception);
