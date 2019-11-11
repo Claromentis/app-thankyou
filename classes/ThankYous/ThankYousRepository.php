@@ -16,6 +16,7 @@ use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
+use Claromentis\ThankYou\Tags\Exceptions\TagException;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
@@ -149,9 +150,6 @@ class ThankYousRepository
 	public function CreateThankablesFromOClasses(array $o_classes): array
 	{
 		//TODO: Expand accepted objects to include all PERM_OCLASS_*
-
-		$supported_o_class_ids = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
-
 		$o_classes_object_ids = [];
 		foreach ($o_classes as $o_class)
 		{
@@ -160,7 +158,7 @@ class ThankYousRepository
 				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified");
 			}
 
-			if (!in_array($o_class['oclass'], $supported_o_class_ids))
+			if (!in_array($o_class['oclass'], self::THANKABLES))
 			{
 				throw new ThankYouOClass("Failed to Get Permission Object Classes Names, Object class is not supported");
 			}
@@ -268,7 +266,7 @@ class ThankYousRepository
 	/**
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
-	 * @throws ThankYouNotFound
+	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
 	 * @throws ThankYouRepository - On failure to save to database.
 	 */
 	public function SaveToDb(ThankYou $thank_you)
@@ -320,6 +318,7 @@ class ThankYousRepository
 		}
 
 		$id = $thanks_item->Save();
+		$thank_you->SetId($id);
 
 		$this->SaveThankYouTags($thank_you);
 
@@ -538,7 +537,13 @@ class ThankYousRepository
 			}
 		}
 
-		$tags = $this->tags->GetTagsById(array_keys($tags));
+		try
+		{
+			$tags = $this->tags->GetTagsById(array_keys($tags));
+		} catch (TagException $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetTagsById", null, $exception);
+		}
 
 		$thank_yous = [];
 		foreach ($ids as $id)
