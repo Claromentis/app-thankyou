@@ -258,6 +258,14 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
             body.thanked = thanked_array;
         }
 
+        if (typeof tags === 'object' && tags !== null) {
+            var thanked_tags = [];
+            for (var offset in tags) {
+                thanked_tags.push(parseInt(tags[offset]));
+            }
+            body.tags = thanked_tags;
+        }
+
         var url = '/api/thankyou/v2/thankyou';
         if (id !== null) {
             url += '/' + id;

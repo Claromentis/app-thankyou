@@ -7,6 +7,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Constants;
 use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
+use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
@@ -149,74 +150,84 @@ class ThankYous
 	}
 
 	/**
-	 * @param User      $author
-	 * @param array     $thanked
+	 * @param User|int  $author
 	 * @param string    $description
 	 * @param Date|null $date_created
-	 * @return int
+	 * @return ThankYou
 	 * @throws ThankYouAuthor - If the Author could not be loaded.
-	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
-	 * @throws ThankYouOClass - If one or more of the Owner Classes is not recognised.
-	 * @throws ThankYouRepository - On failure to save to database.
 	 */
-	public function CreateAndSave(User $author, array $thanked, string $description, ?Date $date_created = null)
+	public function Create($author, string $description, ?Date $date_created = null)
 	{
-		if (!$author->IsLoaded() && !$author->Load())
-		{
-			throw new ThankYouAuthor("Failed to create Thank You, could not load Author");
-		}
+		return $this->thank_yous_repository->Create($author, $description, $date_created);
+	}
 
-		try
-		{
-			$thank_you = $this->thank_yous_repository->Create($author, $description, $date_created);
-		} catch (ThankYouAuthor $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by Create in CreateAndSave", null, $exception);
-		}
-
-		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses($thanked);
-
-		$thank_you->SetThanked($thankables);
-
+	/**
+	 * @param ThankYou $thank_you
+	 * @throws ThankYouOClass
+	 */
+	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
+	{
 		$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
+	}
 
-		try
+	/**
+	 * @param ThankYou $thank_you
+	 * @throws ThankYouException
+	 */
+	public function Notify(ThankYou $thank_you)
+	{
+		$thanked_users = $thank_you->GetUsers();
+		if (!isset($thanked_users))
 		{
-			$id = $this->thank_yous_repository->SaveToDb($thank_you);
-		} catch (ThankYouNotFound $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by SaveToDb", null, $exception);
+			throw new ThankYouException("Failed to Notify Thanked Users, Thanked Users haven't been set");
 		}
 
-		$thanked_users = $thank_you->GetUsers();
-		$users_ids     = [];
+		$all_users_ids = [];
 		foreach ($thanked_users as $thanked_user)
 		{
-			$users_ids[] = $thanked_user->GetId();
+			$all_users_ids[] = $thanked_user->GetId();
 		}
+
+		$description = $thank_you->GetDescription();
 
 		try
 		{
 			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
 
 			$params = [
-				'author'              => $author->GetFullName(),
-				'other_people_number' => count($users_ids) - 1,
-				'description'         => $description,
+				'author'              => $thank_you->GetAuthor()->GetFullName(),
+				'other_people_number' => count($all_users_ids) - 1,
+				'description'         => $description
 			];
-			NotificationMessage::Send('thankyou.new_thanks', $params, $users_ids, Constants::IM_TYPE_THANKYOU);
+			NotificationMessage::Send('thankyou.new_thanks', $params, $all_users_ids, Constants::IM_TYPE_THANKYOU);
 
 			if ($this->config->Get('notify_line_manager'))
 			{
-				//TODO: Fix mad spam if a big group is thanked (build $user_ids from thanked users only, don't affect the notification code above
-				$this->line_manager_notifier->SendMessage($description, $users_ids);
+				$thankables = $thank_you->GetThankable();
+				if (!isset($thankables))
+				{
+					throw new ThankYouException("Failed to Notify Thanked User's Line Managers");
+				}
+
+				$user_ids = [];
+				foreach ($thankables as $thankable)
+				{
+					$owner_class_id = $thankable->GetOwnerClass();
+					$thanked_id     = $thankable->GetId();
+					if ($owner_class_id === PERM_OCLASS_INDIVIDUAL && isset($id))
+					{
+						$user_ids[] = $thanked_id;
+					}
+				}
+				$this->line_manager_notifier->SendMessage($description, $user_ids);
 			}
+		} catch (ThankYouException $exception)
+		{
+			throw $exception;
 		} catch (Exception $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown by NotificationMessage library", null, $exception);
 		}
-
-		return $id;
 	}
 
 	/**
@@ -235,6 +246,16 @@ class ThankYous
 		}
 
 		return $thankables[0];
+	}
+
+	/**
+	 * @param array $oclasses
+	 * @return array|Thankable[]
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 */
+	public function CreateThankablesFromOClasses(array $oclasses)
+	{
+		return $this->thank_yous_repository->CreateThankablesFromOClasses($oclasses);
 	}
 
 	/**
@@ -364,7 +385,7 @@ class ThankYous
 
 	/**
 	 * @param ThankYou $thank_you
-	 * @throws ThankYouNotFound
+	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
 	 * @throws ThankYouRepository - On failure to save to database.
 	 */
 	public function Save(ThankYou $thank_you)

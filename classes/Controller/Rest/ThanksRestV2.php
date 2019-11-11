@@ -9,19 +9,21 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Configuration\Configuration;
-use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
+use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
+use Claromentis\ThankYou\Tags\Exceptions\TagException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Tags\Tag;
 use Date;
 use DateClaTimeZone;
 use InvalidArgumentException;
+use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use RestExBadRequest;
@@ -148,17 +150,71 @@ class ThanksRestV2
 
 		$thanked     = (array) ($post['thanked'] ?? null);
 		$description = (string) ($post['description'] ?? null);
+		$tag_ids     = $post['tags'] ?? null;
 
 		$invalid_params = [];
 
-		if (count($thanked) === 0)
+		foreach ($thanked as $offset => $oclass)
 		{
-			$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
+			$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
+		}
+
+		try
+		{
+			$thankables = $this->api->ThankYous()->CreateThankablesFromOClasses($thanked);
+
+			if (count($thankables) === 0)
+			{
+				$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
+			}
+		} catch (ThankYouOClass $exception)
+		{
+			$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
+			$first   = true;
+			foreach ($this->api->ThankYous()->GetThankableObjectTypes() as $owner_class)
+			{
+				$message .= $first ? $owner_class : ", " . $owner_class;
+				$first   = false;
+			}
+			$invalid_params[] = ['name' => 'thanked', 'reason' => $message];
 		}
 
 		if ($description === '')
 		{
 			$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
+		}
+
+		if (isset($tag_ids))
+		{
+			if ($this->config->Get('thankyou_core_values_enabled') !== true)
+			{
+				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.disabled')];
+			} else
+			{
+				if (!is_array($tag_ids))
+				{
+					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_array')];
+				}
+
+				try
+				{
+					$tags = $this->api->Tag()->GetTagsById($tag_ids);
+
+					foreach ($tag_ids as $tag_id)
+					{
+						if (!isset($tags[$tag_id]))
+						{
+							$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)];
+						}
+					}
+				} catch (TagException $exception)
+				{
+					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
+				}
+			}
+		} elseif ($this->config->Get('thankyou_core_values_mandatory') === true)
+		{
+			$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 		}
 
 		if (count($invalid_params) > 0)
@@ -173,7 +229,18 @@ class ThanksRestV2
 
 		try
 		{
-			$this->api->ThankYous()->CreateAndSave($context->GetUser(), $thanked, $description);
+			$thank_you = $this->api->ThankYous()->Create($context->GetUser(), $description, null);
+			$thank_you->SetThanked($thankables);
+			if (isset($tags))
+			{
+				$thank_you->SetTags($tags);
+			}
+			$this->api->ThankYous()->PopulateThankYouUsersFromThankables($thank_you);
+			$this->api->ThankYous()->Save($thank_you);
+			$this->api->ThankYous()->Notify($thank_you);
+		} catch (ThankYouNotFound $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown when creating Thank You", null, $exception);
 		} catch (ThankYouOClass $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -191,6 +258,9 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.thankyou.error.create'),
 				'status' => 500
 			], 500);
+		} catch (ThankYouException $exception)
+		{
+			$this->log->error("A Thank You was created but there was an error sending notifications", [$exception]);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);
@@ -255,42 +325,27 @@ class ThanksRestV2
 					$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
 				} else
 				{
-					$thankables = [];
-					foreach ($thanked as $offset => $thank)
+					foreach ($thanked as $offset => $oclass)
 					{
-						$thank_error = false;
-						$owner_class = $thank['oclass'] ?? null;
-						$thanked_id  = $thank['id'] ?? null;
-
-						if (!isset($owner_class))
-						{
-							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.oclass.error.undefined')];
-							$thank_error      = true;
-						} elseif (!is_int($owner_class))
-						{
-							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.oclass.error.not_integer')];
-							$thank_error      = true;
-						}
-
-						if (!isset($thanked_id))
-						{
-							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.id.error.undefined')];
-							$thank_error      = true;
-						} elseif (!is_int($thanked_id))
-						{
-							$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.id.error.not_integer')];
-							$thank_error      = true;
-						}
-
-						if ($thank_error)
-						{
-							break;
-						}
-
-						$thankables[] = $this->api->ThankYous()->CreateThankableFromOClass($owner_class, $thanked_id);
+						$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
 					}
 
-					$thank_you->SetThanked($thankables);
+					try
+					{
+						$thankables = $this->api->ThankYous()->CreateThankablesFromOClasses($thanked);
+						$thank_you->SetThanked($thankables);
+						$this->api->ThankYous()->PopulateThankYouUsersFromThankables($thank_you);
+					} catch (ThankYouOClass $exception)
+					{
+						$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
+						$first   = true;
+						foreach ($this->api->ThankYous()->GetThankableObjectTypes() as $owner_class)
+						{
+							$message .= $first ? $owner_class : ", " . $owner_class;
+							$first   = false;
+						}
+						$invalid_params[] = ['name' => 'thanked', 'reason' => $message];
+					}
 				}
 			}
 
@@ -312,7 +367,7 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.error.thanks_not_found'),
 				'status' => 404
 			], 404);
-		} catch (ThankYouOClass | ThankableNotFound $exception)
+		} catch (ThankYouOClass $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'           => 'https://developer.claromentis.com',
@@ -375,7 +430,7 @@ class ThanksRestV2
 			$tag = $this->api->Tag()->GetTag($id);
 		} catch (TagNotFound $exception)
 		{
-			throw new RestExNotFound(($this->lmsg)('thankyou.tag.error.id.not_found'), "Not Found", $exception);
+			throw new RestExNotFound(($this->lmsg)('thankyou.tag.error.id.not_found', $id), "Not Found", $exception);
 		}
 
 		$tag_display = $this->ConvertTagsToArray([$tag])[0];
@@ -558,7 +613,7 @@ class ThanksRestV2
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
-				'title'  => ($this->lmsg)('thankyou.tag.error.id.not_found'),
+				'title'  => ($this->lmsg)('thankyou.tag.error.id.not_found', $id),
 				'status' => 404
 			], 404);
 		} catch (TagDuplicateNameException $exception)
@@ -573,6 +628,8 @@ class ThanksRestV2
 
 		return $this->response->GetJsonPrettyResponse($response, 200);
 	}
+
+	//TODO: Add a Delete route for tags...
 
 	/**
 	 * @param ServerRequestInterface $request
