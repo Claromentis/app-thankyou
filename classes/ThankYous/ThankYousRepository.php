@@ -586,14 +586,17 @@ class ThankYousRepository
 				$thank_you->SetUsers($thanked_users);
 			}
 
-			if (isset($thankyou_items[$id]['tags']))
+			if ($tags)
 			{
 				$thankyou_tags = [];
-				foreach ($thankyou_items[$id]['tags'] as $tag_id => $true)
+				if (isset($thankyou_items[$id]['tags']))
 				{
-					if (isset($tags[$tag_id]))
+					foreach ($thankyou_items[$id]['tags'] as $tag_id => $true)
 					{
-						$thankyou_tags[] = $tags[$tag_id];
+						if (isset($tags[$tag_id]))
+						{
+							$thankyou_tags[] = $tags[$tag_id];
+						}
 					}
 				}
 				$thank_you->SetTags($thankyou_tags);
