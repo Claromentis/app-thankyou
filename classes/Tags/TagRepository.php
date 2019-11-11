@@ -178,6 +178,11 @@ class TagRepository
 	 */
 	public function Load(array $ids): array
 	{
+		if (count($ids) === 0)
+		{
+			return [];
+		}
+
 		foreach ($ids as $id)
 		{
 			if (!is_int($id))
