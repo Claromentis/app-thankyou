@@ -29,6 +29,7 @@ use Claromentis\ThankYou\Controller\ThanksController;
 use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
+use Claromentis\ThankYou\Tags\Format\TagFormatter;
 use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
@@ -156,6 +157,10 @@ class Plugin implements
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
 			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
+		};
+
+		$app[TagFormatter::class] = function ($app) {
+			return new TagFormatter($app['rest.formatter']);
 		};
 	}
 
