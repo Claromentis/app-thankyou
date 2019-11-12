@@ -41,7 +41,6 @@ lm	thankyou.tag.error.background.invalid		Invalid Background
 lm	thankyou.tag.error.background.undefined		Core Value Background Colour must be set
 lm	thankyou.tag.error.create		Could not create Core Value
 lm	thankyou.tag.error.id.not_found		Core Value with ID %d could not be found
-lm	thankyou.tag.error.metadata.invalid		Metadata must be passed as an array if defined
 lm	thankyou.tag.error.modify		Could not modify Core Value
 lm	thankyou.tag.error.name.invalid		Core Value Name must be a string if defined
 lm	thankyou.tag.error.name.not_empty		Core Value's Name cannot be empty
