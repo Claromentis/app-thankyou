@@ -1,8 +1,6 @@
 .	.	.	en
 lm	thankyou.admin.core_values		Core Values
 lm	thankyou.admin.core_values.description		Thank Yous can be linked to your Core Values to encourage engagement.
-lm	thankyou.admin.core_values.empty		No Core Values have been created yet
-lm	thankyou.admin.core_values.error.saving		One or more Core Values could not be saved
 lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
@@ -73,8 +71,6 @@ lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:core_values.body	$lm['thankyou.admin.core_values']	
-lt	thankyou:admin:core_values:empty.body	$lm['thankyou.admin.core_values.empty']	
-lt	thankyou:admin:core_values:error:saving.body	$lm['thankyou.admin.core_values.error.saving']	
 lt	thankyou:admin:export:period.body		Period
 lt	thankyou:admin:export_csv.body		Export to *.csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	

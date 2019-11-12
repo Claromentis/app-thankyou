@@ -1,8 +1,6 @@
 .	.	.	nl
 lm	thankyou.admin.core_values		
 lm	thankyou.admin.core_values.description		
-lm	thankyou.admin.core_values.empty		
-lm	thankyou.admin.core_values.error.saving		
 lm	thankyou.admin.panel.export		
 lm	thankyou.admin.panel.messages		
 lm	thankyou.admin.panel.notifications		
@@ -73,8 +71,6 @@ lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:core_values.body	$lm['thankyou.admin.core_values']	
-lt	thankyou:admin:core_values:empty.body	$lm['thankyou.admin.core_values.empty']	
-lt	thankyou:admin:core_values:error:saving.body	$lm['thankyou.admin.core_values.error.saving']	
 lt	thankyou:admin:export:period.body		
 lt	thankyou:admin:export_csv.body		
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
