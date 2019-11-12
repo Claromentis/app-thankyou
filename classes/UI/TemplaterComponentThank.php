@@ -188,6 +188,12 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			}
 		}
 
+		$tags_args =[];
+		foreach ($thank_you->GetTags() as $tag)
+		{
+			$tags_args[] = ['tag.tag' => $tag];
+		}
+
 		$thankable_object_types      = '';
 		$first_thankable_object_type = true;
 		foreach ($this->api->ThankYous()->GetThankableObjectTypes() as $object_type_id)
@@ -208,6 +214,8 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			'thank_title_link.href'    => '/thankyou/thanks/' . $id,
 
 			'thanked.datasrc' => $thanked_args,
+
+			'tags.datasrc' => $tags_args,
 
 			'author_name.body'  => $author_name,
 			'author_link.href'  => $author_link,
