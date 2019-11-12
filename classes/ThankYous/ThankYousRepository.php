@@ -390,7 +390,7 @@ class ThankYousRepository
 	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
-	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false, bool $tags = false)
+	public function GetThankYous(array $ids, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false)
 	{
 		if (count($ids) === 0)
 		{
@@ -407,17 +407,17 @@ class ThankYousRepository
 
 		$columns = ['thankyou_item.id', 'thankyou_item.author AS author_id', 'thankyou_item.date_created', 'thankyou_item.description'];
 
-		if ($thanked)
+		if ($get_thanked)
 		{
 			array_push($columns, 'thankyou_thanked.object_type AS thanked_object_type', 'thankyou_thanked.object_id AS thanked_object_id');
 		}
 
-		if ($users)
+		if ($get_users)
 		{
 			array_push($columns, 'thankyou_user.user_id AS thanked_user_id');
 		}
 
-		if ($tags)
+		if ($get_tags)
 		{
 			array_push($columns, self::THANK_YOU_TAGS_TABLE . ".tag_id AS tag_id");
 		}
@@ -439,17 +439,17 @@ class ThankYousRepository
 
 		$query .= " FROM thankyou_item";
 
-		if ($thanked)
+		if ($get_thanked)
 		{
 			$query .= " LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id=thankyou_item.id";
 		}
 
-		if ($users)
+		if ($get_users)
 		{
 			$query .= " LEFT JOIN thankyou_user ON thankyou_user.thanks_id=thankyou_item.id";
 		}
 
-		if ($tags)
+		if ($get_tags)
 		{
 			$query .= " LEFT JOIN " . self::THANK_YOU_TAGS_TABLE . " ON " . self::THANK_YOU_TAGS_TABLE . ".item_id=thankyou_item.id";
 		}
@@ -564,14 +564,17 @@ class ThankYousRepository
 
 			$thank_you->SetId($id);
 
-			if (isset($thankyou_items[$id]['thanked']))
+			if ($get_thanked)
 			{
 				$thankables = [];
-				foreach ($thankyou_items[$id]['thanked'] as $thanked_object_type_id => $thanked_object_ids)
+				if (isset($thankyou_items[$id]['thanked']))
 				{
-					foreach ($thanked_object_ids as $thanked_object_id => $true)
+					foreach ($thankyou_items[$id]['thanked'] as $thanked_object_type_id => $thanked_object_ids)
 					{
-						$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
+						foreach ($thanked_object_ids as $thanked_object_id => $true)
+						{
+							$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
+						}
 					}
 				}
 				$thank_you->SetThanked($thankables);
@@ -587,7 +590,7 @@ class ThankYousRepository
 				$thank_you->SetUsers($thanked_users);
 			}
 
-			if ($tags)
+			if ($get_tags)
 			{
 				$thankyou_tags = [];
 				if (isset($thankyou_items[$id]['tags']))
