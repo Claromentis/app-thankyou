@@ -30,6 +30,7 @@ use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
+use Claromentis\ThankYou\Tags\TagAcl;
 use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
@@ -70,6 +71,20 @@ class Plugin implements
 	 */
 	public function register(Container $app)
 	{
+		$app[TagAcl::class] = function ($app) {
+			return new TagAcl($app['admin.panels_list']->GetOne('thankyou'));
+		};
+
+		$app[TagRepository::class] = function ($app) {
+			return new TagRepository($app[DbInterface::class], $app[QueryFactory::class], $app['logger_factory']->GetLogger('tags'), $app[TagFactory::class]);
+		};
+
+		$app[TagFormatter::class] = function ($app) {
+			return new TagFormatter($app['rest.formatter']);
+		};
+
+		$app['thankyou.datatable.tags'] = TagDataTableSource::class;
+
 		// Localization domain
 		$app['localization.domain.thankyou'] = function ($app) {
 			return $app['localization.domain_from_files_factory']('thankyou');
@@ -103,9 +118,6 @@ class Plugin implements
 			return new ThanksRestController($app['thankyou.repository']);
 		};
 
-		// Data source
-		$app['thankyou.datatable.tags'] = TagDataTableSource::class;
-
 		// Notification
 		/*$app['thankyou.line_manager_notifier'] = function () {
 			return new LineManagerNotifier();
@@ -120,6 +132,10 @@ class Plugin implements
 			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'), $app[QueryFactory::class], $app[Tag::class]);
 		};
 
+		$app[ThankYouAcl::class] = function ($app) {
+			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'), $app[UserExtranetService::class]);
+		};
+
 		$app[ThanksListView::class] = function ($app) {
 			/**
 			 * @var PanelsList $panels ;
@@ -129,29 +145,29 @@ class Plugin implements
 			return new ThanksListView($panels->GetOne('thankyou'), $app[ThankYouUtility::class], $app[ThankYouAcl::class], $app[Lmsg::class]);
 		};
 
+		$app['thankyou.config'] = function ($app) {
+			return $app['config.factory']('thankyou');
+		};
+
 		// Pages component
 		$app['pages.component.thankyou'] = function ($app) {
 			return new UI\PagesComponent($app[Lmsg::class], $app['thankyou.config']);
-		};
-
-		$app['thankyou.config'] = function ($app) {
-			return $app['config.factory']('thankyou');
 		};
 
 		$app[ThankYous::class] = function ($app) {
 			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class], $app[ThankYouUtility::class]);
 		};
 
-		$app[ThankYouAcl::class] = function ($app) {
-			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'), $app[UserExtranetService::class]);
-		};
-
 		$app[ThanksController::class] = function ($app) {
 			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config'], $app['logger_factory']->GetLogger('thankyou'));
 		};
 
-		$app[TagRepository::class] = function ($app) {
-			return new TagRepository($app[DbInterface::class], $app[QueryFactory::class], $app['logger_factory']->GetLogger('tags'), $app[TagFactory::class]);
+		$app['templater.ui.thankyou.list'] = function ($app) {
+			return new ThankYousList($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
+		};
+
+		$app['templater.ui.thankyou.thank'] = function ($app) {
+			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
@@ -165,18 +181,6 @@ class Plugin implements
 				$app[ThankYouFormatter::class],
 				$app[TagFormatter::class]
 			);
-		};
-
-		$app['templater.ui.thankyou.list'] = function ($app) {
-			return new ThankYousList($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
-		};
-
-		$app['templater.ui.thankyou.thank'] = function ($app) {
-			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
-		};
-
-		$app[TagFormatter::class] = function ($app) {
-			return new TagFormatter($app['rest.formatter']);
 		};
 	}
 
@@ -257,6 +261,7 @@ class Plugin implements
 				$routes->secure('rest', 'admin', ['panel_code' => 'thankyou']);
 				$routes->post('/tags', ThanksRestV2::class . ':CreateTag');
 				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');
+				$routes->delete('/tags/{id}', ThanksRestV2::class . ':DeleteTag')->assert('id', '\d+');
 				$routes->post('/admin/config', ThanksRestV2::class . ':SetConfig');
 			}
 		];

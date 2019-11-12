@@ -2,10 +2,13 @@
 
 namespace Claromentis\ThankYou\Api;
 
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagException;
+use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
+use Claromentis\ThankYou\Tags\TagAcl;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Date;
@@ -15,14 +18,17 @@ use User;
 
 class Tag
 {
+	private $acl;
+
 	private $factory;
 
 	private $repository;
 
-	public function __construct(TagRepository $tag_repository, TagFactory $tag_factory)
+	public function __construct(TagRepository $tag_repository, TagFactory $tag_factory, TagAcl $tag_acl)
 	{
-		$this->repository = $tag_repository;
+		$this->acl        = $tag_acl
 		$this->factory    = $tag_factory;
+		$this->repository = $tag_repository;
 	}
 
 	/**
@@ -43,10 +49,20 @@ class Tag
 	}
 
 	/**
-	 * @param int $id
+	 * @param int             $id
+	 * @param SecurityContext $context
+	 * @throws TagForbidden - If the SecurityContext does not allow the Tag to be deleted.
+	 * @throws TagNotFound - If the Tag cannot be found in the Repository.
 	 */
-	public function Delete(int $id)
+	public function Delete(int $id, SecurityContext $context)
 	{
+		if (!$this->acl->CanDeleteTag($context))
+		{
+			throw new TagForbidden("User does not have Permission to Delete a Tag");
+		}
+
+		$this->GetTag($id);
+
 		$this->repository->Delete($id);
 	}
 

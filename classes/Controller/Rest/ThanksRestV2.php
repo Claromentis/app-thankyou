@@ -17,6 +17,7 @@ use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagException;
+use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
@@ -487,7 +488,7 @@ class ThanksRestV2
 			], 404);
 		}
 
-		return $this->response->GetJsonPrettyResponse(true);
+		return $this->response->GetJsonPrettyResponse(true, 200);
 	}
 
 	/**
@@ -694,7 +695,29 @@ class ThanksRestV2
 		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag), 200);
 	}
 
-	//TODO: Add a Delete route for tags...
+	public function DeleteTag(int $id, SecurityContext $context): JsonPrettyResponse
+	{
+		try
+		{
+			$this->api->Tag()->Delete($id, $context);
+		} catch (TagForbidden $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.tag.delete.error.permission'),
+				'status' => 401
+			], 401);
+		} catch (TagNotFound $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.tag.error.id.not_found', $id),
+				'status' => 404
+			], 404);
+		}
+
+		return $this->response->GetJsonPrettyResponse(true, 200);
+	}
 
 	/**
 	 * @param ServerRequestInterface $request
