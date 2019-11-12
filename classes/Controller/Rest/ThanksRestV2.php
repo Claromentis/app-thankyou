@@ -212,7 +212,10 @@ class ThanksRestV2
 			$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
 		}
 
-		if (isset($tag_ids))
+		if ($this->config->Get('thankyou_core_values_mandatory') === true && (!isset($tag_ids) || count($tag_ids) === 0))
+		{
+			$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
+		} elseif (isset($tag_ids))
 		{
 			if ($this->config->Get('thankyou_core_values_enabled') !== true)
 			{
@@ -240,9 +243,6 @@ class ThanksRestV2
 					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
 				}
 			}
-		} elseif ($this->config->Get('thankyou_core_values_mandatory') === true)
-		{
-			$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 		}
 
 		if (count($invalid_params) > 0)
@@ -314,7 +314,7 @@ class ThanksRestV2
 
 		try
 		{
-			$thank_you = $this->api->ThankYous()->GetThankYou($id, false, false);
+			$thank_you = $this->api->ThankYous()->GetThankYou($id, false, false, true);
 
 			if (!$this->api->ThankYous()->CanEditThankYou($thank_you, $context))
 			{
@@ -375,6 +375,50 @@ class ThanksRestV2
 						$invalid_params[] = ['name' => 'thanked', 'reason' => $message];
 					}
 				}
+			}
+
+			$tag_ids = $post['tags'] ?? null;
+			if (array_key_exists('tags', $post) && !isset($tag_ids))
+			{
+				$tag_ids = [];
+			}
+
+			$current_tags = $thank_you->GetTags();
+
+			if (isset($tag_ids))
+			{
+				if (is_array($tag_ids))
+				{
+					if ($this->config->Get('thankyou_core_values_enabled') === true)
+					{
+						try
+						{
+							$tags = $this->api->Tag()->GetTagsById($tag_ids);
+
+							foreach ($tag_ids as $tag_id)
+							{
+								if (!isset($tags[$tag_id]))
+								{
+									$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)];
+								}
+							}
+
+							$thank_you->SetTags($tags);
+						} catch (TagException $exception)
+						{
+							$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
+						}
+					} else
+					{
+						$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.disabled')];
+					}
+				} else
+				{
+					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_array')];
+				}
+			} elseif ($this->config->Get('thankyou_core_values_mandatory') && count($current_tags))
+			{
+				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 			}
 
 			if (count($invalid_params) > 0)

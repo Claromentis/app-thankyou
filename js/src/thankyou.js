@@ -245,7 +245,8 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
         var description = self.getDescriptionInput().val();
 
         var body = {
-            description: description
+            description: description,
+            tags: null
         };
 
         if (typeof thanked === 'object') {
