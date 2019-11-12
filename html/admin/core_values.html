@@ -20,18 +20,18 @@
 	<div id="core_values_enabled_body" name="core_values_enabled_body">
 		<cla-checkbox name="core_values_mandatory"></cla-checkbox>
 		<div>
-			<span class="js-core_values-datatable-create"><loc name="common:create"></loc></span>
+			<span class="js-tag-create"><loc name="common:create"></loc></span>
 		</div>
-		<component class_key="data_table" name="core_values" service="thankyou.datatable.tags"/>
+		<component class_key="data_table" name="tags_datatable" service="thankyou.datatable.tags"/>
 	</div>
 </block>
 
 <include file="../../common/layouts/admin_with_info_panel.html"/>
 
-<div id="core_values_modal" class="modal fade" tabindex="-1" role="dialog">
+<div id="tag_modal" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form method="post" class="form-horizontal js-core_values-modal-form">
+			<form method="post" class="form-horizontal js-tag-form">
 				<input type="hidden" name="tag_id"/>
 				<input type="hidden" name="csrf_token">
 				<div class="modal-header">
@@ -64,9 +64,33 @@
 					<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal"
 							aria-hidden="true">Close
 					</button>
-					<button name="thankyou:component:modal:submit" class="btn btn-primary js-core_values-modal-submit">Submit</button>
+					<button name="thankyou:component:modal:submit" class="btn btn-primary">Submit</button>
 				</div>
 			</form>
+		</div>
+	</div>
+</div>
+
+<div id="tag_delete_modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<input type="hidden" name="id"/>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 name="thankyou:tag:delete:title" class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="js-form-error" data-name="problem_details-title" style="text-align: center;"></div>
+				<loc name="thankyou:tag:delete:description"></loc>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default" data-dismiss="modal">
+					<span name="thankyou:component:modal:close" aria-hidden="true"></span>
+				</button>
+				<button name="common:delete" class="btn btn-primary js-tag-delete-submit"></button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -118,27 +142,30 @@
 
         var core_values = $('#core_values_enabled_body');
 
-        core_values.on('click', '.js-core_values-datatable-active', function () {
-            core_values_modal.setActive($(this).parent().attr('data-id'), $(this).attr('data-value'));
+        core_values.on('click', '.js-tag-create', function () {
+            tag_modal.resetForm();
+            tag_modal.showModal(true);
+        });
+
+        core_values.on('click', '.js-tag-active', function () {
+            tag_modal.setActive($(this).parent().attr('data-id'), $(this).attr('data-value'));
 		});
 
-        core_values.on('click', '.js-core_values-datatable-edit', function () {
-            core_values_modal.populateFromId($(this).parent().attr('data-id'));
+        core_values.on('click', '.js-tag-edit', function () {
+            tag_modal.populateFromId($(this).parent().attr('data-id'));
 		});
 
-        core_values.on('click', '.js-core_values-datatable-create', function () {
-            core_values_modal.resetForm();
-            core_values_modal.showModal(true);
-		});
+        core_values.on('click', '.js-tag-delete', function () {
+            tag_delete_modal.populateFromId($(this).parent().attr('data-id'));
+        });
 
-
-        $('.js-core_values-modal-form').on('submit', function (event) {
+        $('.js-tag-form').on('submit', function (event) {
             event.preventDefault();
-            core_values_modal.submit();
+            tag_modal.submit();
 		});
 
-        var core_values_modal = {
-            modal_body: $('#core_values_modal'),
+        var tag_modal = {
+            modal: $('#tag_modal'),
 			error_template: $('#js_modal_error_template'),
             setActive: function (id, active) {
                 var self = this;
@@ -162,31 +189,31 @@
                 })
 			},
 			populateFromTag: function (tag) {
-                this.modal_body.find('input[name="tag_id"]').val(+tag.id);
-                this.modal_body.find('input[name="tag_name"]').val(tag.name);
-                this.modal_body.find('input[name="tag_bg_colour"]').val(tag.bg_colour);
+                this.modal.find('input[name="tag_id"]').val(+tag.id);
+                this.modal.find('input[name="tag_name"]').val(tag.name);
+                this.modal.find('input[name="tag_bg_colour"]').val(tag.bg_colour);
                 this.resetErrors();
                 this.showModal(true);
 			},
 			showModal: function (show) {
                 if (show === true) {
-                    this.modal_body.modal('show');
+                    this.modal.modal('show');
 				} else {
-                    this.modal_body.modal('hide');
+                    this.modal.modal('hide');
 				}
 			},
 			reloadDataTable: function () {
-                $('#core_values table').dataTable().api().ajax.reload();
+                $('#tags_datatable table').dataTable().api().ajax.reload();
 			},
 			resetForm: function () {
-                this.modal_body.find('input[name="tag_id"]').val(null);
-                this.modal_body.find('input[name="tag_name"]').val(null);
-                this.modal_body.find('input[name="tag_bg_colour"]').val(null);
+                this.modal.find('input[name="tag_id"]').val(null);
+                this.modal.find('input[name="tag_name"]').val(null);
+                this.modal.find('input[name="tag_bg_colour"]').val(null);
 
                 this.resetErrors();
 			},
 			resetErrors: function () {
-                var form_errors = this.modal_body.find('.js-form-error');
+                var form_errors = this.modal.find('.js-form-error');
                 form_errors.empty();
 			},
 			submit: function () {
@@ -194,12 +221,12 @@
 
                 self.resetErrors();
 
-                var id = +this.modal_body.find('input[name="tag_id"]').val();
+                var id = +this.modal.find('input[name="tag_id"]').val();
                 if (!(id > 0)) {
                     id = null;
 				}
-                var name = this.modal_body.find('input[name="tag_name"]').val();
-                var bg_colour = this.modal_body.find('input[name="tag_bg_colour"]').val();
+                var name = this.modal.find('input[name="tag_name"]').val();
+                var bg_colour = this.modal.find('input[name="tag_bg_colour"]').val();
 
                 var body = {
                     name: name,
@@ -220,7 +247,7 @@
 					error: function (response) {
                         var body = response.responseJSON;
 
-                        var form_errors = self.modal_body.find('.js-form-error');
+                        var form_errors = self.modal.find('.js-form-error');
                         var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
                         if (problem_details_title_error.length > 0 && 'title' in body) {
                             self.addError(problem_details_title_error, body.title);
@@ -250,6 +277,66 @@
                 container.append(error);
 			}
 		};
+
+        var tag_delete_modal = {
+            modal: $('#tag_delete_modal'),
+            error_template: $('#js_modal_error_template'),
+            resetErrors: function () {
+                var form_errors = this.modal.find('.js-form-error');
+                form_errors.empty();
+            },
+            populateFromId: function (id) {
+                this.modal.find('input[name="id"]').val(id);
+                this.resetErrors();
+                this.showModal(true);
+			},
+            showModal: function (show) {
+                if (show === true) {
+                    this.modal.modal('show');
+                } else {
+                    this.modal.modal('hide');
+                }
+            },
+			submit: function () {
+                var self = this;
+
+                self.resetErrors();
+
+                var id = this.modal.find('input[name="id"]').val();
+
+                $.ajax({
+                    url: '/api/thankyou/v2/tags/' + id,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    error: function (response) {
+                        var body = response.responseJSON;
+
+                        var form_errors = self.modal.find('.js-form-error');
+                        var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
+                        if (problem_details_title_error.length > 0 && 'title' in body) {
+                            self.addError(problem_details_title_error, body.title);
+                        }
+                    },
+                    success: function () {
+                        self.showModal(false);
+                        self.reloadDataTable();
+                    }
+                });
+			},
+            addError: function (container, message) {
+                var error = $(_.template(this.error_template.html())({}));
+                error.text(message);
+                container.append(error);
+            },
+            reloadDataTable: function () {
+                $('#tags_datatable table').dataTable().api().ajax.reload();
+            }
+		};
+
+        tag_delete_modal.modal.find('.js-tag-delete-submit').on('click', function () {
+            tag_delete_modal.submit();
+		});
 
     })(jQuery);
 </script>
