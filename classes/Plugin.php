@@ -34,6 +34,7 @@ use Claromentis\ThankYou\Tags\TagAcl;
 use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
+use Claromentis\ThankYou\Tags\UI\TagTemplaterComponent;
 use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYouFactory;
@@ -81,6 +82,10 @@ class Plugin implements
 
 		$app[TagFormatter::class] = function ($app) {
 			return new TagFormatter($app['rest.formatter']);
+		};
+
+		$app['templater.ui.thankyou.tag'] = function ($app) {
+			return new TagTemplaterComponent($app[Tag::class], $app['logger_factory']->GetLogger('tag'));
 		};
 
 		$app['thankyou.datatable.tags'] = TagDataTableSource::class;
