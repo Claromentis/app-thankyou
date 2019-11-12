@@ -118,7 +118,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		{
 			try
 			{
-				$thank_you = $this->api->ThankYous()->GetThankYous($thank_you, true);
+				$thank_you = $this->api->ThankYous()->GetThankYou($thank_you, true, false, true);
 			} catch (ThankYouOClass $exception)
 			{
 				$this->logger->error("Failed to display Thank in Templater Component Thank", [$exception]);

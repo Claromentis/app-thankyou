@@ -103,10 +103,10 @@ class ThankYousList extends TemplaterComponentTmpl
 		{
 			if (isset($user_id))
 			{
-				$thank_yous = $this->api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true);
+				$thank_yous = $this->api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true, false, true);
 			} else
 			{
-				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, true);
+				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, true, false, true);
 			}
 		} catch (ThankYouOClass $exception)
 		{

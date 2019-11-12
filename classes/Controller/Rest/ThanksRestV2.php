@@ -149,10 +149,12 @@ class ThanksRestV2
 		$limit        = $query_params['limit'] ?? 20;
 		$offset       = $query_params['offset'] ?? 0;
 		$thanked      = (bool) (int) ($query_params['thanked'] ?? null);
+		$users        = (bool) (int) ($query_params['users'] ?? null);
+		$tags         = (bool) (int) ($query_params['tags'] ?? null);
 
 		try
 		{
-			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked);
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked, $users, $tags);
 		} catch (ThankYouOClass $exception)
 		{
 			throw new RestExError(($this->lmsg)('thankyou.thankyou.error.server'), "Internal Server Error", $exception);
