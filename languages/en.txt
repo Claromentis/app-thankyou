@@ -36,7 +36,9 @@ lm	thankyou.grammar.list.and		and
 lm	thankyou.lia.error.saving		One or more Items could not be saved
 lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
+lm	thankyou.tag.delete.description		Deleting this core value will remove it from all the linked thank you notes. Change visibility to 'hidden' to keep existing notes but prevent it from being selected in the future.
 lm	thankyou.tag.delete.error.permission		You do not have permission to delete this Core Value
+lm	thankyou.tag.delete.title		Confirm Deletion
 lm	thankyou.tag.error.active.invalid		Invalid Core Value Active status
 lm	thankyou.tag.error.background.invalid		Invalid Background
 lm	thankyou.tag.error.background.undefined		Core Value Background Colour must be set
@@ -102,3 +104,5 @@ lt	thankyou:component:say_thank_you.body		Say thank you
 lt	thankyou:component:thankyou_users_name.body		Thank you
 lt	thankyou:lia:error:saving.body	$lm['thankyou.lia.error.saving']	
 lt	thankyou:lia:no_results.body	$lm['thankyou.lia.no_results']	
+lt	thankyou:tag:delete:description.body	$lm['thankyou.tag.delete.description']	
+lt	thankyou:tag:delete:title.body	$lm['thankyou.tag.delete.title']	

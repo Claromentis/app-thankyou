@@ -36,7 +36,9 @@ lm	thankyou.grammar.list.and
 lm	thankyou.lia.error.saving		
 lm	thankyou.lia.no_results		
 lm	thankyou.notifications.saved		
+lm	thankyou.tag.delete.description		
 lm	thankyou.tag.delete.error.permission		
+lm	thankyou.tag.delete.title		
 lm	thankyou.tag.error.active.invalid		
 lm	thankyou.tag.error.background.invalid		
 lm	thankyou.tag.error.background.undefined		
@@ -102,3 +104,5 @@ lt	thankyou:component:say_thank_you.body		Sag Danke
 lt	thankyou:component:thankyou_users_name.body		Vielen Dank
 lt	thankyou:lia:error:saving.body	$lm['thankyou.lia.error.saving']	
 lt	thankyou:lia:no_results.body	$lm['thankyou.lia.no_results']	
+lt	thankyou:tag:delete:description.body	$lm['thankyou.tag.delete.description']	
+lt	thankyou:tag:delete:title.body	$lm['thankyou.tag.delete.title']	
