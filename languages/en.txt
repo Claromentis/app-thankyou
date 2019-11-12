@@ -36,6 +36,7 @@ lm	thankyou.grammar.list.and		and
 lm	thankyou.lia.error.saving		One or more Items could not be saved
 lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
+lm	thankyou.tag.delete.error.permission		You do not have permission to delete this Core Value
 lm	thankyou.tag.error.active.invalid		Invalid Core Value Active status
 lm	thankyou.tag.error.background.invalid		Invalid Background
 lm	thankyou.tag.error.background.undefined		Core Value Background Colour must be set

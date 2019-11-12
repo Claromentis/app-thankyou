@@ -36,6 +36,7 @@ lm	thankyou.grammar.list.and
 lm	thankyou.lia.error.saving		
 lm	thankyou.lia.no_results		
 lm	thankyou.notifications.saved		
+lm	thankyou.tag.delete.error.permission		
 lm	thankyou.tag.error.active.invalid		
 lm	thankyou.tag.error.background.invalid		
 lm	thankyou.tag.error.background.undefined		
