@@ -26,7 +26,7 @@ class Tag
 
 	public function __construct(TagRepository $tag_repository, TagFactory $tag_factory, TagAcl $tag_acl)
 	{
-		$this->acl        = $tag_acl
+		$this->acl        = $tag_acl;
 		$this->factory    = $tag_factory;
 		$this->repository = $tag_repository;
 	}

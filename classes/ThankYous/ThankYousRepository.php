@@ -451,7 +451,7 @@ class ThankYousRepository
 
 		if ($tags)
 		{
-			$query .= " LEFT JOIN " . self::THANK_YOU_TAGS_TABLE . " ON " . self::THANK_YOU_TAGS_TABLE . ".thankyou_id=thankyou_item.id";
+			$query .= " LEFT JOIN " . self::THANK_YOU_TAGS_TABLE . " ON " . self::THANK_YOU_TAGS_TABLE . ".item_id=thankyou_item.id";
 		}
 
 		$query .= " WHERE thankyou_item.id IN in:int:ids";
@@ -723,7 +723,7 @@ class ThankYousRepository
 			return $thank_you_tag_ids;
 		}
 
-		$this->db->query("DELETE FROM " . self::THANK_YOU_TAGS_TABLE . " WHERE thankyou_id=int:id", $id);
+		$this->db->query("DELETE FROM " . self::THANK_YOU_TAGS_TABLE . " WHERE item_id=int:id", $id);
 
 		foreach ($tags as $tag)
 		{
@@ -733,7 +733,7 @@ class ThankYousRepository
 				continue;
 			}
 
-			$query = $this->query_factory->GetQueryInsert(self::THANK_YOU_TAGS_TABLE, ['int:thankyou_id' => $id, 'int:tag_id' => $tag_id]);
+			$query = $this->query_factory->GetQueryInsert(self::THANK_YOU_TAGS_TABLE, ['int:item_id' => $id, 'int:tag_id' => $tag_id]);
 			$this->db->query($query);
 			$thank_you_tag_ids[] = (int) $this->db->insertId();
 		}
