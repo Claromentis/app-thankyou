@@ -107,6 +107,7 @@ class ThankYousRepository
 		$thanks_item->SetId($id);
 		try
 		{
+			$this->db->query("DELETE FROM " . self::THANK_YOU_TAGS_TABLE . " WHERE item_id = int:id", $id);
 			$thanks_item->Delete();
 		} catch (ThankYouException $exception)
 		{
