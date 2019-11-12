@@ -21,6 +21,8 @@ class TagRepository
 {
 	const TABLE_NAME = 'thankyou_tag';
 
+	const TAGGED_TABLE = 'thankyou_tagged';
+
 	private $db;
 
 	protected $log;
@@ -157,6 +159,7 @@ class TagRepository
 	public function Delete(int $id)
 	{
 		$this->db->query("DELETE FROM " . self::TABLE_NAME . " WHERE id=int:id", $id);
+		$this->db->query("DELETE FROM " . self::TAGGED_TABLE . " WHERE tag_id=int:id", $id);
 	}
 
 	public function IsTagNameUnique(string $name, ?int $id): bool
