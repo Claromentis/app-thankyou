@@ -130,6 +130,15 @@ class Tag
 	}
 
 	/**
+	 * @param int[] $ids
+	 * @return array
+	 */
+	public function GetTagsTaggedTotals(array $ids): array
+	{
+		return $this->repository->GetTagsTaggedTotals($ids);
+	}
+
+	/**
 	 * @param \Claromentis\ThankYou\Tags\Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
 	 */

@@ -84,6 +84,30 @@ class TagRepository
 	}
 
 	/**
+	 * @param int[] $ids
+	 * @return array
+	 */
+	public function GetTagsTaggedTotals(array $ids): array
+	{
+		if (count($ids) === 0)
+		{
+			return [];
+		}
+
+		$query_string = "SELECT COUNT(item_id) AS total, tag_id FROM " . self::TABLE_NAME . " WHERE tag_id IN in:int:ids GROUP BY tag_id";
+
+		$results = $this->db->query($query_string, $ids);
+
+		$tags_tagged_totals = [];
+		while ($row = $results->fetchArray())
+		{
+			$tags_tagged_totals[(int) $row['tag_id']] = (int) $row['total'];
+		}
+
+		return $tags_tagged_totals;
+	}
+
+	/**
 	 * @param Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
 	 */
@@ -99,11 +123,11 @@ class TagRepository
 		}
 
 		$db_fields = [
-			'str(255):name' => $name,
-			'int:active' => (int) $tag->GetActive(),
-			'int:created_by' => null,
-			'int:created_date' => null,
-			'int:modified_by' => null,
+			'str(255):name'     => $name,
+			'int:active'        => (int) $tag->GetActive(),
+			'int:created_by'    => null,
+			'int:created_date'  => null,
+			'int:modified_by'   => null,
 			'int:modified_date' => null,
 		];
 
@@ -274,6 +298,4 @@ class TagRepository
 			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
 		}
 	}
-
-	//TODO: Add method GetTagFromDbRow for direct calls. Currently only works as an extension of the ThankTagRepository.
 }
