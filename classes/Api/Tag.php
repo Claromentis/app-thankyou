@@ -129,13 +129,18 @@ class Tag
 		return $this->repository->GetTotalTags();
 	}
 
+	public function GetTagsTaggedTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
+	{
+		return $this->repository->GetTagsTaggedTotals($limit, $offset, $active, $orders);
+	}
+
 	/**
 	 * @param int[] $ids
 	 * @return array
 	 */
-	public function GetTagsTaggedTotals(array $ids): array
+	public function GetTagsTaggedTotalsFromIds(array $ids): array
 	{
-		return $this->repository->GetTagsTaggedTotals($ids);
+		return $this->repository->GetTagsTaggedTotalsFromIds($ids);
 	}
 
 	/**

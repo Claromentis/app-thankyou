@@ -86,10 +86,49 @@ class TagRepository
 	}
 
 	/**
+	 * @param int|null   $limit
+	 * @param int|null   $offset
+	 * @param bool|null  $active
+	 * @param array|null $orders
+	 * @return array
+	 */
+	public function GetTagsTaggedTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
+	{
+		$query_string = "SELECT COUNT(" . self::TAGGED_TABLE . ".item_id) AS total, " . self::TAGGED_TABLE . ".tag_id FROM " . self::TAGGED_TABLE . " GROUP BY " . self::TAGGED_TABLE . ".tag_id";
+
+		if (isset($orders) && count($orders) > 0)
+		{
+			$query_string .= " ORDER BY";
+			foreach ($orders as $offset => $order)
+			{
+				$column    = $order['column'] ?? null;
+				$direction = (isset($order['desc']) && $order['desc'] === true) ? 'DESC' : 'ASC';
+				if (!isset($column) || !is_string($column))
+				{
+					throw new InvalidArgumentException("Failed to GetTags, one or more Orders does not have a column");
+				}
+				$query_string .= " " . $column . " " . $direction;
+			}
+		}
+
+		$query = new QueryBuilder($query_string);
+		$query->AddJoin(self::TAGGED_TABLE, self::TABLE_NAME, 'tag', "tag.id = " . self::TAGGED_TABLE . ".tag_id");
+
+		if (isset($active))
+		{
+			$query->AddWhereAndClause("active = " . (int) $active);
+		}
+
+		$query->setLimit($limit, $offset);
+
+		return $this->GetTagsTotalsFromDbQuery($this->db->query($query->GetQuery()));
+	}
+
+	/**
 	 * @param int[] $ids
 	 * @return array
 	 */
-	public function GetTagsTaggedTotals(array $ids): array
+	public function GetTagsTaggedTotalsFromIds(array $ids): array
 	{
 		if (count($ids) === 0)
 		{
@@ -98,15 +137,7 @@ class TagRepository
 
 		$query_string = "SELECT COUNT(item_id) AS total, tag_id FROM " . self::TABLE_NAME . " WHERE tag_id IN in:int:ids GROUP BY tag_id";
 
-		$results = $this->db->query($query_string, $ids);
-
-		$tags_tagged_totals = [];
-		while ($row = $results->fetchArray())
-		{
-			$tags_tagged_totals[(int) $row['tag_id']] = (int) $row['total'];
-		}
-
-		return $tags_tagged_totals;
+		return $this->GetTagsTotalsFromDbQuery($this->db->query($query_string, $ids));
 	}
 
 	/**
@@ -278,6 +309,21 @@ class TagRepository
 		}
 
 		return $tags;
+	}
+
+	/**
+	 * @param ResultInterface $results
+	 * @return array
+	 */
+	private function GetTagsTotalsFromDbQuery(ResultInterface $results): array
+	{
+		$tags_tagged_totals = [];
+		while ($row = $results->fetchArray())
+		{
+			$tags_tagged_totals[(int) $row['tag_id']] = (int) $row['total'];
+		}
+
+		return $tags_tagged_totals;
 	}
 
 	/**
