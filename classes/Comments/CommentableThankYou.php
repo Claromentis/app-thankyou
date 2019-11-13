@@ -14,19 +14,28 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouInvalidThankable;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\ThankYouRuntimeException;
+use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\ThanksItem;
-use InvalidArgumentException;
 use LogicException;
+use Psr\Log\LoggerInterface;
 
 class CommentableThankYou implements CommentableInterface, CommentLocationInterface
 {
 	/**
+	 * @var LoggerInterface $log
+	 */
+	private $log;
+
+	/**
 	 * @var ThanksItem|null $thanks_item
 	 */
 	private $thanks_item;
+
+	public function __construct()
+	{
+		$this->log = Services::I()->GetLogger('comments');
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -75,9 +84,6 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 	 * Only a Comment's Author or a Thank You Admin may Delete it.
 	 *
 	 * {@inheritDoc}
-	 *
-	 * @throws InvalidArgumentException
-	 *
 	 */
 	public function UserHasPermission(SecurityContext $context, $perms, Comment $comment = null): bool
 	{
@@ -114,22 +120,23 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 				return false;
 				break;
 			default:
-				throw new InvalidArgumentException("Invalid argument '" . (string) $perms . "' given for 2nd argument of UserHasPermission");
+				$this->log->error("Invalid argument '" . (string) $perms . "' given for 2nd argument of UserHasPermission");
+
+				return false;
 				break;
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
-	 *
-	 * @throws ThankYouRuntimeException
-	 * @throws LogicException
 	 */
 	public function Notify(Comment $comment, Notification $default_notification)
 	{
 		if (!isset($this->thanks_item))
 		{
-			throw new ThankYouRuntimeException("Failed to send Notifications for Thank You Comment, Thank You Item has not been loaded");
+			$this->log->error("Failed to send Notifications for Thank You Comment, Thank You Item has not been loaded");
+
+			return;
 		}
 
 		/**
@@ -140,9 +147,11 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 		try
 		{
 			$thank_you = $api->ThankYous()->GetThankYous($this->thanks_item->GetId(), false, true);
-		} catch (ThankYouInvalidThankable | ThankYouNotFound $exception)
+		} catch (ThankYouNotFound | ThankYouOClass $exception)
 		{
-			throw new LogicException("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", null, $exception);
+			$this->log->error("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", [$exception]);
+
+			return;
 		}
 
 		$thanked_users = $thank_you->GetUsers();
