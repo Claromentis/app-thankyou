@@ -40,13 +40,13 @@ class TagRepository
 	}
 
 	/**
-	 * @param int         $limit
-	 * @param int         $offset
+	 * @param int|null    $limit
+	 * @param int|null    $offset
 	 * @param string|null $name
 	 * @param array|null  $orders
 	 * @return Tag[]
 	 */
-	public function GetTags(int $limit, int $offset, ?string $name = null, ?array $orders = null): array
+	public function GetTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
 	{
 		$query_string = "SELECT * FROM " . self::TABLE_NAME;
 		if (isset($orders) && count($orders) > 0)
@@ -69,7 +69,9 @@ class TagRepository
 		{
 			$query->AddSubstringFilter('name', $name);
 		}
+
 		$query->setLimit($limit, $offset);
+
 		$results = $this->db->query($query->GetQuery());
 
 		return $this->GetTagsFromDbQuery($results);

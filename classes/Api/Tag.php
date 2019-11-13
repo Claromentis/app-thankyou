@@ -67,13 +67,13 @@ class Tag
 	}
 
 	/**
-	 * @param int         $limit
-	 * @param int         $offset
+	 * @param int|null    $limit
+	 * @param int|null    $offset
 	 * @param string|null $name
 	 * @param array|null  $orders
 	 * @return \Claromentis\ThankYou\Tags\Tag[]
 	 */
-	public function GetTags(int $limit, int $offset, ?string $name = null, ?array $orders = null): array
+	public function GetTags(?int $limit, ?int $offset, ?string $name = null, ?array $orders = null): array
 	{
 		return $this->repository->GetTags($limit, $offset, $name, $orders);
 	}
