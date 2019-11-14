@@ -171,35 +171,10 @@ class ThankYousList extends TemplaterComponentTmpl
 
 		if ($can_create)
 		{
-			$args['create.visible'] = 1;
+			$args['create_container.visible'] = 1;
 			if (isset($create_thankables))
 			{
-				$preselected_thankables = [];
-				foreach ($create_thankables as $thankable)
-				{
-					if ($thankable instanceof Thankable)
-					{
-						$owner_class_name = '';
-						try
-						{
-							$owner_class_name = $this->api->ThankYous()->GetOwnerClassNamesFromIds([$thankable->GetOwnerClass()])[0];
-						} catch (ThankYouOClass $exception)
-						{
-							$this->log->error("Failed to Get Owner Class Name for ID '" . (string) $create_thankables->GetOwnerClass() . "'", [$exception]);
-						}
-
-						$preselected_thankables[] = [
-							'id'          => $thankable->GetId(),
-							'name'        => $thankable->GetName(),
-							'object_type' => [
-								'id'   => $thankable->GetOwnerClass(),
-								'name' => $owner_class_name
-							]
-						];
-					}
-				}
-
-				$args['thank_you_create_button.data-preselected_thanked'] = json_encode($preselected_thankables);
+				$args['create.thankables'] = $create_thankables;
 			}
 		} else
 		{

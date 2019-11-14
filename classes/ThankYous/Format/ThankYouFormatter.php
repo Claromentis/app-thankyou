@@ -4,12 +4,10 @@ namespace Claromentis\ThankYou\ThankYous\Format;
 
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
-use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use DateClaTimeZone;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -22,14 +20,11 @@ class ThankYouFormatter
 
 	private $tag_formatter;
 
-	private $utility;
-
-	public function __construct(Lmsg $lmsg, TagFormatter $tag_formatter, ThankYouAcl $thank_you_acl, ThankYouUtility $thank_you_utility)
+	public function __construct(Lmsg $lmsg, TagFormatter $tag_formatter, ThankYouAcl $thank_you_acl)
 	{
 		$this->acl           = $thank_you_acl;
 		$this->lmsg          = $lmsg;
 		$this->tag_formatter = $tag_formatter;
-		$this->utility       = $thank_you_utility;
 	}
 
 	/**
@@ -180,13 +175,8 @@ class ThankYouFormatter
 		$object_type_id = $thankable->GetOwnerClass();
 		if (isset($object_type_id))
 		{
-			try
-			{
-				$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$object_type_id])[0];
-			} catch (ThankYouOClass $exception)
-			{
-				$owner_class_name = '';
-			}
+			$owner_class_name = $thankable->GetOwnerClassName() ?? '';
+
 			$object_type = ['id' => $object_type_id, 'name' => $owner_class_name];
 		}
 

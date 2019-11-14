@@ -41,6 +41,7 @@ use Claromentis\ThankYou\ThankYous\ThankYouFactory;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Claromentis\ThankYou\UI\TemplaterComponentThank;
+use Claromentis\ThankYou\UI\ThankYouCreateTemplaterComponent;
 use Claromentis\ThankYou\UI\ThankYousList;
 use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
@@ -134,7 +135,7 @@ class Plugin implements
 		};
 
 		$app[ThankYousRepository::class] = function ($app) {
-			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'), $app[QueryFactory::class], $app[Tag::class]);
+			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[ThankYouUtility::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'), $app[QueryFactory::class], $app[Tag::class]);
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
@@ -173,6 +174,10 @@ class Plugin implements
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
 			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
+		};
+
+		$app['templater.ui.thankyou.create'] = function ($app) {
+			return new ThankYouCreateTemplaterComponent($app['logger_factory']->GetLogger('thankyou'));
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
