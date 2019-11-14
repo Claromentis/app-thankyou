@@ -42,7 +42,7 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
         this.resetForm();
 
         if (typeof thanked === 'object' && thanked !== null) {
-            this.setThanked([thanked]);
+            this.setThanked(thanked);
             this.lockThanked(true);
         }
         this.showModal(true);
