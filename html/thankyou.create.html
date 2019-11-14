@@ -9,7 +9,7 @@
 		<include file="includes/modal.html"/>
 		<script type="text/javascript">
 			require(["domReady", "/intranet/thankyou/js/build/thankyou.bundle.js", "jquery"], function (domReady, ThankYou, $) {
-				domReady(function () {console.log('create script');
+				domReady(function () {
 					var thank_you = new ThankYou($('.' + ${class.json}));
 					thank_you.tags_config.placeholder = '<loc name="thankyou:common:select_core_values"></loc>';
 				});
