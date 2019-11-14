@@ -2,7 +2,6 @@
 namespace Claromentis\ThankYou;
 
 use Claromentis\Core\Acl\AclRepository;
-use Claromentis\Core\Admin\PanelsList;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\ControllerCollection;
@@ -43,7 +42,6 @@ use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Claromentis\ThankYou\UI\TemplaterComponentThank;
 use Claromentis\ThankYou\UI\ThankYouCreateTemplaterComponent;
 use Claromentis\ThankYou\UI\ThankYousList;
-use Claromentis\ThankYou\View\ThanksListView;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Psr\Log\LoggerInterface;
@@ -140,15 +138,6 @@ class Plugin implements
 
 		$app[ThankYouAcl::class] = function ($app) {
 			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'), $app[UserExtranetService::class]);
-		};
-
-		$app[ThanksListView::class] = function ($app) {
-			/**
-			 * @var PanelsList $panels ;
-			 */
-			$panels = $app['admin.panels_list'];
-
-			return new ThanksListView($panels->GetOne('thankyou'), $app[ThankYouUtility::class], $app[ThankYouAcl::class], $app[Lmsg::class]);
 		};
 
 		$app['thankyou.config'] = function ($app) {
