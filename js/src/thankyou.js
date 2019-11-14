@@ -1,9 +1,12 @@
 define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
-    var ThankYou = function () {
-        this.modal = $('#thank_you_modal');
-        this.form = $('.js-thank_you-form');
-        this.delete_form = $('.js-thank_you-delete-form');
+    var ThankYou = function (list) {
+        this.list = list;
+        this.modal = list.find('.js-thank_you-modal').first();
+        this.form = this.modal.find('.js-thank_you-form');
+        this.delete_modal = list.find('.js-thank_you-delete-modal');
+        this.delete_form = this.delete_modal.find('.js-thank_you-delete-form');
         this.form_error_template = this.modal.find('.js-form-error-template');
+
         this.tags_config = {
             width: '100%',
             allowClear: true,
@@ -28,33 +31,7 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
         };
 
         this.configureTags();
-
-        $('.js-thank-you-create').on('click', function () {
-            var thanked = null;
-            var create_thanked = $(this).attr('data-preselected_thanked');
-            if (typeof create_thanked === 'string') {
-                thanked = JSON.parse(create_thanked);
-            }
-            thank_you.create(thanked);
-        });
-
-        $('.js-thank_you-edit-button').on('click', function () {
-            thank_you.edit($(this).attr('data-id'));
-        });
-
-        $('.js-thank_you-delete-button').on('click', function () {
-            thank_you.delete($(this).attr('data-id'));
-        });
-
-        this.form.on('submit', null, this, function (event) {
-            event.preventDefault();
-            event.data.submit();
-        });
-
-        this.delete_form.on('submit', null, this, function (event) {
-            event.preventDefault();
-            event.data.submitDelete();
-        });
+        this.registerEventListeners();
     };
 
     ThankYou.prototype.configureTags = function () {
@@ -184,11 +161,10 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
     };
 
     ThankYou.prototype.showDeleteModal = function (show) {
-        var modal = $('#thank_you_delete_modal');
         if (show === true) {
-            modal.modal('show');
+            this.delete_modal.modal('show');
         } else {
-            modal.modal('hide');
+            this.delete_modal.modal('hide');
         }
     };
 
@@ -339,7 +315,35 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
         });
     };
 
-    var thank_you = new ThankYou();
+    ThankYou.prototype.registerEventListeners = function () {
+        var self = this;
+        this.list.on('click', '.js-thank-you-create', function () {
+            var thanked = null;
+            var create_thanked = $(this).attr('data-preselected_thanked');
+            if (typeof create_thanked === 'string') {
+                thanked = JSON.parse(create_thanked);
+            }
+            self.create(thanked);
+        });
 
-    return thank_you;
+        this.list.on('click', '.js-thank_you-edit-button', function () {
+            self.edit($(this).attr('data-id'));
+        });
+
+        this.list.on('click', '.js-thank_you-delete-button', function () {
+            self.delete($(this).attr('data-id'));
+        });
+
+        this.form.on('submit', null, this, function (event) {
+            event.preventDefault();
+            event.data.submit();
+        });
+
+        this.delete_form.on('submit', null, this, function (event) {
+            event.preventDefault();
+            event.data.submitDelete();
+        });
+    };
+
+    return ThankYou;
 });

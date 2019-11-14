@@ -118,6 +118,7 @@ class ThankYousList extends TemplaterComponentTmpl
 		foreach ($thank_yous as $thank_you)
 		{
 			$view_thank_yous[] = [
+				'thank_you.form'           => false,
 				'thank_you.comments'       => $display_comments,
 				'thank_you.delete'         => $can_delete,
 				'thank_you.edit'           => $can_edit,
@@ -129,6 +130,9 @@ class ThankYousList extends TemplaterComponentTmpl
 		}
 
 		$args['thank_yous.datasrc'] = $view_thank_yous;
+		$class                      = uniqid();
+		$args['list.+class']        = $class;
+		$args['class.json']         = $class;
 
 		if (count($args['thank_yous.datasrc']) === 0)
 		{

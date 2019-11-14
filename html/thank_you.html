@@ -3,9 +3,7 @@
 	<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
 </unique_section>
 -->
-<include file="includes/delete_modal.html"/>
-<include file="includes/modal.html"/>
-<div class="js-thank-you thank-you">
+<div name="thank_you" class="js-thank-you thank-you">
 	<div class="thank-you-note">
 		<span>
 			<loc name="thankyou:component:thankyou_users_name"></loc>
@@ -91,4 +89,17 @@
 					   new_on_top="1" compact_mode="1"/>
 		</div>
 	</div>
+	<txt name="thank_you_form">
+		<include file="includes/delete_modal.html"/>
+		<include file="includes/modal.html"/>
+		<script type="text/javascript">
+			require(["domReady", "/intranet/thankyou/js/build/thankyou.bundle.js", "jquery"], function (domReady, ThankYou, $) {
+				domReady(function () {
+					var id = ${id.json};
+					var thank_you = new ThankYou($('.js-thank-you[data-id="' + id + '"]'));
+					thank_you.tags_config.placeholder = '<loc name="thankyou:common:select_core_values"></loc>';
+				});
+			});
+		</script>
+	</txt>
 </div>

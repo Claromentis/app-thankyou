@@ -18,7 +18,7 @@
 						<div class="form-control-static pt-0 col-sm-10">
 							<div class="js-thank_you-picker-container">
 								<component class_key="sugre_picker" name="thank_you_user" multiple="1"
-										   id="thank_you_user" allow_unset="1"/>
+										    allow_unset="1"/>
 							</div>
 							<div class="js-thank_you-thanked-names-container" style="display:none;">
 								<span class="js-thank_you-thanked-names">John Smith</span>
@@ -43,8 +43,7 @@
 							   for="thank_you_description">Comment</label>
 
 						<div class="col-sm-10">
-							<textarea name="thank_you_description" id="thank_you_description"
-									  class="form-control"></textarea>
+							<textarea name="thank_you_description" class="form-control"></textarea>
 							<div class="js-form-error" data-name="description"></div>
 						</div>
 					</div>
@@ -64,9 +63,3 @@
 		<span class="text-danger"></span>
 	</script>
 </div>
-<script type="text/javascript">
-    require(["/intranet/thankyou/js/build/thankyou.bundle.js"], function (thank_you) {
-        thank_you.tags_config.placeholder = '<loc name="thankyou:common:select_core_values"></loc>';
-        thank_you.configureTags();
-    });
-</script>

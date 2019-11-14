@@ -87,6 +87,10 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 	 * * thank_link:
 	 *     * 0 = The Thank will not provide a link to itself.(default)
 	 *     * 1 = The Thank will provide a linke to iteslf.
+	 * * form:
+	 *     * 1 = The Form is included within the Thank You.(default)
+	 *     * 0 = The Form is not included within the Thank You. This option allows Thank You's to be displayed within
+	 *           the Thanks List Templater Component.
 	 *
 	 * @param             $attributes
 	 * @param Application $app
@@ -102,6 +106,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		$time_zone      = DateClaTimeZone::GetCurrentTZ();
 		$can_delete     = (bool) ($attributes['delete'] ?? null);
 		$can_edit       = (bool) ($attributes['edit'] ?? null);
+		$form           = (bool) ($attributes['form'] ?? true);
 		$links_enabled  = (bool) ($attributes['links'] ?? null);
 		$thanked_images = (bool) ($attributes['thanked_images'] ?? null);
 
@@ -188,7 +193,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			}
 		}
 
-		$tags_args =[];
+		$tags_args = [];
 		foreach ($thank_you->GetTags() as $tag)
 		{
 			$tags_args[] = ['tag.tag' => $tag];
@@ -209,6 +214,8 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		}
 
 		$args = [
+			'thank_you.data-id'        => $id,
+			'id.json'                  => $id,
 			'thank_title.visible'      => !$thank_link,
 			'thank_title_link.visible' => $thank_link,
 			'thank_title_link.href'    => '/thankyou/thanks/' . $id,
@@ -239,7 +246,8 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			'date_created.title' => $date_created->getDate(DateFormatter::LONG_DATE),
 
 			'thank_you_user.filter_perm_oclasses' => $thankable_object_types,
-			'thank_you_user.placeholder'          => ($this->lmsg)('thankyou.thank.placeholder')
+			'thank_you_user.placeholder'          => ($this->lmsg)('thankyou.thank.placeholder'),
+			'thank_you_form.visible'              => $form
 		];
 
 		return $this->CallTemplater('thankyou/thank_you.html', $args);
