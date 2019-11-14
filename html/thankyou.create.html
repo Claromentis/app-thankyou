@@ -1,6 +1,20 @@
-<span class="btn btn-primary thank-you--button js-thank-you-create" name="thank_you_create_button">
-	<span class="glyphicons glyphicons-donate"></span>
-	<span class="thank-title">
-		<txt name="thankyou:component:say_thank_you">Say thank you</txt>
+<span name="create_container" class="thank-you">
+	<span class="btn btn-primary thank-you--button js-thank-you-create" name="thank_you_create_button">
+		<span class="glyphicons glyphicons-donate"></span>
+		<span class="thank-title">
+			<txt name="thankyou:component:say_thank_you">Say thank you</txt>
+		</span>
 	</span>
+	<txt name="thank_you_form">
+		<include file="includes/modal.html"/>
+		<script type="text/javascript">
+			require(["domReady", "/intranet/thankyou/js/build/thankyou.bundle.js", "jquery"], function (domReady, ThankYou, $) {
+				domReady(function () {console.log('create script');
+					var thank_you = new ThankYou($('.' + ${class.json}));
+					thank_you.tags_config.placeholder = '<loc name="thankyou:common:select_core_values"></loc>';
+				});
+			});
+		</script>
+	</txt>
 </span>
+

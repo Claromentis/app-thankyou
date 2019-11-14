@@ -9,10 +9,6 @@ use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\Core\Security\SecurityContext;
-use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\View\ThanksListView;
-use DateClaTimeZone;
 
 /**
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
@@ -104,18 +100,15 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function ShowHeader($id_string, OptionsInterface $options, Application $app)
 	{
 		if (!$options->Get('show_header'))
-			return null;
+		{
+			return '';
+		}
 
-		if ($options->Get('allow_new'))
+		$args = [];
+
+		if (!$options->Get('allow_new'))
 		{
-			/**
-			 * @var ThanksListView $view
-			 */
-			$view = $app[ThanksListView::class];
-			$args = $view->ShowAddNew();
-		} else
-		{
-			$args = ['allow_new.visible' => 0];
+			$args = ['create_container.visible' => 0];
 		}
 
 		if ($options->Get('title') !== '')

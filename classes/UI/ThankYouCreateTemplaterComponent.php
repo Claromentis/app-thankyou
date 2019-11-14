@@ -19,7 +19,13 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 	public function Show($attributes, Application $app)
 	{
 		$thankables = $attributes['thankables'] ?? null;
-		$args       = [];
+		$form       = (bool) ($attributes['form'] ?? true);
+
+		$args = ['thank_you_form.visible' => $form];
+
+		$class                           = uniqid();
+		$args['create_container.+class'] = $class;
+		$args['class.json']              = $class;
 
 		if (isset($thankables))
 		{

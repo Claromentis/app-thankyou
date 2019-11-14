@@ -113,7 +113,7 @@ class ThankYousList extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app): string
 	{
-		$can_create = isset($attributes['create']);
+		$can_create = (bool) ($attributes['create'] ?? null);
 		$can_delete = (bool) ($attributes['delete'] ?? null);
 		$can_edit   = (bool) ($attributes['edit'] ?? null);
 		/**
@@ -148,7 +148,6 @@ class ThankYousList extends TemplaterComponentTmpl
 		foreach ($thank_yous as $thank_you)
 		{
 			$view_thank_yous[] = [
-				'thank_you.form'           => false,
 				'thank_you.comments'       => $display_comments,
 				'thank_you.delete'         => $can_delete,
 				'thank_you.edit'           => $can_edit,
