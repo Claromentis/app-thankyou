@@ -19,6 +19,8 @@ use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Date;
+use DateTime;
+use DateTimeZone;
 use Exception;
 use LogicException;
 use NotificationMessage;
@@ -258,17 +260,39 @@ class ThankYous
 	}
 
 	/**
-	 * @param int  $limit
-	 * @param int  $offset
-	 * @param bool $thanked
-	 * @param bool $users
-	 * @param bool $tags
+	 * @param int        $limit
+	 * @param int        $offset
+	 * @param array|null $date_range
+	 * @param bool       $thanked
+	 * @param bool       $users
+	 * @param bool       $tags
 	 * @return ThankYou[]
 	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
-	public function GetRecentThankYous(int $limit, int $offset = 0, bool $thanked = false, bool $users = false, bool $tags = false)
+	public function GetRecentThankYous(int $limit, int $offset = 0, ?array $date_range = null, bool $thanked = false, bool $users = false, bool $tags = false)
 	{
-		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset);
+		if (isset($date_range[0]) && ($date_range[0] instanceof DateTime))
+		{
+			/**
+			 * @var DateTime $from_date
+			 */
+			$from_date = clone $date_range[0];
+			$from_date->setTimezone(new DateTimeZone('UTC'));
+
+			$date_range[0] = (int) $from_date->format('YmdHis');
+		}
+		if (isset($date_range[1]) && ($date_range[1] instanceof DateTime))
+		{
+			/**
+			 * @var DateTime $from_date
+			 */
+			$to_date = clone $date_range[1];
+			$to_date->setTimezone(new DateTimeZone('UTC'));
+
+			$date_range[1] = (int) $to_date->format('YmdHis');
+		}
+
+		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $date_range);
 
 		try
 		{

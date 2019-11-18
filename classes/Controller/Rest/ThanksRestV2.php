@@ -154,7 +154,7 @@ class ThanksRestV2
 
 		try
 		{
-			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, $thanked, $users, $tags);
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, null, $thanked, $users, $tags);
 		} catch (ThankYouOClass $exception)
 		{
 			throw new RestExError(($this->lmsg)('thankyou.thankyou.error.server'), "Internal Server Error", $exception);

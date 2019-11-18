@@ -3,6 +3,8 @@ namespace Claromentis\ThankYou;
 
 use ActiveRecord;
 use ClaAggregation;
+use Claromentis\Core\DAL\Exceptions\TransactionException;
+use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
@@ -130,41 +132,49 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 	 */
 	public function Save()
 	{
-		if (!parent::Save())
-		{
-			throw new ThankYouRepository("Failed to Save Thank You");
-		}
-
-		$db = Services::I()->GetDb();
-
 		try
 		{
-			$id = $this->GetProperty('id');
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
-		}
-
-		if (isset($this->users_ids))
-		{
-			$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $id);
-
-			foreach ($this->users_ids as $user_id)
+			if (!parent::Save())
 			{
-				$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $id, $user_id);
+				throw new ThankYouRepository("Failed to Save Thank You");
 			}
-		}
 
-		if (isset($this->thanked))
-		{
-			$db->query("DELETE FROM thankyou_thanked WHERE item_id=int:id", $id);
-			foreach ($this->thanked as $thank)
+			$db = Services::I()->GetDb();
+
+			try
 			{
-				$db->query("INSERT INTO thankyou_thanked (item_id, object_type, object_id) VALUES (int:tyid, int:otid, int:oid)", $id, $thank['object_type'], $thank['object_id']);
+				$id = $this->GetProperty('id');
+			} catch (Exception $exception)
+			{
+				throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
 			}
-		}
 
-		return (int) $this->GetId();
+			if (isset($this->users_ids))
+			{
+				$db->DoTransaction(function (DbInterface $db) use ($id) {
+					$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $id);
+
+					foreach ($this->users_ids as $user_id)
+					{
+						$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $id, $user_id);
+					}
+				});
+			}
+
+			if (isset($this->thanked))
+			{
+				$db->query("DELETE FROM thankyou_thanked WHERE item_id=int:id", $id);
+				foreach ($this->thanked as $thank)
+				{
+					$db->query("INSERT INTO thankyou_thanked (item_id, object_type, object_id) VALUES (int:tyid, int:otid, int:oid)", $id, $thank['object_type'], $thank['object_id']);
+				}
+			}
+
+			return (int) $this->GetId();
+		} catch (TransactionException $exception)
+		{
+			throw new ThankYouRepository("Failed to Save Thank You", null, $exception);
+		}
 	}
 
 	/**

@@ -136,7 +136,7 @@ class ThankYousList extends TemplaterComponentTmpl
 				$thank_yous = $this->api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true, false, true);
 			} else
 			{
-				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, true, false, true);
+				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, null, true, false, true);
 			}
 		} catch (ThankYouOClass $exception)
 		{

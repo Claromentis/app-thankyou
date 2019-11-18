@@ -17,6 +17,7 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\Exceptions\TagException;
+use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
@@ -29,7 +30,6 @@ use User;
 class ThankYousRepository
 {
 	const THANKABLES = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
-	const THANK_YOU_TAGS_TABLE = 'thankyou_tagged';
 
 	/**
 	 * @var AclRepository
@@ -90,6 +90,7 @@ class ThankYousRepository
 		$this->query_factory       = $query_factory;
 		$this->tags                = $tag_api;
 	}
+	//TODO: Isolating the Tag getting code to the Tag repo.
 
 	/**
 	 * Create a Thank You object.
@@ -114,7 +115,7 @@ class ThankYousRepository
 		$thanks_item->SetId($id);
 		try
 		{
-			$this->db->query("DELETE FROM " . self::THANK_YOU_TAGS_TABLE . " WHERE item_id = int:id", $id);
+			$this->db->query("DELETE FROM " . TagRepository::TAGGED_TABLE . " WHERE item_id = int:id", $id);
 			$thanks_item->Delete();
 		} catch (ThankYouException $exception)
 		{
@@ -444,7 +445,7 @@ class ThankYousRepository
 
 		if ($get_tags)
 		{
-			array_push($columns, self::THANK_YOU_TAGS_TABLE . ".tag_id AS tag_id");
+			array_push($columns, TagRepository::TAGGED_TABLE . ".tag_id AS tag_id");
 		}
 
 		$query = "SELECT ";
@@ -476,7 +477,7 @@ class ThankYousRepository
 
 		if ($get_tags)
 		{
-			$query .= " LEFT JOIN " . self::THANK_YOU_TAGS_TABLE . " ON " . self::THANK_YOU_TAGS_TABLE . ".item_id=thankyou_item.id";
+			$query .= " LEFT JOIN " . TagRepository::TAGGED_TABLE . " ON " . TagRepository::TAGGED_TABLE . ".item_id=thankyou_item.id";
 		}
 
 		$query .= " WHERE thankyou_item.id IN in:int:ids";
@@ -638,28 +639,21 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param int $limit
-	 * @param int $offset
+	 * @param int        $limit
+	 * @param int        $offset
+	 * @param array|null $date_range
 	 * @return int[]
 	 */
-	public function GetRecentThankYousIds(int $limit, int $offset)
+	public function GetRecentThankYousIds(int $limit, int $offset, ?array $date_range = null)
 	{
 		$query = "
 			SELECT thankyou_item.id
 			FROM thankyou_item
-			LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id = thankyou_item.id
-			LEFT JOIN users
-				ON users.id = thankyou_thanked.object_id
-				AND thankyou_thanked.object_type = 1
-			LEFT JOIN groups
-				ON groups.groupid = thankyou_thanked.object_id
-				AND object_type = 3
-			GROUP BY thankyou_item.id, thankyou_item.date_created
 			ORDER BY thankyou_item.date_created DESC";
 
 		try
 		{
-			$query = $this->query_factory->GetQuery($query);
+			$query = $this->query_factory->GetQueryBuilder($query);
 		} catch (Exception $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown", null, $exception);
@@ -667,7 +661,35 @@ class ThankYousRepository
 
 		$query->setLimit($limit, $offset);
 
-		$result = $this->db->query($query);
+		if (isset($date_range))
+		{
+			$lower_date = $date_range[0] ?? null;
+			$upper_date = $date_range[1] ?? null;
+
+			if (!isset($lower_date))
+			{
+				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Lower Date not found at offset 0");
+			}
+
+			if (!isset($upper_date))
+			{
+				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Upper Date not found at offset 1");
+			}
+
+			if (!is_int($lower_date))
+			{
+				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Lower Date is not an integer");
+			}
+
+			if (!is_int($upper_date))
+			{
+				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Upper Date is not an integer");
+			}
+
+			$query->AddWhereAndClause("thankyou_item.date_created BETWEEN " . $lower_date . " AND " . $upper_date);
+		}
+
+		$result = $this->db->query($query->GetQuery());
 
 		$thank_you_ids = [];
 		while ($row = $result->fetchArray())
@@ -751,7 +773,7 @@ class ThankYousRepository
 			return $thank_you_tag_ids;
 		}
 
-		$this->db->query("DELETE FROM " . self::THANK_YOU_TAGS_TABLE . " WHERE item_id=int:id", $id);
+		$this->db->query("DELETE FROM " . TagRepository::TAGGED_TABLE . " WHERE item_id=int:id", $id);
 
 		foreach ($tags as $tag)
 		{
@@ -761,7 +783,7 @@ class ThankYousRepository
 				continue;
 			}
 
-			$query = $this->query_factory->GetQueryInsert(self::THANK_YOU_TAGS_TABLE, ['int:item_id' => $id, 'int:tag_id' => $tag_id]);
+			$query = $this->query_factory->GetQueryInsert(TagRepository::TAGGED_TABLE, ['int:item_id' => $id, 'int:tag_id' => $tag_id]);
 			$this->db->query($query);
 			$thank_you_tag_ids[] = (int) $this->db->insertId();
 		}
