@@ -1,5 +1,8 @@
 #Change Log
 
+## Version 3.3.2 - unreleased ##
+* CORE-1036 Added Hungarian translation
+
 ## Version 3.3.1 - 29th October 2019
 * Added Uzbek translation
 
