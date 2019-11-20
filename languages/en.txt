@@ -1,16 +1,20 @@
 .	.	.	en
-lm	thankyou.admin.core_values		Core Values
 lm	thankyou.admin.core_values.description		Thank Yous can be linked to your Core Values to encourage engagement.
 lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
+lm	thankyou.admin.statistics.title		Reports & Statistics
 lm	thankyou.app_name		Thank you
 lm	thankyou.common.actions		Actions
+lm	thankyou.common.comment		Comment
 lm	thankyou.common.select_core_values		Select Core Values
+lm	thankyou.common.tags		Core Values
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
 lm	thankyou.common.thank_yous		Thank Yous
+lm	thankyou.common.thanked_groups		Thanked Groups
 lm	thankyou.common.thanks_deleted		Thank you message successfully deleted
+lm	thankyou.common.total_thanked_users		Total Thanked Users
 lm	thankyou.communication.imessages		Thank You
 lm	thankyou.component.cover_info.desc		Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"
 lm	thankyou.component.cover_info.title		Thank you
@@ -34,6 +38,7 @@ lm	thankyou.grammar.list.and		and
 lm	thankyou.lia.error.saving		One or more Items could not be saved
 lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
+lm	thankyou.tag.all		All Core Values
 lm	thankyou.tag.delete.description		Deleting this core value will remove it from all the linked thank you notes. Change visibility to 'hidden' to keep existing notes but prevent it from being selected in the future.
 lm	thankyou.tag.delete.error.permission		You do not have permission to delete this Core Value
 lm	thankyou.tag.delete.title		Confirm Deletion
@@ -47,7 +52,7 @@ lm	thankyou.tag.error.name.invalid		Core Value Name must be a string if defined
 lm	thankyou.tag.error.name.not_empty		Core Value's Name cannot be empty
 lm	thankyou.tag.error.name.not_unique		This Core Value Name has already been used
 lm	thankyou.tag.error.name.undefined		Core Value Name must be defined
-lm	thankyou.thank.placeholder		Select user of group
+lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
 lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to: 
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
@@ -70,7 +75,6 @@ lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']
 lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
-lt	thankyou:admin:core_values.body	$lm['thankyou.admin.core_values']	
 lt	thankyou:admin:export:period.body		Period
 lt	thankyou:admin:export_csv.body		Export to *.csv
 lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
@@ -83,9 +87,11 @@ lt	thankyou:admin:notifications:notify_line_manager.body		Also notify the line m
 lt	thankyou:admin:notifications:save.body		Save
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		Users will be notified whenever they're being thanked.
+lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']	
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
 lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
+lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
 lt	thankyou:component:delete.body		Delete
 lt	thankyou:component:delete_confirm.body		Are you sure you want to delete this thank you message?
