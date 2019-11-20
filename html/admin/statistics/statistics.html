@@ -1,0 +1,27 @@
+<block id="admin_breadcrumb">
+	<li><a href="/thankyou/admin/">
+		<loc name="thankyou:admin:breadcrumb">Thank You</loc>
+	</a></li>
+	<li class="active">
+		<loc name="thankyou:admin:statistics:title"></loc>
+	</li>
+</block>
+<block id="info_panel_pills">
+	<include file="../menu.html"/>
+</block>
+
+<block id="page_body">
+	<h3>
+		<loc name="thankyou:admin:statistics:title"></loc>
+	</h3>
+	<div>
+		<h4>
+			Filters
+		</h4>
+		<component class_key="data_table_form" name="dt_form" table="thank_yous_datatable"
+				   template="thankyou/admin/statistics/filter.html"/>
+	</div>
+	<component class_key="data_table" name="thank_yous_datatable" service="thankyou.datatable.thank_yous"/>
+</block>
+
+<include file="../../../common/layouts/admin_with_info_panel.html"/>
