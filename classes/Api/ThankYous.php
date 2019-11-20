@@ -2,8 +2,15 @@
 
 namespace Claromentis\ThankYou\Api;
 
+use Claromentis\Comments\CommentsRepository;
+use Claromentis\Core\Acl\AclRepository;
+use Claromentis\Core\Acl\Exception\InvalidSubjectException;
 use Claromentis\Core\Config\Config;
+use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Security\SecurityContext;
+use Claromentis\People\InvalidFieldIsNotSingle;
+use Claromentis\People\UsersListProvider;
+use Claromentis\ThankYou\Comments\CommentableThankYou;
 use Claromentis\ThankYou\Constants;
 use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
@@ -13,6 +20,7 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\LineManagerNotifier;
+use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
@@ -20,8 +28,8 @@ use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Date;
 use DateTime;
-use DateTimeZone;
 use Exception;
+use InvalidArgumentException;
 use LogicException;
 use NotificationMessage;
 use User;
@@ -30,7 +38,13 @@ class ThankYous
 {
 	private $acl;
 
+	private $acl_repository;
+
+	private $comments_repository;
+
 	private $config;
+
+	private $likes_repository;
 
 	private $line_manager_notifier;
 
@@ -43,10 +57,16 @@ class ThankYous
 		ThankYousRepository $thank_yous_repository,
 		Config $config,
 		ThankYouAcl $acl,
-		ThankYouUtility $thank_you_utility
+		ThankYouUtility $thank_you_utility,
+		CommentsRepository $comments_repository,
+		LikesRepository $likes_repository,
+		AclRepository $acl_repository
 	) {
 		$this->acl                   = $acl;
+		$this->acl_repository        = $acl_repository;
+		$this->comments_repository   = $comments_repository;
 		$this->config                = $config;
+		$this->likes_repository      = $likes_repository;
 		$this->line_manager_notifier = $line_manager_notifier;
 		$this->thank_yous_repository = $thank_yous_repository;
 		$this->utility               = $thank_you_utility;
@@ -106,11 +126,97 @@ class ThankYous
 
 	/**
 	 * @param ThankYou $thank_you
-	 * @throws ThankYouOClass
 	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
 	{
-		$this->thank_yous_repository->PopulateThankYouUsersFromThankables($thank_you);
+		$thankables = $thank_you->GetThankable();
+
+		if (!isset($thankables))
+		{
+			$thank_you->SetUsers(null);
+
+			return;
+		}
+
+		$owner_classes = [];
+		foreach ($thankables as $thankable)
+		{
+			$id        = $thankable->GetId();
+			$oclass_id = $thankable->GetOwnerClass();
+
+			if (!isset($id) || !isset($oclass_id))
+			{
+				continue;
+			}
+			$owner_classes[] = ['oclass' => $oclass_id, 'id' => $id];
+		}
+
+		$user_ids = $this->GetDistinctUserIdsFromOwnerClasses($owner_classes);
+
+		$users_list_provider = new UsersListProvider();
+		$users_list_provider->SetFilterIds($user_ids);
+
+		try
+		{
+			$users = $users_list_provider->GetListObjects();
+		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
+		{
+			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
+		}
+
+		$thank_you->SetUsers($users);
+	}
+
+	/**
+	 * Given an array of arrays with offset id = int, oclass = int, returns a distinct list of User IDs.
+	 *
+	 * @param array $owner_classes
+	 * @return int[]
+	 */
+	public function GetDistinctUserIdsFromOwnerClasses(array $owner_classes)
+	{
+		$acl = $this->acl_repository->Get(0, 0);
+
+		foreach ($owner_classes as $owner_class_member)
+		{
+			$id        = $owner_class_member['id'] ?? null;
+			$oclass_id = $owner_class_member['oclass'] ?? null;
+
+			if (!isset($id))
+			{
+				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, one or more Owner Class Members does not have an ID");
+			}
+			if (!is_int(($id)))
+			{
+				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, Owner Class Member ID " . (string) $id . " is not an integer");
+			}
+
+			if (!isset($oclass_id))
+			{
+				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, one or more Owner Class Members does not have an Owner Class ID");
+			}
+			if (!is_int(($oclass_id)))
+			{
+				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, Owner Class ID " . (string) $oclass_id . " is not an integer");
+			}
+
+			try
+			{
+				$acl->Add(0, $oclass_id, $id);
+			} catch (InvalidSubjectException $invalid_subject_exception)
+			{
+				throw new LogicException("Unexpected Exception thrown by Acl method Add", null, $invalid_subject_exception);
+			}
+		}
+
+		$user_ids = $acl->GetIndividualsList(0);
+
+		foreach ($user_ids as $offset => $user_id)
+		{
+			$user_ids[$offset] = (int) $user_id;
+		}
+
+		return $user_ids;
 	}
 
 	/**
@@ -252,51 +358,44 @@ class ThankYous
 	/**
 	 * Return total number of Thank Yous in the database
 	 *
+	 * @param DateTime[]|int[]|null $date_range
+	 * @param int[]|null            $thanked_user_ids
 	 * @return int
 	 */
-	public function GetTotalThankYousCount(): int
+	public function GetTotalThankYousCount(?array $date_range = null, ?array $thanked_user_ids = null): int
 	{
-		return $this->thank_yous_repository->GetTotalThankYousCount();
+		if (isset($date_range))
+		{
+			$date_range = $this->utility->FormatDateRange($date_range);
+		}
+
+		return $this->thank_yous_repository->GetTotalThankYousCount($date_range, $thanked_user_ids);
 	}
 
 	/**
-	 * @param int        $limit
-	 * @param int        $offset
-	 * @param array|null $date_range
-	 * @param bool       $thanked
-	 * @param bool       $users
-	 * @param bool       $tags
+	 * @param int                   $limit
+	 * @param int                   $offset
+	 * @param DateTime[]|int[]|null $date_range
+	 * @param int[]|null            $thanked_user_ids
+	 * @param int[]|null            $tag_ids
+	 * @param bool                  $get_thanked
+	 * @param bool                  $get_users
+	 * @param bool                  $get_tags
 	 * @return ThankYou[]
 	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
-	public function GetRecentThankYous(int $limit, int $offset = 0, ?array $date_range = null, bool $thanked = false, bool $users = false, bool $tags = false)
+	public function GetRecentThankYous(int $limit, int $offset = 0, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false)
 	{
-		if (isset($date_range[0]) && ($date_range[0] instanceof DateTime))
+		if (isset($date_range))
 		{
-			/**
-			 * @var DateTime $from_date
-			 */
-			$from_date = clone $date_range[0];
-			$from_date->setTimezone(new DateTimeZone('UTC'));
-
-			$date_range[0] = (int) $from_date->format('YmdHis');
-		}
-		if (isset($date_range[1]) && ($date_range[1] instanceof DateTime))
-		{
-			/**
-			 * @var DateTime $from_date
-			 */
-			$to_date = clone $date_range[1];
-			$to_date->setTimezone(new DateTimeZone('UTC'));
-
-			$date_range[1] = (int) $to_date->format('YmdHis');
+			$date_range = $this->utility->FormatDateRange($date_range);
 		}
 
-		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $date_range);
+		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $date_range, $thanked_user_ids, $tag_ids);
 
 		try
 		{
-			return $this->GetThankYous($thank_you_ids, $thanked, $users, $tags);
+			return $this->GetThankYous($thank_you_ids, $get_thanked, $get_users, $get_tags);
 		} catch (ThankYouNotFound $thank_you_not_found)
 		{
 			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
@@ -332,6 +431,62 @@ class ThankYous
 		{
 			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
 		}
+	}
+
+	/**
+	 * Takes an array of "ThankYou"s or Thank Yous IDs and returns an array of integers representing that Thank You's total Comments, indexed by the IDs provided.
+	 *
+	 * @param int[]|ThankYou[] $ids
+	 * @return int[]
+	 */
+	public function GetThankYousCommentsCount(array $ids): array
+	{
+		$comment_counts = [];
+		foreach ($ids as $id)
+		{
+			if ($id instanceof ThankYou)
+			{
+				$id = $id->GetId();
+			}
+
+			if (!is_int($id))
+			{
+				throw new InvalidArgumentException("Failed to Get Thank Yous Comments Count, invalid ID '" . (string) $id . "' given");
+			}
+			$comment = new CommentableThankYou();
+			$comment->Load($id);
+
+			$comment_counts[$id] = $this->comments_repository->GetCommentsCount($comment);
+		}
+
+		return $comment_counts;
+	}
+
+	/**
+	 * Takes an array of "ThankYou"s or Thank Yous IDs and return an array of integers representing that Thank You's total Likes, indexed by the IDs provided.
+	 *
+	 * @param int[]|ThankYou[] $ids
+	 * @return int[]
+	 */
+	public function GetThankYousLikesCount(array $ids): array
+	{
+		$likes_counts = [];
+		foreach ($ids as $id)
+		{
+			if ($id instanceof ThankYou)
+			{
+				$id = $id->GetId();
+			}
+
+			if (!is_int($id))
+			{
+				throw new InvalidArgumentException("Failed to Get Thank Yous Likes Count, invalid ID '" . (string) $id . "' given");
+			}
+
+			$likes_counts[$id] = $this->likes_repository->GetCount(ThanksItem::AGGREGATION, $id);
+		}
+
+		return $likes_counts;
 	}
 
 	/**

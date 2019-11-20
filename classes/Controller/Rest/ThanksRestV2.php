@@ -154,7 +154,7 @@ class ThanksRestV2
 
 		try
 		{
-			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, null, $thanked, $users, $tags);
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, null, null, null, $thanked, $users, $tags);
 		} catch (ThankYouOClass $exception)
 		{
 			throw new RestExError(($this->lmsg)('thankyou.thankyou.error.server'), "Internal Server Error", $exception);
@@ -272,14 +272,6 @@ class ThanksRestV2
 		} catch (ThankYouNotFound $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown when creating Thank You", null, $exception);
-		} catch (ThankYouOClass $exception)
-		{
-			return $this->response->GetJsonPrettyResponse([
-				'type'           => 'https://developer.claromentis.com',
-				'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
-				'status'         => 400,
-				'invalid-params' => [['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankable.error.unsuitable_owner_classes')]]
-			], 400);
 		} catch (ThankYouAuthor | ThankYouRepository $exception)
 		{
 			$this->log->error("CreateThankYou Failed unexpectedly", [$exception]);

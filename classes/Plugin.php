@@ -1,6 +1,7 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\TemplaterTrait;
@@ -9,6 +10,7 @@ use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Event\LazyResolver;
 use Claromentis\Core\Http\ResponseFactory;
+use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
@@ -24,6 +26,7 @@ use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
+use Claromentis\ThankYou\Controller\StatisticsController;
 use Claromentis\ThankYou\Controller\ThanksController;
 use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
@@ -34,6 +37,7 @@ use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\Tags\UI\TagTemplaterComponent;
+use Claromentis\ThankYou\ThankYous\DataTables\ThankYousDataTableSource;
 use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYouFactory;
@@ -133,7 +137,15 @@ class Plugin implements
 		};
 
 		$app[ThankYousRepository::class] = function ($app) {
-			return new ThankYousRepository($app[ThankYouFactory::class], $app[ThanksItemFactory::class], $app[ThankYouUtility::class], $app[AclRepository::class], $app[DbInterface::class], $app['logger_factory']->GetLogger('thankyou'), $app[QueryFactory::class], $app[Tag::class]);
+			return new ThankYousRepository(
+				$app[ThankYouFactory::class],
+				$app[ThanksItemFactory::class],
+				$app[ThankYouUtility::class],
+				$app[DbInterface::class],
+				$app['logger_factory']->GetLogger('thankyou'),
+				$app[QueryFactory::class],
+				$app[Tag::class]
+			);
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
@@ -150,11 +162,24 @@ class Plugin implements
 		};
 
 		$app[ThankYous::class] = function ($app) {
-			return new ThankYous($app[LineManagerNotifier::class], $app[ThankYousRepository::class], $app['thankyou.config'], $app[ThankYouAcl::class], $app[ThankYouUtility::class]);
+			return new ThankYous(
+				$app[LineManagerNotifier::class],
+				$app[ThankYousRepository::class],
+				$app['thankyou.config'],
+				$app[ThankYouAcl::class],
+				$app[ThankYouUtility::class],
+				$app[CommentsRepository::class],
+				$app[LikesRepository::class],
+				$app[AclRepository::class]
+			);
 		};
 
 		$app[ThanksController::class] = function ($app) {
 			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config'], $app['logger_factory']->GetLogger('thankyou'));
+		};
+
+		$app[StatisticsController::class] = function ($app) {
+			return new StatisticsController($app[Lmsg::class], $app['thankyou.config'], $app[Tag::class]);
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
@@ -167,6 +192,10 @@ class Plugin implements
 
 		$app['templater.ui.thankyou.create'] = function ($app) {
 			return new ThankYouCreateTemplaterComponent($app['logger_factory']->GetLogger('thankyou'));
+		};
+
+		$app['thankyou.datatable.thank_yous'] = function ($app) {
+			return new ThankYousDataTableSource($app[ThankYous::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'), $app[SugreUtility::class]);
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
@@ -229,6 +258,7 @@ class Plugin implements
 				$routes->get('/admin/export', 'thankyou.admin_export_controller:ShowExportPanel');
 				$routes->post('/admin/export', 'thankyou.admin_export_controller:ExportCsv');
 				$routes->get('/admin/core_values', ThanksController::class . ':CoreValues');
+				$routes->get('/admin/statistics', StatisticsController::class . ':Statistics');
 			}
 		];
 	}

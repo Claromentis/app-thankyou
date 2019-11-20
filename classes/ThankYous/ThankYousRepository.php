@@ -2,11 +2,10 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
-use Claromentis\Core\Acl\AclRepository;
-use Claromentis\Core\Acl\Exception\InvalidSubjectException;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\CDN\CDNSystemException;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
+use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
@@ -31,10 +30,9 @@ class ThankYousRepository
 {
 	const THANKABLES = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
 
-	/**
-	 * @var AclRepository
-	 */
-	private $acl_repository;
+	const THANK_YOU_TABLE = 'thankyou_item';
+	const THANKED_USERS_TABLE = 'thankyou_user';
+	const THANK_YOU_TAGS_TABLE = 'thankyou_tagged';
 
 	/**
 	 * @var DbInterface
@@ -75,7 +73,6 @@ class ThankYousRepository
 		ThankYouFactory $thank_you_factory,
 		ThanksItemFactory $thanks_item_factory,
 		ThankYouUtility $thank_you_utility,
-		AclRepository $acl_repository,
 		DbInterface $db_interface,
 		LoggerInterface $logger,
 		QueryFactory $query_factory,
@@ -84,7 +81,6 @@ class ThankYousRepository
 		$this->thank_you_factory   = $thank_you_factory;
 		$this->thanks_item_factory = $thanks_item_factory;
 		$this->utility             = $thank_you_utility;
-		$this->acl_repository      = $acl_repository;
 		$this->db                  = $db_interface;
 		$this->logger              = $logger;
 		$this->query_factory       = $query_factory;
@@ -353,58 +349,6 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param ThankYou $thank_you
-	 * @throws ThankYouOClass - If one or more of the Owner Classes is not recognised.
-	 */
-	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
-	{
-		$thankables = $thank_you->GetThankable();
-
-		if (!isset($thankables))
-		{
-			$thank_you->SetUsers(null);
-
-			return;
-		}
-
-		$acl = $this->acl_repository->Get(0, 0);
-
-		foreach ($thankables as $thankable)
-		{
-			$id        = $thankable->GetId();
-			$oclass_id = $thankable->GetOwnerClass();
-
-			if (!isset($id) || !isset($oclass_id))
-			{
-				continue;
-			}
-
-			try
-			{
-				$acl->Add(0, $oclass_id, $id);
-			} catch (InvalidSubjectException $invalid_subject_exception)
-			{
-				throw new ThankYouOClass("Failed to Populate Thank You's Users, invalid oclass object", null, $invalid_subject_exception);
-			}
-		}
-
-		$users = $acl->GetIndividualsList(0);
-
-		$users_list_provider = new UsersListProvider();
-		$users_list_provider->SetFilterIds($users);
-
-		try
-		{
-			$users = $users_list_provider->GetListObjects();
-		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
-		{
-			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
-		}
-
-		$thank_you->SetUsers($users);
-	}
-
-	/**
 	 * Given an array of IDs from the table thankyou_item, returns (ThankYou)s in the same order.
 	 * If param $thanked is TRUE, the (ThankYou)s the ThankYou's Thankables will be set.
 	 *
@@ -642,51 +586,37 @@ class ThankYousRepository
 	 * @param int        $limit
 	 * @param int        $offset
 	 * @param array|null $date_range
+	 * @param int[]|null $thanked_user_ids
+	 * @param int[]|null $tag_ids
 	 * @return int[]
 	 */
-	public function GetRecentThankYousIds(int $limit, int $offset, ?array $date_range = null)
+	public function GetRecentThankYousIds(int $limit, int $offset, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
 		$query = "
-			SELECT thankyou_item.id
-			FROM thankyou_item
-			ORDER BY thankyou_item.date_created DESC";
+			SELECT " . self::THANK_YOU_TABLE . ".id
+			FROM " . self::THANK_YOU_TABLE
+			. "	GROUP BY " . self::THANK_YOU_TABLE . ".id
+			ORDER BY " . self::THANK_YOU_TABLE . ".date_created DESC";
 
-		try
-		{
-			$query = $this->query_factory->GetQueryBuilder($query);
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown", null, $exception);
-		}
+		$query = $this->query_factory->GetQueryBuilder($query);
 
 		$query->setLimit($limit, $offset);
 
 		if (isset($date_range))
 		{
-			$lower_date = $date_range[0] ?? null;
-			$upper_date = $date_range[1] ?? null;
+			$this->QueryAddCreatedBetweenFilter($query, $date_range);
+		}
 
-			if (!isset($lower_date))
-			{
-				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Lower Date not found at offset 0");
-			}
+		if (isset($thanked_user_ids))
+		{
+			$query->AddJoin(self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANKED_USERS_TABLE . ".thanks_id");
+			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
+		}
 
-			if (!isset($upper_date))
-			{
-				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Upper Date not found at offset 1");
-			}
-
-			if (!is_int($lower_date))
-			{
-				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Lower Date is not an integer");
-			}
-
-			if (!is_int($upper_date))
-			{
-				throw new InvalidArgumentException("Failed to Get Recent Thank You IDs, Upper Date is not an integer");
-			}
-
-			$query->AddWhereAndClause("thankyou_item.date_created BETWEEN " . $lower_date . " AND " . $upper_date);
+		if (isset($tag_ids))
+		{
+			$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryAddTagsFilter($query, $tag_ids);
 		}
 
 		$result = $this->db->query($query->GetQuery());
@@ -703,11 +633,28 @@ class ThankYousRepository
 	/**
 	 * Returns total number of thanks items in the database
 	 *
+	 * @param array|null $date_range
+	 * @param int[]|null $thanked_user_ids
 	 * @return int
 	 */
-	public function GetTotalThankYousCount(): int
+	public function GetTotalThankYousCount(?array $date_range = null, ?array $thanked_user_ids = null): int
 	{
-		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_item");
+		$query_string = "SELECT COUNT(DISTINCT " . self::THANK_YOU_TABLE . ".id) FROM " . self::THANK_YOU_TABLE;
+
+		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		if (isset($date_range))
+		{
+			$this->QueryAddCreatedBetweenFilter($query, $date_range);
+		}
+
+		if (isset($thanked_user_ids))
+		{
+			$query->AddJoin(self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANKED_USERS_TABLE . ".thanks_id");
+			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
+		}
+
+		list($count) = $this->db->query_row($query->GetQuery());
 
 		return $count;
 	}
@@ -789,5 +736,73 @@ class ThankYousRepository
 		}
 
 		return $thank_you_tag_ids;
+	}
+
+	/**
+	 * @param QueryBuilder $query
+	 * @param int[]        $date_range
+	 */
+	private function QueryAddCreatedBetweenFilter(QueryBuilder $query, array $date_range)
+	{
+		$lower_date = $date_range[0] ?? null;
+		$upper_date = $date_range[1] ?? null;
+
+		if (!isset($lower_date))
+		{
+			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Lower Date not found at offset 0");
+		}
+
+		if (!isset($upper_date))
+		{
+			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Upper Date not found at offset 1");
+		}
+
+		if (!is_int($lower_date))
+		{
+			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Lower Date is not an integer");
+		}
+
+		if (!is_int($upper_date))
+		{
+			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Upper Date is not an integer");
+		}
+
+		$query->AddWhereAndClause(self::THANK_YOU_TABLE . ".date_created BETWEEN " . $lower_date . " AND " . $upper_date);
+	}
+
+	private function QueryAddThankedUserFilter(QueryBuilder $query, array $thanked_user_ids)
+	{
+		$where         = self::THANKED_USERS_TABLE . ".user_id IN (";
+		$first_user_id = true;
+		foreach ($thanked_user_ids as $user_id)
+		{
+			if (!is_int($user_id))
+			{
+				throw new InvalidArgumentException("Failed to Add Thanked User Filter to Query, User ID '" . (string) $user_id . "' is not an integer");
+			}
+
+			$where         .= $first_user_id ? $user_id : ", " . $user_id;
+			$first_user_id = false;
+		}
+		$where .= ")";
+		$query->AddWhereAndClause($where);
+	}
+
+	private function QueryAddTagsFilter(QueryBuilder $query, array $tag_ids)
+	{
+		$where        = self::THANK_YOU_TAGS_TABLE . ".tag_id IN (";
+		$first_tag_id = true;
+		foreach ($tag_ids as $tag_id)
+		{
+			if (!is_int($tag_id))
+			{
+				throw new InvalidArgumentException("Failed to Add Tagged Filter to Query, Tag ID '" . (string) $tag_id . "' is not an integer");
+			}
+
+			$where        .= $first_tag_id ? $tag_id : ", " . $tag_id;
+			$first_tag_id = false;
+		}
+		$where .= ")";
+		$query->AddWhereAndClause($where);
 	}
 }
