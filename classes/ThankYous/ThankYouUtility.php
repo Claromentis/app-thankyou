@@ -4,6 +4,8 @@ namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
+use DateTime;
+use DateTimeZone;
 use InvalidArgumentException;
 
 class ThankYouUtility
@@ -30,5 +32,35 @@ class ThankYouUtility
 		}
 
 		return $names;
+	}
+
+	/**
+	 * @param DateTime[]|int[] $date_range
+	 * @return int[]
+	 */
+	public function FormatDateRange(array $date_range): array
+	{
+		if (isset($date_range[0]) && ($date_range[0] instanceof DateTime))
+		{
+			/**
+			 * @var DateTime $from_date
+			 */
+			$from_date = clone $date_range[0];
+			$from_date->setTimezone(new DateTimeZone('UTC'));
+
+			$date_range[0] = (int) $from_date->format('YmdHis');
+		}
+		if (isset($date_range[1]) && ($date_range[1] instanceof DateTime))
+		{
+			/**
+			 * @var DateTime $from_date
+			 */
+			$to_date = clone $date_range[1];
+			$to_date->setTimezone(new DateTimeZone('UTC'));
+
+			$date_range[1] = (int) $to_date->format('YmdHis');
+		}
+
+		return $date_range;
 	}
 }
