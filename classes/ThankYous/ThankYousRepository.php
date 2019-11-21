@@ -89,187 +89,6 @@ class ThankYousRepository
 	//TODO: Isolating the Tag getting code to the Tag repo.
 
 	/**
-	 * Create a Thank You object.
-	 *
-	 * @param User|int  $author
-	 * @param string    $description
-	 * @param Date|null $date_created
-	 * @return ThankYou
-	 * @throws ThankYouAuthor - If the Author could not be loaded.
-	 */
-	public function Create($author, string $description, ?Date $date_created = null)
-	{
-		return $this->thank_you_factory->Create($author, $date_created, $description);
-	}
-
-	/**
-	 * Create an array of Thankables from an array of Group IDs. The returned array is indexed by the Group's ID
-	 *
-	 * @param array $groups_ids
-	 * @return Thankable[]
-	 */
-	public function CreateThankablesFromGroupIds(array $groups_ids): array
-	{
-		$owner_class_id = PERM_OCLASS_GROUP;
-		try
-		{
-			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[0];
-		} catch (ThankYouOClass $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
-		}
-
-		foreach ($groups_ids as $groups_id)
-		{
-			if (!is_int($groups_id))
-			{
-				throw new InvalidArgumentException("Failed to Create Thankables from Groups, invalid Group ID provided");
-			}
-		}
-
-		$result = $this->db->query("SELECT groupid, groupname, ex_area_id FROM groups WHERE groupid IN in:int:groups ORDER BY groupid", $groups_ids);
-
-		$group_thankables = [];
-		while ($group = $result->fetchArray())
-		{
-			$id                    = (int) $group['groupid'];
-			$group_thankables[$id] = new Thankable($group['groupname'], $id, $owner_class_name, $owner_class_id, (int) $group['ex_area_id']);
-		}
-
-		return $group_thankables;
-	}
-
-	/**
-	 * @param array $o_classes
-	 * @return Thankable[]
-	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
-	 */
-	public function CreateThankablesFromOClasses(array $o_classes): array
-	{
-		//TODO: Expand accepted objects to include all PERM_OCLASS_*
-		$o_classes_object_ids = [];
-		foreach ($o_classes as $o_class)
-		{
-			if (!isset($o_class['oclass']))
-			{
-				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified");
-			}
-
-			if (!in_array($o_class['oclass'], self::THANKABLES))
-			{
-				throw new ThankYouOClass("Failed to Get Permission Object Classes Names, Object class is not supported");
-			}
-
-			if (!isset($o_class['id']) || !is_int($o_class['id']))
-			{
-				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object ID is not specified or is invalid");
-			}
-
-			if (!isset($o_classes_object_ids[$o_class['oclass']]))
-			{
-				$o_classes_object_ids[$o_class['oclass']] = [];
-			}
-
-			$o_classes_object_ids[$o_class['oclass']][] = $o_class['id'];
-		}
-
-		$thankables = [];
-		if (isset($o_classes_object_ids[PERM_OCLASS_GROUP]))
-		{
-			$thankables = array_merge($thankables, $this->CreateThankablesFromGroupIds($o_classes_object_ids[PERM_OCLASS_GROUP]));
-		}
-
-		if (isset($o_classes_object_ids[PERM_OCLASS_INDIVIDUAL]))
-		{
-			$thankables = array_merge($thankables, $this->CreateThankablesFromUserIds($o_classes_object_ids[PERM_OCLASS_INDIVIDUAL]));
-		}
-
-		return $thankables;
-	}
-
-	/**
-	 * @param array $user_ids
-	 * @return Thankable[]
-	 */
-	public function CreateThankablesFromUserIds(array $user_ids)
-	{
-		try
-		{
-			return $this->CreateThankablesFromUsers($this->GetUsers($user_ids));
-		} catch (ThankYouException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by CreateThankablesFromUsers in CreateThankablesFromUserIds", null, $exception);
-		}
-	}
-
-	/**
-	 * Creates an array of Thankables from an array of Users. Retains indexes.
-	 *
-	 * @param array $users
-	 * @return Thankable[]
-	 * @throws ThankYouException - If the Users given have not been loaded.
-	 */
-	public function CreateThankablesFromUsers(array $users)
-	{
-		$owner_class_id = PermOClass::INDIVIDUAL;
-		try
-		{
-			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[0];
-		} catch (ThankYouOClass $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
-		}
-
-		foreach ($users as $user_offset => $user)
-		{
-			if (!($user instanceof User))
-			{
-				throw new InvalidArgumentException("Failed to Create Thankables From Users, invalid object passed");
-			}
-
-			if (!$user->IsLoaded())
-			{
-				throw new ThankYouException("Failed to Create Thankables From Users, one or more Users are not loaded");
-			}
-
-			try
-			{
-				$user_image_url = User::GetPhotoUrl($user->GetId());//TODO: Replace with a non-static post People API update
-			} catch (CDNSystemException $cdn_system_exception)
-			{
-				$this->logger->error("Failed to Get User's Photo URL when Creating Thankable: " . $cdn_system_exception->getMessage());
-				$user_image_url = null;
-			}
-
-			$user_profile_url = User::GetProfileUrl($user->GetId(), false);//TODO: Replace with a non-static post People API update
-
-			$users[$user_offset] = new Thankable($user->GetFullname(), $user->GetId(), $owner_class_name, $owner_class_id, $user->GetExAreaId(), $user_image_url, $user_profile_url);
-		}
-
-		return $users;
-	}
-
-	/**
-	 * Returns an array of Users indexed by their ID.
-	 *
-	 * @param array $user_ids
-	 * @return User[]
-	 */
-	public function GetUsers(array $user_ids): array
-	{
-		$users_list_provider = new UsersListProvider();
-		$users_list_provider->SetFilterProtectExtranets(false);
-		$users_list_provider->SetFilterIds($user_ids);
-		try
-		{
-			return $users_list_provider->GetListObjects();
-		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
-		{
-			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
-		}
-	}
-
-	/**
 	 * Given an array of IDs from the table thankyou_item, returns (ThankYou)s in the same order.
 	 * If param $thanked is TRUE, the (ThankYou)s the ThankYou's Thankables will be set.
 	 *
@@ -552,6 +371,37 @@ class ThankYousRepository
 	}
 
 	/**
+	 * @param int $user_id
+	 * @param int $limit
+	 * @param int $offset
+	 * @return int[]
+	 */
+	public function GetUsersRecentThankYousIdsFromDb(int $user_id, int $limit, int $offset)
+	{
+		$query = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC";
+
+		try
+		{
+			$query = $this->query_factory->GetQuery($query, $user_id);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown", null, $exception);
+		}
+
+		$query->setLimit($limit, $offset);
+
+		$result = $this->db->query($query);
+
+		$thank_you_ids = [];
+		while ($row = $result->fetchArray())
+		{
+			$thank_you_ids[] = (int) $row['thanks_id'];
+		}
+
+		return $thank_you_ids;
+	}
+
+	/**
 	 * Returns total number of thanks items in the database
 	 *
 	 * @param array|null $date_range
@@ -595,34 +445,184 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param int $user_id
-	 * @param int $limit
-	 * @param int $offset
-	 * @return int[]
+	 * Returns an array of Users indexed by their ID.
+	 *
+	 * @param array $user_ids
+	 * @return User[]
 	 */
-	public function GetUsersRecentThankYousIdsFromDb(int $user_id, int $limit, int $offset)
+	public function GetUsers(array $user_ids): array
 	{
-		$query = "SELECT thanks_id FROM thankyou_user LEFT JOIN thankyou_item ON thankyou_item.id = thankyou_user.thanks_id WHERE user_id = int:user_id ORDER BY thankyou_item.date_created DESC";
-
+		$users_list_provider = new UsersListProvider();
+		$users_list_provider->SetFilterProtectExtranets(false);
+		$users_list_provider->SetFilterIds($user_ids);
 		try
 		{
-			$query = $this->query_factory->GetQuery($query, $user_id);
-		} catch (Exception $exception)
+			return $users_list_provider->GetListObjects();
+		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
 		{
-			throw new LogicException("Unexpected Exception thrown", null, $exception);
+			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
+		}
+	}
+
+	/**
+	 * Create a Thank You object.
+	 *
+	 * @param User|int  $author
+	 * @param string    $description
+	 * @param Date|null $date_created
+	 * @return ThankYou
+	 * @throws ThankYouAuthor - If the Author could not be loaded.
+	 */
+	public function Create($author, string $description, ?Date $date_created = null)
+	{
+		return $this->thank_you_factory->Create($author, $date_created, $description);
+	}
+
+	/**
+	 * Create an array of Thankables from an array of Group IDs. The returned array is indexed by the Group's ID
+	 *
+	 * @param array $groups_ids
+	 * @return Thankable[]
+	 */
+	public function CreateThankablesFromGroupIds(array $groups_ids): array
+	{
+		$owner_class_id = PERM_OCLASS_GROUP;
+		try
+		{
+			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[0];
+		} catch (ThankYouOClass $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
 		}
 
-		$query->setLimit($limit, $offset);
-
-		$result = $this->db->query($query);
-
-		$thank_you_ids = [];
-		while ($row = $result->fetchArray())
+		foreach ($groups_ids as $groups_id)
 		{
-			$thank_you_ids[] = (int) $row['thanks_id'];
+			if (!is_int($groups_id))
+			{
+				throw new InvalidArgumentException("Failed to Create Thankables from Groups, invalid Group ID provided");
+			}
 		}
 
-		return $thank_you_ids;
+		$result = $this->db->query("SELECT groupid, groupname, ex_area_id FROM groups WHERE groupid IN in:int:groups ORDER BY groupid", $groups_ids);
+
+		$group_thankables = [];
+		while ($group = $result->fetchArray())
+		{
+			$id                    = (int) $group['groupid'];
+			$group_thankables[$id] = new Thankable($group['groupname'], $id, $owner_class_name, $owner_class_id, (int) $group['ex_area_id']);
+		}
+
+		return $group_thankables;
+	}
+
+	/**
+	 * @param array $o_classes
+	 * @return Thankable[]
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 */
+	public function CreateThankablesFromOClasses(array $o_classes): array
+	{
+		//TODO: Expand accepted objects to include all PERM_OCLASS_*
+		$o_classes_object_ids = [];
+		foreach ($o_classes as $o_class)
+		{
+			if (!isset($o_class['oclass']))
+			{
+				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified");
+			}
+
+			if (!in_array($o_class['oclass'], self::THANKABLES))
+			{
+				throw new ThankYouOClass("Failed to Get Permission Object Classes Names, Object class is not supported");
+			}
+
+			if (!isset($o_class['id']) || !is_int($o_class['id']))
+			{
+				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object ID is not specified or is invalid");
+			}
+
+			if (!isset($o_classes_object_ids[$o_class['oclass']]))
+			{
+				$o_classes_object_ids[$o_class['oclass']] = [];
+			}
+
+			$o_classes_object_ids[$o_class['oclass']][] = $o_class['id'];
+		}
+
+		$thankables = [];
+		if (isset($o_classes_object_ids[PERM_OCLASS_GROUP]))
+		{
+			$thankables = array_merge($thankables, $this->CreateThankablesFromGroupIds($o_classes_object_ids[PERM_OCLASS_GROUP]));
+		}
+
+		if (isset($o_classes_object_ids[PERM_OCLASS_INDIVIDUAL]))
+		{
+			$thankables = array_merge($thankables, $this->CreateThankablesFromUserIds($o_classes_object_ids[PERM_OCLASS_INDIVIDUAL]));
+		}
+
+		return $thankables;
+	}
+
+	/**
+	 * @param array $user_ids
+	 * @return Thankable[]
+	 */
+	public function CreateThankablesFromUserIds(array $user_ids)
+	{
+		try
+		{
+			return $this->CreateThankablesFromUsers($this->GetUsers($user_ids));
+		} catch (ThankYouException $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by CreateThankablesFromUsers in CreateThankablesFromUserIds", null, $exception);
+		}
+	}
+
+	/**
+	 * Creates an array of Thankables from an array of Users. Retains indexes.
+	 *
+	 * @param array $users
+	 * @return Thankable[]
+	 * @throws ThankYouException - If the Users given have not been loaded.
+	 */
+	public function CreateThankablesFromUsers(array $users)
+	{
+		$owner_class_id = PermOClass::INDIVIDUAL;
+		try
+		{
+			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[0];
+		} catch (ThankYouOClass $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
+		}
+
+		foreach ($users as $user_offset => $user)
+		{
+			if (!($user instanceof User))
+			{
+				throw new InvalidArgumentException("Failed to Create Thankables From Users, invalid object passed");
+			}
+
+			if (!$user->IsLoaded())
+			{
+				throw new ThankYouException("Failed to Create Thankables From Users, one or more Users are not loaded");
+			}
+
+			try
+			{
+				$user_image_url = User::GetPhotoUrl($user->GetId());//TODO: Replace with a non-static post People API update
+			} catch (CDNSystemException $cdn_system_exception)
+			{
+				$this->logger->error("Failed to Get User's Photo URL when Creating Thankable: " . $cdn_system_exception->getMessage());
+				$user_image_url = null;
+			}
+
+			$user_profile_url = User::GetProfileUrl($user->GetId(), false);//TODO: Replace with a non-static post People API update
+
+			$users[$user_offset] = new Thankable($user->GetFullname(), $user->GetId(), $owner_class_name, $owner_class_id, $user->GetExAreaId(), $user_image_url, $user_profile_url);
+		}
+
+		return $users;
 	}
 
 	/**
