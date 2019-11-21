@@ -514,7 +514,7 @@ class ThankYous
 	 */
 	public function Save(ThankYou $thank_you)
 	{
-		$this->thank_yous_repository->SaveToDb($thank_you);
+		$this->thank_yous_repository->Save($thank_you);
 	}
 
 	/**
@@ -538,6 +538,6 @@ class ThankYous
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
 
-		$this->thank_yous_repository->DeleteFromDb($id);
+		$this->thank_yous_repository->Delete($id);
 	}
 }

@@ -103,23 +103,6 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param int $id
-	 */
-	public function DeleteFromDb(int $id)
-	{
-		$thanks_item = $this->thanks_item_factory->Create();
-		$thanks_item->SetId($id);
-		try
-		{
-			$this->db->query("DELETE FROM " . TagRepository::TAGGED_TABLE . " WHERE item_id = int:id", $id);
-			$thanks_item->Delete();
-		} catch (ThankYouException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown when deleting Thank You", null, $exception);
-		}
-	}
-
-	/**
 	 * Create an array of Thankables from an array of Group IDs. The returned array is indexed by the Group's ID
 	 *
 	 * @param array $groups_ids
@@ -284,68 +267,6 @@ class ThankYousRepository
 		{
 			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
 		}
-	}
-
-	/**
-	 * @param ThankYou $thank_you
-	 * @return int ID of saved Thank You
-	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
-	 * @throws ThankYouRepository - On failure to save to database.
-	 */
-	public function SaveToDb(ThankYou $thank_you)
-		//TODO : Rename to Save
-	{
-		$thanks_item = $this->thanks_item_factory->Create();
-
-		$id = $thank_you->GetId();
-		if (isset($id) && !$thanks_item->Load($id))
-		{
-			throw new ThankYouNotFound("Failed to Update Thank You, Thank You not found");
-		}
-
-		$thanks_item->SetAuthor($thank_you->GetAuthor()->GetId());
-
-		$date_created = clone $thank_you->GetDateCreated();
-		$date_created->setTimezone(new DateTimeZone("UTC"));
-		$thanks_item->SetDateCreated($date_created->format('YmdHis'));
-
-		$thanks_item->SetDescription($thank_you->GetDescription());
-
-		$thanked_users = $thank_you->GetUsers();
-		if (isset($thanked_users))
-		{
-			$users_ids = [];
-			foreach ($thanked_users as $offset => $user)
-			{
-				$users_ids[] = $user->GetId();
-			}
-			$thanks_item->SetUsers($users_ids);
-		}
-
-		$thanked = $thank_you->GetThankable();
-		if (isset($thanked))
-		{
-			$thankyou_thanked = [];
-			foreach ($thanked as $thank)
-			{
-				$object_type = $thank->GetOwnerClass();
-				$object_id   = $thank->GetId();
-
-				if (isset($object_type) && isset($object_id))
-				{
-					$thankyou_thanked[] = ['object_type' => $object_type, 'object_id' => $object_id];
-				}
-			}
-
-			$thanks_item->SetThanked($thankyou_thanked);
-		}
-
-		$id = $thanks_item->Save();
-		$thank_you->SetId($id);
-
-		$this->SaveThankYouTags($thank_you);
-
-		return $id;
 	}
 
 	/**
@@ -702,6 +623,85 @@ class ThankYousRepository
 		}
 
 		return $thank_you_ids;
+	}
+
+	/**
+	 * @param int $id
+	 */
+	public function Delete(int $id)
+	{
+		$thanks_item = $this->thanks_item_factory->Create();
+		$thanks_item->SetId($id);
+		try
+		{
+			$this->db->query("DELETE FROM " . TagRepository::TAGGED_TABLE . " WHERE item_id = int:id", $id);
+			$thanks_item->Delete();
+		} catch (ThankYouException $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown when deleting Thank You", null, $exception);
+		}
+	}
+
+	/**
+	 * @param ThankYou $thank_you
+	 * @return int ID of saved Thank You
+	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
+	 * @throws ThankYouRepository - On failure to save to database.
+	 */
+	public function Save(ThankYou $thank_you)
+		//TODO : Rename to Save
+	{
+		$thanks_item = $this->thanks_item_factory->Create();
+
+		$id = $thank_you->GetId();
+		if (isset($id) && !$thanks_item->Load($id))
+		{
+			throw new ThankYouNotFound("Failed to Update Thank You, Thank You not found");
+		}
+
+		$thanks_item->SetAuthor($thank_you->GetAuthor()->GetId());
+
+		$date_created = clone $thank_you->GetDateCreated();
+		$date_created->setTimezone(new DateTimeZone("UTC"));
+		$thanks_item->SetDateCreated($date_created->format('YmdHis'));
+
+		$thanks_item->SetDescription($thank_you->GetDescription());
+
+		$thanked_users = $thank_you->GetUsers();
+		if (isset($thanked_users))
+		{
+			$users_ids = [];
+			foreach ($thanked_users as $offset => $user)
+			{
+				$users_ids[] = $user->GetId();
+			}
+			$thanks_item->SetUsers($users_ids);
+		}
+
+		$thanked = $thank_you->GetThankable();
+		if (isset($thanked))
+		{
+			$thankyou_thanked = [];
+			foreach ($thanked as $thank)
+			{
+				$object_type = $thank->GetOwnerClass();
+				$object_id   = $thank->GetId();
+
+				if (isset($object_type) && isset($object_id))
+				{
+					$thankyou_thanked[] = ['object_type' => $object_type, 'object_id' => $object_id];
+				}
+			}
+
+			$thanks_item->SetThanked($thankyou_thanked);
+		}
+
+		$id = $thanks_item->Save();
+		$thank_you->SetId($id);
+
+		$this->SaveThankYouTags($thank_you);
+
+		return $id;
 	}
 
 	/**
