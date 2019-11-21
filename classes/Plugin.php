@@ -104,6 +104,21 @@ class Plugin implements
 		$app['thankyou.config'] = function ($app) {
 			return $app['config.factory']('thankyou');
 		};
+
+		$app->extend('likes.audit.applications', function ($applications) {
+			$applications[ThanksItem::AGGREGATION] = [
+				"like_text"           => "User liked a thankyou",
+				"unlike_text"         => "User unliked a thankyou",
+				"comment_like_text"   => "User liked comment (#%d) on a thankyou",
+				"comment_unlike_text" => "User unliked comment (#%d) on a thankyou",
+
+				"application" => "thankyou",
+			];
+
+			return $applications;
+		});
+
+		$app['audit.application.thankyou'] = AuditConfig::class;
 	}
 
 	/**
