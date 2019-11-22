@@ -15,6 +15,7 @@ lm	thankyou.common.thank_yous
 lm	thankyou.common.thanked_groups		
 lm	thankyou.common.thanks_deleted		Dankesnachricht erfolgreich gelöscht
 lm	thankyou.common.total_thanked_users		
+lm	thankyou.common.total_times_thanked		
 lm	thankyou.communication.imessages		
 lm	thankyou.component.cover_info.desc		Ermöglicht Benutzern, ein Tag zu markieren und öffentlich Danke zu sagen. Zeigt eine Liste der letzten "Danke" an
 lm	thankyou.component.cover_info.title		Vielen Dank
@@ -93,6 +94,7 @@ lt	thankyou:common:actions.body	$lm['thankyou.common.actions']
 lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
 lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
+lt	thankyou:common:total_times_thanked.body	$lm['thankyou.common.total_times_thanked']	
 lt	thankyou:component:delete.body		Löschen
 lt	thankyou:component:delete_confirm.body		Möchten Sie diese Dankesnachricht wirklich löschen?
 lt	thankyou:component:delete_thank_you.body		Dankeschön löschen
