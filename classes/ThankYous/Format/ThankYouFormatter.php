@@ -117,7 +117,8 @@ class ThankYouFormatter
 		{
 			foreach ($users as $offset => $user)
 			{
-				$users[$offset] = ['id' => $user->GetId(), 'name' => $user->GetFullname()];
+				$user_name      = (isset($security_context) && !$this->acl->CanSeeUser($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->GetFullname();
+				$users[$offset] = ['id' => $user->GetId(), 'name' => $user_name];
 			}
 		}
 		$output['users'] = $users;

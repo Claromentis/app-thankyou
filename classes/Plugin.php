@@ -38,6 +38,7 @@ use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\Tags\UI\TagTemplaterComponent;
 use Claromentis\ThankYou\ThankYous\DataTables\ThankYousDataTableSource;
+use Claromentis\ThankYou\ThankYous\DataTables\UsersDataTableSource;
 use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYouFactory;
@@ -170,7 +171,8 @@ class Plugin implements
 				$app[ThankYouUtility::class],
 				$app[CommentsRepository::class],
 				$app[LikesRepository::class],
-				$app[AclRepository::class]
+				$app[AclRepository::class],
+				$app[UserExtranetService::class]
 			);
 		};
 
@@ -179,7 +181,7 @@ class Plugin implements
 		};
 
 		$app[StatisticsController::class] = function ($app) {
-			return new StatisticsController($app[Lmsg::class], $app['thankyou.config'], $app[Tag::class]);
+			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app['thankyou.config'], $app[Tag::class]);
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
@@ -195,7 +197,21 @@ class Plugin implements
 		};
 
 		$app['thankyou.datatable.thank_yous'] = function ($app) {
-			return new ThankYousDataTableSource($app[ThankYous::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'), $app[SugreUtility::class]);
+			return new ThankYousDataTableSource(
+				$app[ThankYous::class],
+				$app[SugreUtility::class],
+				$app['thankyou.config'],
+				$app[Lmsg::class],
+				$app['logger_factory']->GetLogger('thankyou')
+			);
+		};
+
+		$app['thankyou.datatable.users'] = function ($app) {
+			return new UsersDataTableSource(
+				$app[ThankYous::class],
+				$app[SugreUtility::class],
+				$app[Lmsg::class]
+			);
 		};
 
 		$app[ThanksRestV2::class] = function ($app) {
@@ -258,7 +274,8 @@ class Plugin implements
 				$routes->get('/admin/export', 'thankyou.admin_export_controller:ShowExportPanel');
 				$routes->post('/admin/export', 'thankyou.admin_export_controller:ExportCsv');
 				$routes->get('/admin/core_values', ThanksController::class . ':CoreValues');
-				$routes->get('/admin/statistics', StatisticsController::class . ':Statistics');
+				$routes->get('/admin/statistics', StatisticsController::class . ':Reports');
+				$routes->get('/admin/statistics/{report_index}', StatisticsController::class . ':View');
 			}
 		];
 	}
@@ -373,7 +390,7 @@ class Plugin implements
 		switch ($attr['page'])
 		{
 			case 'viewprofile.tab_nav':
-				$count = $api->ThankYous()->GetUsersThankYousCount($user_id);
+				$count = $api->ThankYous()->GetUsersTotalThankYous($context, null, null, [$user_id])[$user_id];
 
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $lmsg("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':

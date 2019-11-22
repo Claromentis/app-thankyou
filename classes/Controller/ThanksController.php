@@ -36,7 +36,7 @@ class ThanksController
 		$this->sugre_repository = $sugre_repository;
 	}
 
-	public function Admin(ServerRequestInterface $server_request)
+	public function Admin(SecurityContext $context, ServerRequestInterface $server_request)
 	{
 		$args  = [];
 		$limit = 20;
@@ -48,7 +48,7 @@ class ThanksController
 
 		require_once('paging.php'); //TODO: not this...
 
-		$args['paging.body_html'] = get_navigation($server_request->getUri()->getPath(), $this->api->ThankYous()->GetTotalThankYousCount(), $offset, '', $limit);
+		$args['paging.body_html'] = get_navigation($server_request->getUri()->getPath(), $this->api->ThankYous()->GetTotalThankYousCount($context), $offset, '', $limit);
 
 		$args['ty_list.limit']  = $limit;
 		$args['ty_list.offset'] = $offset;

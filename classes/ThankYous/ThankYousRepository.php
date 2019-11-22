@@ -33,6 +33,7 @@ class ThankYousRepository
 	const THANK_YOU_TABLE = 'thankyou_item';
 	const THANKED_USERS_TABLE = 'thankyou_user';
 	const THANK_YOU_TAGS_TABLE = 'thankyou_tagged';
+	const USER_TABLE = 'users';
 
 	/**
 	 * @var DbInterface
@@ -290,12 +291,15 @@ class ThankYousRepository
 				$thank_you->SetThanked($thankables);
 			}
 
-			if (isset($thankyou_items[$id]['thanked_users']))
+			if ($get_users)
 			{
 				$thanked_users = [];
-				foreach ($thankyou_items[$id]['thanked_users'] as $user_id => $true)
+				if (isset($thankyou_items[$id]['thanked_users']))
 				{
-					$thanked_users[] = $users[$user_id];
+					foreach ($thankyou_items[$id]['thanked_users'] as $user_id => $true)
+					{
+						$thanked_users[] = $users[$user_id];
+					}
 				}
 				$thank_you->SetUsers($thanked_users);
 			}
@@ -328,9 +332,11 @@ class ThankYousRepository
 	 * @param array|null $date_range
 	 * @param int[]|null $thanked_user_ids
 	 * @param int[]|null $tag_ids
+	 * @param int[]|null $extranet_ids
+	 * @param bool       $allow_no_thanked
 	 * @return int[]
 	 */
-	public function GetRecentThankYousIds(int $limit, int $offset, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
+	public function GetRecentThankYousIds(?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
 		$query = "
 			SELECT " . self::THANK_YOU_TABLE . ".id
@@ -347,9 +353,13 @@ class ThankYousRepository
 			$this->QueryAddCreatedBetweenFilter($query, $date_range);
 		}
 
-		if (isset($thanked_user_ids))
+		if (isset($extranet_ids) || isset($thanked_user_ids))
 		{
 			$query->AddJoin(self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANKED_USERS_TABLE . ".thanks_id");
+		}
+
+		if (isset($thanked_user_ids))
+		{
 			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
 		}
 
@@ -357,6 +367,12 @@ class ThankYousRepository
 		{
 			$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
 			$this->QueryAddTagsFilter($query, $tag_ids);
+		}
+
+		if (isset($extranet_ids))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
 		}
 
 		$result = $this->db->query($query->GetQuery());
@@ -404,15 +420,29 @@ class ThankYousRepository
 	/**
 	 * Returns total number of thanks items in the database
 	 *
+	 * @param int[]|null $extranet_ids
+	 * @param bool       $allow_no_thanked
 	 * @param array|null $date_range
 	 * @param int[]|null $thanked_user_ids
+	 * @param int[]|null $tag_ids
 	 * @return int
 	 */
-	public function GetTotalThankYousCount(?array $date_range = null, ?array $thanked_user_ids = null): int
+	public function GetTotalThankYousCount(?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
 	{
 		$query_string = "SELECT COUNT(DISTINCT " . self::THANK_YOU_TABLE . ".id) FROM " . self::THANK_YOU_TABLE;
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		if (isset($extranet_ids) || isset($thanked_user_ids))
+		{
+			$query->AddJoin(self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANKED_USERS_TABLE . ".thanks_id");
+		}
+
+		if (isset($extranet_ids))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
+		}
 
 		if (isset($date_range))
 		{
@@ -421,8 +451,13 @@ class ThankYousRepository
 
 		if (isset($thanked_user_ids))
 		{
-			$query->AddJoin(self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANKED_USERS_TABLE . ".thanks_id");
 			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
+		}
+
+		if (isset($tag_ids))
+		{
+			$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryAddTagsFilter($query, $tag_ids);
 		}
 
 		list($count) = $this->db->query_row($query->GetQuery());
@@ -431,15 +466,111 @@ class ThankYousRepository
 	}
 
 	/**
-	 * Returns total number of Thank Yous associated with a User
+	 * Returns an array of the total number of Thank Yous associated with a User, indexed by the User's ID.
 	 *
-	 * @param int $user_id
-	 *
+	 * @param int[]      $user_ids
+	 * @param array|null $date_range
+	 * @param int[]|null $tag_ids
+	 * @param int[]|null $extranet_ids
+	 * @param int|null   $limit
+	 * @param int|null   $offset
+	 * @return int[]
+	 */
+	public function GetTotalUsersThankYous(?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): array
+	{
+		$query_string = "SELECT COUNT(" . self::THANKED_USERS_TABLE . ".thanks_id) AS \"" . self::THANKED_USERS_TABLE . ".total_thank_yous\"";
+		$query_string .= ", " . self::THANKED_USERS_TABLE . ".user_id AS \"" . self::THANKED_USERS_TABLE . ".user_id\"";
+		$query_string .= " FROM " . self::THANKED_USERS_TABLE;
+		$query_string .= " ORDER BY " . self::USER_TABLE . ".firstname ASC";
+		$query_string .= " GROUP BY " . self::THANKED_USERS_TABLE . ".user_id";
+
+		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+
+		if (isset($user_ids))
+		{
+			$this->QueryAddThankedUserFilter($query, $user_ids);
+		}
+
+		if (isset($date_range))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
+			$this->QueryAddCreatedBetweenFilter($query, $date_range);
+		}
+
+		if (isset($tag_ids))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryAddTagsFilter($query, $tag_ids);
+		}
+
+		if (isset($extranet_ids))
+		{
+			$this->QueryAddExtranetFilter($query, $extranet_ids);
+		}
+
+		$query->SetLimit($limit, $offset);
+
+		$result = $this->db->query($query->GetQuery());
+
+		$users_total_thank_yous = [];
+		while ($row = $result->fetchArray())
+		{
+			$users_total_thank_yous[(int) $row[self::THANKED_USERS_TABLE . ".user_id"]] = (int) $row[self::THANKED_USERS_TABLE . ".total_thank_yous"];
+		}
+
+		if (isset($user_ids))
+		{
+			foreach ($user_ids as $user_id)
+			{
+				if (!isset($users_total_thank_yous[$user_id]))
+				{
+					$users_total_thank_yous[$user_id] = 0;
+				}
+			}
+		}
+
+		return $users_total_thank_yous;
+	}
+
+	/**
+	 * @param int[]|null $user_ids
+	 * @param array|null $date_range
+	 * @param int[]|null $tag_ids
+	 * @param int[]|null $extranet_ids
 	 * @return int
 	 */
-	public function GetUsersThankYousCount(int $user_id): int
+	public function GetTotalUsers(?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): int
 	{
-		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_user WHERE user_id=int:uid", $user_id);
+		$query_string = "SELECT COUNT(DISTINCT " . self::THANKED_USERS_TABLE . ".user_id) FROM " . self::THANKED_USERS_TABLE;
+
+		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		if (isset($user_ids))
+		{
+			$this->QueryAddThankedUserFilter($query, $user_ids);
+		}
+
+		if (isset($date_range))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
+			$this->QueryAddCreatedBetweenFilter($query, $date_range);
+		}
+
+		if (isset($tag_ids))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryAddTagsFilter($query, $tag_ids);
+		}
+
+		if (isset($extranet_ids))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+			$this->QueryAddExtranetFilter($query, $extranet_ids);
+		}
+
+		list($count) = $this->db->query_row($query->GetQuery());
 
 		return $count;
 	}
@@ -447,10 +578,11 @@ class ThankYousRepository
 	/**
 	 * Returns an array of Users indexed by their ID.
 	 *
-	 * @param array $user_ids
+	 * @param int[] $user_ids
 	 * @return User[]
 	 */
 	public function GetUsers(array $user_ids): array
+		//TODO: Remove this function with and replace uses with a call to a different API, once a suitable one exists.
 	{
 		$users_list_provider = new UsersListProvider();
 		$users_list_provider->SetFilterProtectExtranets(false);
@@ -744,6 +876,8 @@ class ThankYousRepository
 	 */
 	private function QueryAddCreatedBetweenFilter(QueryBuilder $query, array $date_range)
 	{
+		$date_range = $this->utility->FormatDateRange($date_range);
+
 		$lower_date = $date_range[0] ?? null;
 		$upper_date = $date_range[1] ?? null;
 
@@ -772,6 +906,11 @@ class ThankYousRepository
 
 	private function QueryAddThankedUserFilter(QueryBuilder $query, array $thanked_user_ids)
 	{
+		if (count($thanked_user_ids) === 0)
+		{
+			return;
+		}
+
 		$where         = self::THANKED_USERS_TABLE . ".user_id IN (";
 		$first_user_id = true;
 		foreach ($thanked_user_ids as $user_id)
@@ -790,6 +929,11 @@ class ThankYousRepository
 
 	private function QueryAddTagsFilter(QueryBuilder $query, array $tag_ids)
 	{
+		if (count($tag_ids) === 0)
+		{
+			return;
+		}
+
 		$where        = self::THANK_YOU_TAGS_TABLE . ".tag_id IN (";
 		$first_tag_id = true;
 		foreach ($tag_ids as $tag_id)
@@ -803,6 +947,38 @@ class ThankYousRepository
 			$first_tag_id = false;
 		}
 		$where .= ")";
+
+		$query->AddWhereAndClause($where);
+	}
+
+	private function QueryAddExtranetFilter(QueryBuilder $query, array $extranet_ids, bool $allow_absence = false)
+	{
+		if (count($extranet_ids) === 0)
+		{
+			return;
+		}
+
+		$where             = "(" . self::USER_TABLE . ".ex_area_id IN (";
+		$first_extranet_id = true;
+		foreach ($extranet_ids as $extranet_id)
+		{
+			if (!is_int($extranet_id))
+			{
+				throw new InvalidArgumentException("Failed to Add Extranet Filter to Query, Extranet ID '" . (string) $extranet_id . "' is not an integer");
+			}
+
+			$where             .= $first_extranet_id ? $extranet_id : ", " . $extranet_id;
+			$first_extranet_id = false;
+		}
+		$where .= ")";
+
+		if ($allow_absence)
+		{
+			$where .= " OR " . self::USER_TABLE . ".ex_area_id IS NULL";
+		}
+
+		$where .= ")";
+
 		$query->AddWhereAndClause($where);
 	}
 }

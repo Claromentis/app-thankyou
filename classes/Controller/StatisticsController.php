@@ -3,9 +3,11 @@
 namespace Claromentis\ThankYou\Controller;
 
 use Claromentis\Core\Config\Config;
+use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Api\Tag;
+use Psr\Http\Message\ServerRequestInterface;
 
 class StatisticsController
 {
@@ -13,16 +15,33 @@ class StatisticsController
 
 	private $lmsg;
 
+	private $response;
+
 	private $tag_api;
 
-	public function __construct(Lmsg $lmsg, Config $config, Tag $tag_api)
+	public function __construct(ResponseFactory $response_factory, Lmsg $lmsg, Config $config, Tag $tag_api)
 	{
-		$this->config  = $config;
-		$this->lmsg    = $lmsg;
-		$this->tag_api = $tag_api;
+		$this->config   = $config;
+		$this->lmsg     = $lmsg;
+		$this->response = $response_factory;
+		$this->tag_api  = $tag_api;
 	}
 
-	public function Statistics()
+	public function Reports(ServerRequestInterface $request)
+	{
+		$url = $request->getRequestTarget();
+
+		$args = ['nav_statistics.+class' => 'active'];
+
+		foreach ($this->GetReports() as $report_index => $report)
+		{
+			$args['reports.datasrc'][] = ['report.body' => $report['name'], 'report.href' => $url . '/' . $report_index];
+		}
+
+		return new TemplaterCallResponse('thankyou/admin/statistics/reports.html', $args, ($this->lmsg)('thankyou.app_name'));
+	}
+
+	public function View(string $report_index, ServerRequestInterface $request)
 	{
 		$core_values_enabled = (bool) $this->config->Get('thankyou_core_values_enabled');
 
@@ -44,6 +63,30 @@ class StatisticsController
 			$args['dt_form.args']['tags.visible'] = 0;
 		}
 
-		return new TemplaterCallResponse('thankyou/admin/statistics/statistics.html', $args, ($this->lmsg)('thankyou.app_name'));
+		$report            = $this->GetReports()[$report_index] ?? null;
+		$datatable_service = $report['datatable_service'] ?? null;
+		$report_name       = $report['name'] ?? '';
+
+		if (!isset($datatable_service))
+		{
+			return $this->response->GetRedirectResponse(substr($request->getRequestTarget(), 0, -strlen($report_index)));
+		}
+
+		$args['thankyou_reports_datatable.service'] = $datatable_service;
+		$args['current_page_title.body']            = $report_name;
+
+		return new TemplaterCallResponse('thankyou/admin/statistics/thank_yous.html', $args, ($this->lmsg)('thankyou.app_name'));
+	}
+
+	/**
+	 * @return array
+	 */
+	private function GetReports(): array
+	{
+		return [
+			'thankyous' => ['name' => ($this->lmsg)('thankyou.common.thank_yous'), 'datatable_service' => 'thankyou.datatable.thank_yous'],
+			'users'     => ['name' => ($this->lmsg)('common.users'), 'datatable_service' => 'thankyou.datatable.users'],
+			'tags'      => ['name' => ($this->lmsg)('thankyou.common.tags'), 'datatable_service' => 'thankyou.datatable.tags']
+		];
 	}
 }

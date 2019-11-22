@@ -9,6 +9,7 @@ use Claromentis\Core\Config\Config;
 use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\InvalidFieldIsNotSingle;
+use Claromentis\People\Service\UserExtranetService;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments\CommentableThankYou;
 use Claromentis\ThankYou\Constants;
@@ -44,6 +45,8 @@ class ThankYous
 
 	private $config;
 
+	private $extranet_service;
+
 	private $likes_repository;
 
 	private $line_manager_notifier;
@@ -60,12 +63,14 @@ class ThankYous
 		ThankYouUtility $thank_you_utility,
 		CommentsRepository $comments_repository,
 		LikesRepository $likes_repository,
-		AclRepository $acl_repository
+		AclRepository $acl_repository,
+		UserExtranetService $user_extranet_service
 	) {
 		$this->acl                   = $acl;
 		$this->acl_repository        = $acl_repository;
 		$this->comments_repository   = $comments_repository;
 		$this->config                = $config;
+		$this->extranet_service      = $user_extranet_service;
 		$this->likes_repository      = $likes_repository;
 		$this->line_manager_notifier = $line_manager_notifier;
 		$this->thank_yous_repository = $thank_yous_repository;
@@ -73,98 +78,235 @@ class ThankYous
 	}
 
 	/**
-	 * @param ThankYou        $thank_you
-	 * @param SecurityContext $security_context
-	 * @return bool
-	 */
-	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
-	{
-		return $this->acl->CanDeleteThankYou($thank_you, $security_context);
-	}
-
-	/**
-	 * @param ThankYou        $thank_you
-	 * @param SecurityContext $security_context
-	 * @return bool
-	 */
-	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
-	{
-		return $this->acl->CanEditThankYou($thank_you, $security_context);
-	}
-
-	/**
-	 * @param SecurityContext $security_context
-	 * @param ThankYou        $thank_you
-	 * @return bool
-	 */
-	public function CanSeeThankYouAuthor(SecurityContext $security_context, ThankYou $thank_you): bool
-	{
-		return $this->acl->CanSeeThankYouAuthor($security_context, $thank_you);
-	}
-
-	/**
-	 * @param SecurityContext $security_context
-	 * @param Thankable       $thankable
-	 * @return bool
-	 */
-	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool
-	{
-		return $this->acl->CanSeeThankableName($security_context, $thankable);
-	}
-
-	/**
-	 * @param User|int  $author
-	 * @param string    $description
-	 * @param Date|null $date_created
+	 * @param int  $id
+	 * @param bool $thanked
+	 * @param bool $users
+	 * @param bool $tags
 	 * @return ThankYou
-	 * @throws ThankYouAuthor - If the Author could not be loaded.
+	 * @throws ThankYouNotFound - If the Thank You could not be found.
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
-	public function Create($author, string $description, ?Date $date_created = null)
+	public function GetThankYou(int $id, bool $thanked = false, bool $users = false, bool $tags = false): ThankYou
 	{
-		return $this->thank_yous_repository->Create($author, $description, $date_created);
+		return $this->GetThankYous([$id], $thanked, $users, $tags)[$id];
 	}
 
 	/**
-	 * @param ThankYou $thank_you
+	 * @param int|int[] $ids
+	 * @param bool      $thanked
+	 * @param bool      $users
+	 * @param bool      $tags
+	 * @return ThankYou|ThankYou[]
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
+	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
-	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
+	public function GetThankYous($ids, bool $thanked = false, bool $users = false, bool $tags = false)
+		//TODO: Tighten inputs and outputs to be more specific.
 	{
-		$thankables = $thank_you->GetThankable();
-
-		if (!isset($thankables))
+		$array_return = true;
+		if (!is_array($ids))
 		{
-			$thank_you->SetUsers(null);
-
-			return;
+			$array_return = false;
+			$ids          = [$ids];
 		}
 
-		$owner_classes = [];
-		foreach ($thankables as $thankable)
-		{
-			$id        = $thankable->GetId();
-			$oclass_id = $thankable->GetOwnerClass();
+		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked, $users, $tags);
 
-			if (!isset($id) || !isset($oclass_id))
-			{
-				continue;
-			}
-			$owner_classes[] = ['oclass' => $oclass_id, 'id' => $id];
+		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
+	}
+
+	/**
+	 * @param SecurityContext       $context
+	 * @param bool                  $get_thanked
+	 * @param bool                  $get_users
+	 * @param bool                  $get_tags
+	 * @param int                   $limit
+	 * @param int                   $offset
+	 * @param DateTime[]|int[]|null $date_range
+	 * @param int[]|null            $thanked_user_ids
+	 * @param int[]|null            $tag_ids
+	 * @return ThankYou[]
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
+	 */
+	public function GetRecentThankYous(SecurityContext $context, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false, ?int $limit = null, ?int $offset = null, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
+	{
+		$extranet_ids = $this->GetVisibleExtranetIds($context);
+
+		if (isset($date_range))
+		{
+			$date_range = $this->utility->FormatDateRange($date_range);
 		}
 
-		$user_ids = $this->GetDistinctUserIdsFromOwnerClasses($owner_classes);
-
-		$users_list_provider = new UsersListProvider();
-		$users_list_provider->SetFilterIds($user_ids);
+		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
 
 		try
 		{
-			$users = $users_list_provider->GetListObjects();
-		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
+			return $this->GetThankYous($thank_you_ids, $get_thanked, $get_users, $get_tags);
+		} catch (ThankYouNotFound $thank_you_not_found)
 		{
-			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
+			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
+		}
+	}
+
+	/**
+	 * @param int  $user_id
+	 * @param int  $limit
+	 * @param int  $offset
+	 * @param bool $thanked
+	 * @param bool $users
+	 * @param bool $tags
+	 * @return ThankYou[]
+	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
+	 */
+	public function GetUsersRecentThankYous(int $user_id, int $limit, int $offset = 0, bool $thanked = false, bool $users = false, bool $tags = false)
+	{
+		$thank_you_ids = $this->thank_yous_repository->GetUsersRecentThankYousIdsFromDb($user_id, $limit, $offset);
+
+		try
+		{
+			return $this->GetThankYous($thank_you_ids, $thanked, $users, $tags);
+		} catch (ThankYouNotFound $thank_you_not_found)
+		{
+			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
+		}
+	}
+
+	/**
+	 * @return int[]
+	 */
+	public function GetThankableObjectTypes(): array
+	{
+		return $this->thank_yous_repository::THANKABLES;
+	}
+
+	/**
+	 * Return total number of Thank Yous in the database
+	 *
+	 * @param SecurityContext       $context
+	 * @param DateTime[]|int[]|null $date_range
+	 * @param int[]|null            $thanked_user_ids
+	 * @param array|null            $tag_ids
+	 * @return int
+	 */
+	public function GetTotalThankYousCount(SecurityContext $context, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
+	{
+		$extranet_ids = $this->GetVisibleExtranetIds($context);
+
+		return $this->thank_yous_repository->GetTotalThankYousCount($extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
+	}
+
+	/**
+	 * Returns an array of the total number of Thank Yous associated with a User, indexed by the User's ID.
+	 *
+	 * @param SecurityContext $context
+	 * @param int|null        $limit
+	 * @param int|null        $offset
+	 * @param int[]|null      $user_ids
+	 * @param array|null      $date_range
+	 * @param int[]|null      $tag_ids
+	 * @return int[]
+	 */
+	public function GetUsersTotalThankYous(SecurityContext $context, ?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null): array
+	{
+		$extranet_ids = $this->GetVisibleExtranetIds($context);
+
+		return $this->thank_yous_repository->GetTotalUsersThankYous($limit, $offset, $user_ids, $date_range, $tag_ids, $extranet_ids);
+	}
+
+	/**
+	 * Given an array of ThankYous, returns the total comments on each, indexed by their IDs.
+	 *
+	 * @param ThankYou[] $thank_yous
+	 * @return array
+	 */
+	public function GetThankYousCommentsCount(array $thank_yous): array
+	{
+		$thank_yous_comments = [];
+		foreach ($thank_yous as $thank_you)
+		{
+			if (!($thank_you instanceof ThankYou))
+			{
+				throw new InvalidArgumentException("Failed to Get Thank Yous Comments Count, one or more entities provided is not a Thank You");
+			}
+
+			$id = $thank_you->GetId();
+
+			if (!isset($id))
+			{
+				continue;
+			}
+
+			$comment = new CommentableThankYou();
+			$comment->Load($id);
+
+			$thank_yous_comments[$id] = (int) $this->comments_repository->GetCommentsCount($comment);
 		}
 
-		$thank_you->SetUsers($users);
+		return $thank_yous_comments;
+	}
+
+	/**
+	 * Given an array of ThankYous, returns the total likes on each, indexed by their IDs.
+	 *
+	 * @param ThankYou[] $thank_yous
+	 * @return int[]
+	 */
+	public function GetThankYousLikesCount(array $thank_yous): array
+	{
+		$thank_yous_likes = [];
+		foreach ($thank_yous as $thank_you)
+		{
+			if (!($thank_you instanceof ThankYou))
+			{
+				throw new InvalidArgumentException("Failed to Get Thank Yous Likes Count, one or more entities provided is not a Thank You");
+			}
+
+			$id = $thank_you->GetId();
+
+			if (!isset($id))
+			{
+				continue;
+			}
+
+			$thank_yous_likes[$id] = (int) $this->likes_repository->GetCount(ThanksItem::AGGREGATION, $id);
+		}
+
+		return $thank_yous_likes;
+	}
+
+	/**
+	 * @param SecurityContext $context
+	 * @param int[]|null      $user_ids
+	 * @param array|null      $date_range
+	 * @param int[]|null      $tag_ids
+	 * @return int
+	 */
+	public function GetTotalUsers(SecurityContext $context, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null): int
+	{
+		$extranet_ids = $this->GetVisibleExtranetIds($context);
+
+		return $this->thank_yous_repository->GetTotalUsers($user_ids, $date_range, $tag_ids, $extranet_ids);
+	}
+
+	/**
+	 * @param int|int[] $object_types_id
+	 * @return string|string[]
+	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
+	 */
+	public function GetOwnerClassNamesFromIds(array $object_types_id)
+	{
+		return $this->utility->GetOwnerClassNamesFromIds($object_types_id);
+	}
+
+	/**
+	 * Returns an array of Users indexed by their IDs.
+	 *
+	 * @param int[] $user_ids
+	 * @return User[]
+	 */
+	public function GetUsers(array $user_ids)
+	{
+		return $this->thank_yous_repository->GetUsers($user_ids);
 	}
 
 	/**
@@ -217,6 +359,215 @@ class ThankYous
 		}
 
 		return $user_ids;
+	}
+
+	/**
+	 * Determines which Extranets are visible to a specific Security Context, and returns their IDs.
+	 * In the event that all Extranets are visible, null is returned.
+	 *
+	 * @param SecurityContext $context
+	 * @return int[]|null
+	 */
+	public function GetVisibleExtranetIds(SecurityContext $context)
+	{
+		if ($context->IsPrimaryExtranet())
+		{
+			return null;
+		} else
+		{
+			return [(int) $context->GetExtranetAreaId(), (int) $this->extranet_service->GetPrimaryId()];
+		}
+	}
+
+	/**
+	 * @param User|int  $author
+	 * @param string    $description
+	 * @param Date|null $date_created
+	 * @return ThankYou
+	 * @throws ThankYouAuthor - If the Author could not be loaded.
+	 */
+	public function Create($author, string $description, ?Date $date_created = null)
+	{
+		return $this->thank_yous_repository->Create($author, $description, $date_created);
+	}
+
+	/**
+	 * @param int $o_class
+	 * @param int $id
+	 * @return Thankable
+	 * @throws ThankYouOClass - If the Owner Class given is not supported.
+	 * @throws ThankableNotFound - If the Thankable could not be found.
+	 */
+	public function CreateThankableFromOClass(int $o_class, int $id)
+	{
+		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]]);
+		if (!isset($thankables[0]))
+		{
+			throw new ThankableNotFound("Thankable could not be found with Owner Class '" . $o_class . "' and ID '" . $id . "'");
+		}
+
+		return $thankables[0];
+	}
+
+	/**
+	 * @param array $oclasses
+	 * @return array|Thankable[]
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 */
+	public function CreateThankablesFromOClasses(array $oclasses)
+	{
+		return $this->thank_yous_repository->CreateThankablesFromOClasses($oclasses);
+	}
+
+	/**
+	 * @param ThankYou $thank_you
+	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
+	 * @throws ThankYouRepository - On failure to save to database.
+	 */
+	public function Save(ThankYou $thank_you)
+	{
+		$this->thank_yous_repository->Save($thank_you);
+	}
+
+	/**
+	 * @param SecurityContext $security_context
+	 * @param int             $id
+	 * @throws ThankYouNotFound - If the Thank You could not be found.
+	 * @throws ThankYouForbidden - If the Security Context's User does not have permission.
+	 */
+	public function Delete(SecurityContext $security_context, int $id)
+	{
+		try
+		{
+			$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
+		} catch (ThankYouOClass $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by GetThankYous in Delete", null, $exception);
+		}
+
+		if (!$this->CanDeleteThankYou($thank_you, $security_context))
+		{
+			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
+		}
+
+		$this->thank_yous_repository->Delete($id);
+	}
+
+	/**
+	 * @param ThankYou        $thank_you
+	 * @param SecurityContext $security_context
+	 * @return bool
+	 */
+	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
+	{
+		return $this->acl->CanDeleteThankYou($thank_you, $security_context);
+	}
+
+	/**
+	 * @param ThankYou        $thank_you
+	 * @param SecurityContext $security_context
+	 * @return bool
+	 */
+	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
+	{
+		return $this->acl->CanEditThankYou($thank_you, $security_context);
+	}
+
+	/**
+	 * @param SecurityContext $security_context
+	 * @param ThankYou        $thank_you
+	 * @return bool
+	 */
+	public function CanSeeThankYouAuthor(SecurityContext $security_context, ThankYou $thank_you): bool
+	{
+		return $this->acl->CanSeeThankYouAuthor($security_context, $thank_you);
+	}
+
+	/**
+	 * @param SecurityContext $security_context
+	 * @param Thankable       $thankable
+	 * @return bool
+	 */
+	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool
+	{
+		return $this->acl->CanSeeThankableName($security_context, $thankable);
+	}
+
+	/**
+	 * Determines whether a Security Context can view a User's details.
+	 *
+	 * @param SecurityContext $context
+	 * @param User            $user
+	 * @return bool
+	 */
+	public function CanSeeUser(SecurityContext $context, User $user): bool
+	{
+		return $this->acl->CanSeeUser($context, $user);
+	}
+
+	/**
+	 * @param SecurityContext $security_context
+	 * @return bool
+	 */
+	public function IsAdmin(SecurityContext $security_context): bool
+	{
+		return $this->acl->IsAdmin($security_context);
+	}
+
+	/**
+	 * Determines whether an Extranet Area is visible. If the second parameter is provided, this will be relative to
+	 * that Extranet.
+	 *
+	 * @param int      $target_extranet_id
+	 * @param int|null $viewers_extranet_id
+	 * @return bool
+	 */
+	public function IsExtranetVisible(int $target_extranet_id, ?int $viewers_extranet_id = null): bool
+	{
+		return $this->acl->IsExtranetVisible($target_extranet_id, $viewers_extranet_id);
+	}
+
+	/**
+	 * @param ThankYou $thank_you
+	 */
+	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
+	{
+		$thankables = $thank_you->GetThankable();
+
+		if (!isset($thankables))
+		{
+			$thank_you->SetUsers(null);
+
+			return;
+		}
+
+		$owner_classes = [];
+		foreach ($thankables as $thankable)
+		{
+			$id        = $thankable->GetId();
+			$oclass_id = $thankable->GetOwnerClass();
+
+			if (!isset($id) || !isset($oclass_id))
+			{
+				continue;
+			}
+			$owner_classes[] = ['oclass' => $oclass_id, 'id' => $id];
+		}
+
+		$user_ids = $this->GetDistinctUserIdsFromOwnerClasses($owner_classes);
+
+		$users_list_provider = new UsersListProvider();
+		$users_list_provider->SetFilterIds($user_ids);
+
+		try
+		{
+			$users = $users_list_provider->GetListObjects();
+		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
+		{
+			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
+		}
+
+		$thank_you->SetUsers($users);
 	}
 
 	/**
@@ -277,267 +628,5 @@ class ThankYous
 		{
 			throw new LogicException("Unexpected Exception thrown by NotificationMessage library", null, $exception);
 		}
-	}
-
-	/**
-	 * @param int $o_class
-	 * @param int $id
-	 * @return Thankable
-	 * @throws ThankYouOClass - If the Owner Class given is not supported.
-	 * @throws ThankableNotFound - If the Thankable could not be found.
-	 */
-	public function CreateThankableFromOClass(int $o_class, int $id)
-	{
-		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]]);
-		if (!isset($thankables[0]))
-		{
-			throw new ThankableNotFound("Thankable could not be found with Owner Class '" . $o_class . "' and ID '" . $id . "'");
-		}
-
-		return $thankables[0];
-	}
-
-	/**
-	 * @param array $oclasses
-	 * @return array|Thankable[]
-	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
-	 */
-	public function CreateThankablesFromOClasses(array $oclasses)
-	{
-		return $this->thank_yous_repository->CreateThankablesFromOClasses($oclasses);
-	}
-
-	/**
-	 * @param int|int[] $object_types_id
-	 * @return string|string[]
-	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
-	 */
-	public function GetOwnerClassNamesFromIds(array $object_types_id)
-	{
-		return $this->utility->GetOwnerClassNamesFromIds($object_types_id);
-	}
-
-	/**
-	 * @param int  $id
-	 * @param bool $thanked
-	 * @param bool $users
-	 * @param bool $tags
-	 * @return ThankYou
-	 * @throws ThankYouNotFound - If the Thank You could not be found.
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
-	 */
-	public function GetThankYou(int $id, bool $thanked = false, bool $users = false, bool $tags = false): ThankYou
-	{
-		return $this->GetThankYous([$id], $thanked, $users, $tags)[$id];
-	}
-
-	/**
-	 * @param int|int[] $ids
-	 * @param bool      $thanked
-	 * @param bool      $users
-	 * @param bool      $tags
-	 * @return ThankYou|ThankYou[]
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
-	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
-	 */
-	public function GetThankYous($ids, bool $thanked = false, bool $users = false, bool $tags = false)
-		//TODO: Tighten inputs and outputs to be more specific.
-	{
-		$array_return = true;
-		if (!is_array($ids))
-		{
-			$array_return = false;
-			$ids          = [$ids];
-		}
-
-		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked, $users, $tags);
-
-		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
-	}
-
-	/**
-	 * Return total number of Thank Yous in the database
-	 *
-	 * @param DateTime[]|int[]|null $date_range
-	 * @param int[]|null            $thanked_user_ids
-	 * @return int
-	 */
-	public function GetTotalThankYousCount(?array $date_range = null, ?array $thanked_user_ids = null): int
-	{
-		if (isset($date_range))
-		{
-			$date_range = $this->utility->FormatDateRange($date_range);
-		}
-
-		return $this->thank_yous_repository->GetTotalThankYousCount($date_range, $thanked_user_ids);
-	}
-
-	/**
-	 * @param int                   $limit
-	 * @param int                   $offset
-	 * @param DateTime[]|int[]|null $date_range
-	 * @param int[]|null            $thanked_user_ids
-	 * @param int[]|null            $tag_ids
-	 * @param bool                  $get_thanked
-	 * @param bool                  $get_users
-	 * @param bool                  $get_tags
-	 * @return ThankYou[]
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
-	 */
-	public function GetRecentThankYous(int $limit, int $offset = 0, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false)
-	{
-		if (isset($date_range))
-		{
-			$date_range = $this->utility->FormatDateRange($date_range);
-		}
-
-		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $date_range, $thanked_user_ids, $tag_ids);
-
-		try
-		{
-			return $this->GetThankYous($thank_you_ids, $get_thanked, $get_users, $get_tags);
-		} catch (ThankYouNotFound $thank_you_not_found)
-		{
-			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
-		}
-	}
-
-	/**
-	 * @return int[]
-	 */
-	public function GetThankableObjectTypes(): array
-	{
-		return $this->thank_yous_repository::THANKABLES;
-	}
-
-	/**
-	 * @param int  $user_id
-	 * @param int  $limit
-	 * @param int  $offset
-	 * @param bool $thanked
-	 * @param bool $users
-	 * @param bool $tags
-	 * @return ThankYou[]
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
-	 */
-	public function GetUsersRecentThankYous(int $user_id, int $limit, int $offset = 0, bool $thanked = false, bool $users = false, bool $tags = false)
-	{
-		$thank_you_ids = $this->thank_yous_repository->GetUsersRecentThankYousIdsFromDb($user_id, $limit, $offset);
-
-		try
-		{
-			return $this->GetThankYous($thank_you_ids, $thanked, $users, $tags);
-		} catch (ThankYouNotFound $thank_you_not_found)
-		{
-			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
-		}
-	}
-
-	/**
-	 * Takes an array of "ThankYou"s or Thank Yous IDs and returns an array of integers representing that Thank You's total Comments, indexed by the IDs provided.
-	 *
-	 * @param int[]|ThankYou[] $ids
-	 * @return int[]
-	 */
-	public function GetThankYousCommentsCount(array $ids): array
-	{
-		$comment_counts = [];
-		foreach ($ids as $id)
-		{
-			if ($id instanceof ThankYou)
-			{
-				$id = $id->GetId();
-			}
-
-			if (!is_int($id))
-			{
-				throw new InvalidArgumentException("Failed to Get Thank Yous Comments Count, invalid ID '" . (string) $id . "' given");
-			}
-			$comment = new CommentableThankYou();
-			$comment->Load($id);
-
-			$comment_counts[$id] = $this->comments_repository->GetCommentsCount($comment);
-		}
-
-		return $comment_counts;
-	}
-
-	/**
-	 * Takes an array of "ThankYou"s or Thank Yous IDs and return an array of integers representing that Thank You's total Likes, indexed by the IDs provided.
-	 *
-	 * @param int[]|ThankYou[] $ids
-	 * @return int[]
-	 */
-	public function GetThankYousLikesCount(array $ids): array
-	{
-		$likes_counts = [];
-		foreach ($ids as $id)
-		{
-			if ($id instanceof ThankYou)
-			{
-				$id = $id->GetId();
-			}
-
-			if (!is_int($id))
-			{
-				throw new InvalidArgumentException("Failed to Get Thank Yous Likes Count, invalid ID '" . (string) $id . "' given");
-			}
-
-			$likes_counts[$id] = $this->likes_repository->GetCount(ThanksItem::AGGREGATION, $id);
-		}
-
-		return $likes_counts;
-	}
-
-	/**
-	 * @param int $user_id
-	 * @return int
-	 */
-	public function GetUsersThankYousCount(int $user_id): int
-	{
-		return $this->thank_yous_repository->GetUsersThankYousCount($user_id);
-	}
-
-	/**
-	 * @param SecurityContext $security_context
-	 * @return bool
-	 */
-	public function IsAdmin(SecurityContext $security_context): bool
-	{
-		return $this->acl->IsAdmin($security_context);
-	}
-
-	/**
-	 * @param ThankYou $thank_you
-	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
-	 * @throws ThankYouRepository - On failure to save to database.
-	 */
-	public function Save(ThankYou $thank_you)
-	{
-		$this->thank_yous_repository->Save($thank_you);
-	}
-
-	/**
-	 * @param SecurityContext $security_context
-	 * @param int             $id
-	 * @throws ThankYouNotFound - If the Thank You could not be found.
-	 * @throws ThankYouForbidden - If the Security Context's User does not have permission.
-	 */
-	public function Delete(SecurityContext $security_context, int $id)
-	{
-		try
-		{
-			$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
-		} catch (ThankYouOClass $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetThankYous in Delete", null, $exception);
-		}
-
-		if (!$this->CanDeleteThankYou($thank_you, $security_context))
-		{
-			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
-		}
-
-		$this->thank_yous_repository->Delete($id);
 	}
 }

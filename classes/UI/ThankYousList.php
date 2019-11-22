@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
@@ -113,6 +114,11 @@ class ThankYousList extends TemplaterComponentTmpl
 	 */
 	public function Show($attributes, Application $app): string
 	{
+		/**
+		 * @var SecurityContext $context
+		 */
+		$context = $app[SecurityContext::class];
+
 		$can_create = (bool) ($attributes['create'] ?? null);
 		$can_delete = (bool) ($attributes['delete'] ?? null);
 		$can_edit   = (bool) ($attributes['edit'] ?? null);
@@ -136,7 +142,7 @@ class ThankYousList extends TemplaterComponentTmpl
 				$thank_yous = $this->api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true, false, true);
 			} else
 			{
-				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($limit, $offset, null, null, null, true, false, true);
+				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset);
 			}
 		} catch (ThankYouOClass $exception)
 		{
