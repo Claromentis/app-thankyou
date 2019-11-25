@@ -9,6 +9,7 @@ use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\ThankYou\Api\ThankYous;
 
 /**
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
@@ -56,7 +57,8 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			'allow_new'      => ['type' => 'bool', 'default' => true, 'title' => ($this->lmsg)('thankyou.component.options.show_button')],
 			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('thankyou.component.options.profile_images')],
 			'comments'       => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('common.show_comments')],
-			//	'user_id' => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
+			'user_id'        => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
+			'group_ids'      => ['type' => 'array_int', 'title' => ($this->lmsg)('thankyou.common.filter_by_groups'), 'default' => [], 'input' => 'group_picker', 'width' => 'medium'],
 			'limit'          => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50]
 		];
 	}
@@ -72,6 +74,14 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	 */
 	public function ShowBody($id_string, OptionsInterface $options, Application $app)
 	{
+		/**
+		 * @var ThankYous $api
+		 */
+		$api = $app[ThankYous::class];
+
+		$thank_user_id = $options->Get('user_id');
+		$group_ids     = $options->Get('group_ids');
+
 		$args = [];
 
 		$args['ty_list.limit'] = $options->Get('limit');
@@ -83,6 +93,27 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		$args['ty_list.create']         = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
 		$args['ty_list.thanked_images'] = (bool) $options->Get('profile_images');
 		$args['ty_list.comments']       = (bool) $options->Get('comments');
+
+		$thanked_owner_classes = [];
+		if (isset($thank_user_id))
+		{
+			$thanked_owner_classes[] = ['id' => (int) $thank_user_id, 'oclass' => PERM_OCLASS_INDIVIDUAL];
+		}
+
+		if (is_array($group_ids))
+		{
+			foreach ($group_ids as $group_id)
+			{
+				$thanked_owner_classes[] = ['id' => (int) $group_id, 'oclass' => PERM_OCLASS_GROUP];
+			}
+		}
+
+		$user_ids = $api->GetDistinctUserIdsFromOwnerClasses($thanked_owner_classes);
+
+		if (count($user_ids) > 0)
+		{
+			$args['ty_list.user_ids'] = $user_ids;
+		}
 
 		return $this->CallTemplater('thankyou/pages_component.html', $args);
 	}
