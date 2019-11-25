@@ -7,6 +7,7 @@ lm	thankyou.admin.statistics.title		Reports & Statistics
 lm	thankyou.app_name		Thank you
 lm	thankyou.common.actions		Actions
 lm	thankyou.common.comment		Comment
+lm	thankyou.common.filter_by_groups		Filter by Groups
 lm	thankyou.common.select_core_values		Select Core Values
 lm	thankyou.common.tags		Core Values
 lm	thankyou.common.thank_you_message		Thank you message

@@ -7,6 +7,7 @@ lm	thankyou.admin.statistics.title
 lm	thankyou.app_name		Vielen Dank
 lm	thankyou.common.actions		
 lm	thankyou.common.comment		
+lm	thankyou.common.filter_by_groups		
 lm	thankyou.common.select_core_values		
 lm	thankyou.common.tags		
 lm	thankyou.common.thank_you_message		Dankesnachricht
