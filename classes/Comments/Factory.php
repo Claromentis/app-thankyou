@@ -16,4 +16,16 @@ class Factory
 
 		return $comment;
 	}
+
+	/**
+	 * Determines whether the input is equal to the factories output.
+	 *
+	 * @param mixed $object
+	 * @return bool
+	 */
+
+	public function IsCommentInstance($object): bool
+	{
+		return is_object($object) && $object instanceof CommentableThankYou;
+	}
 }
