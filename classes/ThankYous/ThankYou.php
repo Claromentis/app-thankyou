@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Claromentis\ThankYou\Comments\CommentableThankYou;
 use Claromentis\ThankYou\Tags\Tag;
 use Date;
 use InvalidArgumentException;
@@ -13,6 +14,11 @@ class ThankYou
 	 * @var User $author
 	 */
 	private $author;
+
+	/**
+	 * @var CommentableThankYou|null $comment
+	 */
+	private $comment;
 
 	/**
 	 * @var Date $date_created
@@ -67,6 +73,14 @@ class ThankYou
 	}
 
 	/**
+	 * @return CommentableThankYou|null
+	 */
+	public function GetComment(): ?CommentableThankYou
+	{
+		return $this->comment;
+	}
+
+	/**
 	 * @return int|null
 	 */
 	public function GetId(): ?int
@@ -112,6 +126,14 @@ class ThankYou
 	public function GetTags(): ?array
 	{
 		return $this->tags;
+	}
+
+	/**
+	 * @param CommentableThankYou|null $commentable_thank_you
+	 */
+	public function SetComment(?CommentableThankYou $commentable_thank_you)
+	{
+		$this->comment = $commentable_thank_you;
 	}
 
 	/**
