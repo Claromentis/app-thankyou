@@ -53,6 +53,7 @@ lm	thankyou.tag.error.name.invalid		Core Value Name must be a string if defined
 lm	thankyou.tag.error.name.not_empty		Core Value's Name cannot be empty
 lm	thankyou.tag.error.name.not_unique		This Core Value Name has already been used
 lm	thankyou.tag.error.name.undefined		Core Value Name must be defined
+lm	thankyou.tag.total_uses		Number of times selected
 lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
 lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to: 
