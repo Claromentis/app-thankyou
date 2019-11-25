@@ -31,9 +31,9 @@ use Claromentis\ThankYou\Controller\ThanksController;
 use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
+use Claromentis\ThankYou\Tags\DataTables\TagDataTableSource;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
 use Claromentis\ThankYou\Tags\TagAcl;
-use Claromentis\ThankYou\Tags\TagDataTableSource;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\Tags\UI\TagTemplaterComponent;
@@ -76,6 +76,7 @@ class Plugin implements
 	 */
 	public function register(Container $app)
 	{
+		//Tags
 		$app[TagAcl::class] = function ($app) {
 			return new TagAcl($app['admin.panels_list']->GetOne('thankyou'));
 		};
@@ -92,7 +93,9 @@ class Plugin implements
 			return new TagTemplaterComponent($app[Tag::class], $app['logger_factory']->GetLogger('tag'));
 		};
 
-		$app['thankyou.datatable.tags'] = TagDataTableSource::class;
+		$app['tags.datatable.admin'] = TagDataTableSource::class;
+
+		//Thank Yous
 
 		// Localization domain
 		$app['localization.domain.thankyou'] = function ($app) {

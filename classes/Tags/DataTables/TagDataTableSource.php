@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\Tags;
+namespace Claromentis\ThankYou\Tags\DataTables;
 
 use Claromentis\Core\DataTable\Contract\DataSource;
 use Claromentis\Core\DataTable\Contract\Parameters;
@@ -8,6 +8,7 @@ use Claromentis\Core\DataTable\Contract\TableFilter;
 use Claromentis\Core\DataTable\Shared\ColumnHelper;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
+use Claromentis\ThankYou\Tags\TagRepository;
 use LogicException;
 
 class TagDataTableSource implements DataSource
@@ -57,7 +58,7 @@ class TagDataTableSource implements DataSource
 			$rows[] = [
 				'name'      => $tag->GetName(),
 				'bg_colour' => $bg_colour,
-				'actions'    => ['active' => $tag->GetActive(), 'id' => $tag->GetId()]
+				'actions'   => ['active' => $tag->GetActive(), 'id' => $tag->GetId()]
 			];
 		}
 

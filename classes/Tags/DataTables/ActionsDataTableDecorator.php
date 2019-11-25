@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\Tags;
+namespace Claromentis\ThankYou\Tags\DataTables;
 
 use Claromentis\Core\DataTable\Decorator\Decorator;
 
