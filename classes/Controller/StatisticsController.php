@@ -75,7 +75,7 @@ class StatisticsController
 		$args['thankyou_reports_datatable.service'] = $datatable_service;
 		$args['current_page_title.body']            = $report_name;
 
-		return new TemplaterCallResponse('thankyou/admin/statistics/thank_yous.html', $args, ($this->lmsg)('thankyou.app_name'));
+		return new TemplaterCallResponse('thankyou/admin/statistics/report.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
 
 	/**
