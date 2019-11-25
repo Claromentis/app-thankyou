@@ -132,18 +132,12 @@ class ThankYousList extends TemplaterComponentTmpl
 		$limit             = (int) ($attributes['limit'] ?? 20);
 		$offset            = (int) ($attributes['offset'] ?? null);
 		$thanks_links      = (bool) ($attributes['thanks_links'] ?? null);
-		$user_id           = (isset($attributes['user_id'])) ? (int) $attributes['user_id'] : null;
+		$user_ids          = (isset($attributes['user_id'])) ? [(int) $attributes['user_id']] : [];
 
 		$thank_yous = [];
 		try
 		{
-			if (isset($user_id))
-			{
-				$thank_yous = $this->api->ThankYous()->GetUsersRecentThankYous($user_id, $limit, $offset, true, false, true);
-			} else
-			{
-				$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset);
-			}
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset, null, $user_ids, null);
 		} catch (ThankYouOClass $exception)
 		{
 			$this->log->error("Failed to display Thank Yous in Templater Component 'thankyou.list'", [$exception]);

@@ -149,29 +149,6 @@ class ThankYous
 	}
 
 	/**
-	 * @param int  $user_id
-	 * @param int  $limit
-	 * @param int  $offset
-	 * @param bool $thanked
-	 * @param bool $users
-	 * @param bool $tags
-	 * @return ThankYou[]
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
-	 */
-	public function GetUsersRecentThankYous(int $user_id, int $limit, int $offset = 0, bool $thanked = false, bool $users = false, bool $tags = false)
-	{
-		$thank_you_ids = $this->thank_yous_repository->GetUsersRecentThankYousIdsFromDb($user_id, $limit, $offset);
-
-		try
-		{
-			return $this->GetThankYous($thank_you_ids, $thanked, $users, $tags);
-		} catch (ThankYouNotFound $thank_you_not_found)
-		{
-			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
-		}
-	}
-
-	/**
 	 * @return int[]
 	 */
 	public function GetThankableObjectTypes(): array
