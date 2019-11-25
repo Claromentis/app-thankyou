@@ -139,10 +139,23 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			throw new InvalidArgumentException("Failed to generate Thank You Templater Component, object of type \"\Claromentis\ThankYou\ThankYous\ThankYou\" must be given.");
 		}
 
-		$id                   = $thank_you->GetId();
+		$id = $thank_you->GetId();
+
+		$display_comments = ((bool) isset($id) && ($attributes['comments'] ?? null) && (bool) $this->config->Get('thank_you_comments'));
+
+		$total_comments = 0;
+		if ($display_comments)
+		{
+			if ($thank_you->GetComment() === null)
+			{
+				$this->api->ThankYous()->LoadThankYousComments([$thank_you]);
+			}
+
+			$total_comments = $thank_you->GetComment()->GetTotalComments();
+		}
+
 		$can_edit_thank_you   = isset($id) && $can_edit && $this->api->ThankYous()->CanEditThankYou($thank_you, $context);
 		$can_delete_thank_you = isset($id) && $can_delete && $this->api->ThankYous()->CanDeleteThankYou($thank_you, $context);
-		$display_comments     = ((bool) isset($id) && ($attributes['comments'] ?? null) && (bool) $this->config->Get('thank_you_comments'));
 		$thank_link           = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
 
 		$author_id   = $thank_you->GetAuthor()->GetId();
@@ -232,6 +245,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			'has_description.visible' => strlen($thank_you->GetDescription()) > 0,
 
 			'comments.visible'            => $display_comments,
+			'comments_count.body'         => $total_comments,
 			'thank_you_comment.object_id' => $id,
 
 			'like_component.object_id' => $id,

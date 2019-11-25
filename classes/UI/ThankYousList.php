@@ -108,6 +108,12 @@ class ThankYousList extends TemplaterComponentTmpl
 		try
 		{
 			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset, null, $user_ids, null);
+
+			if ($display_comments)
+			{
+				$this->api->ThankYous()->LoadThankYousComments($thank_yous);
+			}
+
 		} catch (ThankYouOClass $exception)
 		{
 			$this->log->error("Failed to display Thank Yous in Templater Component 'thankyou.list'", [$exception]);
