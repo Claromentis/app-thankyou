@@ -37,6 +37,7 @@ use Claromentis\ThankYou\Tags\TagAcl;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\Tags\UI\TagTemplaterComponent;
+use Claromentis\ThankYou\ThankYous\DataTables\TagsDataTableSource;
 use Claromentis\ThankYou\ThankYous\DataTables\ThankYousDataTableSource;
 use Claromentis\ThankYou\ThankYous\DataTables\UsersDataTableSource;
 use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
@@ -213,6 +214,15 @@ class Plugin implements
 			return new UsersDataTableSource(
 				$app[ThankYous::class],
 				$app[SugreUtility::class],
+				$app[Lmsg::class]
+			);
+		};
+
+		$app['thankyou.datatable.statistics.tags'] = function ($app) {
+			return new TagsDataTableSource(
+				$app[ThankYous::class],
+				$app[SugreUtility::class],
+				$app[Tag::class],
 				$app[Lmsg::class]
 			);
 		};
