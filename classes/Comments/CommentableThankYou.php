@@ -52,7 +52,6 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 
 	/**
 	 * {@inheritDoc}
-	 * @throws LogicException
 	 */
 	public function GetAggregationObject(): ClaAggregation
 	{

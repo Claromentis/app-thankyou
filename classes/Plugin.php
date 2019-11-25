@@ -22,6 +22,7 @@ use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Api\Tag;
 use Claromentis\ThankYou\Api\ThankYous;
+use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Controller\AdminExportController;
 use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
@@ -174,6 +175,7 @@ class Plugin implements
 				$app[ThankYouAcl::class],
 				$app[ThankYouUtility::class],
 				$app[CommentsRepository::class],
+				$app[Comments\Factory::class],
 				$app[LikesRepository::class],
 				$app[AclRepository::class],
 				$app[UserExtranetService::class]

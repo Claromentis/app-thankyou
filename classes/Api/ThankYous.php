@@ -213,37 +213,6 @@ class ThankYous
 	}
 
 	/**
-	 * Given an array of ThankYous, returns the total comments on each, indexed by their IDs.
-	 *
-	 * @param ThankYou[] $thank_yous
-	 * @return array
-	 */
-	public function GetThankYousCommentsCount(array $thank_yous): array
-	{
-		$thank_yous_comments = [];
-		foreach ($thank_yous as $thank_you)
-		{
-			if (!($thank_you instanceof ThankYou))
-			{
-				throw new InvalidArgumentException("Failed to Get Thank Yous Comments Count, one or more entities provided is not a Thank You");
-			}
-
-			$id = $thank_you->GetId();
-
-			if (!isset($id))
-			{
-				continue;
-			}
-
-			$comment = $this->comments_factory->Create($id);
-
-			$thank_yous_comments[$id] = (int) $this->comments_repository->GetCommentsCount($comment);
-		}
-
-		return $thank_yous_comments;
-	}
-
-	/**
 	 * Given an array of ThankYous, returns the total likes on each, indexed by their IDs.
 	 *
 	 * @param ThankYou[] $thank_yous
@@ -333,16 +302,16 @@ class ThankYous
 			{
 				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, one or more Owner Class Members does not have an ID");
 			}
-			if (!is_int(($id)))
+			if (!is_int($id) || !($id > 0))
 			{
-				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, Owner Class Member ID " . (string) $id . " is not an integer");
+				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, Owner Class Member ID " . (string) $id . " is not a natural number");
 			}
 
 			if (!isset($oclass_id))
 			{
 				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, one or more Owner Class Members does not have an Owner Class ID");
 			}
-			if (!is_int(($oclass_id)))
+			if (!is_int($oclass_id))
 			{
 				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, Owner Class ID " . (string) $oclass_id . " is not an integer");
 			}
@@ -389,6 +358,7 @@ class ThankYous
 	 */
 	public function LoadThankYousComments(array $thank_yous)
 	{
+		$thank_yous_comments = [];
 		foreach ($thank_yous as $thank_you)
 		{
 			if (!($thank_you instanceof ThankYou))
@@ -403,10 +373,33 @@ class ThankYous
 				continue;
 			}
 
-			$comments = $this->comments_factory->Create($id);
+			$thank_yous_comments[$id] = $this->comments_factory->Create($id);
 
-			$thank_you->SetComment($comments);
+			$thank_you->SetComment($thank_yous_comments[$id]);
 		}
+		$this->LoadThankYousCommentsTotalComments($thank_yous_comments);
+	}
+
+	/**
+	 * Sets Thank Yous Comments' Total Comments.
+	 *
+	 * @param Comments\CommentableThankYou[] $thank_yous_comments
+	 * @return array
+	 */
+	public function LoadThankYousCommentsTotalComments(array $thank_yous_comments): array
+	{
+		foreach ($thank_yous_comments as $thank_you_comments)
+		{
+			if (!$this->comments_factory->IsCommentInstance($thank_you_comments))
+			{
+				throw new InvalidArgumentException("Failed to Load Thank Yous' Comments Total Comments, one ore more entities provided is not a Thank You Comments");
+			}
+
+			$comments_total_count = (int) $this->comments_repository->GetCommentsCount($thank_you_comments);
+			$thank_you_comments->SetTotalComments($comments_total_count);
+		}
+
+		return $thank_yous_comments;
 	}
 
 	/**

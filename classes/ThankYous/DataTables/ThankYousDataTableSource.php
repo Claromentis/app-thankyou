@@ -90,7 +90,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 		$thank_you_comment_counts = [];
 		if ($get_comments)
 		{
-			$thank_you_comment_counts = $this->api->GetThankYousCommentsCount($thank_yous);
+			$this->api->LoadThankYousComments($thank_yous);
 		}
 
 		$likes_counts = $this->api->GetThankYousLikesCount($thank_yous);
@@ -148,7 +148,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 			if ($this->config->Get('thank_you_comments') === true)
 			{
-				$row['comments_count'] = $thank_you_comment_counts[$id] ?? 0;
+				$row['comments_count'] = $thank_you->GetComment()->GetTotalComments();
 			}
 
 			$rows[] = $row;
