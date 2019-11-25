@@ -16,7 +16,6 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
@@ -148,9 +147,9 @@ class ThanksRestV2
 		$query_params = $request->getQueryParams();
 		$limit        = $query_params['limit'] ?? 20;
 		$offset       = $query_params['offset'] ?? 0;
-		$get_thanked      = (bool) (int) ($query_params['thanked'] ?? null);
-		$get_users        = (bool) (int) ($query_params['users'] ?? null);
-		$get_tags         = (bool) (int) ($query_params['tags'] ?? null);
+		$get_thanked  = (bool) (int) ($query_params['thanked'] ?? null);
+		$get_users    = (bool) (int) ($query_params['users'] ?? null);
+		$get_tags     = (bool) (int) ($query_params['tags'] ?? null);
 
 		try
 		{
@@ -230,7 +229,18 @@ class ThanksRestV2
 					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_array')];
 				}
 
-				try
+				$tag_ids_valid = true;
+				foreach ($tag_ids as $tag_id)
+				{
+					if (!is_int($tag_id))
+					{
+						$tag_ids_valid    = false;
+						$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
+						break;
+					}
+				}
+
+				if ($tag_ids_valid)
 				{
 					$tags = $this->api->Tag()->GetTagsById($tag_ids);
 
@@ -241,9 +251,6 @@ class ThanksRestV2
 							$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)];
 						}
 					}
-				} catch (TagException $exception)
-				{
-					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
 				}
 			}
 		}
@@ -386,7 +393,18 @@ class ThanksRestV2
 				{
 					if ($this->config->Get('thankyou_core_values_enabled') === true)
 					{
-						try
+						$tag_ids_valid = true;
+						foreach ($tag_ids as $tag_id)
+						{
+							if (!is_int($tag_id))
+							{
+								$tag_ids_valid    = false;
+								$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
+								break;
+							}
+						}
+
+						if ($tag_ids_valid)
 						{
 							$tags = $this->api->Tag()->GetTagsById($tag_ids);
 
@@ -399,9 +417,6 @@ class ThanksRestV2
 							}
 
 							$thank_you->SetTags($tags);
-						} catch (TagException $exception)
-						{
-							$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
 						}
 					} else
 					{

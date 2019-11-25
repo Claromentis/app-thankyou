@@ -249,13 +249,7 @@ class ThankYousRepository
 			}
 		}
 
-		try
-		{
-			$tags = $this->tags->GetTagsById(array_keys($tags));
-		} catch (TagException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetTagsById", null, $exception);
-		}
+		$tags = $this->tags->GetTagsById(array_keys($tags));
 
 		$thank_yous = [];
 		foreach ($ids as $id)

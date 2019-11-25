@@ -4,7 +4,6 @@ namespace Claromentis\ThankYou\Api;
 
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
@@ -106,18 +105,9 @@ class Tag
 	 *
 	 * @param int[] $ids
 	 * @return \Claromentis\ThankYou\Tags\Tag[]
-	 * @throws TagException
 	 */
 	public function GetTagsById(array $ids): array
 	{
-		foreach ($ids as $id)
-		{
-			if (!is_int($id))
-			{
-				throw new TagException("Failed to Get Tags By ID, one or more IDs is not an integer");
-			}
-		}
-
 		return $this->repository->Load($ids);
 	}
 
