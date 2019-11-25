@@ -41,8 +41,8 @@ use Psr\Log\LoggerInterface;
  *     * int = How many Thank Yous to display.
  * * offset:
  *     * int = Offset of Thank Yous.
- * * user_id:
- *     * int  = Only display Thank Yous associated with this User.
+ * * user_ids:
+ *     * int[]  = Only display Thank Yous associated with these Users.
  *
  **/
 //TODO: Add AJAX callback to populate template. Add pagination supported by it.
@@ -78,36 +78,6 @@ class ThankYousList extends TemplaterComponentTmpl
 	}
 
 	/**
-	 * #Attributes
-	 * * comments:
-	 *     * 0 = Thank Yous Comments are hidden.
-	 *     * 1 = Thank Yous Comments are shown.
-	 * * create:
-	 *     * 0 = Creating Thank Yous is disabled.
-	 *     * 1 = Creating Thank Yous is enabled.
-	 *     * array = Creating ThankYous is locked to the Thankable array given (Created with \Claromentis\ThankYou\View\ThanksListView::ConvertThankableToArray).
-	 * * delete:
-	 *     * 0 = Deleting Thank Yous is disabled.
-	 *     * 1 = Deleting Thank Yous is enabled (subject to permissions or admin_mode).
-	 * * edit:
-	 *     * 0 = Editing Thank Yous is disabled.
-	 *     * 1 = Editing Thank Yous is enabled (subject to permissions or admin_mode).
-	 * * thanked_images:
-	 *     * 0 = Thanked will never display as an image.
-	 *     * 1 = Thanked will display as an image if available.
-	 * * thanks_links:
-	 *     * 0 = Thanks will not provide a link to themselves.(default)
-	 *     * 1 = Thanks will provide a link to themselves.
-	 * * links:
-	 *     * 0 = Thanked will never provide a link.
-	 *     * 1 = Thanked will provide a link if available.
-	 * * limit:
-	 *     * int = How many Thank Yous to display.
-	 * * offset:
-	 *     * int = Offset of Thank Yous.
-	 * * user_id:
-	 *     * int  = Only display Thank Yous associated with this User.
-	 *
 	 * @param array       $attributes
 	 * @param Application $app
 	 * @return string
@@ -132,7 +102,7 @@ class ThankYousList extends TemplaterComponentTmpl
 		$limit             = (int) ($attributes['limit'] ?? 20);
 		$offset            = (int) ($attributes['offset'] ?? null);
 		$thanks_links      = (bool) ($attributes['thanks_links'] ?? null);
-		$user_ids          = (isset($attributes['user_id'])) ? [(int) $attributes['user_id']] : [];
+		$user_ids          = $attributes['user_ids'] ?? null;
 
 		$thank_yous = [];
 		try
