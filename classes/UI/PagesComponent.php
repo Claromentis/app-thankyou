@@ -57,7 +57,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			'allow_new'      => ['type' => 'bool', 'default' => true, 'title' => ($this->lmsg)('thankyou.component.options.show_button')],
 			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('thankyou.component.options.profile_images')],
 			'comments'       => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('common.show_comments')],
-			'user_id'        => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
+			'user_id'        => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.user_id'), 'default' => null, 'input' => 'user_picker', 'width' => 'medium'],
 			'group_ids'      => ['type' => 'array_int', 'title' => ($this->lmsg)('thankyou.common.filter_by_groups'), 'default' => [], 'input' => 'group_picker', 'width' => 'medium'],
 			'limit'          => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50]
 		];
@@ -95,7 +95,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		$args['ty_list.comments']       = (bool) $options->Get('comments');
 
 		$thanked_owner_classes = [];
-		if (isset($thank_user_id))
+		if (isset($thank_user_id) && $thank_user_id > 0)
 		{
 			$thanked_owner_classes[] = ['id' => (int) $thank_user_id, 'oclass' => PERM_OCLASS_INDIVIDUAL];
 		}
@@ -104,7 +104,10 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		{
 			foreach ($group_ids as $group_id)
 			{
-				$thanked_owner_classes[] = ['id' => (int) $group_id, 'oclass' => PERM_OCLASS_GROUP];
+				if ($group_id > 0)
+				{
+					$thanked_owner_classes[] = ['id' => (int) $group_id, 'oclass' => PERM_OCLASS_GROUP];
+				}
 			}
 		}
 
