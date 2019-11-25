@@ -20,7 +20,6 @@ use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
-use Exception;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -30,6 +29,7 @@ class ThankYousRepository
 {
 	const THANKABLES = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
 
+	const TAG_TABLE = 'thankyou_tag';
 	const THANK_YOU_TABLE = 'thankyou_item';
 	const THANKED_USERS_TABLE = 'thankyou_user';
 	const THANK_YOU_TAGS_TABLE = 'thankyou_tagged';
@@ -386,6 +386,69 @@ class ThankYousRepository
 		return $thank_you_ids;
 	}
 
+	public function GetTagsTotalThankYouUses(?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
+	{
+		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
+		$query_string .= ", " . self::THANK_YOU_TAGS_TABLE . ".tag_id AS \"" . self::THANK_YOU_TAGS_TABLE . ".tag_id\"";
+		$query_string .= " FROM " . self::THANK_YOU_TAGS_TABLE;
+		$query_string .= " ORDER BY " . self::TAG_TABLE . ".name ASC";
+		$query_string .= " GROUP BY " . self::THANK_YOU_TAGS_TABLE . ".tag_id";
+
+		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::TAG_TABLE, self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
+
+		if (isset($thanked_user_ids) || isset($extranet_ids))
+		{
+			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANKED_USERS_TABLE . ".thanks_id");
+		}
+
+		if (isset($thanked_user_ids))
+		{
+			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
+		}
+
+		if (isset($date_range))
+		{
+			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
+			$this->QueryAddCreatedBetweenFilter($query, $date_range);
+		}
+
+		if (isset($tag_ids))
+		{
+			$this->QueryAddTagsFilter($query, $tag_ids);
+		}
+
+		if (isset($extranet_ids))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
+		}
+
+		$query->SetLimit($limit, $offset);
+
+		$result = $this->db->query($query->GetQuery());
+
+		$tags_total_thank_yous = [];
+		while ($row = $result->fetchArray())
+		{
+			$tags_total_thank_yous[(int) $row[self::THANK_YOU_TAGS_TABLE . ".tag_id"]] = (int) $row[self::THANK_YOU_TAGS_TABLE . ".total_uses"];
+		}
+
+		if (isset($tag_ids))
+		{
+			foreach ($tag_ids as $tag_id)
+			{
+				if (!isset($tags_total_thank_yous[$tag_id]))
+				{
+					$tags_total_thank_yous[$tag_id] = 0;
+				}
+			}
+		}
+
+		return $tags_total_thank_yous;
+	}
+
 	/**
 	 * Returns total number of thanks items in the database
 	 *
@@ -537,6 +600,54 @@ class ThankYousRepository
 		{
 			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
 			$this->QueryAddExtranetFilter($query, $extranet_ids);
+		}
+
+		list($count) = $this->db->query_row($query->GetQuery());
+
+		return $count;
+	}
+
+	/**
+	 * Returns the number of tags which satisfy the filtering provided.
+	 *
+	 * @param int[]|null $extranet_ids
+	 * @param bool       $allow_no_thanked
+	 * @param array|null $date_range
+	 * @param int[]|null $thanked_user_ids
+	 * @param int[]|null $tag_ids
+	 * @return int
+	 */
+	public function GetTotalTags(?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
+	{
+		$query_string = "SELECT COUNT(DISTINCT " . self::THANK_YOU_TAGS_TABLE . ".tag_id) FROM " . self::THANK_YOU_TAGS_TABLE;
+
+		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		if (isset($thanked_user_ids) || isset($extranet_ids))
+		{
+			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANKED_USERS_TABLE . ".thanks_id");
+		}
+
+		if (isset($thanked_user_ids))
+		{
+			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
+		}
+
+		if (isset($date_range))
+		{
+			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
+			$this->QueryAddCreatedBetweenFilter($query, $date_range);
+		}
+
+		if (isset($tag_ids))
+		{
+			$this->QueryAddTagsFilter($query, $tag_ids);
+		}
+
+		if (isset($extranet_ids))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
 		}
 
 		list($count) = $this->db->query_row($query->GetQuery());

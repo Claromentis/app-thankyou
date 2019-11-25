@@ -191,6 +191,24 @@ class ThankYous
 	}
 
 	/**
+	 * Return an array of the total number of times a Tag has been used, indexed by the Tag's ID.
+	 *
+	 * @param SecurityContext $context
+	 * @param int|null        $limit
+	 * @param int|null        $offset
+	 * @param int[]|null      $thanked_user_ids
+	 * @param array|null      $date_range
+	 * @param int[]|null      $tag_ids
+	 * @return int[]
+	 */
+	public function GetTagsTotalThankYouUses(SecurityContext $context, ?int $limit = null, ?int $offset = null, ?array $thanked_user_ids = null, ?array $date_range = null, ?array $tag_ids = null): array
+	{
+		$extranet_ids = $this->GetVisibleExtranetIds($context);
+
+		return $this->thank_yous_repository->GetTagsTotalThankYouUses($limit, $offset, $extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
+	}
+
+	/**
 	 * Given an array of ThankYous, returns the total comments on each, indexed by their IDs.
 	 *
 	 * @param ThankYou[] $thank_yous
@@ -263,6 +281,13 @@ class ThankYous
 		$extranet_ids = $this->GetVisibleExtranetIds($context);
 
 		return $this->thank_yous_repository->GetTotalUsers($user_ids, $date_range, $tag_ids, $extranet_ids);
+	}
+
+	public function GetTotalTags(SecurityContext $context, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
+	{
+		$extranet_ids = $this->GetVisibleExtranetIds($context);
+
+		return $this->thank_yous_repository->GetTotalTags($extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
 	}
 
 	/**
