@@ -60,7 +60,7 @@ class StatisticsController
 			$args['dt_form.args']['tags.datasrc'] = $tag_options;
 		} else
 		{
-			$args['dt_form.args']['tags.visible'] = 0;
+			$args['dt_form.args']['tags_filter_container.visible'] = 0;
 		}
 
 		$report            = $this->GetReports()[$report_index] ?? null;
@@ -83,10 +83,18 @@ class StatisticsController
 	 */
 	private function GetReports(): array
 	{
-		return [
+		$core_values_enabled = (bool) $this->config->Get('thankyou_core_values_enabled');
+
+		$reports = [
 			'thankyous' => ['name' => ($this->lmsg)('thankyou.common.thank_yous'), 'datatable_service' => 'thankyou.datatable.thank_yous'],
-			'users'     => ['name' => ($this->lmsg)('common.users'), 'datatable_service' => 'thankyou.datatable.users'],
-			'tags'      => ['name' => ($this->lmsg)('thankyou.common.tags'), 'datatable_service' => 'thankyou.datatable.tags']
+			'users'     => ['name' => ($this->lmsg)('common.users'), 'datatable_service' => 'thankyou.datatable.users']
 		];
+
+		if ($core_values_enabled)
+		{
+			$reports ['tags'] = ['name' => ($this->lmsg)('thankyou.common.tags'), 'datatable_service' => 'thankyou.datatable.statistics.tags'];
+		}
+
+		return $reports;
 	}
 }
