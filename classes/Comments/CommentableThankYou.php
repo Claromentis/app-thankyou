@@ -32,18 +32,22 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 	 */
 	private $thanks_item;
 
+	/**
+	 * @var int|null $total_comments
+	 */
+	private $total_comments;
+
 	public function __construct()
 	{
 		$this->log = Services::I()->GetLogger('comments');
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @return int|null
 	 */
-	public function Load($id, $extra = [])
+	public function GetTotalComments(): ?int
 	{
-		$this->thanks_item = new ThanksItem();
-		$this->thanks_item->SetId((int) $id);
+		return $this->total_comments;
 	}
 
 	/**
@@ -63,6 +67,29 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 	/**
 	 * {@inheritDoc}
 	 */
+	public function GetBreadcrumbs(int $object_id): array
+	{
+		$lmsg = Services::I()->{Lmsg::class};
+		/**
+		 * @var HttpUtil $http_util
+		 */
+		$http_util = Services::I()->{HttpUtil::class};
+
+		return [
+			[
+				'name' => $lmsg('thankyou.app_name'),
+				'url'  => $http_util->CreateInternalLink('/thankyou/thanks')
+			],
+			[
+				'name' => $lmsg('thankyou.app_name'),
+				'url'  => $http_util->CreateInternalLink('/thankyou/thanks/' . $object_id)
+			]
+		];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function GetOptions(): array
 	{
 		return [
@@ -70,6 +97,23 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 			SupportedOptions::LIKES       => true,
 			SupportedOptions::ATTACHMENTS => true,
 		];
+	}
+
+	/**
+	 * @param int|null $total_comments
+	 */
+	public function SetTotalComments(?int $total_comments)
+	{
+		$this->total_comments = $total_comments;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function Load($id, $extra = [])
+	{
+		$this->thanks_item = new ThanksItem();
+		$this->thanks_item->SetId((int) $id);
 	}
 
 	/**
@@ -168,28 +212,5 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 		}
 
 		$default_notification->Send();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function GetBreadcrumbs(int $object_id): array
-	{
-		$lmsg = Services::I()->{Lmsg::class};
-		/**
-		 * @var HttpUtil $http_util
-		 */
-		$http_util = Services::I()->{HttpUtil::class};
-
-		return [
-			[
-				'name' => $lmsg('thankyou.app_name'),
-				'url'  => $http_util->CreateInternalLink('/thankyou/thanks')
-			],
-			[
-				'name' => $lmsg('thankyou.app_name'),
-				'url'  => $http_util->CreateInternalLink('/thankyou/thanks/' . $object_id)
-			]
-		];
 	}
 }

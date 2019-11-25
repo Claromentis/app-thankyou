@@ -11,7 +11,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\People\UsersListProvider;
-use Claromentis\ThankYou\Comments\CommentableThankYou;
+use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Constants;
 use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
@@ -47,6 +47,8 @@ class ThankYous
 
 	private $extranet_service;
 
+	private $comments_factory;
+
 	private $likes_repository;
 
 	private $line_manager_notifier;
@@ -62,12 +64,14 @@ class ThankYous
 		ThankYouAcl $acl,
 		ThankYouUtility $thank_you_utility,
 		CommentsRepository $comments_repository,
+		Comments\Factory $comments_factory,
 		LikesRepository $likes_repository,
 		AclRepository $acl_repository,
 		UserExtranetService $user_extranet_service
 	) {
 		$this->acl                   = $acl;
 		$this->acl_repository        = $acl_repository;
+		$this->comments_factory      = $comments_factory;
 		$this->comments_repository   = $comments_repository;
 		$this->config                = $config;
 		$this->extranet_service      = $user_extranet_service;
@@ -231,8 +235,7 @@ class ThankYous
 				continue;
 			}
 
-			$comment = new CommentableThankYou();
-			$comment->Load($id);
+			$comment = $this->comments_factory->Create($id);
 
 			$thank_yous_comments[$id] = (int) $this->comments_repository->GetCommentsCount($comment);
 		}
@@ -378,6 +381,31 @@ class ThankYous
 		} else
 		{
 			return [(int) $context->GetExtranetAreaId(), (int) $this->extranet_service->GetPrimaryId()];
+		}
+	}
+
+	/**
+	 * @param ThankYou[] $thank_yous
+	 */
+	public function LoadThankYousComments(array $thank_yous)
+	{
+		foreach ($thank_yous as $thank_you)
+		{
+			if (!($thank_you instanceof ThankYou))
+			{
+				throw new InvalidArgumentException("Failed to Load Thank Yous Comments, one or more Thank You given is not a Thank You");
+			}
+
+			$id = $thank_you->GetId();
+
+			if (!isset($id))
+			{
+				continue;
+			}
+
+			$comments = $this->comments_factory->Create($id);
+
+			$thank_you->SetComment($comments);
 		}
 	}
 
