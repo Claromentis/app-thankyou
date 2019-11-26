@@ -1,8 +1,3 @@
-<!--@head@
-<unique_section name="thankyou_component_styles">
-	<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
-</unique_section>
--->
 <div name="list">
 	<div class="row">
 		<div class="col-md-12">
@@ -34,16 +29,5 @@
             var thank_you = new ThankYou($('.' + ${class.json}));
             thank_you.tags_config.placeholder = '<loc name="thankyou:common:select_core_values"></loc>';
         });
-    });
-</script>
-
-<script type="text/javascript">
-    require(['domReady', 'jquery'], function (domReady, $) {
-        domReady(function () {
-            $('.js-comments-reveal').click(function (ev) {
-                var comments = $(this).closest($('.js-thank-you')).find($('.js-comments'))
-                comments.toggle();
-            })
-        })
     });
 </script>

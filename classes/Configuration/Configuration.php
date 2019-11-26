@@ -20,7 +20,7 @@ class Configuration
 			'notify_line_manager' => [
 				'title'   => ($this->lmsg)('thankyou.configurations.notify_line_manager.title'),
 				'type'    => 'bool',
-				'default' => true
+				'default' => false
 			],
 			'thank_you_comments'  => [
 				'title'   => ($this->lmsg)('thankyou.configurations.thank_you_comments.title'),

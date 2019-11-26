@@ -334,6 +334,10 @@ define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
             self.delete($(this).attr('data-id'));
         });
 
+        this.list.on('click', '.js-comments-reveal', function (event) {
+            $(event.target).closest('.js-thank-you').find('.js-comments').toggle();
+        });
+
         this.form.on('submit', null, this, function (event) {
             event.preventDefault();
             event.data.submit();

@@ -50,7 +50,8 @@ var tags = {
         new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false,
-                drop_console: false
+                drop_console: false,
+                drop_debugger: false
             }
         })
     ]
