@@ -57,6 +57,13 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 
 		$args['tag.body'] = $tag->GetName();
 
+		$bg_colour = $tag->GetBackgroundColour();
+
+		if (isset($bg_colour))
+		{
+			$args['tag.colour'] = $bg_colour;
+		}
+
 		return $this->CallTemplater('thankyou/tag_template.html', $args);
 	}
 }
