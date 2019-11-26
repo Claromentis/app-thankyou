@@ -388,14 +388,14 @@ class ThankYousRepository
 		}
 
 		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
-		$query_string .= ", " . self::THANK_YOU_TAGS_TABLE . ".tag_id AS \"" . self::THANK_YOU_TAGS_TABLE . ".tag_id\"";
-		$query_string .= " FROM " . self::THANK_YOU_TAGS_TABLE;
+		$query_string .= ", " . self::TAG_TABLE . ".id AS \"" . self::TAG_TABLE . ".id\"";
+		$query_string .= " FROM " . self::TAG_TABLE;
 		$query_string .= $order;
-		$query_string .= " GROUP BY " . self::THANK_YOU_TAGS_TABLE . ".tag_id";
+		$query_string .= " GROUP BY " . self::TAG_TABLE . ".id";
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
 
-		$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::TAG_TABLE, self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
+		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
 
 		if (isset($thanked_user_ids) || isset($extranet_ids))
 		{
@@ -431,7 +431,7 @@ class ThankYousRepository
 		$tags_total_thank_yous = [];
 		while ($row = $result->fetchArray())
 		{
-			$tags_total_thank_yous[(int) $row[self::THANK_YOU_TAGS_TABLE . ".tag_id"]] = (int) $row[self::THANK_YOU_TAGS_TABLE . ".total_uses"];
+			$tags_total_thank_yous[(int) $row[self::TAG_TABLE . ".id"]] = (int) $row[self::THANK_YOU_TAGS_TABLE . ".total_uses"];
 		}
 
 		if (isset($tag_ids))
@@ -510,14 +510,14 @@ class ThankYousRepository
 	public function GetTotalUsersThankYous(?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): array
 	{
 		$query_string = "SELECT COUNT(" . self::THANKED_USERS_TABLE . ".thanks_id) AS \"" . self::THANKED_USERS_TABLE . ".total_thank_yous\"";
-		$query_string .= ", " . self::THANKED_USERS_TABLE . ".user_id AS \"" . self::THANKED_USERS_TABLE . ".user_id\"";
-		$query_string .= " FROM " . self::THANKED_USERS_TABLE;
+		$query_string .= ", " . self::USER_TABLE . ".id AS \"" . self::USER_TABLE . ".id\"";
+		$query_string .= " FROM " . self::USER_TABLE;
 		$query_string .= " ORDER BY " . self::USER_TABLE . ".firstname ASC";
-		$query_string .= " GROUP BY " . self::THANKED_USERS_TABLE . ".user_id";
+		$query_string .= " GROUP BY " . self::USER_TABLE . ".id";
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
 
-		$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+		$query->AddJoin(self::USER_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
 
 		if (isset($user_ids))
 		{
@@ -548,7 +548,7 @@ class ThankYousRepository
 		$users_total_thank_yous = [];
 		while ($row = $result->fetchArray())
 		{
-			$users_total_thank_yous[(int) $row[self::THANKED_USERS_TABLE . ".user_id"]] = (int) $row[self::THANKED_USERS_TABLE . ".total_thank_yous"];
+			$users_total_thank_yous[(int) $row[self::USER_TABLE . ".id"]] = (int) $row[self::THANKED_USERS_TABLE . ".total_thank_yous"];
 		}
 
 		if (isset($user_ids))
@@ -574,9 +574,11 @@ class ThankYousRepository
 	 */
 	public function GetTotalUsers(?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): int
 	{
-		$query_string = "SELECT COUNT(DISTINCT " . self::THANKED_USERS_TABLE . ".user_id) FROM " . self::THANKED_USERS_TABLE;
+		$query_string = "SELECT COUNT(DISTINCT " . self::USER_TABLE . ".id) FROM " . self::USER_TABLE;
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		$query->AddJoin(self::USER_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
 
 		if (isset($user_ids))
 		{
@@ -618,9 +620,11 @@ class ThankYousRepository
 	 */
 	public function GetTotalTags(?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
 	{
-		$query_string = "SELECT COUNT(DISTINCT " . self::THANK_YOU_TAGS_TABLE . ".tag_id) FROM " . self::THANK_YOU_TAGS_TABLE;
+		$query_string = "SELECT COUNT(DISTINCT " . self::TAG_TABLE . ".id) FROM " . self::TAG_TABLE;
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
 
 		if (isset($thanked_user_ids) || isset($extranet_ids))
 		{
