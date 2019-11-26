@@ -1,4 +1,4 @@
-define(['jquery', 'cla_select2', '../../css/style.scss'], function ($) {
+define(['jquery', 'cla_select2'], function ($) {
     var ThankYou = function (list) {
         this.list = list;
         this.modal = list.find('.js-thank_you-modal').first();
