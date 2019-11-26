@@ -1,6 +1,5 @@
 .	.	.	en
 lm	thankyou.admin.core_values.description		Thank Yous can be linked to your Core Values to encourage engagement.
-lm	thankyou.admin.panel.export		Export
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
 lm	thankyou.admin.statistics.title		Reports & Statistics
@@ -75,13 +74,8 @@ lm	thankyou.thankyou.thanked.oclass.error.not_integer		Thanked oclass must be an
 lm	thankyou.thankyou.thanked.oclass.error.undefined		Thanked must contain an oclass
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
-lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
-lt	thankyou:admin:export:period.body		Period
-lt	thankyou:admin:export_csv.body		Export to *.csv
-lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
-lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:menu:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:messages_heading.body		Thank You Messages

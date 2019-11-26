@@ -23,8 +23,6 @@ use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Api\Tag;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Comments;
-use Claromentis\ThankYou\Controller\AdminExportController;
-use Claromentis\ThankYou\Controller\AdminNotificationsController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\StatisticsController;
@@ -125,22 +123,9 @@ class Plugin implements
 			return $panels;
 		});
 
-		$app['thankyou.admin_export_controller'] = function () {
-			return new AdminExportController();
-		};
-
-		$app['thankyou.admin_notifications_controller'] = function () {
-			return new AdminNotificationsController();
-		};
-
 		$app['thankyou.rest_controller'] = function ($app) {
 			return new ThanksRestController($app['thankyou.repository']);
 		};
-
-		// Notification
-		/*$app['thankyou.line_manager_notifier'] = function () {
-			return new LineManagerNotifier();
-		};*/
 
 		// Repositories
 		$app['thankyou.repository'] = function ($app) {
@@ -291,8 +276,6 @@ class Plugin implements
 				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
 				$routes->get('/admin', ThanksController::class . ':Admin');
 				$routes->match('/admin/configuration', ThanksController::class . ':Configuration')->method('GET|POST');
-				$routes->get('/admin/export', 'thankyou.admin_export_controller:ShowExportPanel');
-				$routes->post('/admin/export', 'thankyou.admin_export_controller:ExportCsv');
 				$routes->get('/admin/core_values', ThanksController::class . ':CoreValues');
 				$routes->get('/admin/statistics', StatisticsController::class . ':Reports');
 				$routes->get('/admin/statistics/{report_index}', StatisticsController::class . ':View');
