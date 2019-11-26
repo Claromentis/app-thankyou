@@ -172,6 +172,10 @@ class Plugin implements
 			);
 		};
 
+		$app['audit.application.thankyou'] = function ($app) {
+			return new AuditConfig($app[Lmsg::class], $app[Tag::class]);
+		};
+
 		$app[ThanksController::class] = function ($app) {
 			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config'], $app['logger_factory']->GetLogger('thankyou'));
 		};
@@ -412,7 +416,7 @@ class Plugin implements
 
 				$args                     = [];
 				$args['ty_list.limit']    = 20;
-				$args['ty_list.user_ids']  = [$user_id];
+				$args['ty_list.user_ids'] = [$user_id];
 				$args['ty_list.comments'] = true;
 				$args['ty_list.create']   = [$create];
 

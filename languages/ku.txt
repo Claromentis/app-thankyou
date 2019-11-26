@@ -4,6 +4,9 @@ lm	thankyou.admin.panel.messages
 lm	thankyou.admin.panel.notifications		
 lm	thankyou.admin.statistics.title		
 lm	thankyou.app_name		
+lm	thankyou.audit.create_thank_you		
+lm	thankyou.audit.delete_thank_you		
+lm	thankyou.audit.edit_thank_you		
 lm	thankyou.common.actions		
 lm	thankyou.common.comment		
 lm	thankyou.common.filter_by_groups		
@@ -40,6 +43,9 @@ lm	thankyou.lia.error.saving
 lm	thankyou.lia.no_results		
 lm	thankyou.notifications.saved		
 lm	thankyou.tag.all		
+lm	thankyou.tag.audit.create		
+lm	thankyou.tag.audit.delete		
+lm	thankyou.tag.audit.edit		
 lm	thankyou.tag.delete.description		
 lm	thankyou.tag.delete.error.permission		
 lm	thankyou.tag.delete.title		
@@ -53,6 +59,7 @@ lm	thankyou.tag.error.name.invalid
 lm	thankyou.tag.error.name.not_empty		
 lm	thankyou.tag.error.name.not_unique		
 lm	thankyou.tag.error.name.undefined		
+lm	thankyou.tag.name		
 lm	thankyou.tag.total_uses		
 lm	thankyou.thank.placeholder		
 lm	thankyou.thankable.error.unsuitable_owner_classes		
@@ -64,6 +71,7 @@ lm	thankyou.thankyou.description.error.not_string
 lm	thankyou.thankyou.error.create		
 lm	thankyou.thankyou.error.modify		
 lm	thankyou.thankyou.error.server		
+lm	thankyou.thankyou.name		
 lm	thankyou.thankyou.tags.error.disabled		
 lm	thankyou.thankyou.tags.error.not_array		
 lm	thankyou.thankyou.thanked.error.empty		

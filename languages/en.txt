@@ -4,6 +4,9 @@ lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
 lm	thankyou.admin.statistics.title		Reports & Statistics
 lm	thankyou.app_name		Thank you
+lm	thankyou.audit.create_thank_you		Created Thank You
+lm	thankyou.audit.delete_thank_you		Deleted Thank You
+lm	thankyou.audit.edit_thank_you		Edited Thank You
 lm	thankyou.common.actions		Actions
 lm	thankyou.common.comment		Comment
 lm	thankyou.common.filter_by_groups		Filter by Groups
@@ -40,6 +43,9 @@ lm	thankyou.lia.error.saving		One or more Items could not be saved
 lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
 lm	thankyou.tag.all		All Core Values
+lm	thankyou.tag.audit.create		Core Value Created
+lm	thankyou.tag.audit.delete		Core Value Deleted
+lm	thankyou.tag.audit.edit		Core Value Edited
 lm	thankyou.tag.delete.description		Deleting this core value will remove it from all the linked thank you notes. Change visibility to 'hidden' to keep existing notes but prevent it from being selected in the future.
 lm	thankyou.tag.delete.error.permission		You do not have permission to delete this Core Value
 lm	thankyou.tag.delete.title		Confirm Deletion
@@ -53,6 +59,7 @@ lm	thankyou.tag.error.name.invalid		Core Value Name must be a string if defined
 lm	thankyou.tag.error.name.not_empty		Core Value's Name cannot be empty
 lm	thankyou.tag.error.name.not_unique		This Core Value Name has already been used
 lm	thankyou.tag.error.name.undefined		Core Value Name must be defined
+lm	thankyou.tag.name		Core Value
 lm	thankyou.tag.total_uses		Number of times selected
 lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
@@ -64,6 +71,7 @@ lm	thankyou.thankyou.description.error.not_string		A Thank You's Description mus
 lm	thankyou.thankyou.error.create		Could not create Thank You
 lm	thankyou.thankyou.error.modify		Could not modify Thank You
 lm	thankyou.thankyou.error.server		The Thank You you've requested could not be loaded due to a server error
+lm	thankyou.thankyou.name		Thank You
 lm	thankyou.thankyou.tags.error.disabled		Core Values are disabled for Thank Yous
 lm	thankyou.thankyou.tags.error.not_array		Thank You Core Values must be given as an array of integers
 lm	thankyou.thankyou.thanked.error.empty		Nothing has been thanked
