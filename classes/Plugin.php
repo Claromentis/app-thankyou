@@ -49,6 +49,7 @@ use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Claromentis\ThankYou\UI\TemplaterComponentThank;
 use Claromentis\ThankYou\UI\ThankYouCreateTemplaterComponent;
 use Claromentis\ThankYou\UI\ThankYousList;
+use Claromentis\ThankYou\UI\ThankYouTagStatsTemplaterComponent;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Psr\Log\LoggerInterface;
@@ -93,6 +94,10 @@ class Plugin implements
 
 		$app['templater.ui.thankyou.tag'] = function ($app) {
 			return new TagTemplaterComponent($app[Tag::class], $app['logger_factory']->GetLogger('tag'));
+		};
+
+		$app['templater.ui.thankyou.tag_stats'] = function ($app) {
+			return new ThankYouTagStatsTemplaterComponent($app[ThankYous::class], $app[Tag::class], $app['logger_factory']->GetLogger('tag'));
 		};
 
 		$app['tags.datatable.admin'] = TagDataTableSource::class;
