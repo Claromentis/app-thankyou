@@ -15,7 +15,6 @@ use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
-use Claromentis\ThankYou\Tags\Exceptions\TagException;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
@@ -380,12 +379,18 @@ class ThankYousRepository
 		return $thank_you_ids;
 	}
 
-	public function GetTagsTotalThankYouUses(?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
+	public function GetTagsTotalThankYouUses(?array $orders = null, ?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
+		$order = "";
+		if (isset($orders))
+		{
+			$order = $this->utility->BuildOrderString($orders);
+		}
+
 		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
 		$query_string .= ", " . self::THANK_YOU_TAGS_TABLE . ".tag_id AS \"" . self::THANK_YOU_TAGS_TABLE . ".tag_id\"";
 		$query_string .= " FROM " . self::THANK_YOU_TAGS_TABLE;
-		$query_string .= " ORDER BY " . self::TAG_TABLE . ".name ASC";
+		$query_string .= $order;
 		$query_string .= " GROUP BY " . self::THANK_YOU_TAGS_TABLE . ".tag_id";
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);

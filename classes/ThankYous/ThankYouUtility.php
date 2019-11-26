@@ -63,4 +63,31 @@ class ThankYouUtility
 
 		return $date_range;
 	}
+
+	/**
+	 * @param array $orders
+	 * @return string
+	 */
+	public function BuildOrderString(array $orders): string
+		//TODO: Use this function in Thank You and Tag Repo!
+	{
+		if (count($orders) === 0)
+		{
+			return '';
+		}
+
+		$query_string = " ORDER BY";
+		foreach ($orders as $offset => $order)
+		{
+			$column    = $order['column'] ?? null;
+			$direction = (isset($order['desc']) && $order['desc'] === true) ? 'DESC' : 'ASC';
+			if (!isset($column) || !is_string($column))
+			{
+				throw new InvalidArgumentException("Failed to GetTags, one or more Orders does not have a column");
+			}
+			$query_string .= " " . $column . " " . $direction;
+		}
+
+		return $query_string;
+	}
 }

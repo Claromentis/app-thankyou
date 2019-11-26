@@ -9,6 +9,8 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Exception\ThankYouRepository;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 
 class TagsDataTableSource extends FilterDataTableSource
 {
@@ -52,17 +54,18 @@ class TagsDataTableSource extends FilterDataTableSource
 
 		$rows = [];
 
-		$tags_thankyou_total_uses = $this->api->GetTagsTotalThankYouUses($context, $limit, $offset, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
+		$order = ['column' => ThankYousRepository::TAG_TABLE . ".name"];
+		$tags_thankyou_total_uses = $this->api->GetTagsTotalThankYouUses($context, [$order], $limit, $offset, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
 
 		$tag_ids = array_keys($tags_thankyou_total_uses);
 
 		$tags = $this->tag_api->GetTagsById($tag_ids);
 
-		foreach ($tags as $tag_id => $tag)
+		foreach ($tags_thankyou_total_uses as $tag_id => $tag_thank_you_total_uses)
 		{
 			$row = [
-				'name'       => $tag->GetName(),
-				'total_uses' => $tags_thankyou_total_uses[$tag_id]
+				'name'       => $tags[$tag_id]->GetName(),
+				'total_uses' => $tag_thank_you_total_uses
 			];
 
 			$rows[] = $row;
