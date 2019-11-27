@@ -450,7 +450,7 @@ class ThankYous
 	}
 
 	/**
-	 * Save a Thank You to the Repository.
+	 * Save a Thank You to the Repository and generate an Audit. If the Thank You doesn't have an ID, one will be set.
 	 *
 	 * @param ThankYou $thank_you
 	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
@@ -458,7 +458,7 @@ class ThankYous
 	 */
 	public function Save(ThankYou $thank_you)
 	{
-		$new = ($thank_you->GetId() === null) ? false : true;
+		$new = ($thank_you->GetId() === null) ? true : false;
 		$this->thank_yous_repository->Save($thank_you);
 
 		$id = $thank_you->GetId();
