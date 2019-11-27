@@ -141,6 +141,8 @@ class TagRepository
 	}
 
 	/**
+	 * Saves a Tag to the database. If the Tag does not have an ID, it will be added.
+	 *
 	 * @param Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
 	 */
