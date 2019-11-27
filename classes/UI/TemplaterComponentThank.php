@@ -70,8 +70,8 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 	 *
 	 * ##Optional
 	 * * comments:
-	 *     * 0 = Comments will not be displayed.(default)
-	 *     * 1 = Comments will be displayed.
+	 *     * 0 = Comments will not be accessible.(default)
+	 *     * 1 = Comments will be accessible.
 	 * * delete:
 	 *     * 0 = Deleting the Thank You is disabled.(default)
 	 *     * 1 = Deleting the Thank You is enabled (subject to permissions).
@@ -141,10 +141,11 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 
 		$id = $thank_you->GetId();
 
-		$display_comments = ((bool) isset($id) && ($attributes['comments'] ?? null) && (bool) $this->config->Get('thank_you_comments'));
+		$display_comments_count = (bool) $this->config->Get('thank_you_comments') && isset($id);
+		$access_comments        = $display_comments_count && (bool) ($attributes['comments'] ?? null);
 
 		$total_comments = 0;
-		if ($display_comments)
+		if ($display_comments_count)
 		{
 			if ($thank_you->GetComment() === null)
 			{
@@ -244,9 +245,10 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			'description.body_html'   => $this->cla_text->ProcessPlain($thank_you->GetDescription()),
 			'has_description.visible' => strlen($thank_you->GetDescription()) > 0,
 
-			'comments.visible'            => $display_comments,
-			'comments_count.body'         => $total_comments,
 			'thank_you_comment.object_id' => $id,
+			'comments_count.body'         => $total_comments,
+			'comments_link.visible'       => $access_comments,
+			'comments_no_link.visible'    => !$access_comments && $display_comments_count,
 
 			'like_component.object_id' => $id,
 			'like_component.visible'   => isset($id),

@@ -28,10 +28,15 @@
 		<div class="row small">
 			<div class="col-xs-6">
 				<component name="like_component" class_key="like_it" object_type="thanks" object_id=""/>
-				<span name="comments" class="comments-toggle-wrapper comments-border">
-					<a href="javascript:void(0)" class="js-comments-reveal"><span
-						class="glyphicons-comments glyphicons"></span> <txt class="badge"
-																			name="comments_count"></txt></a>
+				<span class="comments-toggle-wrapper comments-border">
+					<a name="comments_link" href="javascript:void(0)" class="js-comments-reveal">
+						<span class="glyphicons-comments glyphicons"></span>
+						<txt name="comments_count" class="badge"></txt>
+					</a>
+					<span name="comments_no_link">
+						<span class="glyphicons-comments glyphicons"></span>
+						<txt name="comments_count" class="badge"></txt>
+					</span>
 				</span>
 				<span class="thankyou-link-border" style="">
 					<a name="thank_title_link">
@@ -76,7 +81,7 @@
 			</div>
 		</div>
 	</div>
-	<div name="comments">
+	<div name="comments_link">
 		<div class="js-comments comments mt-10" style="display: none;">
 			<component class="\Claromentis\Comments\UI\Comments" name="thank_you_comment" object_type="thanks"
 					   new_on_top="1" compact_mode="1"/>
