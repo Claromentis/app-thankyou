@@ -277,7 +277,10 @@ class ThankYousRepository
 					{
 						foreach ($thanked_object_ids as $thanked_object_id => $true)
 						{
-							$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
+							if (isset($perm_oclasses[$thanked_object_type_id][$thanked_object_id]))
+							{
+								$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
+							}
 						}
 					}
 				}
@@ -796,7 +799,7 @@ class ThankYousRepository
 	/**
 	 * Creates an array of Thankables from an array of Users. Retains indexes.
 	 *
-	 * @param array $users
+	 * @param User[] $users
 	 * @return Thankable[]
 	 * @throws ThankYouException - If the Users given have not been loaded.
 	 */
