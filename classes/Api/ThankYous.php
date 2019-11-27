@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\Api;
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\Exception\InvalidSubjectException;
+use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Security\SecurityContext;
@@ -21,6 +22,7 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\LineManagerNotifier;
+use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThankYous\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
@@ -41,6 +43,8 @@ class ThankYous
 
 	private $acl_repository;
 
+	private $audit;
+
 	private $comments_repository;
 
 	private $config;
@@ -58,6 +62,7 @@ class ThankYous
 	private $utility;
 
 	public function __construct(
+		Audit $audit,
 		LineManagerNotifier $line_manager_notifier,
 		ThankYousRepository $thank_yous_repository,
 		Config $config,
@@ -71,6 +76,7 @@ class ThankYous
 	) {
 		$this->acl                   = $acl;
 		$this->acl_repository        = $acl_repository;
+		$this->audit                 = $audit;
 		$this->comments_factory      = $comments_factory;
 		$this->comments_repository   = $comments_repository;
 		$this->config                = $config;
@@ -444,13 +450,26 @@ class ThankYous
 	}
 
 	/**
+	 * Save a Thank You to the Repository.
+	 *
 	 * @param ThankYou $thank_you
 	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
 	 * @throws ThankYouRepository - On failure to save to database.
 	 */
 	public function Save(ThankYou $thank_you)
 	{
+		$new = ($thank_you->GetId() === null) ? false : true;
 		$this->thank_yous_repository->Save($thank_you);
+
+		$id = $thank_you->GetId();
+
+		if ($new)
+		{
+			$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_create', $id, $thank_you->GetDescription());
+		} else
+		{
+			$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_edit', $id, $thank_you->GetDescription());
+		}
 	}
 
 	/**
@@ -475,6 +494,8 @@ class ThankYous
 		}
 
 		$this->thank_yous_repository->Delete($id);
+
+		$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_delete', $id, $thank_you->GetDescription());
 	}
 
 	/**

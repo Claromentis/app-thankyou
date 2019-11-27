@@ -35,7 +35,7 @@ class AuditConfig implements ApplicationAuditConfig
 	 */
 	public function GetAuditApplication(): array
 	{
-		return ['thankyou', ($this->lmsg)('thankyou.app_name')];
+		return [Plugin::APPLICATION_NAME, ($this->lmsg)('thankyou.app_name')];
 	}
 
 	/**

@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou;
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Application;
+use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
@@ -66,6 +67,8 @@ class Plugin implements
 	EventListenerProviderInterface
 {
 	use TemplaterTrait;
+
+	const APPLICATION_NAME = 'thankyou';
 
 	/**
 	 * Registers services on the given container.
@@ -159,6 +162,7 @@ class Plugin implements
 
 		$app[ThankYous::class] = function ($app) {
 			return new ThankYous(
+				$app[Audit::class],
 				$app[LineManagerNotifier::class],
 				$app[ThankYousRepository::class],
 				$app['thankyou.config'],

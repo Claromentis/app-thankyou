@@ -858,6 +858,8 @@ class ThankYousRepository
 	}
 
 	/**
+	 * Saves a Thank You to the repository. If the Thank You is new the ID its ID will also be set.
+	 *
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
 	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
