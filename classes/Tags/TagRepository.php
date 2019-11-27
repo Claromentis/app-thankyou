@@ -52,7 +52,7 @@ class TagRepository
 		if (isset($orders) && count($orders) > 0)
 		{
 			$query_string .= " ORDER BY";
-			foreach ($orders as $offset => $order)
+			foreach ($orders as $order)
 			{
 				$column    = $order['column'] ?? null;
 				$direction = (isset($order['desc']) && $order['desc'] === true) ? 'DESC' : 'ASC';
