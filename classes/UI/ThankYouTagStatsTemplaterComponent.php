@@ -47,13 +47,21 @@ class ThankYouTagStatsTemplaterComponent extends TemplaterComponentTmpl
 
 		foreach ($tags_thankyou_total_uses as $tag_id => $tag_thankyou_total_uses)
 		{
+			if ($total_tags_uses === 0)
+			{
+				$percentage = '0%';
+			} else
+			{
+				$percentage = floor(100 * $tag_thankyou_total_uses / $total_tags_uses) . '%';
+			}
+
 			$args['tags.datasrc'][] = [
 				'tag_name.body'                        => $tags[$tag_id]->GetName(),
 				'tag_progress_bar.minimum'             => 0,
 				'tag_progress_bar.maximum'             => $total_tags_uses,
 				'tag_progress_bar.current'             => $tag_thankyou_total_uses,
 				'tag_progress_bar.barcolour'           => $tags[$tag_id]->GetBackgroundColour(),
-				'tag_progress_bar.data-original-title' => floor(100 * $tag_thankyou_total_uses / $total_tags_uses) . '%'
+				'tag_progress_bar.data-original-title' => $percentage
 			];
 		}
 
