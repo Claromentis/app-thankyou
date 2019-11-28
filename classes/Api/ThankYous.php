@@ -23,7 +23,7 @@ use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\ThanksItem;
-use Claromentis\ThankYou\ThankYous\Thankable;
+use Claromentis\ThankYou\Thankable\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
@@ -549,8 +549,8 @@ class ThankYous
 	}
 
 	/**
-	 * @param SecurityContext $security_context
-	 * @param Thankable       $thankable
+	 * @param SecurityContext                           $security_context
+	 * @param Thankable $thankable
 	 * @return bool
 	 */
 	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool

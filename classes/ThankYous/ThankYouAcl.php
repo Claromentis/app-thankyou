@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\ThankYous;
 use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\Service\UserExtranetService;
+use Claromentis\ThankYou\Thankable\Thankable;
 use InvalidArgumentException;
 use User;
 

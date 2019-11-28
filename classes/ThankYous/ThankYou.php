@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\ThankYou\Comments\CommentableThankYou;
 use Claromentis\ThankYou\Tags\Tag;
+use Claromentis\ThankYou\Thankable\Thankable;
 use Date;
 use InvalidArgumentException;
 use User;

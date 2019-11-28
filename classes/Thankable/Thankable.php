@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\ThankYous;
+namespace Claromentis\ThankYou\Thankable;
 
 class Thankable
 {

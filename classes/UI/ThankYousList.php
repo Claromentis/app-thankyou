@@ -8,7 +8,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
-use Claromentis\ThankYou\ThankYous\Thankable;
+use Claromentis\ThankYou\Thankable\Thankable;
 use Psr\Log\LoggerInterface;
 
 /**

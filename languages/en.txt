@@ -39,9 +39,11 @@ lm	thankyou.error.invalid_users		Failed to save Thank You, the Users provided we
 lm	thankyou.error.no_edit_permission		You do not have permission to modify this thank you message
 lm	thankyou.error.thanks_not_found		Thank you message does not exist
 lm	thankyou.grammar.list.and		and
+lm	thankyou.group.not_found		Group not found
 lm	thankyou.lia.error.saving		One or more Items could not be saved
 lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
+lm	thankyou.owner_class.not_found		Unknown Owner Class
 lm	thankyou.tag.all		All Core Values
 lm	thankyou.tag.audit.create		Core Value Created
 lm	thankyou.tag.audit.delete		Core Value Deleted
@@ -80,6 +82,7 @@ lm	thankyou.thankyou.thanked.id.error.not_integer		Thanked ID must be an integer
 lm	thankyou.thankyou.thanked.id.error.undefined		Thanked must contain an ID
 lm	thankyou.thankyou.thanked.oclass.error.not_integer		Thanked oclass must be an integer
 lm	thankyou.thankyou.thanked.oclass.error.undefined		Thanked must contain an oclass
+lm	thankyou.user.not_found		User not found
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	

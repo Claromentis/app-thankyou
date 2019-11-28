@@ -103,6 +103,11 @@ class Plugin implements
 
 		$app['tags.datatable.admin'] = TagDataTableSource::class;
 
+		//Thankable
+		$app[Thankable\Factory::class] = function ($app) {
+			return new Thankable\Factory($app[Lmsg::class], $app[ThankYouUtility::class], $app['logger_factory']->GetLogger('thankyou'));
+		};
+
 		//Thank Yous
 
 		// Localization domain
@@ -143,7 +148,8 @@ class Plugin implements
 				$app[DbInterface::class],
 				$app['logger_factory']->GetLogger('thankyou'),
 				$app[QueryFactory::class],
-				$app[Tag::class]
+				$app[Tag::class],
+				$app[Thankable\Factory::class]
 			);
 		};
 

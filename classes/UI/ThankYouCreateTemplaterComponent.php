@@ -4,7 +4,7 @@ namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
-use Claromentis\ThankYou\ThankYous\Thankable;
+use Claromentis\ThankYou\Thankable\Thankable;
 use Psr\Log\LoggerInterface;
 
 class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl

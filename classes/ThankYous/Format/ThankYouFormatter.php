@@ -5,7 +5,7 @@ namespace Claromentis\ThankYou\ThankYous\Format;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
-use Claromentis\ThankYou\ThankYous\Thankable;
+use Claromentis\ThankYou\Thankable\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use DateClaTimeZone;

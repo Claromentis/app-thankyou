@@ -39,9 +39,11 @@ lm	thankyou.error.invalid_users
 lm	thankyou.error.no_edit_permission		
 lm	thankyou.error.thanks_not_found		
 lm	thankyou.grammar.list.and		
+lm	thankyou.group.not_found		
 lm	thankyou.lia.error.saving		
 lm	thankyou.lia.no_results		
 lm	thankyou.notifications.saved		
+lm	thankyou.owner_class.not_found		
 lm	thankyou.tag.all		
 lm	thankyou.tag.audit.create		
 lm	thankyou.tag.audit.delete		
@@ -80,6 +82,7 @@ lm	thankyou.thankyou.thanked.id.error.not_integer
 lm	thankyou.thankyou.thanked.id.error.undefined		
 lm	thankyou.thankyou.thanked.oclass.error.not_integer		
 lm	thankyou.thankyou.thanked.oclass.error.undefined		
+lm	thankyou.user.not_found		
 lm	thankyou.user_profile.tab_name		
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	

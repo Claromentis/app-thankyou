@@ -16,6 +16,7 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\TagRepository;
+use Claromentis\ThankYou\Thankable;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
@@ -45,6 +46,11 @@ class ThankYousRepository
 	 * @var LoggerInterface
 	 */
 	private $logger;
+
+	/**
+	 * @var Thankable\Factory $thankable_factory
+	 */
+	private $thankable_factory;
 
 	/**
 	 * @var ThanksItemFactory
@@ -78,7 +84,8 @@ class ThankYousRepository
 		DbInterface $db_interface,
 		LoggerInterface $logger,
 		QueryFactory $query_factory,
-		Tag $tag_api
+		Tag $tag_api,
+		Thankable\Factory $thankable_factory
 	) {
 		$this->thank_you_factory   = $thank_you_factory;
 		$this->thanks_item_factory = $thanks_item_factory;
@@ -87,6 +94,7 @@ class ThankYousRepository
 		$this->logger              = $logger;
 		$this->query_factory       = $query_factory;
 		$this->tags                = $tag_api;
+		$this->thankable_factory   = $thankable_factory;
 	}
 	//TODO: Isolating the Tag getting code to the Tag repo.
 
@@ -681,7 +689,7 @@ class ThankYousRepository
 	 * Returns an array of Thanked Objects, retaining indexing.
 	 *
 	 * @param array $thankeds
-	 * @return Thankable[]
+	 * @return Thankable\Thankable[]
 	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $thankeds): array
@@ -735,18 +743,11 @@ class ThankYousRepository
 	 * Create an array of Thankables from an array of Group IDs. The returned array is indexed by the Group's ID
 	 *
 	 * @param int[] $groups_ids
-	 * @return Thankable[]
+	 * @return Thankable\Thankable[]
 	 */
 	public function CreateThankablesFromGroupIds(array $groups_ids): array
 	{
 		$owner_class_id = PERM_OCLASS_GROUP;
-		try
-		{
-			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[$owner_class_id];
-		} catch (ThankYouOClass $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
-		}
 
 		foreach ($groups_ids as $groups_id)
 		{
@@ -762,15 +763,14 @@ class ThankYousRepository
 		while ($group = $result->fetchArray())
 		{
 			$id                    = (int) $group['groupid'];
-			$group_thankables[$id] = new Thankable($group['groupname'], $id, $owner_class_name, $owner_class_id, (int) $group['ex_area_id']);
+			$group_thankables[$id] = $this->thankable_factory->Create($group['groupname'], $id, $owner_class_id, (int) $group['ex_area_id']);
 		}
 
 		foreach ($groups_ids as $groups_id)
 		{
 			if (!isset($group_thankables[$groups_id]))
 			{
-				//TODO: Factory & Localize.
-				$group_thankables[$groups_id] = new Thankable('GROUP UNKNOWN');
+				$group_thankables[$groups_id] = $this->thankable_factory->CreateUnknown($groups_id, $owner_class_id);
 			}
 		}
 
@@ -782,10 +782,12 @@ class ThankYousRepository
 	 * Returns array indexed by the IDs.
 	 *
 	 * @param int[] $user_ids
-	 * @return Thankable[]
+	 * @return Thankable\Thankable[]
 	 */
 	public function CreateThankablesFromUserIds(array $user_ids)
 	{
+		$owner_class_id = PERM_OCLASS_INDIVIDUAL;
+
 		$users = $this->GetUsers($user_ids);
 
 		try
@@ -800,8 +802,7 @@ class ThankYousRepository
 		{
 			if (!isset($thankables[$user_id]))
 			{
-				//TODO: localize message, make a factory.
-				$thankables[$user_id] = new Thankable('UNKNOWN USER');
+				$thankables[$user_id] = $this->thankable_factory->CreateUnknown($user_id, $owner_class_id);
 			}
 		}
 
@@ -812,19 +813,12 @@ class ThankYousRepository
 	 * Creates an array of Thankables from an array of Users. Retains indexes.
 	 *
 	 * @param User[] $users
-	 * @return Thankable[]
+	 * @return Thankable\Thankable[]
 	 * @throws ThankYouException - If the Users given have not been loaded.
 	 */
 	public function CreateThankablesFromUsers(array $users)
 	{
 		$owner_class_id = PermOClass::INDIVIDUAL;
-		try
-		{
-			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[$owner_class_id];
-		} catch (ThankYouOClass $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
-		}
 
 		foreach ($users as $user_offset => $user)
 		{
@@ -849,7 +843,7 @@ class ThankYousRepository
 
 			$user_profile_url = User::GetProfileUrl($user->GetId(), false);//TODO: Replace with a non-static post People API update
 
-			$users[$user_offset] = new Thankable($user->GetFullname(), $user->GetId(), $owner_class_name, $owner_class_id, $user->GetExAreaId(), $user_image_url, $user_profile_url);
+			$users[$user_offset] = $this->thankable_factory->Create($user->GetFullname(), $user->GetId(), $owner_class_id, $user->GetExAreaId(), $user_image_url, $user_profile_url);
 		}
 
 		return $users;
