@@ -2,9 +2,10 @@
 
 namespace Claromentis\ThankYou;
 
-use Claromentis\Core\Audit\ExtendedApplicationAuditConfig;
+use Claromentis\Core\Audit\ApplicationAuditConfig;
+use Claromentis\Core\Audit\ApplicationAuditUrlConfig;
 
-class AuditConfig implements ExtendedApplicationAuditConfig
+class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 {
 
 	/**
