@@ -11,6 +11,8 @@ use InvalidArgumentException;
 class ThankYouUtility
 {
 	/**
+	 * Returns an array of Owner Class Names indexed by their IDs.
+	 *
 	 * @param int[] $ids
 	 * @return string[]
 	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
@@ -18,14 +20,14 @@ class ThankYouUtility
 	public function GetOwnerClassNamesFromIds(array $ids): array
 	{
 		$names = [];
-		foreach ($ids as $offset => $id)
+		foreach ($ids as $id)
 		{
 			if (!is_int($id))
 			{
 				throw new InvalidArgumentException("Failed to Get Thankable Object Type's Name From ID, non-integer value given");
 			}
-			$names[$offset] = PermOClass::GetName($id);
-			if (!is_string($names[$offset]))
+			$names[$id] = PermOClass::GetName($id);
+			if (!is_string($names[$id]))
 			{
 				throw new ThankYouOClass("Failed to Get Thankable Object Type's Name From ID, oClass did not return string");
 			}

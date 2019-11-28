@@ -190,7 +190,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 		try
 		{
 			$thank_you = $api->ThankYous()->GetThankYous($this->thanks_item->GetId(), false, true);
-		} catch (ThankYouNotFound | ThankYouOClass $exception)
+		} catch (ThankYouNotFound $exception)
 		{
 			$this->log->error("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", [$exception]);
 

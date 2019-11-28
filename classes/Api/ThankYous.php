@@ -14,7 +14,6 @@ use Claromentis\People\Service\UserExtranetService;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Constants;
-use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
@@ -94,7 +93,6 @@ class ThankYous
 	 * @param bool $tags
 	 * @return ThankYou
 	 * @throws ThankYouNotFound - If the Thank You could not be found.
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
 	public function GetThankYou(int $id, bool $thanked = false, bool $users = false, bool $tags = false): ThankYou
 	{
@@ -107,7 +105,6 @@ class ThankYous
 	 * @param bool      $users
 	 * @param bool      $tags
 	 * @return ThankYou|ThankYou[]
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
 	public function GetThankYous($ids, bool $thanked = false, bool $users = false, bool $tags = false)
@@ -120,9 +117,43 @@ class ThankYous
 			$ids          = [$ids];
 		}
 
-		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $thanked, $users, $tags);
+		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $users, $tags);
+
+		if ($thanked)
+		{
+			$this->LoadThankYousThankeds($thank_yous);
+		}
 
 		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
+	}
+
+	/**
+	 * @param ThankYou[] $thank_yous
+	 */
+	public function LoadThankYousThankeds(array $thank_yous)
+	{
+		$ids = [];
+		foreach ($thank_yous as $thank_you)
+		{
+			$id = $thank_you->GetId();
+			if (isset($id))
+			{
+				$ids[$id] = true;
+			}
+		}
+
+		$ids = array_keys($ids);
+
+		$thankeds = $this->thank_yous_repository->GetThankYousThankedsByThankYouIds($ids);
+
+		foreach ($thank_yous as $thank_you)
+		{
+			$id = $thank_you->GetId();
+			if (isset($id) && isset($thankeds[$id]))
+			{
+				$thank_you->SetThanked($thankeds[$id]);
+			}
+		}
 	}
 
 	/**
@@ -136,7 +167,6 @@ class ThankYous
 	 * @param int[]|null            $thanked_user_ids
 	 * @param int[]|null            $tag_ids
 	 * @return ThankYou[]
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
 	public function GetRecentThankYous(SecurityContext $context, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false, ?int $limit = null, ?int $offset = null, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
@@ -426,22 +456,18 @@ class ThankYous
 	 * @param int $id
 	 * @return Thankable
 	 * @throws ThankYouOClass - If the Owner Class given is not supported.
-	 * @throws ThankableNotFound - If the Thankable could not be found.
 	 */
 	public function CreateThankableFromOClass(int $o_class, int $id)
 	{
-		$thankables = $this->thank_yous_repository->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]]);
-		if (!isset($thankables[0]))
-		{
-			throw new ThankableNotFound("Thankable could not be found with Owner Class '" . $o_class . "' and ID '" . $id . "'");
-		}
-
-		return $thankables[0];
+		return $this->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
 	}
 
 	/**
+	 * Takes an array of arrays in the format ['oclass' => int, 'id' => int]
+	 * Returns an array of Thanked Objects, retaining indexing.
+	 *
 	 * @param array $oclasses
-	 * @return array|Thankable[]
+	 * @return Thankable[]
 	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $oclasses)
@@ -480,13 +506,7 @@ class ThankYous
 	 */
 	public function Delete(SecurityContext $security_context, int $id)
 	{
-		try
-		{
-			$thank_you = $this->thank_yous_repository->GetThankYous([$id], false)[$id];
-		} catch (ThankYouOClass $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetThankYous in Delete", null, $exception);
-		}
+		$thank_you = $this->GetThankYou($id);
 
 		if (!$this->CanDeleteThankYou($thank_you, $security_context))
 		{

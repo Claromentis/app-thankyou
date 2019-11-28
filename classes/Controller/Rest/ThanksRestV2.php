@@ -126,9 +126,6 @@ class ThanksRestV2
 		} catch (ThankYouNotFound $exception)
 		{
 			throw new RestExNotFound(($this->lmsg)('thankyou.error.thanks_not_found'), "Not found", $exception);
-		} catch (ThankYouOClass $exception)
-		{
-			throw new RestExError(($this->lmsg)('thankyou.thankyou.error.server'), "Internal Server Error", $exception);
 		}
 
 		$display_thank_you = $this->thank_you_formatter->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
@@ -449,14 +446,6 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.error.thanks_not_found'),
 				'status' => 404
 			], 404);
-		} catch (ThankYouOClass $exception)
-		{
-			return $this->response->GetJsonPrettyResponse([
-				'type'           => 'https://developer.claromentis.com',
-				'title'          => ($this->lmsg)('thankyou.thankyou.error.modify'),
-				'status'         => 400,
-				'invalid-params' => [['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankable.error.unsuitable_owner_classes')]]
-			], 400);
 		} catch (ThankYouRepository $exception)
 		{
 			$this->log->error("CreateThankYou Failed unexpectedly", [$exception]);

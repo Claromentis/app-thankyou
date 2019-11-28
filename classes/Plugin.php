@@ -413,7 +413,7 @@ class Plugin implements
 					{
 						$create = $thankable;
 					}
-				} catch (ThankYouOClass | ThankableNotFound $exception)
+				} catch (ThankYouOClass $exception)
 				{
 					$log->error("Failed to lock Thank You Creation to User Id '" . $user_id . "' on User's Profile", [$exception]);
 				}

@@ -33,6 +33,8 @@ class ThankYousRepository
 	const THANKED_USERS_TABLE = 'thankyou_user';
 	const THANK_YOU_TAGS_TABLE = 'thankyou_tagged';
 	const USER_TABLE = 'users';
+	const GROUP_TABLE = 'groups';
+	const THANKED_TABLE = 'thankyou_thanked';
 
 	/**
 	 * @var DbInterface
@@ -93,14 +95,12 @@ class ThankYousRepository
 	 * If param $thanked is TRUE, the (ThankYou)s the ThankYou's Thankables will be set.
 	 *
 	 * @param int[] $ids
-	 * @param bool  $get_thanked
 	 * @param bool  $get_users
 	 * @param bool  $get_tags
 	 * @return ThankYou[]
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
-	 * @throws ThankYouOClass - If one or more Thankable's Owner Classes is not recognised.
 	 */
-	public function GetThankYous(array $ids, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false)
+	public function GetThankYous(array $ids, bool $get_users = false, bool $get_tags = false)
 	{
 		if (count($ids) === 0)
 		{
@@ -116,11 +116,6 @@ class ThankYousRepository
 		}
 
 		$columns = ['thankyou_item.id', 'thankyou_item.author AS author_id', 'thankyou_item.date_created', 'thankyou_item.description'];
-
-		if ($get_thanked)
-		{
-			array_push($columns, 'thankyou_thanked.object_type AS thanked_object_type', 'thankyou_thanked.object_id AS thanked_object_id');
-		}
 
 		if ($get_users)
 		{
@@ -149,11 +144,6 @@ class ThankYousRepository
 
 		$query .= " FROM thankyou_item";
 
-		if ($get_thanked)
-		{
-			$query .= " LEFT JOIN thankyou_thanked ON thankyou_thanked.item_id=thankyou_item.id";
-		}
-
 		if ($get_users)
 		{
 			$query .= " LEFT JOIN thankyou_user ON thankyou_user.thanks_id=thankyou_item.id";
@@ -168,36 +158,20 @@ class ThankYousRepository
 
 		$result = $this->db->query($query, $ids);
 
-		$perm_oclasses  = [PERM_OCLASS_INDIVIDUAL => []];
 		$thankyou_items = [];
 		$tags           = [];
+		$user_ids       = [];
 		while ($row = $result->fetchArray())
 		{
 			$id           = (int) $row['id'];
 			$author_id    = (int) $row['author_id'];
 			$date_created = (string) $row['date_created'];
 
-			$perm_oclasses[PERM_OCLASS_INDIVIDUAL][$author_id] = true;
+			$user_ids[$author_id] = true;
 
 			if (!isset($thankyou_items[$id]))
 			{
 				$thankyou_items[$id] = ['author_id' => $author_id, 'date_created' => $date_created, 'description' => $row['description']];
-			}
-
-			if (isset($row['thanked_object_type']) && isset($row['thanked_object_id']))
-			{
-				$thanked_object_type = (int) $row['thanked_object_type'];
-				$thanked_object_id   = (int) $row['thanked_object_id'];
-
-				if (!isset($thankyou_items[$id]['thanked'][$thanked_object_type][$thanked_object_id]))
-				{
-					$thankyou_items[$id]['thanked'][$thanked_object_type][$thanked_object_id] = true;
-				}
-
-				if (!isset($perm_oclasses[$thanked_object_type][$thanked_object_id]))
-				{
-					$perm_oclasses[$thanked_object_type][$thanked_object_id] = true;
-				}
 			}
 
 			if (isset($row['thanked_user_id']))
@@ -209,10 +183,7 @@ class ThankYousRepository
 					$thankyou_items[$id]['thanked_users'][$thanked_user_id] = true;
 				}
 
-				if (!isset($perm_oclasses[PERM_OCLASS_INDIVIDUAL][$thanked_user_id]))
-				{
-					$perm_oclasses[PERM_OCLASS_INDIVIDUAL][$thanked_user_id] = true;
-				}
+				$user_ids[$thanked_user_id] = true;
 			}
 
 			if (isset($row['tag_id']))
@@ -225,28 +196,7 @@ class ThankYousRepository
 			}
 		}
 
-		foreach ($perm_oclasses as $object_type_id => $object_type_objects)
-		{
-			switch ($object_type_id)
-			{
-				case PERM_OCLASS_INDIVIDUAL:
-					$users = $this->GetUsers(array_keys($object_type_objects));
-					try
-					{
-						$perm_oclasses[$object_type_id] = $this->CreateThankablesFromUsers($users);
-					} catch (ThankYouException $exception)
-					{
-						throw new LogicException("Unexpected Exception thrown by CreateThankablesFromUsers in GetThankYous", null, $exception);
-					}
-					break;
-				case PERM_OCLASS_GROUP:
-					$perm_oclasses[$object_type_id] = $this->CreateThankablesFromGroupIds(array_keys($object_type_objects));
-					break;
-				default:
-					throw new ThankYouOClass("Unable to create Thankable for Owner Class '" . (string) $object_type_id . "'");
-					break;
-			}
-		}
+		$users = $this->GetUsers(array_keys($user_ids));
 
 		$tags = $this->tags->GetTagsById(array_keys($tags));
 
@@ -267,25 +217,6 @@ class ThankYousRepository
 			}
 
 			$thank_you->SetId($id);
-
-			if ($get_thanked)
-			{
-				$thankables = [];
-				if (isset($thankyou_items[$id]['thanked']))
-				{
-					foreach ($thankyou_items[$id]['thanked'] as $thanked_object_type_id => $thanked_object_ids)
-					{
-						foreach ($thanked_object_ids as $thanked_object_id => $true)
-						{
-							if (isset($perm_oclasses[$thanked_object_type_id][$thanked_object_id]))
-							{
-								$thankables[] = $perm_oclasses[$thanked_object_type_id][$thanked_object_id];
-							}
-						}
-					}
-				}
-				$thank_you->SetThanked($thankables);
-			}
 
 			if ($get_users)
 			{
@@ -380,6 +311,55 @@ class ThankYousRepository
 		}
 
 		return $thank_you_ids;
+	}
+
+	/**
+	 * Given an array of Thank You IDs, returns an array of Thankeds, indexed by the Thank You's ID and then the Thanked's ID.
+	 *
+	 * @param int[] $ids
+	 * @return array[Thankable]
+	 */
+	public function GetThankYousThankedsByThankYouIds(array $ids)
+	{
+		$query_string = "SELECT id, item_id, object_type, object_id FROM " . self::THANKED_TABLE;
+
+		$query = $this->query_factory->GetQueryBuilder($query_string);
+
+		$query->AddWhereAndClause(self::THANKED_TABLE . ".item_id IN in:int:thank_you_ids", $ids);
+
+		$result = $this->db->query($query->GetQuery());
+
+		$thank_yous_thankeds = [];
+		$thankeds            = [];
+		while ($row = $result->fetchArray())
+		{
+			$id                    = (int) $row['id'];
+			$thank_you_id          = (int) $row['item_id'];
+			$owner_class_id        = (int) $row['object_type'];
+			$owner_classes_item_id = (int) $row['object_id'];
+
+			$thankeds[$id] = ['oclass' => $owner_class_id, 'id' => $owner_classes_item_id];
+
+			$thank_yous_thankeds[$thank_you_id][$id] = true;
+		}
+
+		try
+		{
+			$thankeds = $this->CreateThankablesFromOClasses($thankeds);
+		} catch (ThankYouOClass $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown", null, $exception);
+		}
+
+		foreach ($thank_yous_thankeds as $thank_you_id => $thank_you_thankeds)
+		{
+			foreach ($thank_you_thankeds as $id => $true)
+			{
+				$thank_yous_thankeds[$thank_you_id][$id] = $thankeds[$id];
+			}
+		}
+
+		return $thank_yous_thankeds;
 	}
 
 	public function GetTagsTotalThankYouUses(?array $orders = null, ?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
@@ -697,9 +677,64 @@ class ThankYousRepository
 	}
 
 	/**
+	 * Takes an array of arrays in the format ['oclass' => int, 'id' => int]
+	 * Returns an array of Thanked Objects, retaining indexing.
+	 *
+	 * @param array $thankeds
+	 * @return Thankable[]
+	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 */
+	public function CreateThankablesFromOClasses(array $thankeds): array
+	{
+		//TODO: Expand accepted objects to include all PERM_OCLASS_*
+		$owner_classes_ids = [];
+		foreach ($thankeds as $thanked)
+		{
+			if (!isset($thanked['oclass']))
+			{
+				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified");
+			}
+
+			if (!in_array($thanked['oclass'], self::THANKABLES))
+			{
+				throw new ThankYouOClass("Failed to Get Permission Object Classes Names, Object class is not supported");
+			}
+
+			if (!isset($thanked['id']) || !is_int($thanked['id']))
+			{
+				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object ID is not specified or is invalid");
+			}
+
+			if (!isset($owner_classes_ids[$thanked['oclass']]))
+			{
+				$owner_classes_ids[$thanked['oclass']] = [];
+			}
+
+			$owner_classes_ids[$thanked['oclass']][$thanked['id']] = true;
+		}
+
+		if (isset($owner_classes_ids[PERM_OCLASS_GROUP]))
+		{
+			$owner_classes_ids[PERM_OCLASS_GROUP] = $this->CreateThankablesFromGroupIds(array_keys($owner_classes_ids[PERM_OCLASS_GROUP]));
+		}
+
+		if (isset($owner_classes_ids[PERM_OCLASS_INDIVIDUAL]))
+		{
+			$owner_classes_ids[PERM_OCLASS_INDIVIDUAL] = $this->CreateThankablesFromUserIds(array_keys($owner_classes_ids[PERM_OCLASS_INDIVIDUAL]));
+		}
+
+		foreach ($thankeds as $offset => $thanked)
+		{
+			$thankeds[$offset] = $owner_classes_ids[$thanked['oclass']][$thanked['id']];
+		}
+
+		return $thankeds;
+	}
+
+	/**
 	 * Create an array of Thankables from an array of Group IDs. The returned array is indexed by the Group's ID
 	 *
-	 * @param array $groups_ids
+	 * @param int[] $groups_ids
 	 * @return Thankable[]
 	 */
 	public function CreateThankablesFromGroupIds(array $groups_ids): array
@@ -707,7 +742,7 @@ class ThankYousRepository
 		$owner_class_id = PERM_OCLASS_GROUP;
 		try
 		{
-			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[0];
+			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[$owner_class_id];
 		} catch (ThankYouOClass $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
@@ -721,7 +756,7 @@ class ThankYousRepository
 			}
 		}
 
-		$result = $this->db->query("SELECT groupid, groupname, ex_area_id FROM groups WHERE groupid IN in:int:groups ORDER BY groupid", $groups_ids);
+		$result = $this->db->query("SELECT groupid, groupname, ex_area_id FROM " . self::GROUP_TABLE . " WHERE groupid IN in:int:groups ORDER BY groupid", $groups_ids);
 
 		$group_thankables = [];
 		while ($group = $result->fetchArray())
@@ -730,70 +765,47 @@ class ThankYousRepository
 			$group_thankables[$id] = new Thankable($group['groupname'], $id, $owner_class_name, $owner_class_id, (int) $group['ex_area_id']);
 		}
 
+		foreach ($groups_ids as $groups_id)
+		{
+			if (!isset($group_thankables[$groups_id]))
+			{
+				//TODO: Factory & Localize.
+				$group_thankables[$groups_id] = new Thankable('GROUP UNKNOWN');
+			}
+		}
+
 		return $group_thankables;
 	}
 
 	/**
-	 * @param array $o_classes
-	 * @return Thankable[]
-	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
-	 */
-	public function CreateThankablesFromOClasses(array $o_classes): array
-	{
-		//TODO: Expand accepted objects to include all PERM_OCLASS_*
-		$o_classes_object_ids = [];
-		foreach ($o_classes as $o_class)
-		{
-			if (!isset($o_class['oclass']))
-			{
-				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified");
-			}
-
-			if (!in_array($o_class['oclass'], self::THANKABLES))
-			{
-				throw new ThankYouOClass("Failed to Get Permission Object Classes Names, Object class is not supported");
-			}
-
-			if (!isset($o_class['id']) || !is_int($o_class['id']))
-			{
-				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object ID is not specified or is invalid");
-			}
-
-			if (!isset($o_classes_object_ids[$o_class['oclass']]))
-			{
-				$o_classes_object_ids[$o_class['oclass']] = [];
-			}
-
-			$o_classes_object_ids[$o_class['oclass']][] = $o_class['id'];
-		}
-
-		$thankables = [];
-		if (isset($o_classes_object_ids[PERM_OCLASS_GROUP]))
-		{
-			$thankables = array_merge($thankables, $this->CreateThankablesFromGroupIds($o_classes_object_ids[PERM_OCLASS_GROUP]));
-		}
-
-		if (isset($o_classes_object_ids[PERM_OCLASS_INDIVIDUAL]))
-		{
-			$thankables = array_merge($thankables, $this->CreateThankablesFromUserIds($o_classes_object_ids[PERM_OCLASS_INDIVIDUAL]));
-		}
-
-		return $thankables;
-	}
-
-	/**
-	 * @param array $user_ids
+	 * Creates Thankables from User IDs. If the User cannot be found, a substitute Thankable will be created.
+	 * Returns array indexed by the IDs.
+	 *
+	 * @param int[] $user_ids
 	 * @return Thankable[]
 	 */
 	public function CreateThankablesFromUserIds(array $user_ids)
 	{
+		$users = $this->GetUsers($user_ids);
+
 		try
 		{
-			return $this->CreateThankablesFromUsers($this->GetUsers($user_ids));
+			$thankables = $this->CreateThankablesFromUsers($users);
 		} catch (ThankYouException $exception)
 		{
-			throw new LogicException("Unexpected Exception thrown by CreateThankablesFromUsers in CreateThankablesFromUserIds", null, $exception);
+			throw new LogicException("Unexpected Exception thrown when Creating Thankables From Users", null, $exception);
 		}
+
+		foreach ($user_ids as $user_id)
+		{
+			if (!isset($thankables[$user_id]))
+			{
+				//TODO: localize message, make a factory.
+				$thankables[$user_id] = new Thankable('UNKNOWN USER');
+			}
+		}
+
+		return $thankables;
 	}
 
 	/**
@@ -808,7 +820,7 @@ class ThankYousRepository
 		$owner_class_id = PermOClass::INDIVIDUAL;
 		try
 		{
-			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[0];
+			$owner_class_name = $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[$owner_class_id];
 		} catch (ThankYouOClass $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown by GetOwnerClassNamesFromIds", null, $exception);
