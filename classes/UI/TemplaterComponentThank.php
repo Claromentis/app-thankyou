@@ -177,8 +177,11 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		{
 			$total_thanked = count($thankables);
 
-			foreach ($thankables as $offset => $thankable)
+			$thanked_displayed = 0;
+			foreach ($thankables as $thankable)
 			{
+				$thanked_displayed++;
+
 				$thankable_hidden = !$this->api->ThankYous()->CanSeeThankableName($context, $thankable);
 
 				$image_url             = $thankable_hidden ? null : $thankable->GetImageUrl();
@@ -197,7 +200,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 					'thanked_link.title'        => $thanked_tooltip,
 					'profile_image.src'         => $image_url,
 					'profile_image.visible'     => $display_thanked_image,
-					'delimiter_visible.visible' => !($offset === $total_thanked - 1)
+					'delimiter_visible.visible' => !($thanked_displayed === $total_thanked)
 				];
 			}
 		}
