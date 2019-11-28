@@ -1,3 +1,9 @@
+<!--@head@
+<unique_section name="thankyou_component_styles">
+	<component class_key="css_loader" src="/intranet/thankyou/css/admin.scss" >
+</unique_section>
+-->
+
 <block id="admin_breadcrumb">
 	<li><a href="/thankyou/admin/">
 		<loc name="thankyou:admin:breadcrumb">Thank You</loc>
@@ -14,11 +20,16 @@
 	<h3>
 		<loc name="thankyou:admin:statistics:title"></loc>
 	</h3>
-	<h4>
-		<loc name="common:reports"></loc>
-	</h4>
-	<div name="reports" datasrc="">
-		<a name="report"></a>
+	<div class="row" name="reports" datasrc="">
+		<div class="col-sm-4">
+			<a class="report-link" name="reportlink">
+			<cla-card>
+
+					<h4 name="report"></h4>
+			</cla-card>
+			</a>
+
+		</div>
 	</div>
 </block>
 
