@@ -114,11 +114,7 @@
 	<span class="text-danger"></span>
 </script>
 <script type="text/javascript">
-    require(['domReady', 'jquery', 'colour_picker'], function(domReady, $) {
-        domReady(function () {
-
-		});
-	});
+    require(['colour_picker'], function() {});
 
 	(function ($) {
         $('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
@@ -161,11 +157,20 @@
             });
         });
 
+        $('#tag_modal, input[name="tag_name"], .js-color-confirm').on('keypress', function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                $('.js-tag-form').submit();
+            }
+		})
+
         var core_values = $('#core_values_enabled_body');
 
         core_values.on('click', '.js-tag-create', function () {
             tag_modal.resetForm();
             tag_modal.showModal(true);
+            tag_modal.modal.find('input[name="tag_bg_colour"]').val('#00adef');
+            tag_modal.updateColourPickerBg();
         });
 
         core_values.on('click', '.js-tag-active', function () {
@@ -207,6 +212,7 @@
 					url: '/api/thankyou/v2/tags/' + id
 				}).done(function(data){
                     self.populateFromTag(data);
+                    self.updateColourPickerBg();
                 })
 			},
 			populateFromTag: function (tag) {
@@ -215,6 +221,10 @@
                 this.modal.find('input[name="tag_bg_colour"]').val(tag.bg_colour);
                 this.resetErrors();
                 this.showModal(true);
+			},
+			updateColourPickerBg: function () {
+                var colourPicker = $('#tag_modal').find($('.js-color-confirm'));
+                colourPicker.css('background-color', colourPicker.val());
 			},
 			showModal: function (show) {
                 if (show === true) {
