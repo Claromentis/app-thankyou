@@ -102,6 +102,39 @@ class Tag
 	}
 
 	/**
+	 * Given a Tagged ID and Aggregation ID, returns an array of Tags, indexed by the Tagging's ID.
+	 *
+	 * @param int $tagged_id
+	 * @param int $aggregation_id
+	 * @return \Claromentis\ThankYou\Tags\Tag[]
+	 */
+	public function GetTaggedTags(int $tagged_id, int $aggregation_id)
+	{
+		return $this->GetTaggedsTags([$tagged_id], $aggregation_id)[$tagged_id];
+	}
+
+	/**
+	 * Given an Aggregation ID, and Tagged IDs, returns an array of Taggings, indexed by the Tagged's ID.
+	 *
+	 * @param int[] $tagged_ids
+	 * @param int   $aggregation_id
+	 * @return array[]
+	 */
+	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id)
+	{
+		$taggeds_tags = $this->repository->GetTaggedsTags($tagged_ids, $aggregation_id);
+		foreach ($tagged_ids as $tagged_id)
+		{
+			if (!isset($taggeds_tags[$tagged_id]))
+			{
+				$taggeds_tags[$tagged_id] = [];
+			}
+		}
+
+		return $taggeds_tags;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function GetTotalTags(): int
@@ -249,8 +282,8 @@ class Tag
 	/**
 	 * Deletes a Tagged's Tags from the Repository.
 	 *
-	 * @param int   $tagged_id
-	 * @param int   $aggregation_id
+	 * @param int                              $tagged_id
+	 * @param int                              $aggregation_id
 	 * @param \Claromentis\ThankYou\Tags\Tag[] $tags
 	 */
 	public function RemoveTaggedTags(int $tagged_id, int $aggregation_id, array $tags)

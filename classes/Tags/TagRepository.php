@@ -250,6 +250,51 @@ class TagRepository
 	}
 
 	/**
+	 * Given an Aggregation ID, and Tagged IDs, returns an array of Taggings, indexed by the Tagged's ID.
+	 *
+	 * @param int[] $tagged_ids
+	 * @param int   $aggregation_id
+	 * @return array[]
+	 */
+	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id)
+	{
+		$query_string = "SELECT * FROM " . self::TAGGED_TABLE;
+		$query        = $this->db->GetQueryBuilder($query_string);
+
+		$this->QueryFilterAggregationId($query, $aggregation_id);
+		$this->QueryFilterTaggedId($query, $tagged_ids);
+
+		$results = $this->db->query($query->GetQuery());
+
+		$tag_ids = [];
+		$rows    = [];
+		while ($row = $results->fetchArray())
+		{
+			$id        = (int) $row['id'];
+			$tagged_id = (int) $row['item_id'];
+			$tag_id    = (int) $row['tag_id'];
+
+			$rows[$id]        = ['tagged_id' => $tagged_id, 'tag_id' => $tag_id];
+			$tag_ids[$tag_id] = true;
+		}
+
+		$tag_ids = array_keys($tag_ids);
+
+		$tags = $this->GetTags($tag_ids);
+
+		$taggeds_tags = [];
+		foreach ($rows as $tagging_id => $row)
+		{
+			if (isset($tags[$row['tag_id']]))
+			{
+				$taggeds_tags[$row['tagged_id']][$tagging_id] = $tags[$row['tag_id']];
+			}
+		}
+
+		return $taggeds_tags;
+	}
+
+	/**
 	 * Saves a Tagged's Tag. If an ID is provided, an existing record will be updated, if not a new entry will be created.
 	 *
 	 * @param int      $tagged_id
@@ -301,7 +346,8 @@ class TagRepository
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
 		$query->AddWhereAndClause("item_id=int:tagged_id", $tagged_id);
-		$query->AddWhereAndClause("aggregation_id=int:aggregation_id", $aggregation_id);
+
+		$this->QueryFilterAggregationId($query, $aggregation_id);
 
 		if (isset($tag_id))
 		{
@@ -409,6 +455,25 @@ class TagRepository
 		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
 		{
 			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
+		}
+	}
+
+	private function QueryFilterAggregationId(QueryBuilder $query, int $aggregation_id)
+	{
+		$query->AddWhereAndClause(self::TAGGED_TABLE . ".aggregation_id=int:aggregation_id", $aggregation_id);
+	}
+
+	private function QueryFilterTaggedId(QueryBuilder $query, $tagged_ids)
+	{
+		if (is_int($tagged_ids))
+		{
+			$query->AddWhereAndClause(self::TAGGED_TABLE . ".item_id=int:tagged_ids", $tagged_ids);
+		} elseif (is_array($tagged_ids))
+		{
+			$query->AddWhereAndClause(self::TAGGED_TABLE . ".item_id IN in:int:tagged_ids", $tagged_ids);
+		} else
+		{
+			throw new InvalidArgumentException("Failed to Add Tagged ID Filter to Query, invalid value for parameter tagged_ids given: " . (string) $tagged_ids);
 		}
 	}
 }
