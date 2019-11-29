@@ -183,4 +183,92 @@ class Tag
 
 		$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'tag_delete', $id, $tag->GetName());
 	}
+
+	/**
+	 * Saves a Tagged's Tag to the Repository.
+	 * Returns the ID of the Tagging.
+	 *
+	 * @param int                            $tagged_id
+	 * @param int                            $aggregation_id
+	 * @param \Claromentis\ThankYou\Tags\Tag $tag
+	 * @return int
+	 * @throws TagNotFound
+	 */
+	public function AddTaggedTag(int $tagged_id, int $aggregation_id, \Claromentis\ThankYou\Tags\Tag $tag)
+	{
+		$tag_id = $tag->GetId();
+
+		if (!isset($tag_id))
+		{
+			throw new InvalidArgumentException("Failed to Add Tagged's Tag, Tag's ID unknown");
+		}
+
+		return $this->repository->SaveTaggedTag($tagged_id, $aggregation_id, $tag_id);
+	}
+
+	/**
+	 * Saves a Tagged's Tags to the Repository.
+	 * Returns an array of the Tagging IDs.
+	 *
+	 * @param int                              $tagged_id
+	 * @param int                              $aggregation_id
+	 * @param \Claromentis\ThankYou\Tags\Tag[] $tags
+	 * @return int[]
+	 * @throws TagNotFound
+	 */
+	public function AddTaggedTags(int $tagged_id, int $aggregation_id, array $tags)
+	{
+		$tagging_ids = [];
+		foreach ($tags as $tag)
+		{
+			$tagging_ids[] = $this->AddTaggedTag($tagged_id, $aggregation_id, $tag);
+		}
+
+		return $tagging_ids;
+	}
+
+	/**
+	 * Deletes a Tagged's Tag from the Repository.
+	 *
+	 * @param int                            $tagged_id
+	 * @param int                            $aggregation_id
+	 * @param \Claromentis\ThankYou\Tags\Tag $tag
+	 */
+	public function RemoveTaggedTag(int $tagged_id, int $aggregation_id, \Claromentis\ThankYou\Tags\Tag $tag)
+	{
+		$tag_id = $tag->GetId();
+
+		if (!isset($tag_id))
+		{
+			throw new InvalidArgumentException("Failed to Remove Tagged's Tag, Tag's ID unknown");
+		}
+
+		$this->repository->DeleteTaggedTags($tagged_id, $aggregation_id, $tag_id);
+	}
+
+	/**
+	 * Deletes a Tagged's Tags from the Repository.
+	 *
+	 * @param int   $tagged_id
+	 * @param int   $aggregation_id
+	 * @param \Claromentis\ThankYou\Tags\Tag[] $tags
+	 */
+	public function RemoveTaggedTags(int $tagged_id, int $aggregation_id, array $tags)
+	{
+		foreach ($tags as $tag)
+		{
+			$this->RemoveTaggedTag($tagged_id, $aggregation_id, $tag);
+		}
+	}
+
+	/**
+	 * Deletes all of a Tagged's Tags from the Repository.
+	 *
+	 * @param int $tagged_id
+	 * @param int $aggregation_id
+	 */
+	public function RemoveAllTaggedTags(int $tagged_id, int $aggregation_id)
+	{
+		$this->repository->DeleteTaggedTags($tagged_id, $aggregation_id);
+	}
 }
