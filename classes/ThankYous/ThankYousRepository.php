@@ -17,6 +17,7 @@ use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\Thankable;
+use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
@@ -271,7 +272,7 @@ class ThankYousRepository
 
 		if (isset($tag_ids))
 		{
-			$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryJoinThankYouToTagged($query);
 			$this->QueryAddTagsFilter($query, $tag_ids);
 		}
 
@@ -356,6 +357,7 @@ class ThankYousRepository
 		$query_string .= " GROUP BY " . self::TAG_TABLE . ".id";
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
+		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . ThanksItem::AGGREGATION);
 
 		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
 
@@ -449,7 +451,7 @@ class ThankYousRepository
 
 		if (isset($tag_ids))
 		{
-			$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryJoinThankYouToTagged($query);
 			$this->QueryAddTagsFilter($query, $tag_ids);
 		}
 
@@ -494,7 +496,7 @@ class ThankYousRepository
 
 		if (isset($tag_ids))
 		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryJoinThankedUsersToTagged($query);
 			$this->QueryAddTagsFilter($query, $tag_ids);
 		}
 
@@ -555,7 +557,7 @@ class ThankYousRepository
 
 		if (isset($tag_ids))
 		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TAGS_TABLE . ".item_id");
+			$this->QueryJoinThankedUsersToTagged($query);
 			$this->QueryAddTagsFilter($query, $tag_ids);
 		}
 
@@ -585,6 +587,7 @@ class ThankYousRepository
 		$query_string = "SELECT COUNT(DISTINCT " . self::TAG_TABLE . ".id) FROM " . self::TAG_TABLE;
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
+		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . ThanksItem::AGGREGATION);
 
 		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
 
@@ -829,7 +832,6 @@ class ThankYousRepository
 		$thanks_item->SetId($id);
 		try
 		{
-			$this->db->query("DELETE FROM " . TagRepository::TAGGED_TABLE . " WHERE item_id = int:id", $id);
 			$thanks_item->Delete();
 		} catch (ThankYouException $exception)
 		{
@@ -897,6 +899,16 @@ class ThankYousRepository
 		$thank_you->SetId($id);
 
 		return $id;
+	}
+
+	private function QueryJoinThankYouToTagged(QueryBuilder $query)
+	{
+		$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id AND aggregation_id = " . ThanksItem::AGGREGATION);
+	}
+
+	private function QueryJoinThankedUsersToTagged(QueryBuilder $query)
+	{
+		$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TAGS_TABLE . ".item_id AND aggregation_id = " . ThanksItem::AGGREGATION);
 	}
 
 	/**

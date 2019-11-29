@@ -567,6 +567,7 @@ class ThankYous
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
 
+		$this->tag_api->RemoveAllTaggedTags($id, ThanksItem::AGGREGATION);
 		$this->thank_yous_repository->Delete($id);
 
 		$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_delete', $id, $thank_you->GetDescription());
