@@ -896,43 +896,7 @@ class ThankYousRepository
 		$id = $thanks_item->Save();
 		$thank_you->SetId($id);
 
-		$this->SaveThankYouTags($thank_you);
-
 		return $id;
-	}
-
-	/**
-	 * @param ThankYou $thank_you
-	 * @return int[]
-	 */
-	private function SaveThankYouTags(ThankYou $thank_you): array
-	{
-		$id   = $thank_you->GetId();
-		$tags = $thank_you->GetTags();
-
-		$thank_you_tag_ids = [];
-
-		if (!isset($tags) || !isset($id))
-		{
-			return $thank_you_tag_ids;
-		}
-
-		$this->db->query("DELETE FROM " . TagRepository::TAGGED_TABLE . " WHERE item_id=int:id", $id);
-
-		foreach ($tags as $tag)
-		{
-			$tag_id = $tag->GetId();
-			if (!isset($tag_id))
-			{
-				continue;
-			}
-
-			$query = $this->query_factory->GetQueryInsert(TagRepository::TAGGED_TABLE, ['int:item_id' => $id, 'int:tag_id' => $tag_id]);
-			$this->db->query($query);
-			$thank_you_tag_ids[] = (int) $this->db->insertId();
-		}
-
-		return $thank_you_tag_ids;
 	}
 
 	/**

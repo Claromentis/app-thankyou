@@ -23,6 +23,7 @@ use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
@@ -525,13 +526,22 @@ class ThankYous
 	 * @param ThankYou $thank_you
 	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
 	 * @throws ThankYouRepository - On failure to save to database.
+	 * @throws TagNotFound
 	 */
 	public function Save(ThankYou $thank_you)
 	{
 		$new = ($thank_you->GetId() === null) ? true : false;
+
 		$this->thank_yous_repository->Save($thank_you);
 
 		$id = $thank_you->GetId();
+
+		$tags = $thank_you->GetTags();
+		if (isset($tags))
+		{
+			$this->tag_api->RemoveAllTaggedTags($id, ThanksItem::AGGREGATION);
+			$this->tag_api->AddTaggedTags($id, ThanksItem::AGGREGATION, $tags);
+		}
 
 		if ($new)
 		{
