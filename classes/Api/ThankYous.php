@@ -61,6 +61,8 @@ class ThankYous
 
 	private $utility;
 
+	private $tag_api;
+
 	public function __construct(
 		Audit $audit,
 		LineManagerNotifier $line_manager_notifier,
@@ -72,7 +74,8 @@ class ThankYous
 		Comments\Factory $comments_factory,
 		LikesRepository $likes_repository,
 		AclRepository $acl_repository,
-		UserExtranetService $user_extranet_service
+		UserExtranetService $user_extranet_service,
+		Tag $tag_api
 	) {
 		$this->acl                   = $acl;
 		$this->acl_repository        = $acl_repository;
@@ -85,6 +88,7 @@ class ThankYous
 		$this->line_manager_notifier = $line_manager_notifier;
 		$this->thank_yous_repository = $thank_yous_repository;
 		$this->utility               = $thank_you_utility;
+		$this->tag_api               = $tag_api;
 	}
 
 	/**
@@ -118,11 +122,16 @@ class ThankYous
 			$ids          = [$ids];
 		}
 
-		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $users, $tags);
+		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $users);
 
 		if ($thanked)
 		{
 			$this->LoadThankYousThankeds($thank_yous);
+		}
+
+		if ($tags)
+		{
+			$this->LoadThankYousTags($thank_yous);
 		}
 
 		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
@@ -154,6 +163,40 @@ class ThankYous
 			{
 				$thank_you->SetThanked($thankeds[$id]);
 			}
+		}
+	}
+
+	/**
+	 * Given an array of ThankYous, loads the ThankYous Tags from the Repository and sets them.
+	 *
+	 * @param ThankYou[] $thank_yous
+	 */
+	public function LoadThankYousTags(array $thank_yous)
+	{
+		$ids = [];
+		foreach ($thank_yous as $thank_you)
+		{
+			$id = $thank_you->GetId();
+			if (!isset($id))
+			{
+				throw new InvalidArgumentException("Failed to Load Thank You's Tags, one or more Thank You does not have an ID");
+			}
+			$ids[$id] = true;
+		}
+
+		$ids = array_keys($ids);
+
+		$taggeds_tags = $this->tag_api->GetTaggedsTags($ids, ThanksItem::AGGREGATION);
+
+		foreach ($thank_yous as $thank_you)
+		{
+			$id = $thank_you->GetId();
+			if (!isset($taggeds_tags[$id]))
+			{
+				throw new LogicException("Failed to Load Thank Yous Tags, Thank You's Tags missing");
+			}
+
+			$thank_you->SetTags($taggeds_tags[$id]);
 		}
 	}
 
@@ -550,8 +593,8 @@ class ThankYous
 	}
 
 	/**
-	 * @param SecurityContext                           $security_context
-	 * @param Thankable $thankable
+	 * @param SecurityContext $security_context
+	 * @param Thankable       $thankable
 	 * @return bool
 	 */
 	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool

@@ -104,11 +104,10 @@ class ThankYousRepository
 	 *
 	 * @param int[] $ids
 	 * @param bool  $get_users
-	 * @param bool  $get_tags
 	 * @return ThankYou[]
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
-	public function GetThankYous(array $ids, bool $get_users = false, bool $get_tags = false)
+	public function GetThankYous(array $ids, bool $get_users = false)
 	{
 		if (count($ids) === 0)
 		{
@@ -128,11 +127,6 @@ class ThankYousRepository
 		if ($get_users)
 		{
 			array_push($columns, 'thankyou_user.user_id AS thanked_user_id');
-		}
-
-		if ($get_tags)
-		{
-			array_push($columns, TagRepository::TAGGED_TABLE . ".tag_id AS tag_id");
 		}
 
 		$query = "SELECT ";
@@ -155,11 +149,6 @@ class ThankYousRepository
 		if ($get_users)
 		{
 			$query .= " LEFT JOIN thankyou_user ON thankyou_user.thanks_id=thankyou_item.id";
-		}
-
-		if ($get_tags)
-		{
-			$query .= " LEFT JOIN " . TagRepository::TAGGED_TABLE . " ON " . TagRepository::TAGGED_TABLE . ".item_id=thankyou_item.id";
 		}
 
 		$query .= " WHERE thankyou_item.id IN in:int:ids";
@@ -206,8 +195,6 @@ class ThankYousRepository
 
 		$users = $this->GetUsers(array_keys($user_ids));
 
-		$tags = $this->tags->GetTagsById(array_keys($tags));
-
 		$thank_yous = [];
 		foreach ($ids as $id)
 		{
@@ -237,22 +224,6 @@ class ThankYousRepository
 					}
 				}
 				$thank_you->SetUsers($thanked_users);
-			}
-
-			if ($get_tags)
-			{
-				$thankyou_tags = [];
-				if (isset($thankyou_items[$id]['tags']))
-				{
-					foreach ($thankyou_items[$id]['tags'] as $tag_id => $true)
-					{
-						if (isset($tags[$tag_id]))
-						{
-							$thankyou_tags[] = $tags[$tag_id];
-						}
-					}
-				}
-				$thank_you->SetTags($thankyou_tags);
 			}
 
 			$thank_yous[$id] = $thank_you;
@@ -482,7 +453,7 @@ class ThankYousRepository
 			$this->QueryAddTagsFilter($query, $tag_ids);
 		}
 
-		list($count) = $this->db->query_row($query->GetQuery());
+		[$count] = $this->db->query_row($query->GetQuery());
 
 		return $count;
 	}
@@ -594,7 +565,7 @@ class ThankYousRepository
 			$this->QueryAddExtranetFilter($query, $extranet_ids);
 		}
 
-		list($count) = $this->db->query_row($query->GetQuery());
+		[$count] = $this->db->query_row($query->GetQuery());
 
 		return $count;
 	}
@@ -644,7 +615,7 @@ class ThankYousRepository
 			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
 		}
 
-		list($count) = $this->db->query_row($query->GetQuery());
+		[$count] = $this->db->query_row($query->GetQuery());
 
 		return $count;
 	}

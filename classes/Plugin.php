@@ -178,7 +178,8 @@ class Plugin implements
 				$app[Comments\Factory::class],
 				$app[LikesRepository::class],
 				$app[AclRepository::class],
-				$app[UserExtranetService::class]
+				$app[UserExtranetService::class],
+				$app[Tag::class]
 			);
 		};
 
