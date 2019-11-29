@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\ThankYous\DataTables;
 
+use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
@@ -10,7 +11,6 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
 use DateClaTimeZone;
 use Psr\Log\LoggerInterface;
 
@@ -77,17 +77,8 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 		$rows = [];
 
-		try
-		{
-			$thank_yous = $this->api->GetRecentThankYous($context, true, true, $get_tags, $limit, $offset, $filters['date_range'], $filters['thanked_user_ids'], $filters['tags']);
-		} catch (ThankYouOClass $exception)
-		{
-			$this->log->error("Failed to Get Recent Thank Yous from the database", [$exception]);
+		$thank_yous = $this->api->GetRecentThankYous($context, true, true, $get_tags, $limit, $offset, $filters['date_range'], $filters['thanked_user_ids'], $filters['tags']);
 
-			return $rows;
-		}
-
-		$thank_you_comment_counts = [];
 		if ($get_comments)
 		{
 			$this->api->LoadThankYousComments($thank_yous);
@@ -106,7 +97,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$thanked_groups = '';
 			foreach ($thank_you->GetThankable() as $thankable)
 			{
-				if ($thankable->GetOwnerClass() === PERM_OCLASS_GROUP)
+				if ($thankable->GetOwnerClass() === PermOClass::GROUP)
 				{
 					$thanked_groups .= $first_group ? $thankable->GetName() : ", " . $thankable->GetName();
 				}

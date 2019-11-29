@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\Api;
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\Exception\InvalidSubjectException;
+use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Like\LikesRepository;
@@ -679,7 +680,7 @@ class ThankYous
 				{
 					$owner_class_id = $thankable->GetOwnerClass();
 					$thanked_id     = $thankable->GetId();
-					if ($owner_class_id === PERM_OCLASS_INDIVIDUAL && isset($id))
+					if ($owner_class_id === PermOClass::INDIVIDUAL && isset($id))
 					{
 						$user_ids[] = $thanked_id;
 					}

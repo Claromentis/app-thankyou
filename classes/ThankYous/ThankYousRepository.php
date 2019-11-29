@@ -27,7 +27,7 @@ use User;
 
 class ThankYousRepository
 {
-	const THANKABLES = [PERM_OCLASS_INDIVIDUAL, PERM_OCLASS_GROUP];
+	const THANKABLES = [PermOClass::INDIVIDUAL, PermOClass::GROUP];
 
 	const TAG_TABLE = 'thankyou_tag';
 	const THANK_YOU_TABLE = 'thankyou_item';
@@ -721,14 +721,14 @@ class ThankYousRepository
 			$owner_classes_ids[$thanked['oclass']][$thanked['id']] = true;
 		}
 
-		if (isset($owner_classes_ids[PERM_OCLASS_GROUP]))
+		if (isset($owner_classes_ids[PermOClass::GROUP]))
 		{
-			$owner_classes_ids[PERM_OCLASS_GROUP] = $this->CreateThankablesFromGroupIds(array_keys($owner_classes_ids[PERM_OCLASS_GROUP]));
+			$owner_classes_ids[PermOClass::GROUP] = $this->CreateThankablesFromGroupIds(array_keys($owner_classes_ids[PermOClass::GROUP]));
 		}
 
-		if (isset($owner_classes_ids[PERM_OCLASS_INDIVIDUAL]))
+		if (isset($owner_classes_ids[PermOClass::INDIVIDUAL]))
 		{
-			$owner_classes_ids[PERM_OCLASS_INDIVIDUAL] = $this->CreateThankablesFromUserIds(array_keys($owner_classes_ids[PERM_OCLASS_INDIVIDUAL]));
+			$owner_classes_ids[PermOClass::INDIVIDUAL] = $this->CreateThankablesFromUserIds(array_keys($owner_classes_ids[PermOClass::INDIVIDUAL]));
 		}
 
 		foreach ($thankeds as $offset => $thanked)
@@ -747,7 +747,7 @@ class ThankYousRepository
 	 */
 	public function CreateThankablesFromGroupIds(array $groups_ids): array
 	{
-		$owner_class_id = PERM_OCLASS_GROUP;
+		$owner_class_id = PermOClass::GROUP;
 
 		foreach ($groups_ids as $groups_id)
 		{
@@ -786,7 +786,7 @@ class ThankYousRepository
 	 */
 	public function CreateThankablesFromUserIds(array $user_ids)
 	{
-		$owner_class_id = PERM_OCLASS_INDIVIDUAL;
+		$owner_class_id = PermOClass::INDIVIDUAL;
 
 		$users = $this->GetUsers($user_ids);
 

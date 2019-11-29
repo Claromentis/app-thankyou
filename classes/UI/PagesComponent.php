@@ -1,6 +1,7 @@
 <?php
 namespace Claromentis\ThankYou\UI;
 
+use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\ComponentInterface;
 use Claromentis\Core\Component\Exception\ComponentRuntimeException;
@@ -97,7 +98,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		$thanked_owner_classes = [];
 		if (isset($thank_user_id) && $thank_user_id > 0)
 		{
-			$thanked_owner_classes[] = ['id' => (int) $thank_user_id, 'oclass' => PERM_OCLASS_INDIVIDUAL];
+			$thanked_owner_classes[] = ['id' => (int) $thank_user_id, 'oclass' => PermOClass::INDIVIDUAL];
 		}
 
 		if (is_array($group_ids))
@@ -106,7 +107,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			{
 				if ($group_id > 0)
 				{
-					$thanked_owner_classes[] = ['id' => (int) $group_id, 'oclass' => PERM_OCLASS_GROUP];
+					$thanked_owner_classes[] = ['id' => (int) $group_id, 'oclass' => PermOClass::GROUP];
 				}
 			}
 		}

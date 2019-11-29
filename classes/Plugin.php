@@ -3,6 +3,7 @@ namespace Claromentis\ThankYou;
 
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
+use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Application;
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Component\TemplaterTrait;
@@ -28,7 +29,6 @@ use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\StatisticsController;
 use Claromentis\ThankYou\Controller\ThanksController;
-use Claromentis\ThankYou\Exception\ThankableNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\DataTables\TagDataTableSource;
@@ -414,7 +414,7 @@ class Plugin implements
 				$create = 0;
 				try
 				{
-					$thankable = $api->ThankYous()->CreateThankableFromOClass(PERM_OCLASS_INDIVIDUAL, $user_id);
+					$thankable = $api->ThankYous()->CreateThankableFromOClass(PermOClass::INDIVIDUAL, $user_id);
 					if ($api->ThankYous()->CanSeeThankableName($context, $thankable))
 					{
 						$create = $thankable;
