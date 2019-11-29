@@ -40,6 +40,33 @@ class TagRepository
 	}
 
 	/**
+	 * Returns an array of Tags indexed by their ID.
+	 *
+	 * @param int[] $ids
+	 * @return Tag[]
+	 */
+	public function GetTags(array $ids): array
+	{
+		if (count($ids) === 0)
+		{
+			return [];
+		}
+
+		foreach ($ids as $id)
+		{
+			if (!is_int($id))
+			{
+				throw new InvalidArgumentException("Failed to Load Tags from Database, Tag IDs must be integers");
+			}
+		}
+
+		$query   = "SELECT * FROM " . self::TABLE_NAME . " WHERE id IN in:int:ids";
+		$results = $this->db->query($query, $ids);
+
+		return $this->GetTagsFromDbQuery($results);
+	}
+
+	/**
 	 * @param int|null    $limit
 	 * @param int|null    $offset
 	 * @param string|null $name
@@ -267,33 +294,6 @@ class TagRepository
 		{
 			return !(bool) $this->db->query_row("SELECT COUNT(1) FROM " . self::TABLE_NAME . " WHERE name=str:name AND id!=int:id", $name, $id)[0];
 		}
-	}
-
-	/**
-	 * Returns an array of Tags indexed by their ID.
-	 *
-	 * @param int[] $ids
-	 * @return Tag[]
-	 */
-	public function Load(array $ids): array
-	{
-		if (count($ids) === 0)
-		{
-			return [];
-		}
-
-		foreach ($ids as $id)
-		{
-			if (!is_int($id))
-			{
-				throw new InvalidArgumentException("Failed to Load Tags from Database, Tag IDs must be integers");
-			}
-		}
-
-		$query   = "SELECT * FROM " . self::TABLE_NAME . " WHERE id IN in:int:ids";
-		$results = $this->db->query($query, $ids);
-
-		return $this->GetTagsFromDbQuery($results);
 	}
 
 	/**

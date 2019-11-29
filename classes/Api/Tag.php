@@ -64,7 +64,7 @@ class Tag
 	{
 		try
 		{
-			$tag = $this->repository->Load([$id]);
+			$tag = $this->repository->GetTags([$id]);
 		} catch (InvalidArgumentException $exception)
 		{
 			throw new LogicException("Failed to Get Tag, unexpected Exception thrown when Loading Tag", null, $exception);
@@ -98,7 +98,7 @@ class Tag
 	 */
 	public function GetTagsById(array $ids): array
 	{
-		return $this->repository->Load($ids);
+		return $this->repository->GetTags($ids);
 	}
 
 	/**
