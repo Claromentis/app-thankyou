@@ -123,11 +123,16 @@ class ThankYous
 			$ids          = [$ids];
 		}
 
-		$thank_yous = $this->thank_yous_repository->GetThankYous($ids, $users);
+		$thank_yous = $this->thank_yous_repository->GetThankYous($ids);
 
 		if ($thanked)
 		{
 			$this->LoadThankYousThankeds($thank_yous);
+		}
+
+		if ($users)
+		{
+			$this->LoadThankYousUsers($thank_yous);
 		}
 
 		if ($tags)
@@ -163,6 +168,41 @@ class ThankYous
 			if (isset($id) && isset($thankeds[$id]))
 			{
 				$thank_you->SetThanked($thankeds[$id]);
+			} else
+			{
+				$thank_you->SetThanked([]);
+			}
+		}
+	}
+
+	/**
+	 * @param ThankYou[] $thank_yous
+	 */
+	public function LoadThankYousUsers(array $thank_yous)
+	{
+		$ids = [];
+		foreach ($thank_yous as $thank_you)
+		{
+			$id = $thank_you->GetId();
+			if (isset($id))
+			{
+				$ids[$id] = true;
+			}
+		}
+
+		$ids = array_keys($ids);
+
+		$thank_you_users = $this->thank_yous_repository->GetThankYousUsersByThankYouIds($ids);
+
+		foreach ($thank_yous as $thank_you)
+		{
+			$id = $thank_you->GetId();
+			if (isset($id) && isset($thank_you_users[$id]))
+			{
+				$thank_you->SetUsers($thank_you_users[$id]);
+			} else
+			{
+				$thank_you->SetUsers([]);
 			}
 		}
 	}

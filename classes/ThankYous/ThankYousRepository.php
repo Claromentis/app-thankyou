@@ -104,11 +104,11 @@ class ThankYousRepository
 	 * If param $thanked is TRUE, the (ThankYou)s the ThankYou's Thankables will be set.
 	 *
 	 * @param int[] $ids
-	 * @param bool  $get_users
 	 * @return ThankYou[]
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
-	public function GetThankYous(array $ids, bool $get_users = false)
+	public function GetThankYous(array $ids)
+		//TODO: Refactor this function as it can be much simpler now.
 	{
 		if (count($ids) === 0)
 		{
@@ -124,11 +124,6 @@ class ThankYousRepository
 		}
 
 		$columns = ['thankyou_item.id', 'thankyou_item.author AS author_id', 'thankyou_item.date_created', 'thankyou_item.description'];
-
-		if ($get_users)
-		{
-			array_push($columns, 'thankyou_user.user_id AS thanked_user_id');
-		}
 
 		$query = "SELECT ";
 
@@ -146,11 +141,6 @@ class ThankYousRepository
 		}
 
 		$query .= " FROM thankyou_item";
-
-		if ($get_users)
-		{
-			$query .= " LEFT JOIN thankyou_user ON thankyou_user.thanks_id=thankyou_item.id";
-		}
 
 		$query .= " WHERE thankyou_item.id IN in:int:ids";
 
@@ -213,19 +203,6 @@ class ThankYousRepository
 			}
 
 			$thank_you->SetId($id);
-
-			if ($get_users)
-			{
-				$thanked_users = [];
-				if (isset($thankyou_items[$id]['thanked_users']))
-				{
-					foreach ($thankyou_items[$id]['thanked_users'] as $user_id => $true)
-					{
-						$thanked_users[] = $users[$user_id];
-					}
-				}
-				$thank_you->SetUsers($thanked_users);
-			}
 
 			$thank_yous[$id] = $thank_you;
 		}
@@ -307,11 +284,11 @@ class ThankYousRepository
 
 		$query->AddWhereAndClause(self::THANKED_TABLE . ".item_id IN in:int:thank_you_ids", $ids);
 
-		$result = $this->db->query($query->GetQuery());
+		$results = $this->db->query($query->GetQuery());
 
 		$thank_yous_thankeds = [];
 		$thankeds            = [];
-		while ($row = $result->fetchArray())
+		while ($row = $results->fetchArray())
 		{
 			$id                    = (int) $row['id'];
 			$thank_you_id          = (int) $row['item_id'];
@@ -340,6 +317,48 @@ class ThankYousRepository
 		}
 
 		return $thank_yous_thankeds;
+	}
+
+	/**
+	 * Given and array of Thank You IDs, returns an array of Thank You Users, indexed by the Thank Yous's ID.
+	 *
+	 * @param int[] $ids
+	 * @return array[]
+	 */
+	public function GetThankYousUsersByThankYouIds(array $ids)
+	{
+		$query_string = "SELECT * FROM " . self::THANKED_USERS_TABLE;
+		$query        = $this->query_factory->GetQueryBuilder($query_string);
+
+		$query->AddWhereAndClause(self::THANKED_USERS_TABLE . ".thanks_id IN in:int:ids", $ids);
+
+		$results = $this->db->query($query->GetQuery());
+
+		$user_ids = [];
+		$rows     = [];
+		while ($row = $results->fetchArray())
+		{
+			$thank_you_id = (int) $row['thanks_id'];
+			$user_id      = (int) $row['user_id'];
+
+			$rows[]             = ['thank_you_id' => $thank_you_id, 'user_id' => $user_id];
+			$user_ids[$user_id] = true;
+		}
+
+		$user_ids = array_keys($user_ids);
+
+		$users = $this->GetUsers($user_ids);
+
+		$thank_yous_users = [];
+		foreach ($rows as $row)
+		{
+			if (isset($users[$row['user_id']]))
+			{
+				$thank_yous_users[$row['thank_you_id']][$row['user_id']] = $users[$row['user_id']];
+			}
+		}
+
+		return $thank_yous_users;
 	}
 
 	public function GetTagsTotalThankYouUses(?array $orders = null, ?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
