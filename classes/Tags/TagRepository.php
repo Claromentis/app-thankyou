@@ -221,6 +221,43 @@ class TagRepository
 		$this->db->query("DELETE FROM " . self::TAGGED_TABLE . " WHERE tag_id=int:id", $id);
 	}
 
+	/**
+	 * @param int      $tagged_id
+	 * @param int      $aggregation_id
+	 * @param int      $tag_id
+	 * @param int|null $id
+	 * @return int
+	 */
+	public function SaveTaggedTag(int $tagged_id, int $aggregation_id, int $tag_id, ?int $id = null)
+	{
+
+
+		$db_fields = [
+			'int:item_id'        => $tagged_id,
+			'int:aggregation_id' => $aggregation_id,
+			'int:tag_id'         => $tag_id
+		];
+
+		if (isset($id))
+		{
+			$query = $this->query_factory->GetQueryUpdate(self::TAGGED_TABLE, "id=int:id", $db_fields);
+			$query->Bind('id', $id);
+			$this->db->query($query);
+		} else
+		{
+			$query = $this->query_factory->GetQueryInsert(self::TAGGED_TABLE, $db_fields);
+			$this->db->query($query);
+			$id = $this->db->insertId();
+		}
+
+		return $id;
+	}
+
+	public function DeleteTaggedTags(int $tagged_id, int $aggregation_id)
+	{
+		$this->db->query("DELETE FROM " . self::TAGGED_TABLE . " WHERE tag_id=int:tagged_id AND aggregation_id=int:aggregation_id", $tagged_id, $aggregation_id);
+	}
+
 	public function IsTagNameUnique(string $name, ?int $id): bool
 	{
 		if (!isset($id))
