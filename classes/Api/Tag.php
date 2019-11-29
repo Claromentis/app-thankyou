@@ -87,7 +87,7 @@ class Tag
 	 */
 	public function GetTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
 	{
-		return $this->repository->GetTags($limit, $offset, $name, $orders);
+		return $this->repository->GetFilteredTags($limit, $offset, $name, $orders);
 	}
 
 	/**

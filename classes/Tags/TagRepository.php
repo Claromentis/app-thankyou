@@ -46,7 +46,7 @@ class TagRepository
 	 * @param array|null  $orders
 	 * @return Tag[]
 	 */
-	public function GetTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
+	public function GetFilteredTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
 	{
 		$query_string = "SELECT * FROM " . self::TABLE_NAME;
 		if (isset($orders) && count($orders) > 0)
