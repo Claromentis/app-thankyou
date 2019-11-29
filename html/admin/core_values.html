@@ -157,6 +157,13 @@
             });
         });
 
+        $('#tag_modal, input[name="tag_name"], .js-color-confirm').on('keypress', function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                $('.js-tag-form').submit();
+            }
+		})
+
         var core_values = $('#core_values_enabled_body');
 
         core_values.on('click', '.js-tag-create', function () {
