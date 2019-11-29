@@ -658,7 +658,7 @@ class ThankYous
 
 		try
 		{
-			NotificationMessage::AddApplicationPrefix('thankyou', 'thankyou');
+			NotificationMessage::AddApplicationPrefix(Plugin::APPLICATION_NAME, Plugin::APPLICATION_NAME);
 
 			$params = [
 				'author'              => $thank_you->GetAuthor()->GetFullName(),

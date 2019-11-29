@@ -82,7 +82,7 @@ class Plugin implements
 	{
 		//Tags
 		$app[TagAcl::class] = function ($app) {
-			return new TagAcl($app['admin.panels_list']->GetOne('thankyou'));
+			return new TagAcl($app['admin.panels_list']->GetOne(self::APPLICATION_NAME));
 		};
 
 		$app[TagRepository::class] = function ($app) {
@@ -105,25 +105,25 @@ class Plugin implements
 
 		//Thankable
 		$app[Thankable\Factory::class] = function ($app) {
-			return new Thankable\Factory($app[Lmsg::class], $app[ThankYouUtility::class], $app['logger_factory']->GetLogger('thankyou'));
+			return new Thankable\Factory($app[Lmsg::class], $app[ThankYouUtility::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		//Thank Yous
 
 		// Localization domain
 		$app['localization.domain.thankyou'] = function ($app) {
-			return $app['localization.domain_from_files_factory']('thankyou');
+			return $app['localization.domain_from_files_factory'](self::APPLICATION_NAME);
 		};
 
 		$app['menu.applications'] = $app->extend('menu.applications', function ($menu_items, $app) {
-			$menu_items['thankyou'] = ['name' => ($app[Lmsg::class])('thankyou.app_name'), 'css_class' => 'glyphicons-donate', 'url' => '/thankyou/thanks'];
+			$menu_items[self::APPLICATION_NAME] = ['name' => ($app[Lmsg::class])('thankyou.app_name'), 'css_class' => 'glyphicons-donate', 'url' => '/thankyou/thanks'];
 
 			return $menu_items;
 		});
 
 		// Admin panel
 		$app['admin.panels'] = $app->extend('admin.panels', function ($panels, $app) {
-			$panels['thankyou'] = [
+			$panels[self::APPLICATION_NAME] = [
 				'name'      => $app['lmsg']('thankyou.app_name'),
 				'css_class' => 'glyphicons-donate',
 				'url'       => '/thankyou/admin/'];
@@ -146,7 +146,7 @@ class Plugin implements
 				$app[ThanksItemFactory::class],
 				$app[ThankYouUtility::class],
 				$app[DbInterface::class],
-				$app['logger_factory']->GetLogger('thankyou'),
+				$app['logger_factory']->GetLogger(self::APPLICATION_NAME),
 				$app[QueryFactory::class],
 				$app[Tag::class],
 				$app[Thankable\Factory::class]
@@ -154,11 +154,11 @@ class Plugin implements
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
-			return new ThankYouAcl($app['admin.panels_list']->GetOne('thankyou'), $app[UserExtranetService::class]);
+			return new ThankYouAcl($app['admin.panels_list']->GetOne(self::APPLICATION_NAME), $app[UserExtranetService::class]);
 		};
 
 		$app['thankyou.config'] = function ($app) {
-			return $app['config.factory']('thankyou');
+			return $app['config.factory'](self::APPLICATION_NAME);
 		};
 
 		// Pages component
@@ -187,7 +187,7 @@ class Plugin implements
 		};
 
 		$app[ThanksController::class] = function ($app) {
-			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config'], $app['logger_factory']->GetLogger('thankyou'));
+			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config'], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app[StatisticsController::class] = function ($app) {
@@ -195,15 +195,15 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
-			return new ThankYousList($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
+			return new ThankYousList($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['templater.ui.thankyou.thank'] = function ($app) {
-			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger('thankyou'));
+			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['templater.ui.thankyou.create'] = function ($app) {
-			return new ThankYouCreateTemplaterComponent($app['logger_factory']->GetLogger('thankyou'));
+			return new ThankYouCreateTemplaterComponent($app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['thankyou.datatable.thank_yous'] = function ($app) {
@@ -212,7 +212,7 @@ class Plugin implements
 				$app[SugreUtility::class],
 				$app['thankyou.config'],
 				$app[Lmsg::class],
-				$app['logger_factory']->GetLogger('thankyou')
+				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
 			);
 		};
 
@@ -287,7 +287,7 @@ class Plugin implements
 				$routes->get('/thanks', ThanksController::class . ':View');
 				$routes->get('/thanks/{id}', ThanksController::class . ':View');
 
-				$routes->secure('html', 'admin', ['panel_code' => 'thankyou']);
+				$routes->secure('html', 'admin', ['panel_code' => self::APPLICATION_NAME]);
 				$routes->get('/admin', ThanksController::class . ':Admin');
 				$routes->match('/admin/configuration', ThanksController::class . ':Configuration')->method('GET|POST');
 				$routes->get('/admin/core_values', ThanksController::class . ':CoreValues');
@@ -321,7 +321,7 @@ class Plugin implements
 				$routes->post('/thankyou/{id}', ThanksRestV2::class . ':UpdateThankYou')->assert('id', '\d+');
 				$routes->delete('/thankyou/{id}', ThanksRestV2::class . ':DeleteThankYou')->assert('id', '\d+');
 
-				$routes->secure('rest', 'admin', ['panel_code' => 'thankyou']);
+				$routes->secure('rest', 'admin', ['panel_code' => self::APPLICATION_NAME]);
 				$routes->post('/tags', ThanksRestV2::class . ':CreateTag');
 				$routes->post('/tags/{id}', ThanksRestV2::class . ':UpdateTag')->assert('id', '\d+');
 				$routes->delete('/tags/{id}', ThanksRestV2::class . ':DeleteTag')->assert('id', '\d+');
@@ -338,7 +338,7 @@ class Plugin implements
 	public function GetIMConfig()
 	{
 		return [
-			"thankyou",
+			self::APPLICATION_NAME,
 			lmsg("thankyou.communication.imessages"),
 			[
 				Constants::IM_TYPE_THANKYOU
@@ -400,7 +400,7 @@ class Plugin implements
 		/**
 		 * @var LoggerInterface $log
 		 */
-		$log = $app['logger_factory']->GetLogger('thankyou');
+		$log = $app['logger_factory']->GetLogger(self::APPLICATION_NAME);
 
 		$user_id = (int) $attr['user_id'];
 
