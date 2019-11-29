@@ -250,6 +250,8 @@ class TagRepository
 	}
 
 	/**
+	 * Saves a Tagged's Tag. If an ID is provided, an existing record will be updated, if not a new entry will be created.
+	 *
 	 * @param int      $tagged_id
 	 * @param int      $aggregation_id
 	 * @param int      $tag_id
@@ -286,9 +288,27 @@ class TagRepository
 		return $id;
 	}
 
-	public function DeleteTaggedTags(int $tagged_id, int $aggregation_id)
+	/**
+	 * Deletes a Tagged's Tags. If a Tag ID is specified, only usages of that Tag will be deleted.
+	 *
+	 * @param int      $tagged_id
+	 * @param int      $aggregation_id
+	 * @param int|null $tag_id
+	 */
+	public function DeleteTaggedTags(int $tagged_id, int $aggregation_id, ?int $tag_id = null)
 	{
-		$this->db->query("DELETE FROM " . self::TAGGED_TABLE . " WHERE tag_id=int:tagged_id AND aggregation_id=int:aggregation_id", $tagged_id, $aggregation_id);
+		$query_string = "DELETE FROM " . self::TAGGED_TABLE;
+
+		$query = $this->query_factory->GetQueryBuilder($query_string);
+		$query->AddWhereAndClause("item_id=int:tagged_id", $tagged_id);
+		$query->AddWhereAndClause("aggregation_id=int:aggregation_id", $aggregation_id);
+
+		if (isset($tag_id))
+		{
+			$query->AddWhereAndClause("tag_id=int:tag_id", $tag_id);
+		}
+
+		$this->db->query($query->GetQuery());
 	}
 
 	public function IsTagNameUnique(string $name, ?int $id): bool
