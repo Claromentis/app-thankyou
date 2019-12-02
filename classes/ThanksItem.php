@@ -10,7 +10,6 @@ use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Exception;
-use InvalidArgumentException;
 use LogicException;
 use ObjectsStorage;
 
@@ -25,8 +24,6 @@ use ObjectsStorage;
 class ThanksItem extends ActiveRecord implements ClaAggregation
 {
 	protected $users_ids;
-
-	private $thanked;
 
 	/**
 	 * @return bool|void
@@ -51,7 +48,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 
 		$db = Services::I()->GetDb();
 		$db->query('DELETE FROM thankyou_user WHERE thanks_id = int:id', $id);
-		$db->query('DELETE FROM thankyou_thanked WHERE item_id = int:id', $id);
 
 		parent::Delete();
 	}
@@ -158,15 +154,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 				});
 			}
 
-			if (isset($this->thanked))
-			{
-				$db->query("DELETE FROM thankyou_thanked WHERE item_id=int:id", $id);
-				foreach ($this->thanked as $thank)
-				{
-					$db->query("INSERT INTO thankyou_thanked (item_id, object_type, object_id) VALUES (int:tyid, int:otid, int:oid)", $id, $thank['object_type'], $thank['object_id']);
-				}
-			}
-
 			return (int) $this->GetId();
 		} catch (TransactionException $exception)
 		{
@@ -228,21 +215,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 		{
 			throw new LogicException("Unexpected Exception thrown by Set Property", null, $exception);
 		}
-	}
-
-	/**
-	 * @param array $thanked
-	 */
-	public function SetThanked(array $thanked)
-	{
-		foreach ($thanked as $thank)
-		{
-			if (!is_array($thank) || !isset($thank['object_type']) || !is_int($thank['object_type']) || !isset($thank['object_id']) || !is_int($thank['object_id']))
-			{
-				throw new InvalidArgumentException("Failed to Set Thanked, invalid Thank provided");
-			}
-		}
-		$this->thanked = $thanked;
 	}
 
 	/**

@@ -812,6 +812,7 @@ class ThankYousRepository
 		$thanks_item->SetId($id);
 		try
 		{
+			$this->DeleteThankYouThankees($id);
 			$thanks_item->Delete();
 		} catch (ThankYouException $exception)
 		{
@@ -856,28 +857,75 @@ class ThankYousRepository
 			$thanks_item->SetUsers($users_ids);
 		}
 
-		$thanked = $thank_you->GetThankable();
-		if (isset($thanked))
-		{
-			$thankyou_thanked = [];
-			foreach ($thanked as $thank)
-			{
-				$object_type = $thank->GetOwnerClass();
-				$object_id   = $thank->GetId();
-
-				if (isset($object_type) && isset($object_id))
-				{
-					$thankyou_thanked[] = ['object_type' => $object_type, 'object_id' => $object_id];
-				}
-			}
-
-			$thanks_item->SetThanked($thankyou_thanked);
-		}
-
 		$id = $thanks_item->Save();
+
 		$thank_you->SetId($id);
 
+		$thankees = $thank_you->GetThankable();
+		if (isset($thankees))
+		{
+			$this->DeleteThankYouThankees($id);
+
+			foreach ($thankees as $thankable)
+			{
+				$owner_class_id      = $thankable->GetOwnerClass();
+				$owner_class_item_id = $thankable->GetId();
+
+				if (isset($owner_class_id) && isset($owner_class_item_id))
+				{
+					$this->SaveThankYouThankee($id, $owner_class_id, $owner_class_item_id);
+				}
+			}
+		}
+
 		return $id;
+	}
+
+	/**
+	 * Saves a Thank You's Thankee. If an ID is provided, an existing record will be updated, if not a new entry will be created.
+	 *
+	 * @param int      $thank_you_id
+	 * @param int      $owner_class_id
+	 * @param int      $owner_class_item_id
+	 * @param int|null $id
+	 * @return int
+	 * @throws ThankYouNotFound
+	 */
+	public function SaveThankYouThankee(int $thank_you_id, int $owner_class_id, int $owner_class_item_id, ?int $id = null)
+	{
+		$this->GetThankYous([$thank_you_id]);
+
+		$db_fields = [
+			'int:item_id'     => $thank_you_id,
+			'int:object_type' => $owner_class_id,
+			'int:object_id'   => $owner_class_item_id
+		];
+
+		if (isset($id))
+		{
+			$query = $this->query_factory->GetQueryUpdate(self::THANKED_TABLE, "id=int:id", $db_fields);
+			$query->Bind('id', $id);
+			$this->db->query($query);
+		} else
+		{
+			$query = $this->query_factory->GetQueryInsert(self::THANKED_TABLE, $db_fields);
+			$this->db->query($query);
+			$id = $this->db->insertId();
+		}
+
+		return $id;
+	}
+
+	/**
+	 * Deletes all of a Thank You's Thankees.
+	 *
+	 * @param int $thank_you_id
+	 */
+	public function DeleteThankYouThankees(int $thank_you_id)
+	{
+		$query_string = "DELETE FROM " . self::THANKED_TABLE . " WHERE item_id=int:thank_you_id";
+
+		$this->db->query($query_string, $thank_you_id);
 	}
 
 	private function QueryJoinThankYouToTagged(QueryBuilder $query)
