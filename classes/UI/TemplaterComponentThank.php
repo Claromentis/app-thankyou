@@ -13,7 +13,6 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use DateClaTimeZone;
 use InvalidArgumentException;
@@ -158,7 +157,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 		$thank_link = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
 		if ($thank_link)
 		{
-			$thank_you_url = '/thankyou/thanks/' . $id;
+			$thank_you_url = $this->api->ThankYous()->GetThankYouUrl($thank_you);
 		}
 
 		$author_id   = $thank_you->GetAuthor()->GetId();
