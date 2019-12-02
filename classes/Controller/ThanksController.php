@@ -134,6 +134,6 @@ class ThanksController
 
 		$args['thank.thank_you'] = $id;
 
-		return new TemplaterCallResponse('thankyou/thank.html', $args, ($this->lmsg)('thankyou.app_name'));
+		return new TemplaterCallResponse('thankyou/thank_you.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
 }
