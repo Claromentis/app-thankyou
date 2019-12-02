@@ -525,6 +525,22 @@ class ThankYous
 	}
 
 	/**
+	 * @param ThankYou $thank_you
+	 * @return string
+	 */
+	public function GetThankYouUrl(ThankYou $thank_you)
+	{
+		$id = $thank_you->GetId();
+
+		if (!isset($id))
+		{
+			throw new InvalidArgumentException("Failed to Get Thank You's URL, Thank You's ID is unknown");
+		}
+
+		return $this->utility->GetThankYouUrl($id);
+	}
+
+	/**
 	 * @param User|int  $author
 	 * @param string    $description
 	 * @param Date|null $date_created

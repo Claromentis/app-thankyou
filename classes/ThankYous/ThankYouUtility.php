@@ -92,4 +92,15 @@ class ThankYouUtility
 
 		return $query_string;
 	}
+
+	/**
+	 * Create a Thank You's URL (not including the site's name)
+	 *
+	 * @param int $id
+	 * @return string
+	 */
+	public function GetThankYouUrl(int $id)
+	{
+		return '/thankyou/thanks/' . $id;
+	}
 }
