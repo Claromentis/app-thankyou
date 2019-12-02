@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\ThankYous\DataTables;
+namespace Claromentis\ThankYou\ThankYous\DataTables\Tag;
 
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
@@ -9,7 +9,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouRepository;
+use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 
 class TagsDataTableSource extends FilterDataTableSource
@@ -54,7 +54,7 @@ class TagsDataTableSource extends FilterDataTableSource
 
 		$rows = [];
 
-		$order = ['column' => ThankYousRepository::TAG_TABLE . ".name"];
+		$order                    = ['column' => ThankYousRepository::TAG_TABLE . ".name"];
 		$tags_thankyou_total_uses = $this->api->GetTagsTotalThankYouUses($context, [$order], $limit, $offset, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
 
 		$tag_ids = array_keys($tags_thankyou_total_uses);
