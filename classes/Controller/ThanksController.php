@@ -36,26 +36,6 @@ class ThanksController
 		$this->sugre_repository = $sugre_repository;
 	}
 
-	public function Admin(SecurityContext $context, ServerRequestInterface $server_request)
-	{
-		$args  = [];
-		$limit = 20;
-
-		$query_params = $server_request->getQueryParams();
-		$offset       = (int) ($query_params['st'] ?? null);
-
-		$args['nav_messages.+class'] = 'active';
-
-		require_once('paging.php'); //TODO: not this...
-
-		$args['paging.body_html'] = get_navigation($server_request->getUri()->getPath(), $this->api->ThankYous()->GetTotalThankYousCount($context), $offset, '', $limit);
-
-		$args['ty_list.limit']  = $limit;
-		$args['ty_list.offset'] = $offset;
-
-		return new TemplaterCallResponse('thankyou/admin/admin.html', $args, ($this->lmsg)('thankyou.app_name'));
-	}
-
 	/**
 	 * @param RequestData            $request_data
 	 * @param ServerRequestInterface $request
@@ -129,7 +109,7 @@ class ThanksController
 		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
 
-	public function View(ServerRequestInterface $request)
+	public function View(ServerRequestInterface $request, SecurityContext $context)
 	{
 		$id = $request->getAttribute('id');
 
@@ -137,6 +117,18 @@ class ThanksController
 
 		if (!isset($id))
 		{
+			require_once('paging.php'); //TODO: not this...
+
+			$limit = 20;
+
+			$query_params = $request->getQueryParams();
+			$offset       = (int) ($query_params['st'] ?? null);
+
+			$args['paging.body_html'] = get_navigation($request->getUri()->getPath(), $this->api->ThankYous()->GetTotalThankYousCount($context), $offset, '', $limit);
+
+			$args['ty_list.limit']  = $limit;
+			$args['ty_list.offset'] = $offset;
+
 			return new TemplaterCallResponse('thankyou/view.html', $args, ($this->lmsg)('thankyou.app_name'));
 		}
 

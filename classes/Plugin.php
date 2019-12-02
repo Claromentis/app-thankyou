@@ -289,10 +289,9 @@ class Plugin implements
 				$routes->get('/thanks/{id}', ThanksController::class . ':View');
 
 				$routes->secure('html', 'admin', ['panel_code' => self::APPLICATION_NAME]);
-				$routes->get('/admin', ThanksController::class . ':Admin');
+				$routes->get('/admin', StatisticsController::class . ':Reports');
 				$routes->match('/admin/configuration', ThanksController::class . ':Configuration')->method('GET|POST');
 				$routes->get('/admin/core_values', ThanksController::class . ':CoreValues');
-				$routes->get('/admin/statistics', StatisticsController::class . ':Reports');
 				$routes->get('/admin/statistics/{report_index}', StatisticsController::class . ':View');
 			}
 		];

@@ -35,7 +35,7 @@ class StatisticsController
 
 		foreach ($this->GetReports() as $report_index => $report)
 		{
-			$args['reports.datasrc'][] = ['report.body' => $report['name'], 'reportlink.href' => $url . '/' . $report_index];
+			$args['reports.datasrc'][] = ['report.body' => $report['name'], 'reportlink.href' => $url . '/statistics/' . $report_index];
 		}
 
 		return new TemplaterCallResponse('thankyou/admin/statistics/reports.html', $args, ($this->lmsg)('thankyou.app_name'));
