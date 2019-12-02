@@ -36,7 +36,8 @@ class Configuration
 			}
 		}
 
-		return new ConfigDialog($options, $config); //TODO: Replace with Factory.
+		//TODO: Replace with Factory.
+		return new ConfigDialog($options, $config);
 	}
 
 	/**

@@ -106,23 +106,17 @@ class ThankYous
 	}
 
 	/**
-	 * @param int|int[] $ids
+	 * Given an array of Thank You IDs, returns the associated objects.
+	 *
+	 * @param int[] $ids
 	 * @param bool      $thanked
 	 * @param bool      $users
 	 * @param bool      $tags
-	 * @return ThankYou|ThankYou[]
+	 * @return ThankYou[]
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
-	public function GetThankYous($ids, bool $thanked = false, bool $users = false, bool $tags = false)
-		//TODO: Tighten inputs and outputs to be more specific.
+	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false, bool $tags = false)
 	{
-		$array_return = true;
-		if (!is_array($ids))
-		{
-			$array_return = false;
-			$ids          = [$ids];
-		}
-
 		$thank_yous = $this->thank_yous_repository->GetThankYous($ids);
 
 		if ($thanked)
@@ -140,7 +134,7 @@ class ThankYous
 			$this->LoadThankYousTags($thank_yous);
 		}
 
-		return $array_return ? $thank_yous : $thank_yous[$ids[0]];
+		return $thank_yous;
 	}
 
 	/**

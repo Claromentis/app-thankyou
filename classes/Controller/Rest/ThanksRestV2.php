@@ -122,7 +122,7 @@ class ThanksRestV2
 
 		try
 		{
-			$thank_you = $this->api->ThankYous()->GetThankYous($id, $thanked, $users, $tags);
+			$thank_you = $this->api->ThankYous()->GetThankYou($id, $thanked, $users, $tags);
 		} catch (ThankYouNotFound $exception)
 		{
 			throw new RestExNotFound(($this->lmsg)('thankyou.error.thanks_not_found'), "Not found", $exception);
