@@ -45,7 +45,7 @@ use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYouFactory;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
-use Claromentis\ThankYou\UI\TemplaterComponentThank;
+use Claromentis\ThankYou\UI\ThankYouTemplaterComponent;
 use Claromentis\ThankYou\UI\ThankYouCreateTemplaterComponent;
 use Claromentis\ThankYou\UI\ThankYousList;
 use Claromentis\ThankYou\UI\ThankYouTagStatsTemplaterComponent;
@@ -199,8 +199,8 @@ class Plugin implements
 			return new ThankYousList($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
-		$app['templater.ui.thankyou.thank'] = function ($app) {
-			return new TemplaterComponentThank($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+		$app['templater.ui.thankyou.thank_you'] = function ($app) {
+			return new ThankYouTemplaterComponent($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['templater.ui.thankyou.create'] = function ($app) {

@@ -19,7 +19,13 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use User;
 
-class TemplaterComponentThank extends TemplaterComponentTmpl
+/**
+ * Class ThankYouTemplaterComponent
+ * #Templater Component:
+ * * class_key = "thankyou.thank_you"
+ *
+ */
+class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 {
 	/**
 	 * @var Api
@@ -272,6 +278,6 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			'thank_you_form.visible'              => $form
 		];
 
-		return $this->CallTemplater('thankyou/thank_you.html', $args);
+		return $this->CallTemplater('thankyou/UI/thank_you_templater_component.html', $args);
 	}
 }
