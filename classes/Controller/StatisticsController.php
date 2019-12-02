@@ -29,7 +29,7 @@ class StatisticsController
 
 	public function Reports(ServerRequestInterface $request)
 	{
-		$url = $request->getRequestTarget();
+		$url = $request->getUri()->getPath();
 
 		$args = ['nav_statistics.+class' => 'active'];
 
