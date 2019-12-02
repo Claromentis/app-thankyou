@@ -30,7 +30,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 		{
 			$this->log->warning("Call to Tag Templater Component with a Tag defined");
 
-			return $this->CallTemplater('thankyou/tag_template.html', ['tag.visible' => 0]);
+			return $this->CallTemplater('thankyou/UI/tag_templater_component.html', ['tag.visible' => 0]);
 		}
 
 		if (is_numeric($tag))
@@ -44,7 +44,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 			{
 				$this->log->warning("Call to Tag Templater Component for Tag with ID '" . $id . "' which could not be found", [$exception]);
 
-				return $this->CallTemplater('thankyou/tag_template.html', ['tag.visible' => 0]);
+				return $this->CallTemplater('thankyou/UI/tag_templater_component.html', ['tag.visible' => 0]);
 			}
 		}
 
@@ -52,7 +52,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 		{
 			$this->log->warning("Call to Tag Template Component for Tag with non Tag object provided");
 
-			return $this->CallTemplater('thankyou/tag_template.html', ['tag.visible' => 0]);
+			return $this->CallTemplater('thankyou/UI/tag_templater_component.html', ['tag.visible' => 0]);
 		}
 
 		$args['tag.body'] = $tag->GetName();
@@ -64,6 +64,6 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 			$args['tag.colour'] = $bg_colour;
 		}
 
-		return $this->CallTemplater('thankyou/tag_template.html', $args);
+		return $this->CallTemplater('thankyou/UI/tag_templater_component.html', $args);
 	}
 }
