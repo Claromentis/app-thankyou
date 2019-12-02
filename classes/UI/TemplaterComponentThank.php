@@ -152,7 +152,12 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 
 		$can_edit_thank_you   = isset($id) && $can_edit && $this->api->ThankYous()->CanEditThankYou($thank_you, $context);
 		$can_delete_thank_you = isset($id) && $can_delete && $this->api->ThankYous()->CanDeleteThankYou($thank_you, $context);
-		$thank_link           = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
+
+		$thank_link = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
+		if ($thank_link)
+		{
+			$thank_you_url = '/thankyou/thanks/' . $id;
+		}
 
 		$author_id   = $thank_you->GetAuthor()->GetId();
 		$author_link = User::GetProfileUrl($author_id, true); // TODO: Replace with a non-static call when People API is available
@@ -230,7 +235,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			'id.json'                  => $id,
 			'thank_title.visible'      => !$thank_link,
 			'thank_title_link.visible' => $thank_link,
-			'thank_title_link.href'    => '/thankyou/thanks/' . $id,
+			'thank_title_link.href'    => $thank_you_url ?? null,
 
 			'thanked.datasrc' => $thanked_args,
 
@@ -245,8 +250,9 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 
 			'thank_you_comment.object_id' => $id,
 			'comments_count.body'         => $total_comments,
-			'comments_link.visible'       => $access_comments,
-			'comments_no_link.visible'    => !$access_comments && $display_comments_count,
+			'comments_link.visible'       => $display_comments_count,
+			'comments_link.href'          => $access_comments ? 'javascript:void(0)' : ($thank_you_url ?? null),
+			'comments_link.+class'        => $access_comments ? 'js-comments-reveal' : null,
 
 			'like_component.object_id' => $id,
 			'like_component.visible'   => isset($id),
