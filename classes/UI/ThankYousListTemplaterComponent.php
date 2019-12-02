@@ -7,7 +7,6 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Psr\Log\LoggerInterface;
 
@@ -46,7 +45,7 @@ use Psr\Log\LoggerInterface;
  *
  **/
 //TODO: Add AJAX callback to populate template. Add pagination supported by it.
-class ThankYousList extends TemplaterComponentTmpl
+class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 {
 	/**
 	 * @var Api $api
@@ -104,19 +103,11 @@ class ThankYousList extends TemplaterComponentTmpl
 		$thanks_links      = (bool) ($attributes['thanks_links'] ?? null);
 		$user_ids          = $attributes['user_ids'] ?? null;
 
-		$thank_yous = [];
-		try
-		{
-			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset, null, $user_ids, null);
+		$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset, null, $user_ids, null);
 
-			if ($display_comments)
-			{
-				$this->api->ThankYous()->LoadThankYousComments($thank_yous);
-			}
-
-		} catch (ThankYouOClass $exception)
+		if ($display_comments)
 		{
-			$this->log->error("Failed to display Thank Yous in Templater Component 'thankyou.list'", [$exception]);
+			$this->api->ThankYous()->LoadThankYousComments($thank_yous);
 		}
 
 		$args            = [];
@@ -156,6 +147,6 @@ class ThankYousList extends TemplaterComponentTmpl
 			$args['create.visible'] = 0;
 		}
 
-		return $this->CallTemplater('thankyou/thank_yous_list.html', $args);
+		return $this->CallTemplater('thankyou/UI/thank_yous_list_templater_component.html', $args);
 	}
 }
