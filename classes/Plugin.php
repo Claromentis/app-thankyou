@@ -248,7 +248,7 @@ class Plugin implements
 		};
 
 		$app->extend('likes.audit.applications', function ($applications) {
-			$applications[ThanksItem::AGGREGATION] = [
+			$applications[ThankYousRepository::AGGREGATION_ID] = [
 				"like_text"           => "User liked a thank you note",
 				"unlike_text"         => "User unliked a thank you note",
 				"comment_like_text"   => "User liked comment (#%d) on a thank you note",

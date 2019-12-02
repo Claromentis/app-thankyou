@@ -6,7 +6,7 @@ use Claromentis\Comments\CommentableFilterEvent;
 use Claromentis\Core\Aggregation\AggregationFilterEvent;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Comments\CommentableThankYou;
-use Claromentis\ThankYou\ThanksItem;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CommentsSubscriber implements EventSubscriberInterface
@@ -40,7 +40,7 @@ class CommentsSubscriber implements EventSubscriberInterface
 	public function RegisterAggregation(AggregationFilterEvent $event)
 	{
 		$event->GetConfig()->AddAggregation(
-			ThanksItem::AGGREGATION,
+			ThankYousRepository::AGGREGATION_ID,
 			'thanks',
 			($this->lmsg)('thankyou.common.thank_you_message'),
 			($this->lmsg)('thankyou.common.thank_you_messages')
@@ -55,6 +55,6 @@ class CommentsSubscriber implements EventSubscriberInterface
 	public function RegisterCommentableObjects(CommentableFilterEvent $event)
 	{
 		$factory = $event->GetFactory();
-		$factory->AddCommentableInterface(ThanksItem::AGGREGATION, CommentableThankYou::class);
+		$factory->AddCommentableInterface(ThankYousRepository::AGGREGATION_ID, CommentableThankYou::class);
 	}
 }

@@ -16,7 +16,6 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Thankable;
-use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
@@ -27,6 +26,7 @@ use User;
 
 class ThankYousRepository
 {
+	const AGGREGATION_ID = 143;
 	const THANKABLES = [PermOClass::INDIVIDUAL, PermOClass::GROUP];
 
 	const TAG_TABLE = 'thankyou_tag';
@@ -335,7 +335,7 @@ class ThankYousRepository
 		$query_string .= " GROUP BY " . self::TAG_TABLE . ".id";
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
-		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . ThanksItem::AGGREGATION);
+		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . self::AGGREGATION_ID);
 
 		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
 
@@ -565,7 +565,7 @@ class ThankYousRepository
 		$query_string = "SELECT COUNT(DISTINCT " . self::TAG_TABLE . ".id) FROM " . self::TAG_TABLE;
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
-		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . ThanksItem::AGGREGATION);
+		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . self::AGGREGATION_ID);
 
 		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
 
@@ -882,12 +882,12 @@ class ThankYousRepository
 
 	private function QueryJoinThankYouToTagged(QueryBuilder $query)
 	{
-		$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id AND aggregation_id = " . ThanksItem::AGGREGATION);
+		$query->AddJoin(self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANK_YOU_TAGS_TABLE . ".item_id AND aggregation_id = " . self::AGGREGATION_ID);
 	}
 
 	private function QueryJoinThankedUsersToTagged(QueryBuilder $query)
 	{
-		$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TAGS_TABLE . ".item_id AND aggregation_id = " . ThanksItem::AGGREGATION);
+		$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TAGS_TABLE . ".item_id AND aggregation_id = " . self::AGGREGATION_ID);
 	}
 
 	/**

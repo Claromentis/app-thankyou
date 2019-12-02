@@ -14,7 +14,6 @@ use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments;
-use Claromentis\ThankYou\Constants;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
@@ -24,7 +23,6 @@ use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
-use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
@@ -223,7 +221,7 @@ class ThankYous
 
 		$ids = array_keys($ids);
 
-		$taggeds_tags = $this->tag_api->GetTaggedsTags($ids, ThanksItem::AGGREGATION);
+		$taggeds_tags = $this->tag_api->GetTaggedsTags($ids, ThankYousRepository::AGGREGATION_ID);
 
 		foreach ($thank_yous as $thank_you)
 		{
@@ -353,7 +351,7 @@ class ThankYous
 				continue;
 			}
 
-			$thank_yous_likes[$id] = (int) $this->likes_repository->GetCount(ThanksItem::AGGREGATION, $id);
+			$thank_yous_likes[$id] = (int) $this->likes_repository->GetCount(ThankYousRepository::AGGREGATION_ID, $id);
 		}
 
 		return $thank_yous_likes;
@@ -600,8 +598,8 @@ class ThankYous
 		$tags = $thank_you->GetTags();
 		if (isset($tags))
 		{
-			$this->tag_api->RemoveAllTaggedTags($id, ThanksItem::AGGREGATION);
-			$this->tag_api->AddTaggedTags($id, ThanksItem::AGGREGATION, $tags);
+			$this->tag_api->RemoveAllTaggedTags($id, ThankYousRepository::AGGREGATION_ID);
+			$this->tag_api->AddTaggedTags($id, ThankYousRepository::AGGREGATION_ID, $tags);
 		}
 
 		if ($new)
@@ -628,7 +626,7 @@ class ThankYous
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
 
-		$this->tag_api->RemoveAllTaggedTags($id, ThanksItem::AGGREGATION);
+		$this->tag_api->RemoveAllTaggedTags($id, ThankYousRepository::AGGREGATION_ID);
 		$this->thank_yous_repository->Delete($id);
 
 		$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_delete', $id, $thank_you->GetDescription());

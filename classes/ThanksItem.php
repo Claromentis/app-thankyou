@@ -8,6 +8,7 @@ use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Exception;
 use InvalidArgumentException;
 use LogicException;
@@ -23,10 +24,6 @@ use ObjectsStorage;
  */
 class ThanksItem extends ActiveRecord implements ClaAggregation
 {
-	//TODO: add constructor so that the object can only exist fully instantiated
-
-	const AGGREGATION = 143;
-
 	protected $users_ids;
 
 	private $thanked;
@@ -253,7 +250,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 	 */
 	public function SetUsers($users_ids)
 	{
-		//TODO: Validate Users
 		if (!is_array($users_ids))
 		{
 			$users_ids = [$users_ids];
@@ -279,7 +275,7 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 	 */
 	public function GetAggregation(): int
 	{
-		return self::AGGREGATION;
+		return ThankYousRepository::AGGREGATION_ID;
 	}
 
 	/**
@@ -287,7 +283,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 	 */
 	public function GetUrl()
 	{
-		//TODO Add a URL if one ever exists...
 		return '';
 	}
 }
