@@ -445,7 +445,7 @@ class Plugin implements
 				$args['ty_list.comments'] = true;
 				$args['ty_list.create']   = [$create];
 
-				$thank_you_list = $this->CallTemplater('thankyou/pages_component.html', $args);
+				$thank_you_list = $this->CallTemplater('thankyou/UI/pages_component.html', $args);
 
 				return '<div id="thanks">' . $thank_you_list . '</div>';
 		}
