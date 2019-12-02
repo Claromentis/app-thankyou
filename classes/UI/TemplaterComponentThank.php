@@ -72,6 +72,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 	 * * comments:
 	 *     * 0 = Comments will not be accessible.(default)
 	 *     * 1 = Comments will be accessible.
+	 *     * 2 = Comments will be accessible and start displayed.
 	 * * delete:
 	 *     * 0 = Deleting the Thank You is disabled.(default)
 	 *     * 1 = Deleting the Thank You is enabled (subject to permissions).
@@ -138,6 +139,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 
 		$display_comments_count = (bool) $this->config->Get('thank_you_comments') && isset($id);
 		$access_comments        = $display_comments_count && (bool) ($attributes['comments'] ?? null);
+		$display_comments       = ($access_comments && (int) $attributes['comments'] === 2);
 
 		$total_comments = 0;
 		if ($display_comments_count)
@@ -253,6 +255,7 @@ class TemplaterComponentThank extends TemplaterComponentTmpl
 			'comments_link.visible'       => $display_comments_count,
 			'comments_link.href'          => $access_comments ? 'javascript:void(0)' : ($thank_you_url ?? null),
 			'comments_link.+class'        => $access_comments ? 'js-comments-reveal' : null,
+			'comment_list.style'          => $display_comments ? '' : 'display:none;',
 
 			'like_component.object_id' => $id,
 			'like_component.visible'   => isset($id),
