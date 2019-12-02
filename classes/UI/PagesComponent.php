@@ -119,7 +119,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			$args['ty_list.user_ids'] = $user_ids;
 		}
 
-		return $this->CallTemplater('thankyou/pages_component.html', $args);
+		return $this->CallTemplater('thankyou/UI/pages_component.html', $args);
 	}
 
 	/**
@@ -153,7 +153,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			$args['default_title.visible'] = 0;
 		}
 
-		$template = 'thankyou/pages_component_header.html';
+		$template = 'thankyou/UI/pages_component_header.html';
 
 		return $this->CallTemplater($template, $args);
 	}
