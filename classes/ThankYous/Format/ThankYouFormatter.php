@@ -133,27 +133,18 @@ class ThankYouFormatter
 	}
 
 	/**
-	 * @param Thankable|Thankable[] $thankables
+	 * @param Thankable[] $thankables
 	 * @param SecurityContext|null  $security_context
 	 * @return array
 	 */
-	public function ConvertThankablesToArrays($thankables, ?SecurityContext $security_context = null): array
+	public function ConvertThankablesToArrays(array $thankables, ?SecurityContext $security_context = null): array
 	{
-		$array_return = true;
-		if (!is_array($thankables))
-		{
-			$array_return = false;
-			$thankables   = [$thankables];
-		}
-
 		$thankables_array = [];
 		foreach ($thankables as $thankable)
 		{
 			$thankables_array[] = $this->ConvertThankableToArray($thankable, $security_context);
 		}
-
-//TODO: Tighten inputs and outputs
-		return $array_return ? $thankables_array : $thankables_array[0];
+		return $thankables_array;
 	}
 
 	/**

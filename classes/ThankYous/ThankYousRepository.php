@@ -15,7 +15,6 @@ use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Exception\ThankYouRepository;
-use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\Thankable;
 use Claromentis\ThankYou\ThanksItem;
 use Claromentis\ThankYou\ThanksItemFactory;
@@ -97,7 +96,6 @@ class ThankYousRepository
 		$this->tags                = $tag_api;
 		$this->thankable_factory   = $thankable_factory;
 	}
-	//TODO: Isolating the Tag getting code to the Tag repo.
 
 	/**
 	 * Given an array of IDs from the table thankyou_item, returns (ThankYou)s in the same order.
@@ -108,7 +106,6 @@ class ThankYousRepository
 	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
 	public function GetThankYous(array $ids)
-		//TODO: Refactor this function as it can be much simpler now.
 	{
 		if (count($ids) === 0)
 		{
@@ -123,80 +120,42 @@ class ThankYousRepository
 			}
 		}
 
-		$columns = ['thankyou_item.id', 'thankyou_item.author AS author_id', 'thankyou_item.date_created', 'thankyou_item.description'];
+		$query_string = "SELECT * FROM " . self::THANK_YOU_TABLE;
 
-		$query = "SELECT ";
+		$query = $this->query_factory->GetQueryBuilder($query_string);
 
-		$first_column = true;
-		foreach ($columns as $column)
-		{
-			if ($first_column)
-			{
-				$query        .= $column;
-				$first_column = false;
-			} else
-			{
-				$query .= ", " . $column;
-			}
-		}
+		$query->AddWhereAndClause("id IN in:int:ids", $ids);
 
-		$query .= " FROM thankyou_item";
+		$result = $this->db->query($query->GetQuery());
 
-		$query .= " WHERE thankyou_item.id IN in:int:ids";
-
-		$result = $this->db->query($query, $ids);
-
-		$thankyou_items = [];
-		$tags           = [];
-		$user_ids       = [];
+		$rows     = [];
+		$user_ids = [];
 		while ($row = $result->fetchArray())
 		{
 			$id           = (int) $row['id'];
-			$author_id    = (int) $row['author_id'];
+			$author_id    = (int) $row['author'];
 			$date_created = (string) $row['date_created'];
 
+			$rows[$id] = ['author_id' => $author_id, 'date_created' => $date_created, 'description' => $row['description']];
+
 			$user_ids[$author_id] = true;
-
-			if (!isset($thankyou_items[$id]))
-			{
-				$thankyou_items[$id] = ['author_id' => $author_id, 'date_created' => $date_created, 'description' => $row['description']];
-			}
-
-			if (isset($row['thanked_user_id']))
-			{
-				$thanked_user_id = (int) $row['thanked_user_id'];
-
-				if (!isset($thankyou_items[$id]['thanked_users'][$thanked_user_id]))
-				{
-					$thankyou_items[$id]['thanked_users'][$thanked_user_id] = true;
-				}
-
-				$user_ids[$thanked_user_id] = true;
-			}
-
-			if (isset($row['tag_id']))
-			{
-				$tag_id = (int) $row['tag_id'];
-
-				$thankyou_items[$id]['tags'][$tag_id] = true;
-
-				$tags[$tag_id] = true;
-			}
 		}
 
-		$users = $this->GetUsers(array_keys($user_ids));
+		$user_ids = array_keys($user_ids);
+
+		$users = $this->GetUsers($user_ids);
 
 		$thank_yous = [];
 		foreach ($ids as $id)
 		{
-			if (!isset($thankyou_items[$id]))
+			if (!isset($rows[$id]))
 			{
 				throw new ThankYouNotFound("Failed to Get Thanks Yous, Thank You with ID '" . $id . "' could not be found'");
 			}
 
 			try
 			{
-				$thank_you = $this->Create($users[$thankyou_items[$id]['author_id']], (string) $thankyou_items[$id]['description'], new Date($thankyou_items[$id]['date_created'], new DateTimeZone('UTC')));
+				$thank_you = $this->Create($users[$rows[$id]['author_id']], $rows[$id]['description'], new Date($rows[$id]['date_created'], new DateTimeZone('UTC')));
 			} catch (ThankYouAuthor $exception)
 			{
 				throw new LogicException("Unexpected Runtime Exception thrown when creating a ThankYou", null, $exception);
@@ -827,14 +786,16 @@ class ThankYousRepository
 
 			try
 			{
-				$user_image_url = User::GetPhotoUrl($user->GetId());//TODO: Replace with a non-static post People API update
+				//TODO: Replace with a non-static post People API update
+				$user_image_url = User::GetPhotoUrl($user->GetId());
 			} catch (CDNSystemException $cdn_system_exception)
 			{
 				$this->logger->error("Failed to Get User's Photo URL when Creating Thankable: " . $cdn_system_exception->getMessage());
 				$user_image_url = null;
 			}
 
-			$user_profile_url = User::GetProfileUrl($user->GetId(), false);//TODO: Replace with a non-static post People API update
+			//TODO: Replace with a non-static post People API update
+			$user_profile_url = User::GetProfileUrl($user->GetId(), false);
 
 			$users[$user_offset] = $this->thankable_factory->Create($user->GetFullname(), $user->GetId(), $owner_class_id, $user->GetExAreaId(), $user_image_url, $user_profile_url);
 		}
@@ -867,7 +828,6 @@ class ThankYousRepository
 	 * @throws ThankYouRepository - On failure to save to database.
 	 */
 	public function Save(ThankYou $thank_you)
-		//TODO : Rename to Save
 	{
 		$thanks_item = $this->thanks_item_factory->Create();
 

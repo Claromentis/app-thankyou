@@ -3,7 +3,6 @@
 namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
-use Claromentis\ThankYou\Exception\ThankYouException;
 use Date;
 use InvalidArgumentException;
 use User;

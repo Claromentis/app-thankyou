@@ -66,7 +66,7 @@ class TagFormatter
 			$modified_by_name = $modified_by->GetFullname();
 		}
 
-		$formatted_tag = [
+		return [
 			'id'            => $tag->GetId(),
 			'active'        => $tag->GetActive(),
 			'name'          => $tag->GetName(),
@@ -76,7 +76,5 @@ class TagFormatter
 			'modified_date' => $modified_date,
 			'bg_colour'     => $tag->GetBackgroundColour()
 		];
-
-		return $formatted_tag;
 	}
 }

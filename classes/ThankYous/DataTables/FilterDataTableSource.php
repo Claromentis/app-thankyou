@@ -62,12 +62,10 @@ abstract class FilterDataTableSource implements DataSource
 			$tags = [(int) $tag];
 		}
 
-		$formatted_filters = [
+		return [
 			'date_range'       => $date_range,
 			'thanked_user_ids' => $user_ids,
 			'tags'             => $tags
 		];
-
-		return $formatted_filters;
 	}
 }

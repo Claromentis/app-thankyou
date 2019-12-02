@@ -117,7 +117,8 @@ class ThanksController
 
 		if (!isset($id))
 		{
-			require_once('paging.php'); //TODO: not this...
+			//TODO: Replace pagination with better tool once it exists.
+			require_once('paging.php');
 
 			$limit = 20;
 
