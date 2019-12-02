@@ -11,6 +11,7 @@ use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Api\ThankYous;
+use ClaText;
 
 /**
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
@@ -148,7 +149,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		if ($options->Get('title') !== '')
 		{
-			$args['custom_title.body']     = $options->Get('title');
+			$args['custom_title.body']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
 			$args['custom_title.visible']  = 1;
 			$args['default_title.visible'] = 0;
 		}
@@ -208,7 +209,8 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			'title'       => ($this->lmsg)('thankyou.component.cover_info.title'),
 			'description' => ($this->lmsg)('thankyou.component.cover_info.desc'),
 			'application' => 'thankyou',
-			'icon_class'  => 'glyphicons glyphicons-donate'
+			'icon_class'  => 'glyphicons glyphicons-donate',
+			'categories'  => ['people']
 		];
 	}
 

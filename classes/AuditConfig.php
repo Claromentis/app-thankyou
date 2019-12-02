@@ -3,10 +3,11 @@
 namespace Claromentis\ThankYou;
 
 use Claromentis\Core\Audit\ApplicationAuditConfig;
+use Claromentis\Core\Audit\ApplicationAuditUrlConfig;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 
-class AuditConfig implements ApplicationAuditConfig
+class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 {
 	/**
 	 * @var Api\Tag $tag_api
@@ -43,7 +44,7 @@ class AuditConfig implements ApplicationAuditConfig
 	 */
 	public function GetAuditEvents(): array
 	{
-		return array_merge($this->GetThankYouAuditEvents(), $this->GetTagAuditEvents());
+		return array_merge($this->GetThankYouAuditEvents(), $this->GetTagAuditEvents(), $this->GetLikeAuditEvents());
 	}
 
 	/**
@@ -69,6 +70,29 @@ class AuditConfig implements ApplicationAuditConfig
 		{
 			return '';
 		}
+	}
+
+	/**
+	 * Returns link to an object by its id and event code
+	 *
+	 * @param string $event_code
+	 * @param int    $object_id
+	 *
+	 * @return string
+	 */
+	public function GetAuditObjectUrl($event_code, $object_id)
+	{
+		return '';
+	}
+
+	private function GetLikeAuditEvents(): array
+	{
+		return [
+			"like" => "Like a thank you note",
+			"unlike" => "Unlike a thank you note",
+			"comment_like" => "Like a comment",
+			"comment_unlike" => "Unlike a comment",
+		];
 	}
 
 	/**

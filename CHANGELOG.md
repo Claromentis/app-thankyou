@@ -1,5 +1,16 @@
-# Change Log #
+#Change Log
 
+## Version 3.3.2 - 27th November 2019 ##
+* CORE-1036 Added Hungarian translation
+
+## Version 3.3.1 - 29th October 2019
+* Added Uzbek translation
+
+## Version 3.3.0 - 18th October 2019
+* Core dependency updated **>=8.6**
+### Improvements
+* !37 CORE-973 Added Component `Thank You` to Category `People, Communication & Social`.
+* !37 CORE-974 Added Localized Titles to the `Thank You` Component.
 ## 3.2.4
 * Added Russian translations and twig template
 

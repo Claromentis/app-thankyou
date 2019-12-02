@@ -246,6 +246,21 @@ class Plugin implements
 				$app[TagFormatter::class]
 			);
 		};
+
+		$app->extend('likes.audit.applications', function ($applications) {
+			$applications[ThanksItem::AGGREGATION] = [
+				"like_text"           => "User liked a thank you note",
+				"unlike_text"         => "User unliked a thank you note",
+				"comment_like_text"   => "User liked comment (#%d) on a thank you note",
+				"comment_unlike_text" => "User unliked comment (#%d) on a thank you note",
+
+				"application" => "thankyou",
+			];
+
+			return $applications;
+		});
+
+		$app['audit.application.thankyou'] = AuditConfig::class;
 	}
 
 	/**

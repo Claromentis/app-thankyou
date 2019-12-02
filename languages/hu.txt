@@ -1,0 +1,53 @@
+.	.	.	hu
+lm	thankyou.admin.panel.export		Exportálás
+lm	thankyou.admin.panel.messages		Üzenetek
+lm	thankyou.admin.panel.notifications		Értesítések
+lm	thankyou.app_name		Köszönjük!
+lm	thankyou.common.thank_you_message		Köszönőüzenet
+lm	thankyou.common.thank_you_messages		Köszönőüzenet
+lm	thankyou.common.thanks_deleted		Köszönjük, az üzenetet sikeresen törölte
+lm	thankyou.communication.imessages		Köszönjük!
+lm	thankyou.component.cover_info.desc		Lehetővé teszi a felhasználóknak, hogy megjelöljenek valakit, és nyilvánosan köszönetet mondjanak Megjeleníti a legutóbbi köszönetek listáját
+lm	thankyou.component.cover_info.title		Köszönjük!
+lm	thankyou.component.no_thanks_all		Még senki sem kapott köszönetet
+lm	thankyou.component.no_thanks_user		%s még nem kapott köszönetet
+lm	thankyou.component.options.custom_title		Cím
+lm	thankyou.component.options.num_items		Megjelenítendő elemek száma
+lm	thankyou.component.options.profile_images		Profilképek megjelenítése
+lm	thankyou.component.options.show_button		Mutassa a „Köszönet” gombot
+lm	thankyou.component.options.show_header		Cím megjelenítése
+lm	thankyou.component.options.user_id		Szűrés felhasználó szerint
+lm	thankyou.component_heading		Köszönjük!
+lm	thankyou.error.no_edit_permission		Nincs jogosultsága a köszönőüzenet módosításához
+lm	thankyou.error.thanks_not_found		A köszönőüzenet nem létezik
+lm	thankyou.grammar.list.and		és
+lm	thankyou.notifications.saved		Beállítások elmentve
+lm	thankyou.user_profile.tab_name		Köszönjük
+lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
+lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
+lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
+lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:export:end_date.body		Az adott dátumig
+lt	thankyou:admin:export:start_date.body		Ettől
+lt	thankyou:admin:export_csv.body		Exportálás *.csv fájlba
+lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
+lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
+lt	thankyou:admin:menu:messages.body	$lm['thankyou.admin.panel.messages']	
+lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:messages_heading.body		Köszönőüzenetek
+lt	thankyou:admin:messages_help.body		Kezelje a felhasználók által közölt köszönőüzeneteket. Felhívjuk figyelmét, hogy az itt elvégzett módosítások megjelennek a Köszönet elemben és az egyes felhasználók profiljában.
+lt	thankyou:admin:notifications:notify_line_manager.body		Ezenkívül értesítse a személy felettesét, akinek az üzenetet küldi
+lt	thankyou:admin:notifications:save.body		Mentés
+lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
+lt	thankyou:admin:notifications_help.body		A felhasználókat köszönőüzenet érkezésekor értesíti.
+lt	thankyou:component:delete.body		Törlés
+lt	thankyou:component:delete_confirm.body		Biztosan törölni szeretné ezt a köszönőüzenetet?
+lt	thankyou:component:delete_thank_you.body		Köszönöm törlése
+lt	thankyou:component:edit.body		Szerkesztés
+lt	thankyou:component:modal:close.body		Bezárás
+lt	thankyou:component:modal:comment.body		Hozzászólás
+lt	thankyou:component:modal:submit.body		Elküldés
+lt	thankyou:component:modal:to.body		Címzett
+lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
+lt	thankyou:component:say_thank_you.body		Köszönet
+lt	thankyou:component:thankyou_users_name.body		Köszönjük!
