@@ -11,6 +11,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\ThankYous\DataTables\ThankYou\DescriptionDecorator;
 use DateClaTimeZone;
 use Psr\Log\LoggerInterface;
 
@@ -49,7 +50,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$columns[] = ['tags', ($this->lmsg)('thankyou.common.tags')];
 		}
 
-		$columns[] = ['description', ($this->lmsg)('thankyou.common.comment')];
+		$columns[] = ['description', ($this->lmsg)('thankyou.common.comment'), new DescriptionDecorator()];
 		$columns[] = ['likes_count', ($this->lmsg)('common.likes')];
 
 		if ($this->config->Get('thank_you_comments') === true)
@@ -134,7 +135,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 				$row['tags'] = $tags;
 			}
 
-			$row['description'] = $thank_you->GetDescription();
+			$row['description'] = ['description' => $thank_you->GetDescription(), 'thank_you_url' => $this->api->GetThankYouUrl($thank_you)];
 			$row['likes_count'] = $likes_counts[$id] ?? 0;
 
 			if ($this->config->Get('thank_you_comments') === true)
