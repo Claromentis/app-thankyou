@@ -2,9 +2,7 @@
 namespace Claromentis\ThankYou;
 
 use Claromentis\Core\DAL;
-use Date;
 use Exception;
-use ObjectsStorage;
 
 /**
  * A repository for thank you items.
@@ -49,49 +47,6 @@ class ThanksRepository
 	}
 
 	/**
-	 * Gets the most recent thank you items.
-	 *
-	 * @param int $limit
-	 * @param int $offset
-	 *
-	 * @return ThanksItem[]
-	 * @throws Exception
-	 */
-	public function GetRecent($limit, $offset = 0)
-	{
-		/** @var ThanksItem[] $items */
-		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), '', 'date_created DESC', $limit, $offset);
-		$this->PopulateUsers($items);
-		return $items;
-	}
-
-	/**
-	 * Gets thank you items between a given date range.
-	 *
-	 * If an end date is not provided, the current date is used in its place.
-	 *
-	 * @param Date $start_date
-	 * @param Date $end_date [optional]
-	 * @return ThanksItem[]
-	 * @throws Exception
-	 */
-	public function GetByDate(Date $start_date, Date $end_date = null)
-	{
-		$end_date = $end_date ?: new Date();
-
-		$filter = new DAL\QueryPart('date_created >= int:start_date AND date_created <= int:end_date', $start_date->getDate(), $end_date->getDate());
-
-		/**
-		 * @var ThanksItem[] $items
-		 */
-		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), $filter, 'date_created DESC');
-
-		$this->PopulateUsers($items);
-
-		return $items;
-	}
-
-	/**
 	 * Loads thanked users into the given thanks items.
 	 *
 	 * @param ThanksItem[] $items
@@ -120,28 +75,5 @@ class ThanksRepository
 			else
 				$item->SetUsers([]); // this is actually an error state as at least one user should be thanked
 		}
-	}
-
-	/**
-	 * Get thanks for a given user.
-	 *
-	 * @param int $user_id
-	 * @param int $limit
-	 *
-	 * @return ThanksItem[]
-	 * @throws Exception
-	 */
-	public function GetForUser($user_id, $limit)
-	{
-		/** @var ThanksItem[] $items */
-		$items = ObjectsStorage::I()->GetMultipleExt(new ThanksItem(), function (DAL\QueryBuilder $qb, $table_name) use ($user_id, $limit) {
-			$qb->AddJoin($table_name, 'thankyou_user', 'tu', "tu.thanks_id={$table_name}.id");
-			$qb->AddWhereAndClause(new DAL\QueryPart("tu.user_id=int:id", $user_id));
-			$qb->SetLimit($limit);
-		}, 'date_created DESC');
-
-		$this->PopulateUsers($items);
-
-		return $items;
 	}
 }
