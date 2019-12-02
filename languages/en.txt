@@ -14,7 +14,7 @@ lm	thankyou.common.select_core_values		Select Core Values
 lm	thankyou.common.tags		Core Values
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
-lm	thankyou.common.thank_yous		Thank Yous
+lm	thankyou.common.thank_yous		Thank You notes
 lm	thankyou.common.thanked_groups		Thanked Groups
 lm	thankyou.common.thanks_deleted		Thank you message successfully deleted
 lm	thankyou.common.total_thanked_users		Total Thanked Users
@@ -65,6 +65,7 @@ lm	thankyou.tag.name		Core Value
 lm	thankyou.tag.total_uses		Number of times selected
 lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
+lm	thankyou.thankable.not_found		Thankable not found
 lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to: 
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
 lm	thankyou.thankyou.core_values.empty		One or more Core Values must be selected

@@ -65,6 +65,7 @@ lm	thankyou.tag.name
 lm	thankyou.tag.total_uses		
 lm	thankyou.thank.placeholder		
 lm	thankyou.thankable.error.unsuitable_owner_classes		
+lm	thankyou.thankable.not_found		
 lm	thankyou.thankable.owner_class.error.not_supported		
 lm	thankyou.thanks_list.no_thanks		
 lm	thankyou.thankyou.core_values.empty		
