@@ -3,8 +3,11 @@ namespace Claromentis\ThankYou;
 
 use AuthUser;
 use Claromentis\ThankYou\Api\ThankYous;
+use Exception;
+use LogicException;
 use NotificationMessage;
 use User;
+use UsersHierarchy;
 
 class LineManagerNotifier
 {
@@ -22,7 +25,7 @@ class LineManagerNotifier
 		$line_managers = [];
 
 		foreach ($user_ids as $user_id) {
-			if ($manager = \UsersHierarchy::GetManager($user_id)) {
+			if ($manager = UsersHierarchy::GetManager($user_id)) {
 				$user = new User($user_id);
 				$user->Load();
 
@@ -47,7 +50,13 @@ class LineManagerNotifier
 				$params['recipients'] = $all_except_last_recipient_csv . ' ' . lmsg('thankyou.grammar.list.and') . ' ' . $last_recipient;
 			}
 
-			NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], ThankYous::IM_TYPE_THANKYOU, null, $author_id);
+			try
+			{
+				NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], ThankYous::IM_TYPE_THANKYOU, null, $author_id);
+			} catch (Exception $exception)
+			{
+				throw new LogicException("Unexpected Exception thrown in NotificationMessage::Send", null, $exception);
+			}
 		}
 	}
 }
