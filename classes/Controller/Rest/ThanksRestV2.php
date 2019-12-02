@@ -137,7 +137,6 @@ class ThanksRestV2
 	 * @param ServerRequestInterface $request
 	 * @param SecurityContext        $security_context
 	 * @return JsonPrettyResponse
-	 * @throws RestExError - If the Thank You could not be created.
 	 */
 	public function GetThankYous(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
 	{
@@ -148,13 +147,8 @@ class ThanksRestV2
 		$get_users    = (bool) (int) ($query_params['users'] ?? null);
 		$get_tags     = (bool) (int) ($query_params['tags'] ?? null);
 
-		try
-		{
-			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($security_context, $get_thanked, $get_users, $get_tags, $limit, $offset);
-		} catch (ThankYouOClass $exception)
-		{
-			throw new RestExError(($this->lmsg)('thankyou.thankyou.error.server'), "Internal Server Error", $exception);
-		}
+		$thank_yous = $this->api->ThankYous()->GetRecentThankYous($security_context, $get_thanked, $get_users, $get_tags, $limit, $offset);
+
 		$display_thank_yous = $this->thank_you_formatter->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
 		return $this->response->GetJsonPrettyResponse($display_thank_yous);
@@ -271,7 +265,13 @@ class ThanksRestV2
 				$thank_you->SetTags($tags);
 			}
 			$this->api->ThankYous()->PopulateThankYouUsersFromThankables($thank_you);
-			$this->api->ThankYous()->Save($thank_you);
+			try
+			{
+				$this->api->ThankYous()->Save($thank_you);
+			} catch (TagNotFound $exception)
+			{
+				throw new LogicException("Unexpected TagNotFound Exception thrown when saving Thank You's Tags, Tags have already been pulled from the Repository!", null, $exception);
+			}
 			$this->api->ThankYous()->Notify($thank_you);
 		} catch (ThankYouNotFound $exception)
 		{
@@ -438,7 +438,13 @@ class ThanksRestV2
 				], 400);
 			}
 
-			$this->api->ThankYous()->Save($thank_you);
+			try
+			{
+				$this->api->ThankYous()->Save($thank_you);
+			} catch (TagNotFound $exception)
+			{
+				throw new LogicException("Unexpected TagNotFound Exception thrown when saving Thank You's Tags, Tags have already been pulled from the Repository!", null, $exception);
+			}
 		} catch (ThankYouNotFound $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([

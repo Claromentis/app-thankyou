@@ -225,7 +225,7 @@ class Tag
 	 * @param int                            $aggregation_id
 	 * @param \Claromentis\ThankYou\Tags\Tag $tag
 	 * @return int
-	 * @throws TagNotFound
+	 * @throws TagNotFound If the Tag could not be found in the Repository.
 	 */
 	public function AddTaggedTag(int $tagged_id, int $aggregation_id, \Claromentis\ThankYou\Tags\Tag $tag)
 	{
@@ -247,7 +247,7 @@ class Tag
 	 * @param int                              $aggregation_id
 	 * @param \Claromentis\ThankYou\Tags\Tag[] $tags
 	 * @return int[]
-	 * @throws TagNotFound
+	 * @throws TagNotFound If one or more of the Tags could not be found in the Repository.
 	 */
 	public function AddTaggedTags(int $tagged_id, int $aggregation_id, array $tags)
 	{

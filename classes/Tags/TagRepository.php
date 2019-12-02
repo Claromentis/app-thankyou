@@ -302,7 +302,7 @@ class TagRepository
 	 * @param int      $tag_id
 	 * @param int|null $id
 	 * @return int
-	 * @throws TagNotFound
+	 * @throws TagNotFound If the Tag with the given ID could not be found.
 	 */
 	public function SaveTaggedTag(int $tagged_id, int $aggregation_id, int $tag_id, ?int $id = null)
 	{

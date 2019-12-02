@@ -15,7 +15,6 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\ThanksItem;
 use LogicException;
 use Psr\Log\LoggerInterface;
