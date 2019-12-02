@@ -184,7 +184,7 @@ class Plugin implements
 		};
 
 		$app['audit.application.thankyou'] = function ($app) {
-			return new AuditConfig($app[Lmsg::class], $app[Tag::class]);
+			return new AuditConfig($app[Lmsg::class], $app[Tag::class], $app[ThankYous::class]);
 		};
 
 		$app[ThanksController::class] = function ($app) {

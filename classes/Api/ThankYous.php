@@ -533,6 +533,15 @@ class ThankYous
 			throw new InvalidArgumentException("Failed to Get Thank You's URL, Thank You's ID is unknown");
 		}
 
+		return $this->GetThankYouUrlById($id);
+	}
+
+	/**
+	 * @param int $id
+	 * @return string
+	 */
+	public function GetThankYouUrlById(int $id)
+	{
 		return $this->utility->GetThankYouUrl($id);
 	}
 

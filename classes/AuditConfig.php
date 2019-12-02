@@ -15,6 +15,11 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	private $tag_api;
 
 	/**
+	 * @var Api\ThankYous $thank_you_api
+	 */
+	private $thank_you_api;
+
+	/**
 	 * @var Lmsg $lmsg
 	 */
 	private $lmsg;
@@ -22,13 +27,15 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	/**
 	 * AuditConfig constructor.
 	 *
-	 * @param Lmsg    $lmsg
-	 * @param Api\Tag $tag_api
+	 * @param Lmsg          $lmsg
+	 * @param Api\Tag       $tag_api
+	 * @param Api\ThankYous $thank_you_api
 	 */
-	public function __construct(Lmsg $lmsg, Api\Tag $tag_api)
+	public function __construct(Lmsg $lmsg, Api\Tag $tag_api, Api\ThankYous $thank_you_api)
 	{
-		$this->tag_api = $tag_api;
-		$this->lmsg    = $lmsg;
+		$this->tag_api       = $tag_api;
+		$this->thank_you_api = $thank_you_api;
+		$this->lmsg          = $lmsg;
 	}
 
 	/**
@@ -44,7 +51,7 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	 */
 	public function GetAuditEvents(): array
 	{
-		return array_merge($this->GetThankYouAuditEvents(), $this->GetTagAuditEvents(), $this->GetLikeAuditEvents());
+		return array_merge($this->GetThankYouAuditEvents(), $this->GetTagAuditEvents());
 	}
 
 	/**
@@ -73,26 +80,17 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	}
 
 	/**
-	 * Returns link to an object by its id and event code
-	 *
-	 * @param string $event_code
-	 * @param int    $object_id
-	 *
-	 * @return string
+	 * @inheritDoc
 	 */
 	public function GetAuditObjectUrl($event_code, $object_id)
 	{
-		return '';
-	}
-
-	private function GetLikeAuditEvents(): array
-	{
-		return [
-			"like" => "Like a thank you note",
-			"unlike" => "Unlike a thank you note",
-			"comment_like" => "Like a comment",
-			"comment_unlike" => "Unlike a comment",
-		];
+		if (isset($this->GetThankYouAuditEvents()[$event_code]))
+		{
+			return $this->thank_you_api->GetThankYouUrlById($object_id);
+		} else
+		{
+			return '';
+		}
 	}
 
 	/**
@@ -119,7 +117,11 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 		return [
 			'thank_you_create' => ($this->lmsg)('thankyou.audit.create_thank_you'),
 			'thank_you_edit'   => ($this->lmsg)('thankyou.audit.edit_thank_you'),
-			'thank_you_delete' => ($this->lmsg)('thankyou.audit.delete_thank_you')
+			'thank_you_delete' => ($this->lmsg)('thankyou.audit.delete_thank_you'),
+			'like'             => "Like a thank you note",
+			'unlike'           => "Unlike a thank you note",
+			'comment_like'     => "Like a comment",
+			'comment_unlike'   => "Unlike a comment"
 		];
 	}
 }
