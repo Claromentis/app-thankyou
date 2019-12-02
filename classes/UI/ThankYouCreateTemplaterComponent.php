@@ -62,6 +62,6 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 			}
 		}
 
-		return $this->CallTemplater('thankyou/thankyou.create.html', $args);
+		return $this->CallTemplater('thankyou/UI/thank_you_create_templater_component.html', $args);
 	}
 }
