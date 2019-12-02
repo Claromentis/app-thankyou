@@ -71,7 +71,6 @@ class ThankYouUtility
 	 * @return string
 	 */
 	public function BuildOrderString(array $orders): string
-		//TODO: Use this function in Thank You and Tag Repo!
 	{
 		if (count($orders) === 0)
 		{

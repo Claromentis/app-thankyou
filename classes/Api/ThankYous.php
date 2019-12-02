@@ -40,6 +40,8 @@ use User;
 
 class ThankYous
 {
+	const IM_TYPE_THANKYOU = 0x1A0;
+
 	private $acl;
 
 	private $acl_repository;
@@ -769,7 +771,7 @@ class ThankYous
 				'other_people_number' => count($all_users_ids) - 1,
 				'description'         => $description
 			];
-			NotificationMessage::Send('thankyou.new_thanks', $params, $all_users_ids, Constants::IM_TYPE_THANKYOU);
+			NotificationMessage::Send('thankyou.new_thanks', $params, $all_users_ids, self::IM_TYPE_THANKYOU);
 
 			if ($this->config->Get('notify_line_manager'))
 			{

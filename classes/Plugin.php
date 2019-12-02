@@ -341,7 +341,7 @@ class Plugin implements
 			self::APPLICATION_NAME,
 			lmsg("thankyou.communication.imessages"),
 			[
-				Constants::IM_TYPE_THANKYOU
+				ThankYous::IM_TYPE_THANKYOU
 			]
 		];
 	}

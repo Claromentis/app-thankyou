@@ -2,6 +2,7 @@
 namespace Claromentis\ThankYou;
 
 use AuthUser;
+use Claromentis\ThankYou\Api\ThankYous;
 use NotificationMessage;
 use User;
 
@@ -46,7 +47,7 @@ class LineManagerNotifier
 				$params['recipients'] = $all_except_last_recipient_csv . ' ' . lmsg('thankyou.grammar.list.and') . ' ' . $last_recipient;
 			}
 
-			NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], Constants::IM_TYPE_THANKYOU, null, $author_id);
+			NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], ThankYous::IM_TYPE_THANKYOU, null, $author_id);
 		}
 	}
 }

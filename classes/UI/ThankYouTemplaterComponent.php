@@ -167,12 +167,15 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		}
 
 		$author_id   = $thank_you->GetAuthor()->GetId();
-		$author_link = User::GetProfileUrl($author_id, true); // TODO: Replace with a non-static call when People API is available
-		$author_name = User::GetNameById($author_id, true); // TODO: Replace with a non-static call when People API is available
+		//TODO: Replace with a non-static call when People API is available
+		$author_link = User::GetProfileUrl($author_id, true);
+		//TODO: Replace with a non-static call when People API is available
+		$author_name = User::GetNameById($author_id, true);
 
 		try
 		{
-			$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->GetId(), true); // TODO: Replace with a non-static call when People API is available
+			//TODO: Replace with a non-static call when People API is available
+			$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->GetId(), true);
 		} catch (CDNSystemException $exception)
 		{
 			$this->logger->error("Error thrown when getting User's Photo's URL in Thank Templater Component: " . $exception->getMessage(), [$exception]);
