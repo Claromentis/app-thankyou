@@ -29,8 +29,8 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	public function GetAuditEvents()
 	{
 		return [
-			"like" => "Like a thankyou",
-			"unlike" => "Unlike a thankyou",
+			"like" => "Like a thank you note",
+			"unlike" => "Unlike a thank you note",
 			"comment_like" => "Like a comment",
 			"comment_unlike" => "Unlike a comment",
 		];
