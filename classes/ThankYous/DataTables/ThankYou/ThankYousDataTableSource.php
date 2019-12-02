@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\ThankYous\DataTables;
+namespace Claromentis\ThankYou\ThankYous\DataTables\ThankYou;
 
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Config\Config;
@@ -11,7 +11,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\ThankYous\DataTables\ThankYou\DescriptionDecorator;
+use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 use DateClaTimeZone;
 use Psr\Log\LoggerInterface;
 
