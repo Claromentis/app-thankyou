@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\ThankYous\DataTables;
+namespace Claromentis\ThankYou\ThankYous\DataTables\User;
 
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
@@ -9,6 +9,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 
 class UsersDataTableSource extends FilterDataTableSource
 {

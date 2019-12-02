@@ -39,7 +39,7 @@ use Claromentis\ThankYou\Tags\TagRepository;
 use Claromentis\ThankYou\Tags\UI\TagTemplaterComponent;
 use Claromentis\ThankYou\ThankYous\DataTables\TagsDataTableSource;
 use Claromentis\ThankYou\ThankYous\DataTables\ThankYou\ThankYousDataTableSource;
-use Claromentis\ThankYou\ThankYous\DataTables\UsersDataTableSource;
+use Claromentis\ThankYou\ThankYous\DataTables\User\UsersDataTableSource;
 use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use Claromentis\ThankYou\ThankYous\ThankYouFactory;
