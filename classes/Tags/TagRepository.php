@@ -245,8 +245,8 @@ class TagRepository
 	 */
 	public function Delete(int $id)
 	{
+		$this->DeleteTagTaggeds($id);
 		$this->db->query("DELETE FROM " . self::TABLE_NAME . " WHERE id=int:id", $id);
-		$this->db->query("DELETE FROM " . self::TAGGED_TABLE . " WHERE tag_id=int:id", $id);
 	}
 
 	/**
@@ -352,6 +352,18 @@ class TagRepository
 		}
 
 		$this->db->query($query_string, ...$params);
+	}
+
+	/**
+	 * Deletes a Tag's Taggings.
+	 *
+	 * @param int $tag_id
+	 */
+	public function DeleteTagTaggeds(int $tag_id)
+	{
+		$query_string = "DELETE FROM " .self::TAGGED_TABLE . " WHERE tag_id=int:tag_id";
+
+		$this->db->query($query_string, $tag_id);
 	}
 
 	public function IsTagNameUnique(string $name, ?int $id): bool
