@@ -91,11 +91,12 @@ class ThankYouAcl
 	 */
 	public function CanSeeThankYouAuthor(SecurityContext $context, ThankYou $thank_you): bool
 	{
-		return $this->IsExtranetVisible($thank_you->GetAuthor()->GetId(), (int) $context->GetExtranetAreaId());
+		return $this->CanSeeUser($context, $thank_you->GetAuthor());
 	}
 
 	/**
 	 * Determines whether a Security Context can view a User's details.
+	 * If the User's Extranet is not set, `false` is returned.
 	 *
 	 * @param SecurityContext $context
 	 * @param User            $user
@@ -107,10 +108,10 @@ class ThankYouAcl
 
 		if (!isset($user_extranet_id))
 		{
-			throw new InvalidArgumentException("Failed to check if Can See User Name, User's Extranet ID is not set");
+			return false;
 		}
 
-		return $this->IsExtranetVisible($user->GetExAreaId(), $context->GetExtranetAreaId());
+		return $this->IsExtranetVisible($user_extranet_id, $context->GetExtranetAreaId());
 	}
 
 	/**
