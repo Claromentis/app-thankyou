@@ -888,19 +888,19 @@ class ThankYousRepository
 	}
 
 	/**
-	 * Saves a Thank You's Thankee. If an ID is provided, an existing record will be updated, if not a new entry will be created.
+	 * Saves a Thank You's Thankee. If an ID is provided, an existing record will be updated, if not a new entry will be
+	 * created.
+	 * Due to the hard dependency on the Thank You,it is recommended that a check has been done for the the Thank You
+	 * with the given ID prior to calling this.
 	 *
 	 * @param int      $thank_you_id
 	 * @param int      $owner_class_id
 	 * @param int      $owner_class_item_id
 	 * @param int|null $id
 	 * @return int
-	 * @throws ThankYouNotFound
 	 */
 	public function SaveThankYouThankee(int $thank_you_id, int $owner_class_id, int $owner_class_item_id, ?int $id = null)
 	{
-		$this->GetThankYous([$thank_you_id]);
-
 		$db_fields = [
 			'int:item_id'     => $thank_you_id,
 			'int:object_type' => $owner_class_id,
