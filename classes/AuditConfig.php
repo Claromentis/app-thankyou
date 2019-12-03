@@ -5,12 +5,13 @@ namespace Claromentis\ThankYou;
 use Claromentis\Core\Audit\ApplicationAuditConfig;
 use Claromentis\Core\Audit\ApplicationAuditUrlConfig;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 
 class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 {
 	/**
-	 * @var Api\Tag $tag_api
+	 * @var Tags\Api $tag_api
 	 */
 	private $tag_api;
 
@@ -28,10 +29,10 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	 * AuditConfig constructor.
 	 *
 	 * @param Lmsg          $lmsg
-	 * @param Api\Tag       $tag_api
+	 * @param Tags\Api      $tag_api
 	 * @param Api\ThankYous $thank_you_api
 	 */
-	public function __construct(Lmsg $lmsg, Api\Tag $tag_api, Api\ThankYous $thank_you_api)
+	public function __construct(Lmsg $lmsg, Tags\Api $tag_api, Api\ThankYous $thank_you_api)
 	{
 		$this->tag_api       = $tag_api;
 		$this->thank_you_api = $thank_you_api;

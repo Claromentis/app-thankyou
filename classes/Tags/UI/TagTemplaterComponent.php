@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou\Tags\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
+use Claromentis\ThankYou\Tags\Api;
 use Claromentis\ThankYou\Tags\Tag;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Psr\Log\LoggerInterface;
@@ -14,9 +15,9 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 
 	private $log;
 
-	public function __construct(\Claromentis\ThankYou\Api\Tag $tag, LoggerInterface $logger)
+	public function __construct(Api $tag_api, LoggerInterface $logger)
 	{
-		$this->api = $tag;
+		$this->api = $tag_api;
 		$this->log = $logger;
 	}
 

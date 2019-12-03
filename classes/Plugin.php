@@ -22,7 +22,7 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
-use Claromentis\ThankYou\Api\Tag;
+use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
@@ -94,11 +94,11 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.tag'] = function ($app) {
-			return new TagTemplaterComponent($app[Tag::class], $app['logger_factory']->GetLogger('tag'));
+			return new TagTemplaterComponent($app[Tags\Api::class], $app['logger_factory']->GetLogger('tag'));
 		};
 
 		$app['templater.ui.thankyou.tag_stats'] = function ($app) {
-			return new ThankYouTagStatsTemplaterComponent($app[ThankYous::class], $app[Tag::class], $app['logger_factory']->GetLogger('tag'));
+			return new ThankYouTagStatsTemplaterComponent($app[ThankYous::class], $app[Tags\Api::class], $app['logger_factory']->GetLogger('tag'));
 		};
 
 		$app['tags.datatable.admin'] = TagDataTableSource::class;
@@ -147,7 +147,7 @@ class Plugin implements
 				$app[DbInterface::class],
 				$app['logger_factory']->GetLogger(self::APPLICATION_NAME),
 				$app[QueryFactory::class],
-				$app[Tag::class],
+				$app[Tags\Api::class],
 				$app[Thankable\Factory::class]
 			);
 		};
@@ -178,12 +178,12 @@ class Plugin implements
 				$app[LikesRepository::class],
 				$app[AclRepository::class],
 				$app[UserExtranetService::class],
-				$app[Tag::class]
+				$app[Tags\Api::class]
 			);
 		};
 
 		$app['audit.application.thankyou'] = function ($app) {
-			return new AuditConfig($app[Lmsg::class], $app[Tag::class], $app[ThankYous::class]);
+			return new AuditConfig($app[Lmsg::class], $app[Tags\Api::class], $app[ThankYous::class]);
 		};
 
 		$app[ThanksController::class] = function ($app) {
@@ -191,7 +191,7 @@ class Plugin implements
 		};
 
 		$app[StatisticsController::class] = function ($app) {
-			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app['thankyou.config'], $app[Tag::class]);
+			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app['thankyou.config'], $app[Tags\Api::class]);
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
@@ -228,7 +228,7 @@ class Plugin implements
 			return new TagsDataTableSource(
 				$app[ThankYous::class],
 				$app[SugreUtility::class],
-				$app[Tag::class],
+				$app[Tags\Api::class],
 				$app[Lmsg::class]
 			);
 		};

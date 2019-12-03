@@ -9,6 +9,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 
@@ -20,7 +21,7 @@ class TagsDataTableSource extends FilterDataTableSource
 
 	private $tag_api;
 
-	public function __construct(Api\ThankYous $thank_you_api, SugreUtility $sugre_utility, Api\Tag $tag_api, Lmsg $lmsg)
+	public function __construct(Api\ThankYous $thank_you_api, SugreUtility $sugre_utility, Tags\Api $tag_api, Lmsg $lmsg)
 	{
 		$this->lmsg = $lmsg;
 

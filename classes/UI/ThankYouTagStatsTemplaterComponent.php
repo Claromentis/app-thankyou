@@ -6,6 +6,7 @@ use Claromentis\Core\Application;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Psr\Log\LoggerInterface;
 
@@ -21,7 +22,7 @@ class ThankYouTagStatsTemplaterComponent extends TemplaterComponentTmpl
 
 	private $log;
 
-	public function __construct(Api\ThankYous $thank_you, Api\Tag $tag, LoggerInterface $logger)
+	public function __construct(Api\ThankYous $thank_you, Tags\Api $tag, LoggerInterface $logger)
 	{
 		$this->tag_api       = $tag;
 		$this->thank_you_api = $thank_you;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\Api;
+namespace Claromentis\ThankYou\Tags;
 
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Security\SecurityContext;
@@ -9,15 +9,12 @@ use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
-use Claromentis\ThankYou\Tags\TagAcl;
-use Claromentis\ThankYou\Tags\TagFactory;
-use Claromentis\ThankYou\Tags\TagRepository;
 use Date;
 use InvalidArgumentException;
 use LogicException;
 use User;
 
-class Tag
+class Api
 {
 	/**
 	 * @var TagAcl $acl
@@ -40,7 +37,7 @@ class Tag
 	private $repository;
 
 	/**
-	 * Tag constructor.
+	 * Api constructor.
 	 *
 	 * @param Audit         $audit
 	 * @param TagRepository $tag_repository
@@ -57,10 +54,10 @@ class Tag
 
 	/**
 	 * @param int $id
-	 * @return \Claromentis\ThankYou\Tags\Tag
+	 * @return Tag
 	 * @throws TagNotFound - If the Tag could not be found in the Repository.
 	 */
-	public function GetTag(int $id): \Claromentis\ThankYou\Tags\Tag
+	public function GetTag(int $id): Tag
 	{
 		try
 		{
@@ -83,7 +80,7 @@ class Tag
 	 * @param int|null    $offset
 	 * @param string|null $name
 	 * @param array|null  $orders
-	 * @return \Claromentis\ThankYou\Tags\Tag[]
+	 * @return Tag[]
 	 */
 	public function GetTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
 	{
@@ -94,7 +91,7 @@ class Tag
 	 * Returns an array of Tags indexed by their ID.
 	 *
 	 * @param int[] $ids
-	 * @return \Claromentis\ThankYou\Tags\Tag[]
+	 * @return Tag[]
 	 */
 	public function GetTagsById(array $ids): array
 	{
@@ -106,7 +103,7 @@ class Tag
 	 *
 	 * @param int $tagged_id
 	 * @param int $aggregation_id
-	 * @return \Claromentis\ThankYou\Tags\Tag[]
+	 * @return Tag[]
 	 */
 	public function GetTaggedTags(int $tagged_id, int $aggregation_id)
 	{
@@ -159,10 +156,10 @@ class Tag
 	/**
 	 * @param User   $user
 	 * @param string $name
-	 * @return \Claromentis\ThankYou\Tags\Tag
+	 * @return Tag
 	 * @throws TagInvalidNameException
 	 */
-	public function Create(User $user, string $name): \Claromentis\ThankYou\Tags\Tag
+	public function Create(User $user, string $name): Tag
 	{
 		$tag = $this->factory->Create($name);
 		$tag->SetCreatedBy($user);
@@ -176,10 +173,10 @@ class Tag
 	/**
 	 * Saves a Tag to the database. If the Tag does not have an ID, one will be set.
 	 *
-	 * @param \Claromentis\ThankYou\Tags\Tag $tag
+	 * @param Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
 	 */
-	public function Save(\Claromentis\ThankYou\Tags\Tag $tag)
+	public function Save(Tag $tag)
 	{
 		$new = ($tag->GetId() === null) ? true : false;
 
@@ -221,13 +218,13 @@ class Tag
 	 * Saves a Tagged's Tag to the Repository.
 	 * Returns the ID of the Tagging.
 	 *
-	 * @param int                            $tagged_id
-	 * @param int                            $aggregation_id
-	 * @param \Claromentis\ThankYou\Tags\Tag $tag
+	 * @param int $tagged_id
+	 * @param int $aggregation_id
+	 * @param Tag $tag
 	 * @return int
 	 * @throws TagNotFound If the Tag could not be found in the Repository.
 	 */
-	public function AddTaggedTag(int $tagged_id, int $aggregation_id, \Claromentis\ThankYou\Tags\Tag $tag)
+	public function AddTaggedTag(int $tagged_id, int $aggregation_id, Tag $tag)
 	{
 		$tag_id = $tag->GetId();
 
@@ -243,9 +240,9 @@ class Tag
 	 * Saves a Tagged's Tags to the Repository.
 	 * Returns an array of the Tagging IDs.
 	 *
-	 * @param int                              $tagged_id
-	 * @param int                              $aggregation_id
-	 * @param \Claromentis\ThankYou\Tags\Tag[] $tags
+	 * @param int   $tagged_id
+	 * @param int   $aggregation_id
+	 * @param Tag[] $tags
 	 * @return int[]
 	 * @throws TagNotFound If one or more of the Tags could not be found in the Repository.
 	 */
@@ -263,11 +260,11 @@ class Tag
 	/**
 	 * Deletes a Tagged's Tag from the Repository.
 	 *
-	 * @param int                            $tagged_id
-	 * @param int                            $aggregation_id
-	 * @param \Claromentis\ThankYou\Tags\Tag $tag
+	 * @param int $tagged_id
+	 * @param int $aggregation_id
+	 * @param Tag $tag
 	 */
-	public function RemoveTaggedTag(int $tagged_id, int $aggregation_id, \Claromentis\ThankYou\Tags\Tag $tag)
+	public function RemoveTaggedTag(int $tagged_id, int $aggregation_id, Tag $tag)
 	{
 		$tag_id = $tag->GetId();
 
@@ -282,9 +279,9 @@ class Tag
 	/**
 	 * Deletes a Tagged's Tags from the Repository.
 	 *
-	 * @param int                              $tagged_id
-	 * @param int                              $aggregation_id
-	 * @param \Claromentis\ThankYou\Tags\Tag[] $tags
+	 * @param int   $tagged_id
+	 * @param int   $aggregation_id
+	 * @param Tag[] $tags
 	 */
 	public function RemoveTaggedTags(int $tagged_id, int $aggregation_id, array $tags)
 	{

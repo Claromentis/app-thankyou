@@ -21,6 +21,7 @@ use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
+use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYou;
@@ -75,7 +76,7 @@ class ThankYous
 		LikesRepository $likes_repository,
 		AclRepository $acl_repository,
 		UserExtranetService $user_extranet_service,
-		Tag $tag_api
+		Tags\Api $tag_api
 	) {
 		$this->acl                   = $acl;
 		$this->acl_repository        = $acl_repository;

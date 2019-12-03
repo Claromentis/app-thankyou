@@ -9,7 +9,7 @@ use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
-use Claromentis\ThankYou\Api\Tag;
+use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
@@ -66,7 +66,7 @@ class ThankYousRepository
 	private $query_factory;
 
 	/**
-	 * @var Tag
+	 * @var Tags\Api
 	 */
 	private $tags;
 
@@ -76,7 +76,7 @@ class ThankYousRepository
 		DbInterface $db_interface,
 		LoggerInterface $logger,
 		QueryFactory $query_factory,
-		Tag $tag_api,
+		Tags\Api $tag_api,
 		Thankable\Factory $thankable_factory
 	) {
 		$this->thank_you_factory = $thank_you_factory;
