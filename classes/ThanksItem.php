@@ -47,7 +47,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 		$id = (int) $id;
 
 		$db = Services::I()->GetDb();
-		$db->query('DELETE FROM thankyou_user WHERE thanks_id = int:id', $id);
 
 		parent::Delete();
 	}
@@ -140,18 +139,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 			} catch (Exception $exception)
 			{
 				throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
-			}
-
-			if (isset($this->users_ids))
-			{
-				$db->DoTransaction(function (DbInterface $db) use ($id) {
-					$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $id);
-
-					foreach ($this->users_ids as $user_id)
-					{
-						$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $id, $user_id);
-					}
-				});
 			}
 
 			return (int) $this->GetId();

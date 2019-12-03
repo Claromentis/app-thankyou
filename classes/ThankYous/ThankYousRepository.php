@@ -810,9 +810,10 @@ class ThankYousRepository
 	{
 		$thanks_item = $this->thanks_item_factory->Create();
 		$thanks_item->SetId($id);
+		$this->DeleteThankYouUsers($id);
+		$this->DeleteThankYouThankees($id);
 		try
 		{
-			$this->DeleteThankYouThankees($id);
 			$thanks_item->Delete();
 		} catch (ThankYouException $exception)
 		{
@@ -846,17 +847,6 @@ class ThankYousRepository
 
 		$thanks_item->SetDescription($thank_you->GetDescription());
 
-		$thanked_users = $thank_you->GetUsers();
-		if (isset($thanked_users))
-		{
-			$users_ids = [];
-			foreach ($thanked_users as $offset => $user)
-			{
-				$users_ids[] = $user->GetId();
-			}
-			$thanks_item->SetUsers($users_ids);
-		}
-
 		$id = $thanks_item->Save();
 
 		$thank_you->SetId($id);
@@ -874,6 +864,22 @@ class ThankYousRepository
 				if (isset($owner_class_id) && isset($owner_class_item_id))
 				{
 					$this->SaveThankYouThankee($id, $owner_class_id, $owner_class_item_id);
+				}
+			}
+		}
+
+		$users = $thank_you->GetUsers();
+		if (isset($users))
+		{
+			$this->DeleteThankYouUsers($id);
+
+			foreach ($users as $user)
+			{
+				$user_id = $user->GetId();
+
+				if (isset($user_id))
+				{
+					$this->SaveThankYouUser($id, $user_id);
 				}
 			}
 		}
@@ -925,6 +931,34 @@ class ThankYousRepository
 	{
 		$query_string = "DELETE FROM " . self::THANKED_TABLE . " WHERE item_id=int:thank_you_id";
 
+		$this->db->query($query_string, $thank_you_id);
+	}
+
+	/**
+	 * Saves a Thank You's thanked User.
+	 *
+	 * @param int $thank_you_id
+	 * @param int $user_id
+	 */
+	public function SaveThankYouUser(int $thank_you_id, int $user_id)
+	{
+		$db_fields = [
+			'int:thanks_id' => $thank_you_id,
+			'int:user_id' => $user_id
+		];
+
+		$query = $this->query_factory->GetQueryInsert(self::THANKED_USERS_TABLE, $db_fields);
+		$this->db->query($query);
+	}
+
+	/**
+	 * Delete all of a Thank You's Users.
+	 *
+	 * @param int $thank_you_id
+	 */
+	public function DeleteThankYouUsers(int $thank_you_id)
+	{
+		$query_string = "DELETE FROM " . self::THANKED_USERS_TABLE . " WHERE thanks_id=int:thank_you_id";
 		$this->db->query($query_string, $thank_you_id);
 	}
 
