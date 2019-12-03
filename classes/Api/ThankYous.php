@@ -19,7 +19,6 @@ use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
-use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
@@ -102,7 +101,13 @@ class ThankYous
 	 */
 	public function GetThankYou(int $id, bool $thanked = false, bool $users = false, bool $tags = false): ThankYou
 	{
-		return $this->GetThankYous([$id], $thanked, $users, $tags)[$id];
+		$thank_yous = $this->GetThankYous([$id], $thanked, $users, $tags);
+		if (!isset($thank_yous[$id]))
+		{
+			throw new ThankYouNotFound("Failed to load Thank You, the Thank You could not be found");
+		}
+
+		return $thank_yous[$id];
 	}
 
 	/**
@@ -113,7 +118,6 @@ class ThankYous
 	 * @param bool      $users
 	 * @param bool      $tags
 	 * @return ThankYou[]
-	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
 	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false, bool $tags = false)
 	{
@@ -258,13 +262,7 @@ class ThankYous
 
 		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
 
-		try
-		{
-			return $this->GetThankYous($thank_you_ids, $get_thanked, $get_users, $get_tags);
-		} catch (ThankYouNotFound $thank_you_not_found)
-		{
-			throw new LogicException("Unexpected ThankYouNotFound Exception thrown by GetThankYous", null, $thank_you_not_found);
-		}
+		return $this->GetThankYous($thank_you_ids, $get_thanked, $get_users, $get_tags);
 	}
 
 	/**

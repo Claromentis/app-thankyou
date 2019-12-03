@@ -89,12 +89,10 @@ class ThankYousRepository
 	}
 
 	/**
-	 * Given an array of IDs from the table thankyou_item, returns (ThankYou)s in the same order.
-	 * If param $thanked is TRUE, the (ThankYou)s the ThankYou's Thankables will be set.
+	 * Given an array of Thank You IDs, returns an array of Thank Yous indexed by their IDs.
 	 *
 	 * @param int[] $ids
 	 * @return ThankYou[]
-	 * @throws ThankYouNotFound - If one or more Thank Yous could not be found.
 	 */
 	public function GetThankYous(array $ids)
 	{
@@ -141,7 +139,13 @@ class ThankYousRepository
 		{
 			if (!isset($rows[$id]))
 			{
-				throw new ThankYouNotFound("Failed to Get Thanks Yous, Thank You with ID '" . $id . "' could not be found'");
+				continue;
+			}
+
+			//TODO: Thank Yous should ideally have a soft dependency on their Author. This also means that counts are now off...
+			if (!isset($users[$rows[$id]['author_id']]))
+			{
+				continue;
 			}
 
 			try
@@ -228,6 +232,11 @@ class ThankYousRepository
 	 */
 	public function GetThankYousThankedsByThankYouIds(array $ids)
 	{
+		if (count($ids) === 0)
+		{
+			return [];
+		}
+
 		$query_string = "SELECT id, item_id, object_type, object_id FROM " . self::THANKED_TABLE;
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
@@ -277,6 +286,11 @@ class ThankYousRepository
 	 */
 	public function GetThankYousUsersByThankYouIds(array $ids)
 	{
+		if (count($ids) === 0)
+		{
+			return [];
+		}
+
 		$query_string = "SELECT * FROM " . self::THANKED_USERS_TABLE;
 		$query        = $this->query_factory->GetQueryBuilder($query_string);
 
@@ -806,7 +820,11 @@ class ThankYousRepository
 		$id = $thank_you->GetId();
 		if (isset($id))
 		{
-			$this->GetThankYous([$id]);
+			$thank_yous = $this->GetThankYous([$id]);
+			if (!isset($thank_yous[$id]))
+			{
+				throw new ThankYouNotFound("Failed to Save Update to Thank You, Thank You not found");
+			}
 		}
 
 		$author_id = $thank_you->GetAuthor()->GetId();

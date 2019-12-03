@@ -258,6 +258,11 @@ class TagRepository
 	 */
 	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id)
 	{
+		if (count($tagged_ids) === 0)
+		{
+			return [];
+		}
+
 		$query_string = "SELECT * FROM " . self::TAGGED_TABLE;
 		$query        = $this->db->GetQueryBuilder($query_string);
 
