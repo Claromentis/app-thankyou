@@ -142,15 +142,9 @@ class ThankYousRepository
 				continue;
 			}
 
-			//TODO: Thank Yous should ideally have a soft dependency on their Author. This also means that counts are now off...
-			if (!isset($users[$rows[$id]['author_id']]))
-			{
-				continue;
-			}
-
 			try
 			{
-				$thank_you = $this->Create($users[$rows[$id]['author_id']], $rows[$id]['description'], new Date($rows[$id]['date_created'], new DateTimeZone('UTC')));
+				$thank_you = $this->Create(($users[$rows[$id]['author_id']] ?? $rows[$id]['author_id']), $rows[$id]['description'], new Date($rows[$id]['date_created'], new DateTimeZone('UTC')));
 			} catch (ThankYouAuthor $exception)
 			{
 				throw new LogicException("Unexpected Runtime Exception thrown when creating a ThankYou", null, $exception);

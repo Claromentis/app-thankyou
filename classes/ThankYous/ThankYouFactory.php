@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Date;
 use InvalidArgumentException;
@@ -9,6 +10,13 @@ use User;
 
 class ThankYouFactory
 {
+	private $lmsg;
+
+	public function __construct(Lmsg $lmsg)
+	{
+		$this->lmsg = $lmsg;
+	}
+
 	/**
 	 * @param User|int  $author
 	 * @param string    $description
@@ -30,7 +38,8 @@ class ThankYouFactory
 
 		if (!$author->IsLoaded() && !$author->Load())
 		{
-			throw new ThankYouAuthor("Failed to create Thank You, could not load Author");
+			$author->SetFirstname('');
+			$author->SetSurname(($this->lmsg)('orgchart.common.deleted_user'));
 		}
 
 		if (!isset($date_created))
