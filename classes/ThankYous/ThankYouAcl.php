@@ -84,6 +84,7 @@ class ThankYouAcl
 
 	/**
 	 * Determines whether a Security Context can view a Thank You Author's Name.
+	 * If the Author's Extranet is not set, `false` is returned.
 	 *
 	 * @param SecurityContext $context
 	 * @param ThankYou        $thank_you
