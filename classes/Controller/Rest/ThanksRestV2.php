@@ -14,7 +14,6 @@ use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
-use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
@@ -276,7 +275,7 @@ class ThanksRestV2
 		} catch (ThankYouNotFound $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown when creating Thank You", null, $exception);
-		} catch (ThankYouAuthor | ThankYouRepository $exception)
+		} catch (ThankYouAuthor $exception)
 		{
 			$this->log->error("CreateThankYou Failed unexpectedly", [$exception]);
 
@@ -452,15 +451,6 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.error.thanks_not_found'),
 				'status' => 404
 			], 404);
-		} catch (ThankYouRepository $exception)
-		{
-			$this->log->error("CreateThankYou Failed unexpectedly", [$exception]);
-
-			return $this->response->GetJsonPrettyResponse([
-				'type'   => 'https://developer.claromentis.com',
-				'title'  => ($this->lmsg)('thankyou.thankyou.error.modify'),
-				'status' => 500
-			], 500);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);

@@ -14,9 +14,7 @@ use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
-use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\Thankable;
-use Claromentis\ThankYou\ThanksItemFactory;
 use Date;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -53,11 +51,6 @@ class ThankYousRepository
 	private $thankable_factory;
 
 	/**
-	 * @var ThanksItemFactory
-	 */
-	private $thanks_item_factory;
-
-	/**
 	 * @var ThankYouFactory
 	 */
 	private $thank_you_factory;
@@ -79,7 +72,6 @@ class ThankYousRepository
 
 	public function __construct(
 		ThankYouFactory $thank_you_factory,
-		ThanksItemFactory $thanks_item_factory,
 		ThankYouUtility $thank_you_utility,
 		DbInterface $db_interface,
 		LoggerInterface $logger,
@@ -87,14 +79,13 @@ class ThankYousRepository
 		Tag $tag_api,
 		Thankable\Factory $thankable_factory
 	) {
-		$this->thank_you_factory   = $thank_you_factory;
-		$this->thanks_item_factory = $thanks_item_factory;
-		$this->utility             = $thank_you_utility;
-		$this->db                  = $db_interface;
-		$this->logger              = $logger;
-		$this->query_factory       = $query_factory;
-		$this->tags                = $tag_api;
-		$this->thankable_factory   = $thankable_factory;
+		$this->thank_you_factory = $thank_you_factory;
+		$this->utility           = $thank_you_utility;
+		$this->db                = $db_interface;
+		$this->logger            = $logger;
+		$this->query_factory     = $query_factory;
+		$this->tags              = $tag_api;
+		$this->thankable_factory = $thankable_factory;
 	}
 
 	/**
@@ -804,50 +795,29 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param int $id
-	 */
-	public function Delete(int $id)
-	{
-		$thanks_item = $this->thanks_item_factory->Create();
-		$thanks_item->SetId($id);
-		$this->DeleteThankYouUsers($id);
-		$this->DeleteThankYouThankees($id);
-		try
-		{
-			$thanks_item->Delete();
-		} catch (ThankYouException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown when deleting Thank You", null, $exception);
-		}
-	}
-
-	/**
 	 * Saves a Thank You to the repository. If the Thank You is new the ID its ID will also be set.
 	 *
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
 	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
-	 * @throws ThankYouRepository - On failure to save to database.
 	 */
 	public function Save(ThankYou $thank_you)
 	{
-		$thanks_item = $this->thanks_item_factory->Create();
-
 		$id = $thank_you->GetId();
-		if (isset($id) && !$thanks_item->Load($id))
+		if (isset($id))
 		{
-			throw new ThankYouNotFound("Failed to Update Thank You, Thank You not found");
+			$this->GetThankYous([$id]);
 		}
 
-		$thanks_item->SetAuthor($thank_you->GetAuthor()->GetId());
+		$author_id = $thank_you->GetAuthor()->GetId();
 
 		$date_created = clone $thank_you->GetDateCreated();
 		$date_created->setTimezone(new DateTimeZone("UTC"));
-		$thanks_item->SetDateCreated($date_created->format('YmdHis'));
+		$date_created_string = $date_created->format('YmdHis');
 
-		$thanks_item->SetDescription($thank_you->GetDescription());
+		$description = $thank_you->GetDescription();
 
-		$id = $thanks_item->Save();
+		$id = $this->SaveThankYou($author_id, $date_created_string, $description, $id);
 
 		$thank_you->SetId($id);
 
@@ -888,6 +858,56 @@ class ThankYousRepository
 	}
 
 	/**
+	 * @param int $id
+	 */
+	public function Delete(int $id)
+	{
+		$this->DeleteThankYouUsers($id);
+		$this->DeleteThankYouThankees($id);
+		$this->DeleteThankYou($id);
+	}
+
+	/**
+	 * Saves a Thank You. If an ID is provided, an existing record will be updated, if not a new entry will be
+	 * created.
+	 *
+	 * @param int      $author_id
+	 * @param int      $date_created
+	 * @param string   $description
+	 * @param int|null $id
+	 * @return int
+	 */
+	private function SaveThankYou(int $author_id, int $date_created, string $description, ?int $id)
+	{
+		$db_fields = [
+			'int:author'       => $author_id,
+			'int:date_created' => $date_created,
+			'clob:description' => $description
+		];
+
+		if (isset($id))
+		{
+			$query = $this->query_factory->GetQueryUpdate(self::THANK_YOU_TABLE, "id=int:id", $db_fields);
+			$query->Bind('id', $id);
+			$this->db->query($query);
+		} else
+		{
+			$query = $this->query_factory->GetQueryInsert(self::THANK_YOU_TABLE, $db_fields);
+			$this->db->query($query);
+			$id = $this->db->insertId();
+		}
+
+		return $id;
+	}
+
+	private function DeleteThankYou(int $thank_you_id)
+	{
+		$query_string = "DELETE FROM " . self::THANK_YOU_TABLE . " WHERE id=int:thank_you_id";
+
+		$this->db->query($query_string, $thank_you_id);
+	}
+
+	/**
 	 * Saves a Thank You's Thankee. If an ID is provided, an existing record will be updated, if not a new entry will be
 	 * created.
 	 * Due to the hard dependency on the Thank You,it is recommended that a check has been done for the the Thank You
@@ -899,7 +919,7 @@ class ThankYousRepository
 	 * @param int|null $id
 	 * @return int
 	 */
-	public function SaveThankYouThankee(int $thank_you_id, int $owner_class_id, int $owner_class_item_id, ?int $id = null)
+	private function SaveThankYouThankee(int $thank_you_id, int $owner_class_id, int $owner_class_item_id, ?int $id = null)
 	{
 		$db_fields = [
 			'int:item_id'     => $thank_you_id,
@@ -927,7 +947,7 @@ class ThankYousRepository
 	 *
 	 * @param int $thank_you_id
 	 */
-	public function DeleteThankYouThankees(int $thank_you_id)
+	private function DeleteThankYouThankees(int $thank_you_id)
 	{
 		$query_string = "DELETE FROM " . self::THANKED_TABLE . " WHERE item_id=int:thank_you_id";
 
@@ -936,15 +956,17 @@ class ThankYousRepository
 
 	/**
 	 * Saves a Thank You's thanked User.
+	 * Due to the hard dependency on the Thank You,it is recommended that a check has been done for the the Thank You
+	 * with the given ID prior to calling this.
 	 *
 	 * @param int $thank_you_id
 	 * @param int $user_id
 	 */
-	public function SaveThankYouUser(int $thank_you_id, int $user_id)
+	private function SaveThankYouUser(int $thank_you_id, int $user_id)
 	{
 		$db_fields = [
 			'int:thanks_id' => $thank_you_id,
-			'int:user_id' => $user_id
+			'int:user_id'   => $user_id
 		];
 
 		$query = $this->query_factory->GetQueryInsert(self::THANKED_USERS_TABLE, $db_fields);
@@ -956,7 +978,7 @@ class ThankYousRepository
 	 *
 	 * @param int $thank_you_id
 	 */
-	public function DeleteThankYouUsers(int $thank_you_id)
+	private function DeleteThankYouUsers(int $thank_you_id)
 	{
 		$query_string = "DELETE FROM " . self::THANKED_USERS_TABLE . " WHERE thanks_id=int:thank_you_id";
 		$this->db->query($query_string, $thank_you_id);

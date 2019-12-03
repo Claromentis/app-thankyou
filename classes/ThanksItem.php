@@ -3,11 +3,7 @@ namespace Claromentis\ThankYou;
 
 use ActiveRecord;
 use ClaAggregation;
-use Claromentis\Core\DAL\Exceptions\TransactionException;
-use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\Services;
-use Claromentis\ThankYou\Exception\ThankYouException;
-use Claromentis\ThankYou\Exception\ThankYouRepository;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Exception;
 use LogicException;
@@ -24,74 +20,6 @@ use ObjectsStorage;
 class ThanksItem extends ActiveRecord implements ClaAggregation
 {
 	protected $users_ids;
-
-	/**
-	 * @return bool|void
-	 * @throws ThankYouException
-	 */
-	public function Delete()
-	{
-		try
-		{
-			$id = $this->GetProperty('id');
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
-		}
-
-		if (!isset($id))
-		{
-			throw new ThankYouException("Failed to delete Thank You, ID unknown");
-		}
-
-		$id = (int) $id;
-
-		$db = Services::I()->GetDb();
-
-		parent::Delete();
-	}
-
-	/**
-	 * @return int|null
-	 */
-	public function GetAuthor()
-	{
-		try
-		{
-			return (int) $this->GetProperty('author');
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
-		}
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function GetDateCreated()
-	{
-		try
-		{
-			return $this->GetProperty('date_created');
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
-		}
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function GetDescription()
-	{
-		try
-		{
-			return $this->GetProperty('description');
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
-		}
-	}
 
 	public function InitDbMapping(ObjectsStorage $storage)
 	{
@@ -116,78 +44,6 @@ class ThanksItem extends ActiveRecord implements ClaAggregation
 		$this->SetUsers($thank_you_users);
 
 		return true;
-	}
-
-	/**
-	 * @return int
-	 * @throws ThankYouRepository - On failure to save to database.
-	 */
-	public function Save()
-	{
-		try
-		{
-			if (!parent::Save())
-			{
-				throw new ThankYouRepository("Failed to Save Thank You");
-			}
-
-			$db = Services::I()->GetDb();
-
-			try
-			{
-				$id = $this->GetProperty('id');
-			} catch (Exception $exception)
-			{
-				throw new LogicException("Unexpected Exception thrown by GetProperty", null, $exception);
-			}
-
-			return (int) $this->GetId();
-		} catch (TransactionException $exception)
-		{
-			throw new ThankYouRepository("Failed to Save Thank You", null, $exception);
-		}
-	}
-
-	/**
-	 * @param int $value
-	 */
-	public function SetAuthor(int $value)
-	{
-		try
-		{
-			$this->SetProperty('author', $value);
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by SetProperty", null, $exception);
-		}
-	}
-
-	/**
-	 * @param string $value
-	 */
-	public function SetDateCreated(string $value)
-	{
-		try
-		{
-			$this->SetProperty('date_created', $value);
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by SetProperty", null, $exception);
-		}
-	}
-
-	/**
-	 * @param $value
-	 */
-	public function SetDescription($value)
-	{
-		try
-		{
-			$this->SetProperty('description', $value);
-		} catch (Exception $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown by Set Property", null, $exception);
-		}
 	}
 
 	/**

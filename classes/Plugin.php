@@ -143,7 +143,6 @@ class Plugin implements
 		$app[ThankYousRepository::class] = function ($app) {
 			return new ThankYousRepository(
 				$app[ThankYouFactory::class],
-				$app[ThanksItemFactory::class],
 				$app[ThankYouUtility::class],
 				$app[DbInterface::class],
 				$app['logger_factory']->GetLogger(self::APPLICATION_NAME),

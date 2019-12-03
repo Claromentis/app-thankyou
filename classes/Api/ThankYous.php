@@ -584,7 +584,6 @@ class ThankYous
 	 *
 	 * @param ThankYou $thank_you
 	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
-	 * @throws ThankYouRepository - On failure to save to database.
 	 * @throws TagNotFound If one or more of the Thank You's Tags could not be found in the Repository.
 	 */
 	public function Save(ThankYou $thank_you)
