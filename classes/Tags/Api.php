@@ -61,18 +61,18 @@ class Api
 	{
 		try
 		{
-			$tag = $this->repository->GetTags([$id]);
+			$tags = $this->repository->GetTags([$id]);
 		} catch (InvalidArgumentException $exception)
 		{
 			throw new LogicException("Failed to Get Tag, unexpected Exception thrown when Loading Tag", null, $exception);
 		}
 
-		if (!isset($tag[$id]))
+		if (!isset($tags[$id]))
 		{
 			throw new TagNotFound("Failed to Get Tag, Tag with ID '" . $id . "' could not be found");
 		}
 
-		return $tag[$id];
+		return $tags[$id];
 	}
 
 	/**
@@ -105,7 +105,7 @@ class Api
 	 * @param int $aggregation_id
 	 * @return Tag[]
 	 */
-	public function GetTaggedTags(int $tagged_id, int $aggregation_id)
+	public function GetTaggedTags(int $tagged_id, int $aggregation_id): array
 	{
 		return $this->GetTaggedsTags([$tagged_id], $aggregation_id)[$tagged_id];
 	}
@@ -117,7 +117,7 @@ class Api
 	 * @param int   $aggregation_id
 	 * @return array[]
 	 */
-	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id)
+	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id): array
 	{
 		$taggeds_tags = $this->repository->GetTaggedsTags($tagged_ids, $aggregation_id);
 		foreach ($tagged_ids as $tagged_id)
@@ -224,7 +224,7 @@ class Api
 	 * @return int
 	 * @throws TagNotFound If the Tag could not be found in the Repository.
 	 */
-	public function AddTaggedTag(int $tagged_id, int $aggregation_id, Tag $tag)
+	public function AddTaggedTag(int $tagged_id, int $aggregation_id, Tag $tag): int
 	{
 		$tag_id = $tag->GetId();
 
@@ -246,7 +246,7 @@ class Api
 	 * @return int[]
 	 * @throws TagNotFound If one or more of the Tags could not be found in the Repository.
 	 */
-	public function AddTaggedTags(int $tagged_id, int $aggregation_id, array $tags)
+	public function AddTaggedTags(int $tagged_id, int $aggregation_id, array $tags): array
 	{
 		$tagging_ids = [];
 		foreach ($tags as $tag)
