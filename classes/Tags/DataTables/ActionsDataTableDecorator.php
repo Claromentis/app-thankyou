@@ -7,37 +7,30 @@ use Claromentis\Core\DataTable\Decorator\Decorator;
 class ActionsDataTableDecorator extends Decorator
 {
 	/**
-	 * Returns an associative array where the keys will be accessible in the angular template.
-	 *
-	 * @param mixed $content
-	 * @return mixed
+	 * @inheritDoc
+	 * @return array
 	 */
 	public function Decorate($content): array
 	{
 		return [
-			'id' => $content['id'],
+			'id'               => $content['id'],
 			'new_active_state' => (int) (!$content['active']),
-			'icon' => $content['active'] ? 'glyphicons-eye-close' : 'glyphicons-eye-open'
+			'icon'             => $content['active'] ? 'glyphicons-eye-close' : 'glyphicons-eye-open'
 		];
 	}
 
 	/**
-	 * Returns the contents of the cell being decorated as a scalar value.
-	 *
-	 * @param mixed $content
-	 * @return string
+	 * @inheritDoc
 	 */
-	public function Basic($content)
+	public function Basic($content): string
 	{
 		return '';
 	}
 
 	/**
-	 * Returns the contents of the template file as a string. Can be processed by process_cla_template first.
-	 *
-	 * @return string
+	 * @inheritDoc
 	 */
-	public function GetTemplate()
+	public function GetTemplate(): string
 	{
 		return process_cla_template('thankyou/admin/actions_data_table_decorator.html', [], [], '', false);
 	}
