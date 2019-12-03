@@ -166,11 +166,17 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			$thank_you_url = $this->api->ThankYous()->GetThankYouUrl($thank_you);
 		}
 
-		$author_id   = $thank_you->GetAuthor()->GetId();
+		$author_id = $thank_you->GetAuthor()->GetId();
 		//TODO: Replace with a non-static call when People API is available
 		$author_link = User::GetProfileUrl($author_id, true);
-		//TODO: Replace with a non-static call when People API is available
-		$author_name = User::GetNameById($author_id, true);
+
+		if (!$this->api->ThankYous()->CanSeeThankYouAuthor($context, $thank_you))
+		{
+			$author_name = ($this->lmsg)('common.perms.hidden_name');
+		} else
+		{
+			$author_name = $thank_you->GetAuthor()->GetFullname();
+		}
 
 		try
 		{
