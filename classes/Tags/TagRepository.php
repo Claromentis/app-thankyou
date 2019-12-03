@@ -256,7 +256,7 @@ class TagRepository
 	 * @param int   $aggregation_id
 	 * @return array[]
 	 */
-	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id)
+	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id): array
 	{
 		if (count($tagged_ids) === 0)
 		{
@@ -309,7 +309,7 @@ class TagRepository
 	 * @return int
 	 * @throws TagNotFound If the Tag with the given ID could not be found.
 	 */
-	public function SaveTaggedTag(int $tagged_id, int $aggregation_id, int $tag_id, ?int $id = null)
+	public function SaveTaggedTag(int $tagged_id, int $aggregation_id, int $tag_id, ?int $id = null): int
 	{
 		$tags = $this->GetTags([$tag_id]);
 		if (!isset($tags[$tag_id]))
@@ -347,12 +347,12 @@ class TagRepository
 	 */
 	public function DeleteTaggedTags(int $tagged_id, int $aggregation_id, ?int $tag_id = null)
 	{
-		$params = [$tagged_id, $aggregation_id];
+		$params       = [$tagged_id, $aggregation_id];
 		$query_string = "DELETE FROM " . self::TAGGED_TABLE . " WHERE item_id=int:tagged_id AND aggregation_id=int:aggregation_id";
 
 		if (isset($tag_id))
 		{
-			$params[] = $tag_id;
+			$params[]     = $tag_id;
 			$query_string .= " AND tag_id=int:tag_id";
 		}
 
@@ -366,7 +366,7 @@ class TagRepository
 	 */
 	public function DeleteTagTaggeds(int $tag_id)
 	{
-		$query_string = "DELETE FROM " .self::TAGGED_TABLE . " WHERE tag_id=int:tag_id";
+		$query_string = "DELETE FROM " . self::TAGGED_TABLE . " WHERE tag_id=int:tag_id";
 
 		$this->db->query($query_string, $tag_id);
 	}
@@ -457,7 +457,7 @@ class TagRepository
 	 * @param array $user_ids
 	 * @return User[]
 	 */
-	private function GetUsers(array $user_ids)
+	private function GetUsers(array $user_ids): array
 		//TODO: Get rid of this method when possible, this class should be able to use something else to mass build Users really.
 	{
 		$users_list_provider = new UsersListProvider();
