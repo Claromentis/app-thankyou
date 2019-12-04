@@ -106,6 +106,8 @@ class TagRepository
 	}
 
 	/**
+	 * Returns the total number of Tags in the Database.
+	 *
 	 * @return int
 	 */
 	public function GetTotalTags(): int
@@ -114,6 +116,8 @@ class TagRepository
 	}
 
 	/**
+	 * Filters for Tags and returns an array of the number of times they've been used for Tagging, indexed by their IDs.
+	 *
 	 * @param int|null   $limit
 	 * @param int|null   $offset
 	 * @param bool|null  $active
@@ -153,6 +157,9 @@ class TagRepository
 	}
 
 	/**
+	 * Given an array of Tag IDs,
+	 * returns the number of times the Tags have been used for Tagging, indexed by the Tag's IDs.
+	 *
 	 * @param int[] $ids
 	 * @return array
 	 */
@@ -437,8 +444,10 @@ class TagRepository
 	}
 
 	/**
+	 * Returns the number of times the given Tags have been used for Tagging, indexed by the Tag's IDs.
+	 *
 	 * @param ResultInterface $results
-	 * @return array
+	 * @return int[]
 	 */
 	private function GetTagsTotalsFromDbQuery(ResultInterface $results): array
 	{

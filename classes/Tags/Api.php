@@ -132,6 +132,8 @@ class Api
 	}
 
 	/**
+	 * Returns the total number of Tags in the Repository.
+	 *
 	 * @return int
 	 */
 	public function GetTotalTags(): int
@@ -139,12 +141,24 @@ class Api
 		return $this->repository->GetTotalTags();
 	}
 
+	/**
+	 * Filters for Tags and returns an array of the number of times they've been used for Tagging, indexed by their IDs.
+	 *
+	 * @param int|null   $limit
+	 * @param int|null   $offset
+	 * @param bool|null  $active
+	 * @param array|null $orders
+	 * @return array
+	 */
 	public function GetTagsTaggedTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
 	{
 		return $this->repository->GetTagsTaggedTotals($limit, $offset, $active, $orders);
 	}
 
 	/**
+	 * Given an array of Tag IDs,
+	 * returns the number of times the Tags have been used for Tagging, indexed by the Tag's IDs.
+	 *
 	 * @param int[] $ids
 	 * @return array
 	 */
@@ -154,6 +168,8 @@ class Api
 	}
 
 	/**
+	 * Creates a Tag with defaults. Used for creating Tags not in the Repository.
+	 *
 	 * @param User   $user
 	 * @param string $name
 	 * @return Tag
@@ -171,14 +187,14 @@ class Api
 	}
 
 	/**
-	 * Saves a Tag to the database. If the Tag does not have an ID, one will be set.
+	 * Saves a Tag to the Repository. If the Tag does not have an ID, one will be set.
 	 *
 	 * @param Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
 	 */
 	public function Save(Tag $tag)
 	{
-		$new = ($tag->GetId() === null) ? true : false;
+		$new = ($tag->GetId() === null);
 
 		$this->repository->Save($tag);
 
@@ -187,10 +203,10 @@ class Api
 
 		if ($new)
 		{
-			$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'tag_create', $id, $name);
+			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'tag_create', $id, $name);
 		} else
 		{
-			$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'tag_edit', $id, $name);
+			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'tag_edit', $id, $name);
 		}
 	}
 
