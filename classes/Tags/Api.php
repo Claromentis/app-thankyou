@@ -227,7 +227,7 @@ class Api
 
 		$this->repository->Delete($id);
 
-		$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'tag_delete', $id, $tag->GetName());
+		$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'tag_delete', $id, $tag->GetName());
 	}
 
 	/**
