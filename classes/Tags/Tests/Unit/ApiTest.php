@@ -3,14 +3,15 @@
 namespace Claromentis\ThankYou\Tags\Tests\Unit;
 
 use Claromentis\Core\Audit\Audit;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Tags\Api;
+use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Tags\Tag;
 use Claromentis\ThankYou\Tags\TagAcl;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
 use Date;
-use DateTime;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use User;
@@ -20,6 +21,8 @@ class ApiTest extends TestCase
 	private $api;
 
 	private $audit_mock;
+
+	private $security_context_mock;
 
 	private $tag_acl_mock;
 
@@ -33,12 +36,13 @@ class ApiTest extends TestCase
 
 	public function SetUp()
 	{
-		$this->audit_mock          = $this->createMock(Audit::class);
-		$this->tag_acl_mock        = $this->createMock(TagAcl::class);
-		$this->tag_factory_mock    = $this->createMock(TagFactory::class);
-		$this->tag_repository_mock = $this->createMock(TagRepository::class);
-		$this->tag_mock            = $this->createMock(Tag::class);
-		$this->user_mock           = $this->createMock(User::class);
+		$this->audit_mock            = $this->createMock(Audit::class);
+		$this->tag_acl_mock          = $this->createMock(TagAcl::class);
+		$this->tag_factory_mock      = $this->createMock(TagFactory::class);
+		$this->tag_repository_mock   = $this->createMock(TagRepository::class);
+		$this->tag_mock              = $this->createMock(Tag::class);
+		$this->user_mock             = $this->createMock(User::class);
+		$this->security_context_mock = $this->createMock(SecurityContext::class);
 
 		$this->api = new Api($this->audit_mock, $this->tag_repository_mock, $this->tag_factory_mock, $this->tag_acl_mock);
 	}
@@ -164,5 +168,31 @@ class ApiTest extends TestCase
 		$this->api->Save($this->tag_mock);
 	}
 
-	//WELCOME BACK! The next test for Api is Delete. You should also write Unit tests for the Tag Factory.
+	public function testDeleteSuccessful()
+	{
+		$this->tag_repository_mock->method('GetTags')->willReturn([1 => $this->tag_mock]);
+		$this->tag_acl_mock->expects($this->any())->method('CanDeleteTag')->with($this->security_context_mock)->willReturn(true);
+		$this->audit_mock->expects($this->once())->method('Store')->with(Audit::AUDIT_SUCCESS, $this->anything(), 'tag_delete');
+
+		$this->api->Delete(1, $this->security_context_mock);
+	}
+
+	public function testDeleteTagNotFound()
+	{
+		$this->tag_repository_mock->method('GetTags')->willReturn([]);
+		$this->tag_acl_mock->expects($this->any())->method('CanDeleteTag')->with($this->security_context_mock)->willReturn(true);
+		$this->expectException(TagNotFound::class);
+
+		$this->api->Delete(1, $this->security_context_mock);
+	}
+
+	public function testDeleteForbidden()
+	{
+		$this->tag_acl_mock->expects($this->any())->method('CanDeleteTag')->with($this->security_context_mock)->willReturn(false);
+		$this->expectException(TagForbidden::class);
+
+		$this->api->Delete(1, $this->security_context_mock);
+	}
+
+	//WELCOME BACK! You should write Unit tests for the Tag Factory.
 }
