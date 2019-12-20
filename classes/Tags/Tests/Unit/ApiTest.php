@@ -78,32 +78,32 @@ class ApiTest extends TestCase
 		$this->assertSame($this->api->GetTagsById([629]), $get_tags_return);
 	}
 
-	public function testGetTaggedTagsSuccessfulTagsFound()
+	public function testGetTaggableTagsSuccessfulTagsFound()
 	{
 		$expected_result        = [1 => $this->tag_mock];
-		$get_tagged_tags_return = [1 => $expected_result];
-		$this->tag_repository_mock->method('GetTaggedsTags')->willReturn($get_tagged_tags_return);
+		$get_taggable_tags_return = [1 => $expected_result];
+		$this->tag_repository_mock->method('GetTaggablesTags')->willReturn($get_taggable_tags_return);
 
-		$this->assertSame($this->api->GetTaggedTags(1, 1337), $expected_result);
+		$this->assertSame($this->api->GetTaggableTags(1, 1337), $expected_result);
 	}
 
-	public function testGetTaggedTagsSuccessfulNoTags()
+	public function testGetTaggableTagsSuccessfulNoTags()
 	{
 		$expected_result        = [];
-		$get_tagged_tags_return = [1 => $expected_result];
-		$this->tag_repository_mock->method('GetTaggedsTags')->willReturn($get_tagged_tags_return);
+		$get_taggable_tags_return = [1 => $expected_result];
+		$this->tag_repository_mock->method('GetTaggablesTags')->willReturn($get_taggable_tags_return);
 
-		$this->assertSame($this->api->GetTaggedTags(1, 1337), $expected_result);
+		$this->assertSame($this->api->GetTaggableTags(1, 1337), $expected_result);
 	}
 
-	public function testGetTaggedsTagsSuccessful()
+	public function testGetTaggablesTagsSuccessful()
 	{
-		$get_tagged_tags_return = [1 => [1 => $this->tag_mock]];
-		$expected_result        = $get_tagged_tags_return;
+		$get_taggable_tags_return = [1 => [1 => $this->tag_mock]];
+		$expected_result        = $get_taggable_tags_return;
 		$expected_result[2]     = [];
-		$this->tag_repository_mock->method('GetTaggedsTags')->willReturn($expected_result);
+		$this->tag_repository_mock->method('GetTaggablesTags')->willReturn($expected_result);
 
-		$this->assertSame($this->api->GetTaggedsTags([1, 2], 1337), $expected_result);
+		$this->assertSame($this->api->GetTaggablesTags([1, 2], 1337), $expected_result);
 	}
 
 	public function testGetTotalTagsSuccessful()
@@ -114,20 +114,20 @@ class ApiTest extends TestCase
 		$this->assertSame($this->api->GetTotalTags(), $expected_result);
 	}
 
-	public function testGetTagsTaggedTotalsSuccessful()
+	public function testGetTagsTaggingTotalsSuccessful()
 	{
 		$expected_result = [1 => 56, 2 => 0, 3 => 9];
-		$this->tag_repository_mock->method('GetTagsTaggedTotals')->willReturn($expected_result);
+		$this->tag_repository_mock->method('GetTagsTaggingTotals')->willReturn($expected_result);
 
-		$this->assertSame($this->api->GetTagsTaggedTotals(), $expected_result);
+		$this->assertSame($this->api->GetTagsTaggingTotals(), $expected_result);
 	}
 
-	public function testGetTagsTaggedTotalsFromIdsSuccessful()
+	public function testGetTagsTaggingTotalsFromIdsSuccessful()
 	{
 		$expected_result = [1 => 56, 2 => 0, 3 => 9];
-		$this->tag_repository_mock->method('GetTagsTaggedTotalsFromIds')->willReturn($expected_result);
+		$this->tag_repository_mock->method('GetTagsTaggingTotalsFromIds')->willReturn($expected_result);
 
-		$this->assertSame($this->api->GetTagsTaggedTotalsFromIds([1, 2, 3]), $expected_result);
+		$this->assertSame($this->api->GetTagsTaggingTotalsFromIds([1, 2, 3]), $expected_result);
 	}
 
 	public function testCreateSuccessful()

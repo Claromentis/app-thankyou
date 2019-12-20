@@ -99,32 +99,32 @@ class Api
 	}
 
 	/**
-	 * Given a Tagged ID and Aggregation ID, returns an array of Tags, indexed by the Tagging's ID.
+	 * Given a Taggable's ID and its Aggregation ID, returns an array of Tags, indexed by the Tagging's ID.
 	 *
-	 * @param int $tagged_id
+	 * @param int $taggable_id
 	 * @param int $aggregation_id
 	 * @return Tag[]
 	 */
-	public function GetTaggedTags(int $tagged_id, int $aggregation_id): array
+	public function GetTaggableTags(int $taggable_id, int $aggregation_id): array
 	{
-		return $this->GetTaggedsTags([$tagged_id], $aggregation_id)[$tagged_id];
+		return $this->GetTaggablesTags([$taggable_id], $aggregation_id)[$taggable_id];
 	}
 
 	/**
-	 * Given an Aggregation ID, and Tagged IDs, returns an array of Taggings, indexed by the Tagged's ID.
+	 * Given an array of Taggables' IDs, and the Taggables' Aggregation ID, returns an array of Taggings, indexed by the Taggable's ID.
 	 *
-	 * @param int[] $tagged_ids
+	 * @param int[] $taggable_ids
 	 * @param int   $aggregation_id
 	 * @return array[]
 	 */
-	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id): array
+	public function GetTaggablesTags(array $taggable_ids, int $aggregation_id): array
 	{
-		$taggeds_tags = $this->repository->GetTaggedsTags($tagged_ids, $aggregation_id);
-		foreach ($tagged_ids as $tagged_id)
+		$taggeds_tags = $this->repository->GetTaggablesTags($taggable_ids, $aggregation_id);
+		foreach ($taggable_ids as $taggable_id)
 		{
-			if (!isset($taggeds_tags[$tagged_id]))
+			if (!isset($taggeds_tags[$taggable_id]))
 			{
-				$taggeds_tags[$tagged_id] = [];
+				$taggeds_tags[$taggable_id] = [];
 			}
 		}
 
@@ -150,9 +150,9 @@ class Api
 	 * @param array|null $orders
 	 * @return array
 	 */
-	public function GetTagsTaggedTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
+	public function GetTagsTaggingTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
 	{
-		return $this->repository->GetTagsTaggedTotals($limit, $offset, $active, $orders);
+		return $this->repository->GetTagsTaggingTotals($limit, $offset, $active, $orders);
 	}
 
 	/**
@@ -162,9 +162,9 @@ class Api
 	 * @param int[] $ids
 	 * @return array
 	 */
-	public function GetTagsTaggedTotalsFromIds(array $ids): array
+	public function GetTagsTaggingTotalsFromIds(array $ids): array
 	{
-		return $this->repository->GetTagsTaggedTotalsFromIds($ids);
+		return $this->repository->GetTagsTaggingTotalsFromIds($ids);
 	}
 
 	/**
@@ -231,90 +231,90 @@ class Api
 	}
 
 	/**
-	 * Saves a Tagged's Tag to the Repository.
+	 * Saves a Tagging to the Repository.
 	 * Returns the ID of the Tagging.
 	 *
-	 * @param int $tagged_id
+	 * @param int $taggable_id
 	 * @param int $aggregation_id
 	 * @param Tag $tag
 	 * @return int
 	 * @throws TagNotFound If the Tag could not be found in the Repository.
 	 */
-	public function AddTaggedTag(int $tagged_id, int $aggregation_id, Tag $tag): int
+	public function AddTagging(int $taggable_id, int $aggregation_id, Tag $tag): int
 	{
 		$tag_id = $tag->GetId();
 
 		if (!isset($tag_id))
 		{
-			throw new InvalidArgumentException("Failed to Add Tagged's Tag, Tag's ID unknown");
+			throw new InvalidArgumentException("Failed to Add Tagging, Tag's ID unknown");
 		}
 
-		return $this->repository->SaveTaggedTag($tagged_id, $aggregation_id, $tag_id);
+		return $this->repository->SaveTagging($taggable_id, $aggregation_id, $tag_id);
 	}
 
 	/**
-	 * Saves a Tagged's Tags to the Repository.
+	 * Saves Taggings for a single Taggable to the Repository.
 	 * Returns an array of the Tagging IDs.
 	 *
-	 * @param int   $tagged_id
+	 * @param int   $taggable_id
 	 * @param int   $aggregation_id
 	 * @param Tag[] $tags
 	 * @return int[]
 	 * @throws TagNotFound If one or more of the Tags could not be found in the Repository.
 	 */
-	public function AddTaggedTags(int $tagged_id, int $aggregation_id, array $tags): array
+	public function AddTaggings(int $taggable_id, int $aggregation_id, array $tags): array
 	{
 		$tagging_ids = [];
 		foreach ($tags as $tag)
 		{
-			$tagging_ids[] = $this->AddTaggedTag($tagged_id, $aggregation_id, $tag);
+			$tagging_ids[] = $this->AddTagging($taggable_id, $aggregation_id, $tag);
 		}
 
 		return $tagging_ids;
 	}
 
 	/**
-	 * Deletes a Tagged's Tag from the Repository.
+	 * Deletes a Tagging from the Repository.
 	 *
-	 * @param int $tagged_id
+	 * @param int $taggable_id
 	 * @param int $aggregation_id
 	 * @param Tag $tag
 	 */
-	public function RemoveTaggedTag(int $tagged_id, int $aggregation_id, Tag $tag)
+	public function RemoveTagging(int $taggable_id, int $aggregation_id, Tag $tag)
 	{
 		$tag_id = $tag->GetId();
 
 		if (!isset($tag_id))
 		{
-			throw new InvalidArgumentException("Failed to Remove Tagged's Tag, Tag's ID unknown");
+			throw new InvalidArgumentException("Failed to Remove Tagging, Tag's ID unknown");
 		}
 
-		$this->repository->DeleteTaggedTags($tagged_id, $aggregation_id, $tag_id);
+		$this->repository->DeleteTaggableTaggings($taggable_id, $aggregation_id, $tag_id);
 	}
 
 	/**
-	 * Deletes a Tagged's Tags from the Repository.
+	 * Deletes specific Taggings for a single Taggable from the Repository.
 	 *
-	 * @param int   $tagged_id
+	 * @param int   $taggable_id
 	 * @param int   $aggregation_id
 	 * @param Tag[] $tags
 	 */
-	public function RemoveTaggedTags(int $tagged_id, int $aggregation_id, array $tags)
+	public function RemoveTaggings(int $taggable_id, int $aggregation_id, array $tags)
 	{
 		foreach ($tags as $tag)
 		{
-			$this->RemoveTaggedTag($tagged_id, $aggregation_id, $tag);
+			$this->RemoveTagging($taggable_id, $aggregation_id, $tag);
 		}
 	}
 
 	/**
-	 * Deletes all of a Tagged's Tags from the Repository.
+	 * Deletes all of a Taggable's Taggings from the Repository.
 	 *
-	 * @param int $tagged_id
+	 * @param int $taggable_id
 	 * @param int $aggregation_id
 	 */
-	public function RemoveAllTaggedTags(int $tagged_id, int $aggregation_id)
+	public function RemoveAllTaggableTaggings(int $taggable_id, int $aggregation_id)
 	{
-		$this->repository->DeleteTaggedTags($tagged_id, $aggregation_id);
+		$this->repository->DeleteTaggableTaggings($taggable_id, $aggregation_id);
 	}
 }

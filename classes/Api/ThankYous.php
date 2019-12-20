@@ -226,7 +226,7 @@ class ThankYous
 
 		$ids = array_keys($ids);
 
-		$taggeds_tags = $this->tag_api->GetTaggedsTags($ids, ThankYousRepository::AGGREGATION_ID);
+		$taggeds_tags = $this->tag_api->GetTaggablesTags($ids, ThankYousRepository::AGGREGATION_ID);
 
 		foreach ($thank_yous as $thank_you)
 		{
@@ -596,8 +596,8 @@ class ThankYous
 		$tags = $thank_you->GetTags();
 		if (isset($tags))
 		{
-			$this->tag_api->RemoveAllTaggedTags($id, ThankYousRepository::AGGREGATION_ID);
-			$this->tag_api->AddTaggedTags($id, ThankYousRepository::AGGREGATION_ID, $tags);
+			$this->tag_api->RemoveAllTaggableTaggings($id, ThankYousRepository::AGGREGATION_ID);
+			$this->tag_api->AddTaggings($id, ThankYousRepository::AGGREGATION_ID, $tags);
 		}
 
 		if ($new)
@@ -624,7 +624,7 @@ class ThankYous
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
 
-		$this->tag_api->RemoveAllTaggedTags($id, ThankYousRepository::AGGREGATION_ID);
+		$this->tag_api->RemoveAllTaggableTaggings($id, ThankYousRepository::AGGREGATION_ID);
 		$this->thank_yous_repository->Delete($id);
 
 		$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_delete', $id, $thank_you->GetDescription());

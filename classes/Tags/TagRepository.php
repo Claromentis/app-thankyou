@@ -22,7 +22,7 @@ class TagRepository
 {
 	const TABLE_NAME = 'thankyou_tag';
 
-	const TAGGED_TABLE = 'thankyou_tagged';
+	const TAGGING_TABLE = 'thankyou_tagged';
 
 	private $db;
 
@@ -116,7 +116,7 @@ class TagRepository
 	}
 
 	/**
-	 * Filters for Tags and returns an array of the number of times they've been used for Tagging, indexed by their IDs.
+	 * Filters Tags and returns an array of the number of Taggings they have, indexed by their IDs.
 	 *
 	 * @param int|null   $limit
 	 * @param int|null   $offset
@@ -124,9 +124,9 @@ class TagRepository
 	 * @param array|null $orders
 	 * @return array
 	 */
-	public function GetTagsTaggedTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
+	public function GetTagsTaggingTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
 	{
-		$query_string = "SELECT COUNT(" . self::TAGGED_TABLE . ".item_id) AS total, " . self::TAGGED_TABLE . ".tag_id FROM " . self::TAGGED_TABLE . " GROUP BY " . self::TAGGED_TABLE . ".tag_id";
+		$query_string = "SELECT COUNT(" . self::TAGGING_TABLE . ".item_id) AS total, " . self::TAGGING_TABLE . ".tag_id FROM " . self::TAGGING_TABLE . " GROUP BY " . self::TAGGING_TABLE . ".tag_id";
 
 		if (isset($orders) && count($orders) > 0)
 		{
@@ -144,7 +144,7 @@ class TagRepository
 		}
 
 		$query = new QueryBuilder($query_string);
-		$query->AddJoin(self::TAGGED_TABLE, self::TABLE_NAME, 'tag', "tag.id = " . self::TAGGED_TABLE . ".tag_id");
+		$query->AddJoin(self::TAGGING_TABLE, self::TABLE_NAME, 'tag', "tag.id = " . self::TAGGING_TABLE . ".tag_id");
 
 		if (isset($active))
 		{
@@ -163,14 +163,14 @@ class TagRepository
 	 * @param int[] $ids
 	 * @return array
 	 */
-	public function GetTagsTaggedTotalsFromIds(array $ids): array
+	public function GetTagsTaggingTotalsFromIds(array $ids): array
 	{
 		if (count($ids) === 0)
 		{
 			return [];
 		}
 
-		$query_string = "SELECT COUNT(item_id) AS total, tag_id FROM " . self::TABLE_NAME . " WHERE tag_id IN in:int:ids GROUP BY tag_id";
+		$query_string = "SELECT COUNT(item_id) AS total, tag_id FROM " . self::TAGGING_TABLE . " WHERE tag_id IN in:int:ids GROUP BY tag_id";
 
 		return $this->GetTagsTotalsFromDbQuery($this->db->query($query_string, $ids));
 	}
@@ -248,33 +248,37 @@ class TagRepository
 	}
 
 	/**
+	 * Delete a Tag and its Taggings records.
+	 *
 	 * @param int $id
 	 */
 	public function Delete(int $id)
 	{
-		$this->DeleteTagTaggeds($id);
+		$this->DeleteAllTagTaggings($id);
 		$this->db->query("DELETE FROM " . self::TABLE_NAME . " WHERE id=int:id", $id);
 	}
 
 	/**
-	 * Given an Aggregation ID, and Tagged IDs, returns an array of Taggings, indexed by the Tagged's ID.
+	 * Given an array of Taggable IDs and their Aggregation ID,
+	 * returns a multidimensional array, primarily indexed by each Taggable's ID.
+	 * Each of these contains an array of Tags, indexed by the Tagging's ID.
 	 *
-	 * @param int[] $tagged_ids
+	 * @param int[] $taggable_ids
 	 * @param int   $aggregation_id
 	 * @return array[]
 	 */
-	public function GetTaggedsTags(array $tagged_ids, int $aggregation_id): array
+	public function GetTaggablesTags(array $taggable_ids, int $aggregation_id): array
 	{
-		if (count($tagged_ids) === 0)
+		if (count($taggable_ids) === 0)
 		{
 			return [];
 		}
 
-		$query_string = "SELECT * FROM " . self::TAGGED_TABLE;
+		$query_string = "SELECT * FROM " . self::TAGGING_TABLE;
 		$query        = $this->db->GetQueryBuilder($query_string);
 
 		$this->QueryFilterAggregationId($query, $aggregation_id);
-		$this->QueryFilterTaggedId($query, $tagged_ids);
+		$this->QueryFilterTaggableId($query, $taggable_ids);
 
 		$results = $this->db->query($query->GetQuery());
 
@@ -282,11 +286,11 @@ class TagRepository
 		$rows    = [];
 		while ($row = $results->fetchArray())
 		{
-			$id        = (int) $row['id'];
-			$tagged_id = (int) $row['item_id'];
-			$tag_id    = (int) $row['tag_id'];
+			$id          = (int) $row['id'];
+			$taggable_id = (int) $row['item_id'];
+			$tag_id      = (int) $row['tag_id'];
 
-			$rows[$id]        = ['tagged_id' => $tagged_id, 'tag_id' => $tag_id];
+			$rows[$id]        = ['taggable_id' => $taggable_id, 'tag_id' => $tag_id];
 			$tag_ids[$tag_id] = true;
 		}
 
@@ -294,50 +298,51 @@ class TagRepository
 
 		$tags = $this->GetTags($tag_ids);
 
-		$taggeds_tags = [];
+		$taggables_tags = [];
 		foreach ($rows as $tagging_id => $row)
 		{
 			if (isset($tags[$row['tag_id']]))
 			{
-				$taggeds_tags[$row['tagged_id']][$tagging_id] = $tags[$row['tag_id']];
+				$taggables_tags[$row['taggable_id']][$tagging_id] = $tags[$row['tag_id']];
 			}
 		}
 
-		return $taggeds_tags;
+		return $taggables_tags;
 	}
 
 	/**
-	 * Saves a Tagged's Tag. If an ID is provided, an existing record will be updated, if not a new entry will be created.
+	 * Saves a Tagging.
+	 * If an ID is provided, an existing record will be updated, if not a new entry will be created.
 	 *
-	 * @param int      $tagged_id
+	 * @param int      $taggable_id
 	 * @param int      $aggregation_id
 	 * @param int      $tag_id
 	 * @param int|null $id
 	 * @return int
 	 * @throws TagNotFound If the Tag with the given ID could not be found.
 	 */
-	public function SaveTaggedTag(int $tagged_id, int $aggregation_id, int $tag_id, ?int $id = null): int
+	public function SaveTagging(int $taggable_id, int $aggregation_id, int $tag_id, ?int $id = null): int
 	{
 		$tags = $this->GetTags([$tag_id]);
 		if (!isset($tags[$tag_id]))
 		{
-			throw new TagNotFound("Failed to Save Tagged's Tag, Tag with ID '" . (string) $tag_id . "' could not be found");
+			throw new TagNotFound("Failed to Save Taggable's Tag, Tag with ID '" . (string) $tag_id . "' could not be found");
 		}
 
 		$db_fields = [
-			'int:item_id'        => $tagged_id,
+			'int:item_id'        => $taggable_id,
 			'int:aggregation_id' => $aggregation_id,
 			'int:tag_id'         => $tag_id
 		];
 
 		if (isset($id))
 		{
-			$query = $this->query_factory->GetQueryUpdate(self::TAGGED_TABLE, "id=int:id", $db_fields);
+			$query = $this->query_factory->GetQueryUpdate(self::TAGGING_TABLE, "id=int:id", $db_fields);
 			$query->Bind('id', $id);
 			$this->db->query($query);
 		} else
 		{
-			$query = $this->query_factory->GetQueryInsert(self::TAGGED_TABLE, $db_fields);
+			$query = $this->query_factory->GetQueryInsert(self::TAGGING_TABLE, $db_fields);
 			$this->db->query($query);
 			$id = $this->db->insertId();
 		}
@@ -346,16 +351,17 @@ class TagRepository
 	}
 
 	/**
-	 * Deletes a Tagged's Tags. If a Tag ID is specified, only usages of that Tag will be deleted.
+	 * Deletes a Taggable's Taggings.
+	 * If a Tag ID is specified, only Taggings with that Tag will be deleted.
 	 *
-	 * @param int      $tagged_id
+	 * @param int      $taggable_id
 	 * @param int      $aggregation_id
 	 * @param int|null $tag_id
 	 */
-	public function DeleteTaggedTags(int $tagged_id, int $aggregation_id, ?int $tag_id = null)
+	public function DeleteTaggableTaggings(int $taggable_id, int $aggregation_id, ?int $tag_id = null)
 	{
-		$params       = [$tagged_id, $aggregation_id];
-		$query_string = "DELETE FROM " . self::TAGGED_TABLE . " WHERE item_id=int:tagged_id AND aggregation_id=int:aggregation_id";
+		$params       = [$taggable_id, $aggregation_id];
+		$query_string = "DELETE FROM " . self::TAGGING_TABLE . " WHERE item_id=int:taggable_id AND aggregation_id=int:aggregation_id";
 
 		if (isset($tag_id))
 		{
@@ -371,9 +377,9 @@ class TagRepository
 	 *
 	 * @param int $tag_id
 	 */
-	public function DeleteTagTaggeds(int $tag_id)
+	public function DeleteAllTagTaggings(int $tag_id)
 	{
-		$query_string = "DELETE FROM " . self::TAGGED_TABLE . " WHERE tag_id=int:tag_id";
+		$query_string = "DELETE FROM " . self::TAGGING_TABLE . " WHERE tag_id=int:tag_id";
 
 		$this->db->query($query_string, $tag_id);
 	}
@@ -451,13 +457,13 @@ class TagRepository
 	 */
 	private function GetTagsTotalsFromDbQuery(ResultInterface $results): array
 	{
-		$tags_tagged_totals = [];
+		$tag_tagging_totals = [];
 		while ($row = $results->fetchArray())
 		{
-			$tags_tagged_totals[(int) $row['tag_id']] = (int) $row['total'];
+			$tag_tagging_totals[(int) $row['tag_id']] = (int) $row['total'];
 		}
 
-		return $tags_tagged_totals;
+		return $tag_tagging_totals;
 	}
 
 	/**
@@ -483,20 +489,20 @@ class TagRepository
 
 	private function QueryFilterAggregationId(QueryBuilder $query, int $aggregation_id)
 	{
-		$query->AddWhereAndClause(self::TAGGED_TABLE . ".aggregation_id=int:aggregation_id", $aggregation_id);
+		$query->AddWhereAndClause(self::TAGGING_TABLE . ".aggregation_id=int:aggregation_id", $aggregation_id);
 	}
 
-	private function QueryFilterTaggedId(QueryBuilder $query, $tagged_ids)
+	private function QueryFilterTaggableId(QueryBuilder $query, $taggable_ids)
 	{
-		if (is_int($tagged_ids))
+		if (is_int($taggable_ids))
 		{
-			$query->AddWhereAndClause(self::TAGGED_TABLE . ".item_id=int:tagged_ids", $tagged_ids);
-		} elseif (is_array($tagged_ids))
+			$query->AddWhereAndClause(self::TAGGING_TABLE . ".item_id=int:taggable_ids", $taggable_ids);
+		} elseif (is_array($taggable_ids))
 		{
-			$query->AddWhereAndClause(self::TAGGED_TABLE . ".item_id IN in:int:tagged_ids", $tagged_ids);
+			$query->AddWhereAndClause(self::TAGGING_TABLE . ".item_id IN in:int:taggable_ids", $taggable_ids);
 		} else
 		{
-			throw new InvalidArgumentException("Failed to Add Tagged ID Filter to Query, invalid value for parameter tagged_ids given: " . (string) $tagged_ids);
+			throw new InvalidArgumentException("Failed to Add Taggable ID Filter to Query, invalid value for parameter taggable_ids given: " . (string) $taggable_ids);
 		}
 	}
 }
