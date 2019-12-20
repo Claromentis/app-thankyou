@@ -593,7 +593,7 @@ class ThanksRestV2
 			], 400);
 		}
 
-		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag), 200);
+		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag), 201);
 	}
 
 	/**
