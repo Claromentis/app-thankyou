@@ -60,6 +60,8 @@ class Factory
 	}
 
 	/**
+	 * Creates and returns a Thankable to represent Thanked objects which could not be identified.
+	 *
 	 * @param int|null $id
 	 * @param int|null $owner_class_id
 	 * @return Thankable
@@ -95,7 +97,7 @@ class Factory
 	 * @param int $owner_class_id
 	 * @return string
 	 */
-	private function GetOwnerClassName(int $owner_class_id)
+	private function GetOwnerClassName(int $owner_class_id): string
 	{
 		try
 		{
