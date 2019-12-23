@@ -21,18 +21,39 @@ class ApiTest extends TestCase
 {
 	private $api;
 
+	/**
+	 * @var Audit $audit_mock
+	 */
 	private $audit_mock;
 
+	/**
+	 * @var SecurityContext $security_context_mock
+	 */
 	private $security_context_mock;
 
+	/**
+	 * @var TagAcl $tag_acl_mock
+	 */
 	private $tag_acl_mock;
 
+	/**
+	 * @var TagFactory $tag_factory_mock
+	 */
 	private $tag_factory_mock;
 
+	/**
+	 * @var Tag $tag_mock
+	 */
 	private $tag_mock;
 
+	/**
+	 * @var TagRepository $tag_repository_mock
+	 */
 	private $tag_repository_mock;
 
+	/**
+	 * @var User $user_mock
+	 */
 	private $user_mock;
 
 	public function SetUp()
@@ -215,10 +236,65 @@ class ApiTest extends TestCase
 	{
 		$tagging_id = 1;
 		$this->tag_mock->expects($this->once())->method('GetId')->willReturn(2);
-		$this->tag_repository_mock->expects($this->once())->method('SaveTagging')->willReturn($tagging_id);
+		$tags = [$this->tag_mock];
+		$this->tag_repository_mock->expects($this->exactly(count($tags)))->method('SaveTagging')->willReturn($tagging_id);
 
-		$this->assertSame([$tagging_id], $this->api->AddTaggings(1, 2, [$this->tag_mock]));
+		$this->assertSame([$tagging_id], $this->api->AddTaggings(1, 2, $tags));
 	}
 
-	//WELCOME BACK! Continue to write tests for tagging successful. You should write Unit tests for the Tag Factory.
+	public function testAddTaggingsInvalidTag()
+	{
+		$this->expectException(InvalidArgumentException::class);
+
+		$this->api->AddTaggings(1, 2, [$this->tag_mock]);
+	}
+
+	public function testRemoveTaggingSuccessful()
+	{
+		$taggable_id    = 1;
+		$aggregation_id = 2;
+		$tag_id         = 3;
+		$this->tag_mock->expects($this->once())->method('GetId')->willReturn($tag_id);
+		$this->tag_repository_mock->expects($this->once())->method('DeleteTaggableTaggings')
+			->with($taggable_id, $aggregation_id, $tag_id);
+
+		$this->api->RemoveTagging($taggable_id, $aggregation_id, $this->tag_mock);
+	}
+
+	public function testRemoveTaggingInvalidTag()
+	{
+		$this->expectException(InvalidArgumentException::class);
+
+		$this->api->RemoveTagging(1, 2, $this->tag_mock);
+	}
+
+	public function testRemoveTaggingsSuccessful()
+	{
+		$taggable_id    = 1;
+		$aggregation_id = 2;
+		$tag_id         = 3;
+		$this->tag_mock->expects($this->once())->method('GetId')->willReturn($tag_id);
+		$tags = [$this->tag_mock];
+		$this->tag_repository_mock->expects($this->exactly(count($tags)))->method('DeleteTaggableTaggings')
+			->with($taggable_id, $aggregation_id, $this->isType('int'));
+
+		$this->api->RemoveTaggings(1, 2, $tags);
+	}
+
+	public function testRemoveTaggingsInvalidTag()
+	{
+		$this->expectException(InvalidArgumentException::class);
+
+		$this->api->RemoveTaggings(1, 2, [$this->tag_mock]);
+	}
+
+	public function testRemoveAllTaggableTaggingsSuccessful()
+	{
+		$taggable_id    = 1;
+		$aggregation_id = 2;
+		$this->tag_repository_mock->expects($this->once())->method('DeleteTaggableTaggings')
+			->with($taggable_id, $aggregation_id, null);
+
+		$this->api->RemoveAllTaggableTaggings($taggable_id, $aggregation_id);
+	}
 }
