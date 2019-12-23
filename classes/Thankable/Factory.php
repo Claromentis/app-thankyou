@@ -6,7 +6,6 @@ use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
-use Psr\Log\LoggerInterface;
 
 class Factory
 {
@@ -14,11 +13,6 @@ class Factory
 	 * @var Lmsg $lmsg
 	 */
 	private $lmsg;
-
-	/**
-	 * @var LoggerInterface $log
-	 */
-	private $log;
 
 	/**
 	 * @var ThankYouUtility $utility
@@ -30,12 +24,10 @@ class Factory
 	 *
 	 * @param Lmsg            $lmsg
 	 * @param ThankYouUtility $utility
-	 * @param LoggerInterface $logger
 	 */
-	public function __construct(Lmsg $lmsg, ThankYouUtility $utility, LoggerInterface $logger)
+	public function __construct(Lmsg $lmsg, ThankYouUtility $utility)
 	{
 		$this->lmsg    = $lmsg;
-		$this->log     = $logger;
 		$this->utility = $utility;
 	}
 

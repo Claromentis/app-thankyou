@@ -105,7 +105,7 @@ class Plugin implements
 
 		//Thankable
 		$app[Thankable\Factory::class] = function ($app) {
-			return new Thankable\Factory($app[Lmsg::class], $app[ThankYouUtility::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+			return new Thankable\Factory($app[Lmsg::class], $app[ThankYouUtility::class]);
 		};
 
 		//Thank Yous
