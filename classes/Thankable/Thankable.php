@@ -10,14 +10,19 @@ class Thankable
 	private $name;
 
 	/**
+	 * @var int|null $extranet_id
+	 */
+	private $extranet_id;
+
+	/**
 	 * @var int|null $id
 	 */
 	private $id;
 
 	/**
-	 * @var string|null $owner_class_name
+	 * @var string|null $image_url
 	 */
-	private $owner_class_name;
+	private $image_url;
 
 	/**
 	 * PermOClass constant.
@@ -27,29 +32,31 @@ class Thankable
 	private $owner_class_id;
 
 	/**
-	 * @var int|null $extranet_id
+	 * @var string|null $owner_class_name
 	 */
-	private $extranet_id;
-
-	/**
-	 * @var string|null $image_url
-	 */
-	private $image_url;
+	private $owner_class_name;
 
 	/**
 	 * @var string|null $profile_url
 	 */
 	private $profile_url;
 
-	public function __construct(string $name, ?int $id = null, ?string $owner_class_name = null, ?int $owner_class_id = null, ?int $extranet_id = null, ?string $image_url = null, ?string $profile_url = null)
+	/**
+	 * Thankable constructor.
+	 *
+	 * @param string $name
+	 */
+	public function __construct(string $name)
 	{
-		$this->name             = $name;
-		$this->id               = $id;
-		$this->owner_class_name = $owner_class_name;
-		$this->owner_class_id   = $owner_class_id;
-		$this->extranet_id      = $extranet_id;
-		$this->image_url        = $image_url;
-		$this->profile_url      = $profile_url;
+		$this->SetName($name);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function GetName(): string
+	{
+		return $this->name;
 	}
 
 	/**
@@ -77,14 +84,6 @@ class Thankable
 	}
 
 	/**
-	 * @return string
-	 */
-	public function GetName(): string
-	{
-		return $this->name;
-	}
-
-	/**
 	 * @return int|null
 	 */
 	public function GetOwnerClass(): ?int
@@ -106,5 +105,52 @@ class Thankable
 	public function GetProfileUrl(): ?string
 	{
 		return $this->profile_url;
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public function SetName(string $name)
+	{
+		$this->name = $name;
+	}
+
+	public function SetExtranetId(?int $id)
+	{
+		$this->extranet_id = $id;
+	}
+
+	/**
+	 * @param int|null $id
+	 */
+	public function SetId(?int $id)
+	{
+		$this->id = $id;
+	}
+
+	public function SetImageUrl(?string $url)
+	{
+		$this->image_url = $url;
+	}
+
+	/**
+	 * @param int|null $owner_class_id
+	 */
+	public function SetOwnerClassId(?int $owner_class_id)
+	{
+		$this->owner_class_id = $owner_class_id;
+	}
+
+	/**
+	 * @param string|null $name
+	 */
+	public function SetOwnerClassName(?string $name)
+	{
+		$this->owner_class_name = $name;
+	}
+
+	public function SetProfileUrl(?string $url)
+	{
+		$this->profile_url = $url;
 	}
 }

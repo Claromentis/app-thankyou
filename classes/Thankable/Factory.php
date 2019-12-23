@@ -48,7 +48,15 @@ class Factory
 			$owner_class_name = $this->GetOwnerClassName($owner_class_id);
 		}
 
-		return new Thankable($name, $id, $owner_class_name, $owner_class_id, $extranet_id, $image_url, $profile_url);
+		$thankable = new Thankable($name);
+		$thankable->SetExtranetId($extranet_id);
+		$thankable->SetId($id);
+		$thankable->SetImageUrl($image_url);
+		$thankable->SetOwnerClassId($owner_class_id);
+		$thankable->SetOwnerClassName($owner_class_name);
+		$thankable->SetProfileUrl($profile_url);
+
+		return $thankable;
 	}
 
 	/**
@@ -75,7 +83,12 @@ class Factory
 			$name = ($this->lmsg)('thankyou.thankable.not_found');
 		}
 
-		return new Thankable($name, $id, $owner_class_name, $owner_class_id);
+		$thankable = new Thankable($name);
+		$thankable->SetId($id);
+		$thankable->SetOwnerClassId($owner_class_id);
+		$thankable->SetOwnerClassName($owner_class_name);
+
+		return $thankable;
 	}
 
 	/**
