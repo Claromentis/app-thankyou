@@ -204,7 +204,7 @@ class ThanksRestV2
 			$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
 		}
 
-		if ($this->config->Get('thankyou_core_values_mandatory') === true && (!isset($tag_ids) || count($tag_ids) === 0))
+		if ($this->api->Configuration()->IsTagsMandatory($this->config) && (!isset($tag_ids) || count($tag_ids) === 0))
 		{
 			$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 		} elseif (isset($tag_ids))
@@ -422,7 +422,7 @@ class ThanksRestV2
 				{
 					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_array')];
 				}
-			} elseif ($this->config->Get('thankyou_core_values_mandatory') && count($current_tags))
+			} elseif ($this->api->Configuration()->IsTagsMandatory($this->config) && count($current_tags))
 			{
 				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 			}

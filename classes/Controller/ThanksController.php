@@ -93,7 +93,7 @@ class ThanksController
 	public function CoreValues()
 	{
 		$core_values_enabled   = $this->api->Configuration()->IsTagsEnabled($this->config);
-		$core_values_mandatory = (bool) $this->config->Get('thankyou_core_values_mandatory');
+		$core_values_mandatory = $this->api->Configuration()->IsTagsMandatory($this->config);
 
 		$args = [
 			'nav_tags.+class'                => 'active',

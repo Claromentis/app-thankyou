@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\Api;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Config\ConfigDialog;
 use Claromentis\Core\Config\WritableConfig;
+
 // TODO: Move to Configuration directory
 class Configuration
 {
@@ -61,5 +62,16 @@ class Configuration
 	public function IsTagsEnabled(Config $config)
 	{
 		return (bool) $config->Get('thankyou_core_values_enabled');
+	}
+
+	/**
+	 * Determines whether Tags are mandatory for Thank Yous.
+	 *
+	 * @param Config $config
+	 * @return bool
+	 */
+	public function IsTagsMandatory(Config $config)
+	{
+		return $this->IsTagsEnabled($config) && (bool) $config->Get('thankyou_core_values_mandatory');
 	}
 }
