@@ -92,7 +92,7 @@ class ThanksController
 
 	public function CoreValues()
 	{
-		$core_values_enabled   = (bool) $this->config->Get('thankyou_core_values_enabled');
+		$core_values_enabled   = $this->api->Configuration()->IsTagsEnabled($this->config);
 		$core_values_mandatory = (bool) $this->config->Get('thankyou_core_values_mandatory');
 
 		$args = [

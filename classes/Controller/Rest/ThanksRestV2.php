@@ -209,7 +209,7 @@ class ThanksRestV2
 			$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 		} elseif (isset($tag_ids))
 		{
-			if ($this->config->Get('thankyou_core_values_enabled') !== true)
+			if (!$this->api->Configuration()->IsTagsEnabled($this->config))
 			{
 				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.disabled')];
 			} else
@@ -387,7 +387,7 @@ class ThanksRestV2
 			{
 				if (is_array($tag_ids))
 				{
-					if ($this->config->Get('thankyou_core_values_enabled') === true)
+					if ($this->api->Configuration()->IsTagsEnabled($this->config))
 					{
 						$tag_ids_valid = true;
 						foreach ($tag_ids as $tag_id)

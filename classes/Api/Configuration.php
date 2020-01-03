@@ -2,9 +2,10 @@
 
 namespace Claromentis\ThankYou\Api;
 
+use Claromentis\Core\Config\Config;
 use Claromentis\Core\Config\ConfigDialog;
 use Claromentis\Core\Config\WritableConfig;
-
+// TODO: Move to Configuration directory
 class Configuration
 {
 	private $config_options;
@@ -49,5 +50,16 @@ class Configuration
 	public function SaveConfig(WritableConfig $config)
 	{
 		$config->Save();
+	}
+
+	/**
+	 * Determines whether Tags are enabled for Thank Yous.
+	 *
+	 * @param Config $config
+	 * @return bool
+	 */
+	public function IsTagsEnabled(Config $config)
+	{
+		return (bool) $config->Get('thankyou_core_values_enabled');
 	}
 }

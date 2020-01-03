@@ -22,6 +22,7 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
+use Claromentis\ThankYou\Api\Configuration;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Comments;
@@ -191,7 +192,7 @@ class Plugin implements
 		};
 
 		$app[StatisticsController::class] = function ($app) {
-			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app['thankyou.config'], $app[Tags\Api::class]);
+			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app['thankyou.config'], $app[Tags\Api::class], $app[Configuration::class]);
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
@@ -209,6 +210,7 @@ class Plugin implements
 		$app['thankyou.datatable.thank_yous'] = function ($app) {
 			return new ThankYousDataTableSource(
 				$app[ThankYous::class],
+				$app[Configuration::class],
 				$app[SugreUtility::class],
 				$app['thankyou.config'],
 				$app[Lmsg::class],

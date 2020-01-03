@@ -21,15 +21,18 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 	private $config;
 
+	private $config_api;
+
 	private $lmsg;
 
 	private $log;
 
-	public function __construct(Api\ThankYous $thank_you_api, SugreUtility $sugre_utility, Config $thank_you_config, Lmsg $lmsg, LoggerInterface $logger)
+	public function __construct(Api\ThankYous $thank_you_api, Api\Configuration $config_api, SugreUtility $sugre_utility, Config $thank_you_config, Lmsg $lmsg, LoggerInterface $logger)
 	{
-		$this->config = $thank_you_config;
-		$this->lmsg   = $lmsg;
-		$this->log    = $logger;
+		$this->config     = $thank_you_config;
+		$this->config_api = $config_api;
+		$this->lmsg       = $lmsg;
+		$this->log        = $logger;
 
 		parent::__construct($thank_you_api, $sugre_utility);
 	}
@@ -45,7 +48,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			['total_thanked_users', ($this->lmsg)('thankyou.common.total_thanked_users')]
 		];
 
-		if ($this->config->Get('thankyou_core_values_enabled') === true)
+		if ($this->config_api->IsTagsEnabled($this->config))
 		{
 			$columns[] = ['tags', ($this->lmsg)('thankyou.common.tags')];
 		}
@@ -73,7 +76,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 		$filters = $this->FormatFilters($params->GetFilters());
 
-		$get_tags     = (bool) $this->config->Get('thankyou_core_values_enabled');
+		$get_tags     = $this->config_api->IsTagsEnabled($this->config);
 		$get_comments = (bool) $this->config->Get('thank_you_comments');
 
 		$rows = [];
