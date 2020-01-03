@@ -115,9 +115,9 @@ class ThankYous
 	 * Given an array of Thank You IDs, returns the associated objects.
 	 *
 	 * @param int[] $ids
-	 * @param bool      $thanked
-	 * @param bool      $users
-	 * @param bool      $tags
+	 * @param bool  $thanked
+	 * @param bool  $users
+	 * @param bool  $tags
 	 * @return ThankYou[]
 	 */
 	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false, bool $tags = false)
@@ -602,10 +602,10 @@ class ThankYous
 
 		if ($new)
 		{
-			$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_create', $id, $thank_you->GetDescription());
+			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_create', $id, $thank_you->GetDescription());
 		} else
 		{
-			$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_edit', $id, $thank_you->GetDescription());
+			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_edit', $id, $thank_you->GetDescription());
 		}
 	}
 
@@ -627,7 +627,7 @@ class ThankYous
 		$this->tag_api->RemoveAllTaggableTaggings($id, ThankYousRepository::AGGREGATION_ID);
 		$this->thank_yous_repository->Delete($id);
 
-		$this->audit->Store(AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_delete', $id, $thank_you->GetDescription());
+		$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_delete', $id, $thank_you->GetDescription());
 	}
 
 	/**
