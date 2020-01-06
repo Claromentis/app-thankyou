@@ -77,19 +77,9 @@ class TagRepository
 	public function GetFilteredTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
 	{
 		$query_string = "SELECT * FROM " . self::TABLE_NAME;
-		if (isset($orders) && count($orders) > 0)
+		if (isset($orders))
 		{
-			$query_string .= " ORDER BY";
-			foreach ($orders as $order)
-			{
-				$column    = $order['column'] ?? null;
-				$direction = (isset($order['desc']) && $order['desc'] === true) ? 'DESC' : 'ASC';
-				if (!isset($column) || !is_string($column))
-				{
-					throw new InvalidArgumentException("Failed to GetTags, one or more Orders does not have a column");
-				}
-				$query_string .= " " . $column . " " . $direction;
-			}
+			$query_string .= $this->QueryBuildOrderString($orders);
 		}
 
 		$query = new QueryBuilder($query_string);
@@ -128,19 +118,9 @@ class TagRepository
 	{
 		$query_string = "SELECT COUNT(" . self::TAGGING_TABLE . ".item_id) AS total, " . self::TAGGING_TABLE . ".tag_id FROM " . self::TAGGING_TABLE . " GROUP BY " . self::TAGGING_TABLE . ".tag_id";
 
-		if (isset($orders) && count($orders) > 0)
+		if (isset($orders))
 		{
-			$query_string .= " ORDER BY";
-			foreach ($orders as $offset => $order)
-			{
-				$column    = $order['column'] ?? null;
-				$direction = (isset($order['desc']) && $order['desc'] === true) ? 'DESC' : 'ASC';
-				if (!isset($column) || !is_string($column))
-				{
-					throw new InvalidArgumentException("Failed to GetTags, one or more Orders does not have a column");
-				}
-				$query_string .= " " . $column . " " . $direction;
-			}
+			$query_string .= $this->QueryBuildOrderString($orders);
 		}
 
 		$query = new QueryBuilder($query_string);
@@ -504,5 +484,33 @@ class TagRepository
 		{
 			throw new InvalidArgumentException("Failed to Add Taggable ID Filter to Query, invalid value for parameter taggable_ids given: " . (string) $taggable_ids);
 		}
+	}
+
+	/**
+	 * Given an array of Orders, returns the Order String to be added to the Query.
+	 *
+	 * @param array[] $orders
+	 * @return string
+	 */
+	private function QueryBuildOrderString(array $orders)
+	{
+		if (count($orders) === 0)
+		{
+			return '';
+		}
+
+		$query_string = " ORDER BY";
+		foreach ($orders as $offset => $order)
+		{
+			$column    = $order['column'] ?? null;
+			$direction = (isset($order['desc']) && $order['desc'] === true) ? 'DESC' : 'ASC';
+			if (!isset($column) || !is_string($column))
+			{
+				throw new InvalidArgumentException("Failed to Tag Query Order String, one or more Orders does not have a column");
+			}
+			$query_string .= " " . $column . " " . $direction;
+		}
+
+		return $query_string;
 	}
 }
