@@ -66,7 +66,7 @@ class TagRepository
 		$query   = "SELECT * FROM " . self::TABLE_NAME . " WHERE id IN in:int:ids";
 		$results = $this->db->query($query, $ids);
 
-		return $this->GetTagsFromDbQuery($results);
+		return $this->GetTagsFromDbResults($results);
 	}
 
 	/**
@@ -94,7 +94,7 @@ class TagRepository
 
 		$results = $this->db->query($query->GetQuery());
 
-		return $this->GetTagsFromDbQuery($results);
+		return $this->GetTagsFromDbResults($results);
 	}
 
 	/**
@@ -135,7 +135,7 @@ class TagRepository
 
 		$query->setLimit($limit, $offset);
 
-		return $this->GetTagsTotalsFromDbQuery($this->db->query($query->GetQuery()));
+		return $this->GetTagsTotalsFromDbResults($this->db->query($query->GetQuery()));
 	}
 
 	/**
@@ -154,7 +154,7 @@ class TagRepository
 
 		$query_string = "SELECT COUNT(item_id) AS total, tag_id FROM " . self::TAGGING_TABLE . " WHERE tag_id IN in:int:ids GROUP BY tag_id";
 
-		return $this->GetTagsTotalsFromDbQuery($this->db->query($query_string, $ids));
+		return $this->GetTagsTotalsFromDbResults($this->db->query($query_string, $ids));
 	}
 
 	/**
@@ -402,7 +402,7 @@ class TagRepository
 	 * @param ResultInterface $results
 	 * @return Tag[]
 	 */
-	private function GetTagsFromDbQuery(ResultInterface $results): array
+	private function GetTagsFromDbResults(ResultInterface $results): array
 	{
 		$rows  = [];
 		$users = [];
@@ -456,7 +456,7 @@ class TagRepository
 	 * @param ResultInterface $results
 	 * @return int[]
 	 */
-	private function GetTagsTotalsFromDbQuery(ResultInterface $results): array
+	private function GetTagsTotalsFromDbResults(ResultInterface $results): array
 	{
 		$tag_tagging_totals = [];
 		while ($row = $results->fetchArray())
