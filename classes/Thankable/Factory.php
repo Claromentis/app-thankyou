@@ -54,7 +54,7 @@ class Factory
 		$thankable->SetImageUrl($image_url);
 		$thankable->SetOwnerClassId($owner_class_id);
 		$thankable->SetOwnerClassName($owner_class_name);
-		$thankable->SetProfileUrl($profile_url);
+		$thankable->SetObjectUrl($profile_url);
 
 		return $thankable;
 	}

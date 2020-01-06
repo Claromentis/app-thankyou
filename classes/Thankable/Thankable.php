@@ -37,9 +37,9 @@ class Thankable
 	private $owner_class_name;
 
 	/**
-	 * @var string|null $profile_url
+	 * @var string|null $object_url
 	 */
-	private $profile_url;
+	private $object_url;
 
 	/**
 	 * Thankable constructor.
@@ -102,9 +102,9 @@ class Thankable
 	/**
 	 * @return string|null
 	 */
-	public function GetProfileUrl(): ?string
+	public function GetObjectUrl(): ?string
 	{
-		return $this->profile_url;
+		return $this->object_url;
 	}
 
 	/**
@@ -149,8 +149,8 @@ class Thankable
 		$this->owner_class_name = $name;
 	}
 
-	public function SetProfileUrl(?string $url)
+	public function SetObjectUrl(?string $url)
 	{
-		$this->profile_url = $url;
+		$this->object_url = $url;
 	}
 }

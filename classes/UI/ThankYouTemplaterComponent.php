@@ -207,7 +207,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 				$thankable_hidden = !$this->api->ThankYous()->CanSeeThankableName($context, $thankable);
 
 				$image_url             = $thankable_hidden ? null : $thankable->GetImageUrl();
-				$thanked_link          = $thankable_hidden ? null : $thankable->GetProfileUrl();
+				$thanked_link          = $thankable_hidden ? null : $thankable->GetObjectUrl();
 				$display_thanked_image = !$thankable_hidden && $thanked_images && isset($image_url);
 				$thanked_tooltip       = $display_thanked_image ? $thankable->GetName() : '';
 				$thanked_link_enabled  = !$thankable_hidden && $links_enabled && isset($thanked_link);
