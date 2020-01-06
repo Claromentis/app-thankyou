@@ -92,18 +92,18 @@ class ThanksController
 
 	public function CoreValues()
 	{
-		$core_values_enabled   = $this->api->Configuration()->IsTagsEnabled($this->config);
-		$core_values_mandatory = $this->api->Configuration()->IsTagsMandatory($this->config);
+		$tags_enabled   = $this->api->Configuration()->IsTagsEnabled($this->config);
+		$tags_mandatory = $this->api->Configuration()->IsTagsMandatory($this->config);
 
 		$args = [
 			'nav_tags.+class'                => 'active',
-			'core_values_enabled.checked'    => $core_values_enabled,
-			'core_values_mandatory.checked'  => $core_values_mandatory,
+			'core_values_enabled.checked'    => $tags_enabled,
+			'core_values_mandatory.checked'  => $tags_mandatory,
 			'core_values_enabled.offtext'    => ($this->lmsg)('common.disabled'),
 			'core_values_enabled.ontext'     => ($this->lmsg)('common.enabled'),
 			'core_values_enabled.body'       => ($this->lmsg)('thankyou.admin.core_values.description'),
 			'core_values_mandatory.body'     => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
-			'core_values_enabled_body.style' => $core_values_enabled ? '' : 'display:none;'
+			'core_values_enabled_body.style' => $tags_enabled ? '' : 'display:none;'
 		];
 
 		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));
@@ -129,6 +129,16 @@ class ThanksController
 
 			$args['ty_list.limit']  = $limit;
 			$args['ty_list.offset'] = $offset;
+
+			$tags_enabled = $this->api->Configuration()->IsTagsEnabled($this->config);
+			if ($tags_enabled)
+			{
+				$args['thankyou_list_container.+class'] = "col-sm-9 col-md-pull-3";
+			} else
+			{
+				$args['thankyou_list_container.+class']       = "col-sm-12";
+				$args['thankyou_tag_stats_container.visible'] = false;
+			}
 
 			return new TemplaterCallResponse('thankyou/view.html', $args, ($this->lmsg)('thankyou.app_name'));
 		}
