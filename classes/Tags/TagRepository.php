@@ -375,15 +375,25 @@ class TagRepository
 		$this->db->query($query_string, $tag_id);
 	}
 
+	/**
+	 * Detemines whether a Tag's Name is unique. If an ID is given, results for this ID will not be retrieved.
+	 *
+	 * @param string   $name
+	 * @param int|null $id
+	 * @return bool
+	 */
 	public function IsTagNameUnique(string $name, ?int $id): bool
 	{
-		if (!isset($id))
+		$params       = [$name];
+		$query_string = "SELECT COUNT(1) FROM " . self::TABLE_NAME . " WHERE name=str:name";
+
+		if (isset($id))
 		{
-			return !(bool) $this->db->query_row("SELECT COUNT(1) FROM " . self::TABLE_NAME . " WHERE name=str:name", $name)[0];
-		} else
-		{
-			return !(bool) $this->db->query_row("SELECT COUNT(1) FROM " . self::TABLE_NAME . " WHERE name=str:name AND id!=int:id", $name, $id)[0];
+			$params[]     = $id;
+			$query_string .= " AND id!=int:id";
 		}
+
+		return !(bool) $this->db->query_row($query_string, ...$params)[0];
 	}
 
 	/**
