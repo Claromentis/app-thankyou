@@ -11,6 +11,9 @@ use RestExNotFound;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
+ * @deprecated Version 1 of the Thank You API is now deprecated
+ * @see        ThanksRestV2
+ *
  * A rest controller for thank you items.
  */
 class ThanksRestController

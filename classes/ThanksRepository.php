@@ -2,9 +2,13 @@
 namespace Claromentis\ThankYou;
 
 use Claromentis\Core\DAL;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Exception;
 
 /**
+ * @deprecated
+ * @see ThankYousRepository
+ *
  * A repository for thank you items.
  */
 class ThanksRepository

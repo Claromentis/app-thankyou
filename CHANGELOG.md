@@ -1,4 +1,8 @@
-#Change Log
+# Change Log
+
+## Version 4.0.0 - Unreleased
+### Developer Notes
+* The REST API v1 has been deprecated, along with `Claromentis\ThankYou\Controller\Rest\ThanksRestController` and `Claromentis\ThankYou\ThanksRepository`.
 
 ## Version 3.3.2 - 27th November 2019 ##
 * CORE-1036 Added Hungarian translation

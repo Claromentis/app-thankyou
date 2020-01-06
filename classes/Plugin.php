@@ -127,7 +127,8 @@ class Plugin implements
 			$panels[self::APPLICATION_NAME] = [
 				'name'      => $app['lmsg']('thankyou.app_name'),
 				'css_class' => 'glyphicons-donate',
-				'url'       => '/thankyou/admin/'];
+				'url'       => '/thankyou/admin/'
+			];
 
 			return $panels;
 		});
