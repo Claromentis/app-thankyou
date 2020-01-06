@@ -1047,20 +1047,21 @@ class ThankYousRepository
 			return;
 		}
 
-		$where         = self::THANKED_USERS_TABLE . ".user_id IN (";
-		$first_user_id = true;
+		$invalid_user_ids = [];
 		foreach ($thanked_user_ids as $user_id)
 		{
 			if (!is_int($user_id))
 			{
-				throw new InvalidArgumentException("Failed to Add Thanked User Filter to Query, User ID '" . (string) $user_id . "' is not an integer");
+				$invalid_user_ids[] = $user_id;
 			}
-
-			$where         .= $first_user_id ? $user_id : ", " . $user_id;
-			$first_user_id = false;
 		}
-		$where .= ")";
-		$query->AddWhereAndClause($where);
+
+		if (!empty($invalid_user_ids))
+		{
+			throw new InvalidArgumentException("Failed to Add Thanked User Filter to Query, invalid user IDs for thanked user filter: " . implode(', ', $invalid_user_ids));
+		}
+
+		$query->AddWhereAndClause(self::THANKED_USERS_TABLE . ".user_id int:in:ids", $thanked_user_ids);
 	}
 
 	private function QueryAddTagsFilter(QueryBuilder $query, array $tag_ids)
