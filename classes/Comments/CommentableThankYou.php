@@ -22,9 +22,9 @@ use Psr\Log\LoggerInterface;
 class CommentableThankYou implements CommentableInterface, CommentLocationInterface
 {
 	/**
-	 * @var LoggerInterface $log
+	 * @var LoggerInterface $logger
 	 */
-	private $log;
+	private $logger;
 
 	/**
 	 * @var ThanksItem|null $thanks_item
@@ -38,7 +38,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 
 	public function __construct()
 	{
-		$this->log = Services::I()->GetLogger('comments');
+		$this->logger = Services::I()->GetLogger('comments');
 	}
 
 	/**
@@ -162,7 +162,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 				return false;
 				break;
 			default:
-				$this->log->error("Invalid argument '" . (string) $perms . "' given for 2nd argument of UserHasPermission");
+				$this->logger->error("Invalid argument '" . (string) $perms . "' given for 2nd argument of UserHasPermission");
 
 				return false;
 				break;
@@ -176,7 +176,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 	{
 		if (!isset($this->thanks_item))
 		{
-			$this->log->error("Failed to send Notifications for Thank You Comment, Thank You Item has not been loaded");
+			$this->logger->error("Failed to send Notifications for Thank You Comment, Thank You Item has not been loaded");
 
 			return;
 		}
@@ -191,7 +191,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 			$thank_you = $api->ThankYous()->GetThankYou($this->thanks_item->GetId(), false, true);
 		} catch (ThankYouNotFound $exception)
 		{
-			$this->log->error("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", [$exception]);
+			$this->logger->error("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", [$exception]);
 
 			return;
 		}

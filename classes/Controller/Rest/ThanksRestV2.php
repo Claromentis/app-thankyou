@@ -48,9 +48,9 @@ class ThanksRestV2
 	private $lmsg;
 
 	/**
-	 * @var LoggerInterface
+	 * @var LoggerInterface $logger
 	 */
-	private $log;
+	private $logger;
 
 	/**
 	 * @var ResponseFactory
@@ -97,7 +97,7 @@ class ThanksRestV2
 		$this->api                 = $api;
 		$this->config              = $config;
 		$this->lmsg                = $lmsg;
-		$this->log                 = $logger;
+		$this->logger              = $logger;
 		$this->response            = $response_factory;
 		$this->rest_format         = $rest_format;
 		$this->tag_formatter       = $tag_formatter;
@@ -277,7 +277,7 @@ class ThanksRestV2
 			throw new LogicException("Unexpected Exception thrown when creating Thank You", null, $exception);
 		} catch (ThankYouAuthor $exception)
 		{
-			$this->log->error("CreateThankYou Failed unexpectedly", [$exception]);
+			$this->logger->error("CreateThankYou Failed unexpectedly", [$exception]);
 
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
@@ -286,7 +286,7 @@ class ThanksRestV2
 			], 500);
 		} catch (ThankYouException $exception)
 		{
-			$this->log->error("A Thank You was created but there was an error sending notifications", [$exception]);
+			$this->logger->error("A Thank You was created but there was an error sending notifications", [$exception]);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);

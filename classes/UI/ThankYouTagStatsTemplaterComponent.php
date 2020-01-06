@@ -8,7 +8,6 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class ThankYouTagStatsTemplaterComponent
@@ -20,13 +19,10 @@ class ThankYouTagStatsTemplaterComponent extends TemplaterComponentTmpl
 
 	private $thank_you_api;
 
-	private $log;
-
-	public function __construct(Api\ThankYous $thank_you, Tags\Api $tag, LoggerInterface $logger)
+	public function __construct(Api\ThankYous $thank_you, Tags\Api $tag)
 	{
 		$this->tag_api       = $tag;
 		$this->thank_you_api = $thank_you;
-		$this->log           = $logger;
 	}
 
 	public function Show($attributes, Application $app)

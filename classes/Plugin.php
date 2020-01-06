@@ -99,7 +99,7 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.tag_stats'] = function ($app) {
-			return new ThankYouTagStatsTemplaterComponent($app[ThankYous::class], $app[Tags\Api::class], $app['logger_factory']->GetLogger('tag'));
+			return new ThankYouTagStatsTemplaterComponent($app[ThankYous::class], $app[Tags\Api::class]);
 		};
 
 		$app['tags.datatable.admin'] = TagDataTableSource::class;
@@ -196,7 +196,7 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
-			return new ThankYousListTemplaterComponent($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+			return new ThankYousListTemplaterComponent($app[Api::class], $app[Lmsg::class]);
 		};
 
 		$app['templater.ui.thankyou.thank_you'] = function ($app) {
@@ -213,8 +213,7 @@ class Plugin implements
 				$app[Configuration::class],
 				$app[SugreUtility::class],
 				$app[self::APPLICATION_NAME . '.config'],
-				$app[Lmsg::class],
-				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
+				$app[Lmsg::class]
 			);
 		};
 
@@ -414,9 +413,9 @@ class Plugin implements
 		$lmsg    = $app[Lmsg::class];
 		$context = $app[SecurityContext::class];
 		/**
-		 * @var LoggerInterface $log
+		 * @var LoggerInterface $logger
 		 */
-		$log = $app['logger_factory']->GetLogger(self::APPLICATION_NAME);
+		$logger = $app['logger_factory']->GetLogger(self::APPLICATION_NAME);
 
 		$user_id = (int) $attr['user_id'];
 
@@ -437,7 +436,7 @@ class Plugin implements
 					}
 				} catch (ThankYouOClass $exception)
 				{
-					$log->error("Failed to lock Thank You Creation to User Id '" . $user_id . "' on User's Profile", [$exception]);
+					$logger->error("Failed to lock Thank You Creation to User Id '" . $user_id . "' on User's Profile", [$exception]);
 				}
 
 				$args                     = [];

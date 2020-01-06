@@ -13,7 +13,6 @@ use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 use DateClaTimeZone;
-use Psr\Log\LoggerInterface;
 
 class ThankYousDataTableSource extends FilterDataTableSource
 {
@@ -25,14 +24,11 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 	private $lmsg;
 
-	private $log;
-
-	public function __construct(Api\ThankYous $thank_you_api, Api\Configuration $config_api, SugreUtility $sugre_utility, Config $thank_you_config, Lmsg $lmsg, LoggerInterface $logger)
+	public function __construct(Api\ThankYous $thank_you_api, Api\Configuration $config_api, SugreUtility $sugre_utility, Config $thank_you_config, Lmsg $lmsg)
 	{
 		$this->config     = $thank_you_config;
 		$this->config_api = $config_api;
 		$this->lmsg       = $lmsg;
-		$this->log        = $logger;
 
 		parent::__construct($thank_you_api, $sugre_utility);
 	}

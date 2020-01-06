@@ -14,12 +14,12 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 {
 	private $config_api;
 
-	private $log;
+	private $logger;
 
 	public function __construct(Configuration $config_api, LoggerInterface $logger)
 	{
 		$this->config_api = $config_api;
-		$this->log        = $logger;
+		$this->logger     = $logger;
 	}
 
 	public function Show($attributes, Application $app)
@@ -63,14 +63,14 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 						];
 					} else
 					{
-						$this->log->error("Value in Templater Component 'thankyou.create' attribute 'thankables' is not a Thankable");
+						$this->logger->error("Value in Templater Component 'thankyou.create' attribute 'thankables' is not a Thankable");
 					}
 				}
 
 				$args['thank_you_create_button.data-preselected_thanked'] = json_encode($preselected_thankables);
 			} else
 			{
-				$this->log->error("Value given to Templater Component 'thankyou.create' attribute 'thankables' was not an array");
+				$this->logger->error("Value given to Templater Component 'thankyou.create' attribute 'thankables' was not an array");
 			}
 		}
 

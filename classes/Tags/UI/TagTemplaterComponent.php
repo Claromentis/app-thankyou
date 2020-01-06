@@ -13,12 +13,12 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 {
 	private $api;
 
-	private $log;
+	private $logger;
 
 	public function __construct(Api $tag_api, LoggerInterface $logger)
 	{
-		$this->api = $tag_api;
-		$this->log = $logger;
+		$this->api    = $tag_api;
+		$this->logger = $logger;
 	}
 
 	public function Show($attributes, Application $app)
@@ -29,7 +29,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 
 		if (!isset($tag))
 		{
-			$this->log->warning("Call to Tag Templater Component with a Tag defined");
+			$this->logger->warning("Call to Tag Templater Component with a Tag defined");
 
 			return $this->CallTemplater('thankyou/UI/tag_templater_component.html', ['tag.visible' => 0]);
 		}
@@ -43,7 +43,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 				$tag = $this->api->GetTag($id);
 			} catch (TagNotFound $exception)
 			{
-				$this->log->warning("Call to Tag Templater Component for Tag with ID '" . $id . "' which could not be found", [$exception]);
+				$this->logger->warning("Call to Tag Templater Component for Tag with ID '" . $id . "' which could not be found", [$exception]);
 
 				return $this->CallTemplater('thankyou/UI/tag_templater_component.html', ['tag.visible' => 0]);
 			}
@@ -51,7 +51,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 
 		if (!($tag instanceof Tag))
 		{
-			$this->log->warning("Call to Tag Template Component for Tag with non Tag object provided");
+			$this->logger->warning("Call to Tag Template Component for Tag with non Tag object provided");
 
 			return $this->CallTemplater('thankyou/UI/tag_templater_component.html', ['tag.visible' => 0]);
 		}

@@ -26,16 +26,16 @@ class TagRepository
 
 	private $db;
 
-	protected $log;
+	protected $logger;
 
 	private $query_factory;
 
 	private $tag_factory;
 
-	public function __construct(DbInterface $db, QueryFactory $query_factory, LoggerInterface $log, TagFactory $tag_factory)
+	public function __construct(DbInterface $db, QueryFactory $query_factory, LoggerInterface $logger, TagFactory $tag_factory)
 	{
 		$this->db            = $db;
-		$this->log           = $log;
+		$this->logger        = $logger;
 		$this->query_factory = $query_factory;
 		$this->tag_factory   = $tag_factory;
 	}
@@ -420,7 +420,7 @@ class TagRepository
 		{
 			if (!isset($row['name']) || !is_string($row['name']))
 			{
-				$this->log->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
+				$this->logger->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
 				continue;
 			}
 			try
@@ -428,7 +428,7 @@ class TagRepository
 				$tag = $this->tag_factory->Create($row['name'], $row['active']);
 			} catch (TagInvalidNameException $exception)
 			{
-				$this->log->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
+				$this->logger->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
 				continue;
 			}
 			$tag->SetId($id);

@@ -4,14 +4,12 @@ namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Config\Config;
-use Claromentis\Core\Config\WritableConfig;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Thankable\Thankable;
-use Psr\Log\LoggerInterface;
 
 /**
  * Templater Component for displaying a list of recent Thank Yous and for submitting a new one.
@@ -61,22 +59,15 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 	private $lmsg;
 
 	/**
-	 * @var LoggerInterface $log
-	 */
-	private $log;
-
-	/**
 	 * ThankYousList constructor.
 	 *
-	 * @param Api             $api
-	 * @param Lmsg            $lmsg
-	 * @param LoggerInterface $logger
+	 * @param Api  $api
+	 * @param Lmsg $lmsg
 	 */
-	public function __construct(Api $api, Lmsg $lmsg, LoggerInterface $logger)
+	public function __construct(Api $api, Lmsg $lmsg)
 	{
 		$this->api  = $api;
 		$this->lmsg = $lmsg;
-		$this->log  = $logger;
 	}
 
 	/**
