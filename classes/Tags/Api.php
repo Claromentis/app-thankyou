@@ -12,7 +12,6 @@ use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Date;
 use InvalidArgumentException;
-use LogicException;
 use User;
 
 class Api
@@ -60,13 +59,7 @@ class Api
 	 */
 	public function GetTag(int $id): Tag
 	{
-		try
-		{
-			$tags = $this->repository->GetTags([$id]);
-		} catch (InvalidArgumentException $exception)
-		{
-			throw new LogicException("Failed to Get Tag, unexpected Exception thrown when Loading Tag", null, $exception);
-		}
+		$tags = $this->repository->GetTags([$id]);
 
 		if (!isset($tags[$id]))
 		{
