@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\Tags;
 
 use Claromentis\Core\Audit\Audit;
+use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
@@ -215,6 +216,7 @@ class Api
 	 * @param SecurityContext $context
 	 * @throws TagForbidden - If the SecurityContext does not allow the Tag to be deleted.
 	 * @throws TagNotFound - If the Tag cannot be found in the Repository.
+	 * @throws StorageException - If the Tag could not be Deleted from the Repository.
 	 */
 	public function Delete(int $id, SecurityContext $context)
 	{

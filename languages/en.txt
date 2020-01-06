@@ -50,6 +50,7 @@ lm	thankyou.tag.audit.delete		Core Value Deleted
 lm	thankyou.tag.audit.edit		Core Value Edited
 lm	thankyou.tag.delete.description		Deleting this core value will remove it from all the linked thank you notes. Change visibility to 'hidden' to keep existing notes but prevent it from being selected in the future.
 lm	thankyou.tag.delete.error.permission		You do not have permission to delete this Core Value
+lm	thankyou.tag.delete.error.repository		Could not delete the given Core Value, an error occurred when contacting the Repository.
 lm	thankyou.tag.delete.title		Confirm Deletion
 lm	thankyou.tag.error.active.invalid		Invalid Core Value Active status
 lm	thankyou.tag.error.background.invalid		Invalid Background

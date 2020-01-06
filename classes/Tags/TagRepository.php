@@ -2,10 +2,12 @@
 
 namespace Claromentis\ThankYou\Tags;
 
+use Claromentis\Core\DAL\Exceptions\TransactionException;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\DAL\ResultInterface;
+use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
@@ -231,11 +233,20 @@ class TagRepository
 	 * Delete a Tag and its Taggings records.
 	 *
 	 * @param int $id
+	 * @throws StorageException - If the Tag could not be Deleted from the Repository.
 	 */
 	public function Delete(int $id)
 	{
-		$this->DeleteAllTagTaggings($id);
-		$this->db->query("DELETE FROM " . self::TABLE_NAME . " WHERE id=int:id", $id);
+		try
+		{
+			$this->db->DoTransaction(function () use ($id) {
+				$this->DeleteAllTagTaggings($id);
+				$this->db->query("DELETE FROM " . self::TABLE_NAME . " WHERE id=int:id", $id);
+			});
+		} catch (TransactionException $transaction_exception)
+		{
+			throw new StorageException("Failed to Delete Tag from the Repository", null, $transaction_exception);
+		}
 	}
 
 	/**

@@ -6,6 +6,7 @@ use Claromentis\Core\Config\WritableConfig;
 use Claromentis\Core\Http\JsonPrettyResponse;
 use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Configuration\Configuration;
@@ -708,6 +709,13 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.tag.error.id.not_found', $id),
 				'status' => 404
 			], 404);
+		} catch (StorageException $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.tag.delete.error.repository'),
+				'status' => 500
+			], 500);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true, 200);

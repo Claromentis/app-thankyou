@@ -50,6 +50,7 @@ lm	thankyou.tag.audit.delete
 lm	thankyou.tag.audit.edit		
 lm	thankyou.tag.delete.description		
 lm	thankyou.tag.delete.error.permission		
+lm	thankyou.tag.delete.error.repository		
 lm	thankyou.tag.delete.title		
 lm	thankyou.tag.error.active.invalid		
 lm	thankyou.tag.error.background.invalid		

@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\Tags\Tests\Unit;
 
 use Claromentis\Core\Audit\Audit;
+use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Tags\Api;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
@@ -192,11 +193,13 @@ class ApiTest extends TestCase
 
 	public function testDeleteSuccessful()
 	{
-		$this->tag_repository_mock->method('GetTags')->willReturn([1 => $this->tag_mock]);
+		$tag_id = 1;
+		$this->tag_repository_mock->method('GetTags')->willReturn([$tag_id => $this->tag_mock]);
 		$this->tag_acl_mock->expects($this->any())->method('CanDeleteTag')->with($this->security_context_mock)->willReturn(true);
-		$this->audit_mock->expects($this->once())->method('Store')->with(Audit::AUDIT_SUCCESS, $this->anything(), 'tag_delete');
+		$this->tag_repository_mock->expects($this->once())->method('Delete')->with($tag_id);
+		$this->audit_mock->expects($this->once())->method('Store')->with(Audit::AUDIT_SUCCESS, $this->anything(), 'tag_delete', $tag_id);
 
-		$this->api->Delete(1, $this->security_context_mock);
+		$this->api->Delete($tag_id, $this->security_context_mock);
 	}
 
 	public function testDeleteTagNotFound()
@@ -214,6 +217,17 @@ class ApiTest extends TestCase
 		$this->expectException(TagForbidden::class);
 
 		$this->api->Delete(1, $this->security_context_mock);
+	}
+
+	public function testDeleteStorageException()
+	{
+		$tag_id = 1;
+		$this->tag_repository_mock->method('GetTags')->willReturn([$tag_id => $this->tag_mock]);
+		$this->tag_acl_mock->expects($this->any())->method('CanDeleteTag')->with($this->security_context_mock)->willReturn(true);
+		$this->tag_repository_mock->expects($this->once())->method('Delete')->willThrowException(new StorageException());
+		$this->expectException(StorageException::class);
+
+		$this->api->Delete($tag_id, $this->security_context_mock);
 	}
 
 	public function testAddTaggingSuccessful()
