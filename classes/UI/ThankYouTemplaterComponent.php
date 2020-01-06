@@ -106,7 +106,10 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		/**
 		 * @var Config $config
 		 */
-		$config         = $app[Plugin::APPLICATION_NAME . '.config'];
+		$config = $app[Plugin::APPLICATION_NAME . '.config'];
+
+		$tags_enabled = $this->api->Configuration()->IsTagsEnabled($config);
+
 		$time_zone      = DateClaTimeZone::GetCurrentTZ();
 		$can_delete     = (bool) ($attributes['delete'] ?? null);
 		$can_edit       = (bool) ($attributes['edit'] ?? null);
@@ -225,9 +228,12 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		}
 
 		$tags_args = [];
-		foreach ($thank_you->GetTags() as $tag)
+		if ($tags_enabled)
 		{
-			$tags_args[] = ['tag.tag' => $tag];
+			foreach ($thank_you->GetTags() as $tag)
+			{
+				$tags_args[] = ['tag.tag' => $tag];
+			}
 		}
 
 		$thankable_object_types      = '';
@@ -245,7 +251,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		}
 
 		$args = [
-			'thank_you_form_tags_segment.visible' => $this->api->Configuration()->IsTagsEnabled($config),
+			'thank_you_form_tags_segment.visible' => $tags_enabled,
 
 			'thank_you.data-id'        => $id,
 			'id.json'                  => $id,
