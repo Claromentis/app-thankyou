@@ -29,7 +29,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 
 		if (!isset($tag))
 		{
-			$this->logger->warning("Call to Tag Templater Component with a Tag defined");
+			$this->logger->warning("Call to Tag Templater Component without a Tag defined");
 
 			return $this->CallTemplater('thankyou/UI/tag_templater_component.html', ['tag.visible' => 0]);
 		}
