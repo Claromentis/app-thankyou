@@ -124,7 +124,7 @@ class TagRepository
 		}
 
 		$query = new QueryBuilder($query_string);
-		$query->AddJoin(self::TAGGING_TABLE, self::TABLE_NAME, 'tag', "tag.id = " . self::TAGGING_TABLE . ".tag_id");
+		$query->AddJoin(self::TAGGING_TABLE, self::TABLE_NAME, self::TABLE_NAME, self::TABLE_NAME . ".id = " . self::TAGGING_TABLE . ".tag_id");
 
 		if (isset($active))
 		{
