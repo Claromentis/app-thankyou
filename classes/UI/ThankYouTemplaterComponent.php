@@ -13,6 +13,7 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use DateClaTimeZone;
 use InvalidArgumentException;
@@ -38,11 +39,6 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 	private $cla_text;
 
 	/**
-	 * @var Config
-	 */
-	private $config;
-
-	/**
 	 * @var Lmsg
 	 */
 	private $lmsg;
@@ -55,13 +51,11 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 	public function __construct(
 		Api $api,
 		ClaText $cla_text,
-		Config $config,
 		Lmsg $lmsg,
 		LoggerInterface $logger
 	) {
 		$this->api      = $api;
 		$this->cla_text = $cla_text;
-		$this->config   = $config;
 		$this->lmsg     = $lmsg;
 		$this->logger   = $logger;
 	}
@@ -108,7 +102,11 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		/**
 		 * @var SecurityContext $context
 		 */
-		$context        = $app[SecurityContext::class];
+		$context = $app[SecurityContext::class];
+		/**
+		 * @var Config $config
+		 */
+		$config         = $app[Plugin::APPLICATION_NAME . '.config'];
 		$time_zone      = DateClaTimeZone::GetCurrentTZ();
 		$can_delete     = (bool) ($attributes['delete'] ?? null);
 		$can_edit       = (bool) ($attributes['edit'] ?? null);
@@ -142,7 +140,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 
 		$id = $thank_you->GetId();
 
-		$display_comments_count = (bool) $this->config->Get('thank_you_comments') && isset($id);
+		$display_comments_count = (bool) $config->Get('thank_you_comments') && isset($id);
 		$access_comments        = $display_comments_count && (bool) ($attributes['comments'] ?? null);
 		$display_comments       = ($access_comments && (int) $attributes['comments'] === 2);
 
@@ -247,6 +245,8 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		}
 
 		$args = [
+			'thank_you_form_tags_segment.visible' => $this->api->Configuration()->IsTagsEnabled($config),
+
 			'thank_you.data-id'        => $id,
 			'id.json'                  => $id,
 			'thank_title.visible'      => !$thank_link,

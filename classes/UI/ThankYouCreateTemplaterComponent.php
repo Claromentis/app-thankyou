@@ -3,29 +3,41 @@
 namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
+use Claromentis\Core\Config\Config;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
+use Claromentis\ThankYou\Api\Configuration;
+use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Psr\Log\LoggerInterface;
 
 class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 {
+	private $config_api;
+
 	private $log;
 
-	public function __construct(LoggerInterface $logger)
+	public function __construct(Configuration $config_api, LoggerInterface $logger)
 	{
-		$this->log = $logger;
+		$this->config_api = $config_api;
+		$this->log        = $logger;
 	}
 
 	public function Show($attributes, Application $app)
 	{
+		/**
+		 * @var Config $config
+		 */
+		$config = $app[Plugin::APPLICATION_NAME . '.config'];
+
 		$thankables = $attributes['thankables'] ?? null;
 		$form       = (bool) ($attributes['form'] ?? true);
 
 		$args = ['thank_you_form.visible' => $form];
 
-		$class                           = uniqid();
-		$args['create_container.+class'] = $class;
-		$args['class.json']              = $class;
+		$class                                       = uniqid();
+		$args['create_container.+class']             = $class;
+		$args['class.json']                          = $class;
+		$args['thank_you_form_tags_segment.visible'] = $this->config_api->IsTagsEnabled($config);
 
 		if (isset($thankables))
 		{

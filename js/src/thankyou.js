@@ -221,8 +221,7 @@ define(['jquery', 'cla_select2'], function ($) {
         var description = self.getDescriptionInput().val();
 
         var body = {
-            description: description,
-            tags: null
+            description: description
         };
 
         if (typeof thanked === 'object') {
@@ -234,12 +233,14 @@ define(['jquery', 'cla_select2'], function ($) {
             body.thanked = thanked_array;
         }
 
-        if (typeof tags === 'object' && tags !== null) {
-            var thanked_tags = [];
-            for (var offset in tags) {
-                thanked_tags.push(parseInt(tags[offset]));
+        if (typeof tags === 'object') {
+            body.tags = [];
+
+            if (tags !== null) {
+                for (var offset in tags) {
+                    body.tags.push(parseInt(tags[offset]));
+                }
             }
-            body.tags = thanked_tags;
         }
 
         var url = '/api/thankyou/v2/thankyou';

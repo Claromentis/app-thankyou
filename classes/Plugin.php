@@ -157,13 +157,13 @@ class Plugin implements
 			return new ThankYouAcl($app['admin.panels_list']->GetOne(self::APPLICATION_NAME), $app[UserExtranetService::class]);
 		};
 
-		$app['thankyou.config'] = function ($app) {
+		$app[self::APPLICATION_NAME . '.config'] = function ($app) {
 			return $app['config.factory'](self::APPLICATION_NAME);
 		};
 
 		// Pages component
 		$app['pages.component.thankyou'] = function ($app) {
-			return new UI\PagesComponent($app[Lmsg::class], $app['thankyou.config']);
+			return new UI\PagesComponent($app[Lmsg::class], $app[self::APPLICATION_NAME . '.config']);
 		};
 
 		$app[ThankYous::class] = function ($app) {
@@ -171,7 +171,7 @@ class Plugin implements
 				$app[Audit::class],
 				$app[LineManagerNotifier::class],
 				$app[ThankYousRepository::class],
-				$app['thankyou.config'],
+				$app[self::APPLICATION_NAME . '.config'],
 				$app[ThankYouAcl::class],
 				$app[ThankYouUtility::class],
 				$app[CommentsRepository::class],
@@ -188,11 +188,11 @@ class Plugin implements
 		};
 
 		$app[ThanksController::class] = function ($app) {
-			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['thankyou.config'], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app[self::APPLICATION_NAME . '.config'], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app[StatisticsController::class] = function ($app) {
-			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app['thankyou.config'], $app[Tags\Api::class], $app[Configuration::class]);
+			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app[self::APPLICATION_NAME . '.config'], $app[Tags\Api::class], $app[Configuration::class]);
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
@@ -200,11 +200,11 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.thank_you'] = function ($app) {
-			return new ThankYouTemplaterComponent($app[Api::class], $app[ClaText::class], $app['thankyou.config'], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+			return new ThankYouTemplaterComponent($app[Api::class], $app[ClaText::class], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['templater.ui.thankyou.create'] = function ($app) {
-			return new ThankYouCreateTemplaterComponent($app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+			return new ThankYouCreateTemplaterComponent($app[Configuration::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['thankyou.datatable.thank_yous'] = function ($app) {
@@ -212,7 +212,7 @@ class Plugin implements
 				$app[ThankYous::class],
 				$app[Configuration::class],
 				$app[SugreUtility::class],
-				$app['thankyou.config'],
+				$app[self::APPLICATION_NAME . '.config'],
 				$app[Lmsg::class],
 				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
 			);
@@ -242,7 +242,7 @@ class Plugin implements
 				$app['logger_factory']->GetLogger('tags'),
 				$app['rest.formatter'],
 				$app[Lmsg::class],
-				$app['thankyou.config'],
+				$app[self::APPLICATION_NAME . '.config'],
 				$app[ThankYouFormatter::class],
 				$app[TagFormatter::class]
 			);

@@ -3,10 +3,13 @@
 namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
+use Claromentis\Core\Config\Config;
+use Claromentis\Core\Config\WritableConfig;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Psr\Log\LoggerInterface;
 
@@ -88,6 +91,11 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		 */
 		$context = $app[SecurityContext::class];
 
+		/**
+		 * @var Config $config
+		 */
+		$config = $app[Plugin::APPLICATION_NAME . '.config'];
+
 		$can_create = (bool) ($attributes['create'] ?? null);
 		$can_delete = (bool) ($attributes['delete'] ?? null);
 		$can_edit   = (bool) ($attributes['edit'] ?? null);
@@ -129,6 +137,8 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		$class                      = uniqid();
 		$args['list.+class']        = $class;
 		$args['class.json']         = $class;
+
+		$args['thank_you_form_tags_segment.visible'] = $this->api->Configuration()->IsTagsEnabled($config);
 
 		if (count($args['thank_yous.datasrc']) === 0)
 		{
