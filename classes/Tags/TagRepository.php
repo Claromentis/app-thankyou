@@ -200,7 +200,7 @@ class TagRepository
 		}
 
 		$modified_date = $tag->GetModifiedDate();
-		if (!isset($modified_date))
+		if (isset($modified_date))
 		{
 			$db_fields['int:modified_date'] = $modified_date->format('YmdHis');
 		}
