@@ -421,7 +421,7 @@ class TagRepository
 		{
 			if (!isset($row['name']) || !is_string($row['name']))
 			{
-				$this->logger->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
+				$this->logger->error("Corrupted Tag data for Tag ID $id, invalid Name", $row);
 				continue;
 			}
 			try
@@ -429,7 +429,7 @@ class TagRepository
 				$tag = $this->tag_factory->Create($row['name'], $row['active']);
 			} catch (TagInvalidNameException $exception)
 			{
-				$this->logger->error("Failed to Get Tags From Db Query, one or more Tags could not be constructed due to invalid database data");
+				$this->logger->error("Corrupted Tag data for Tag ID $id, invalid Name", $row);
 				continue;
 			}
 			$tag->SetId($id);
