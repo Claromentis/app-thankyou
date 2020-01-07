@@ -1071,21 +1071,21 @@ class ThankYousRepository
 			return;
 		}
 
-		$where        = self::THANK_YOU_TAGS_TABLE . ".tag_id IN (";
-		$first_tag_id = true;
+		$invalid_tag_ids = [];
 		foreach ($tag_ids as $tag_id)
 		{
 			if (!is_int($tag_id))
 			{
-				throw new InvalidArgumentException("Failed to Add Tagged Filter to Query, Tag ID '" . (string) $tag_id . "' is not an integer");
+				$invalid_tag_ids[] = $tag_id;
 			}
-
-			$where        .= $first_tag_id ? $tag_id : ", " . $tag_id;
-			$first_tag_id = false;
 		}
-		$where .= ")";
 
-		$query->AddWhereAndClause($where);
+		if (!empty($invalid_tag_ids))
+		{
+			throw new InvalidArgumentException("Failed to Add Tagged Filter to Query, invalid Tag IDs for Tag filter: " . implode(', ', $invalid_tag_ids));
+		}
+
+		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".tag_id IN in:int:tag_ids", $tag_ids);
 	}
 
 	private function QueryAddExtranetFilter(QueryBuilder $query, array $extranet_ids, bool $allow_absence = false)
