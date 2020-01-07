@@ -31,12 +31,7 @@ abstract class FilterDataTableSource implements DataSource
 	 */
 	public function Filters()
 	{
-		return [
-			'from_date' => new ColumnFilter('c.date1', 'str'),
-			'to_date'   => new ColumnFilter('c.date2', 'str'),
-			'erm'       => new ColumnFilter('c.erm', 'str'),
-			'tags'      => new ColumnFilter('tags.tagged', 'str')
-		];
+		return [];
 	}
 
 	/**
