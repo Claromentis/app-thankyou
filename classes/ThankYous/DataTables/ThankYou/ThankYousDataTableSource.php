@@ -5,6 +5,7 @@ namespace Claromentis\ThankYou\ThankYous\DataTables\ThankYou;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
+use Claromentis\Core\DataTable\Decorator\Link;
 use Claromentis\Core\DataTable\Shared\ColumnHelper;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
@@ -52,7 +53,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$columns[] = ['tags', ($this->lmsg)('thankyou.common.tags')];
 		}
 
-		$columns[] = ['description', ($this->lmsg)('thankyou.common.comment'), new DescriptionDecorator()];
+		$columns[] = ['description', ($this->lmsg)('thankyou.common.comment'), new Link()];
 		$columns[] = ['likes_count', ($this->lmsg)('common.likes')];
 
 		if ($this->config_api->IsCommentsEnabled())
@@ -135,7 +136,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 				$row['tags'] = $tags;
 			}
 
-			$row['description'] = ['description' => $thank_you->GetDescription(), 'thank_you_url' => $this->api->GetThankYouUrl($thank_you)];
+			$row['description'] = [$thank_you->GetDescription(), $this->api->GetThankYouUrl($thank_you)];
 			$row['likes_count'] = $likes_counts[$id] ?? 0;
 
 			if ($this->config_api->IsCommentsEnabled())
