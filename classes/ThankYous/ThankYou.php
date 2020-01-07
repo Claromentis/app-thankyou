@@ -55,10 +55,10 @@ class ThankYou
 	 * ThankYou constructor.
 	 *
 	 * @param User   $author
-	 * @param Date   $date_created
 	 * @param string $description
+	 * @param Date   $date_created
 	 */
-	public function __construct(User $author, Date $date_created, string $description)
+	public function __construct(User $author, string $description, Date $date_created)
 	{
 		$this->SetAuthor($author);
 		$this->SetDateCreated($date_created);

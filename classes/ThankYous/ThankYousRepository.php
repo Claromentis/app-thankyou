@@ -624,7 +624,7 @@ class ThankYousRepository
 	 */
 	public function Create($author, string $description, ?Date $date_created = null)
 	{
-		return $this->thank_you_factory->Create($author, $date_created, $description);
+		return $this->thank_you_factory->Create($author, $description, $date_created);
 	}
 
 	/**

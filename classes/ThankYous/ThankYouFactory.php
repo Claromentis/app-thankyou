@@ -26,7 +26,7 @@ class ThankYouFactory
 	 * @param Date|null $date_created
 	 * @return ThankYou
 	 */
-	public function Create($author, ?Date $date_created, string $description)
+	public function Create($author, string $description, ?Date $date_created)
 	{
 		if (is_int($author))
 		{
@@ -49,6 +49,6 @@ class ThankYouFactory
 			$date_created = new Date();
 		}
 
-		return new ThankYou($author, $date_created, $description);
+		return new ThankYou($author, $description, $date_created);
 	}
 }
