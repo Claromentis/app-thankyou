@@ -1061,7 +1061,7 @@ class ThankYousRepository
 			throw new InvalidArgumentException("Failed to Add Thanked User Filter to Query, invalid user IDs for thanked user filter: " . implode(', ', $invalid_user_ids));
 		}
 
-		$query->AddWhereAndClause(self::THANKED_USERS_TABLE . ".user_id in:int:ids", $thanked_user_ids);
+		$query->AddWhereAndClause(self::THANKED_USERS_TABLE . ".user_id IN in:int:thanked_user_ids", $thanked_user_ids);
 	}
 
 	private function QueryAddTagsFilter(QueryBuilder $query, array $tag_ids)
