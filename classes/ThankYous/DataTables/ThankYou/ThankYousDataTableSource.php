@@ -10,8 +10,8 @@ use Claromentis\Core\DataTable\Shared\ColumnHelper;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
-use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Configuration;
+use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 use DateClaTimeZone;
 
@@ -29,7 +29,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 	 */
 	private $lmsg;
 
-	public function __construct(Api\ThankYous $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Lmsg $lmsg)
+	public function __construct(ThankYous\Api $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Lmsg $lmsg)
 	{
 		$this->config_api = $config_api;
 		$this->lmsg       = $lmsg;

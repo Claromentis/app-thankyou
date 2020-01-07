@@ -9,7 +9,7 @@ use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\ThankYou\Api\ThankYous;
+use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\Configuration;
 use ClaText;
 
@@ -83,9 +83,9 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function ShowBody($id_string, OptionsInterface $options, Application $app)
 	{
 		/**
-		 * @var ThankYous $api
+		 * @var ThankYous\Api $api
 		 */
-		$api = $app[ThankYous::class];
+		$api = $app[ThankYous\Api::class];
 
 		$thank_user_id = $options->Get('user_id');
 		$group_ids     = $options->Get('group_ids');

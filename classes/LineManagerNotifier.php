@@ -2,7 +2,7 @@
 namespace Claromentis\ThankYou;
 
 use AuthUser;
-use Claromentis\ThankYou\Api\ThankYous;
+use Claromentis\ThankYou\ThankYous;
 use Exception;
 use LogicException;
 use NotificationMessage;
@@ -52,7 +52,7 @@ class LineManagerNotifier
 
 			try
 			{
-				NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], ThankYous::IM_TYPE_THANKYOU, null, $author_id);
+				NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], ThankYous\Api::IM_TYPE_THANKYOU, null, $author_id);
 			} catch (Exception $exception)
 			{
 				throw new LogicException("Unexpected Exception thrown in NotificationMessage::Send", null, $exception);

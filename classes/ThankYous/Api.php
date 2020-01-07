@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\Api;
+namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
@@ -23,10 +23,6 @@ use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 use Claromentis\ThankYou\Thankable\Thankable;
-use Claromentis\ThankYou\ThankYous\ThankYou;
-use Claromentis\ThankYou\ThankYous\ThankYouAcl;
-use Claromentis\ThankYou\ThankYous\ThankYousRepository;
-use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 use Date;
 use DateTime;
 use Exception;
@@ -35,7 +31,7 @@ use LogicException;
 use NotificationMessage;
 use User;
 
-class ThankYous
+class Api
 {
 	const IM_TYPE_THANKYOU = 0x1A0;
 

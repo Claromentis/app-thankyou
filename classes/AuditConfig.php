@@ -16,7 +16,7 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	private $tag_api;
 
 	/**
-	 * @var Api\ThankYous
+	 * @var ThankYous\Api
 	 */
 	private $thank_you_api;
 
@@ -30,9 +30,9 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 	 *
 	 * @param Lmsg          $lmsg
 	 * @param Tags\Api      $tag_api
-	 * @param Api\ThankYous $thank_you_api
+	 * @param ThankYous\Api $thank_you_api
 	 */
-	public function __construct(Lmsg $lmsg, Tags\Api $tag_api, Api\ThankYous $thank_you_api)
+	public function __construct(Lmsg $lmsg, Tags\Api $tag_api, ThankYous\Api $thank_you_api)
 	{
 		$this->tag_api       = $tag_api;
 		$this->thank_you_api = $thank_you_api;

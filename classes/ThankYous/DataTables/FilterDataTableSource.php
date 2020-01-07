@@ -2,16 +2,15 @@
 
 namespace Claromentis\ThankYou\ThankYous\DataTables;
 
-use Claromentis\Core\DataTable\ColumnFilter;
 use Claromentis\Core\DataTable\Contract\DataSource;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
-use Claromentis\ThankYou\Api\ThankYous;
+use Claromentis\ThankYou\ThankYous;
 use Date;
 
 abstract class FilterDataTableSource implements DataSource
 {
 	/**
-	 * @var ThankYous
+	 * @var ThankYous\Api
 	 */
 	protected $api;
 
@@ -20,7 +19,7 @@ abstract class FilterDataTableSource implements DataSource
 	 */
 	protected $sugre_utility;
 
-	public function __construct(ThankYous $thank_you_api, SugreUtility $sugre_utility)
+	public function __construct(ThankYous\Api $thank_you_api, SugreUtility $sugre_utility)
 	{
 		$this->api           = $thank_you_api;
 		$this->sugre_utility = $sugre_utility;

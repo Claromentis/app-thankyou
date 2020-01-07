@@ -20,7 +20,7 @@ use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Tags;
-use Claromentis\ThankYou\Api\ThankYous;
+use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\StatisticsController;
@@ -103,7 +103,7 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.tag_stats'] = function ($app) {
-			return new ThankYouTagStatsTemplaterComponent($app[ThankYous::class], $app[Tags\Api::class]);
+			return new ThankYouTagStatsTemplaterComponent($app[ThankYous\Api::class], $app[Tags\Api::class]);
 		};
 
 		$app['tags.datatable.admin'] = TagDataTableSource::class;
@@ -168,7 +168,7 @@ class Plugin implements
 		};
 
 		$app['audit.application.thankyou'] = function ($app) {
-			return new AuditConfig($app[Lmsg::class], $app[Tags\Api::class], $app[ThankYous::class]);
+			return new AuditConfig($app[Lmsg::class], $app[Tags\Api::class], $app[ThankYous\Api::class]);
 		};
 
 		$app[ThanksController::class] = function ($app) {
@@ -189,7 +189,7 @@ class Plugin implements
 
 		$app['thankyou.datatable.thank_yous'] = function ($app) {
 			return new ThankYousDataTableSource(
-				$app[ThankYous::class],
+				$app[ThankYous\Api::class],
 				$app[Configuration\Api::class],
 				$app[SugreUtility::class],
 				$app[Lmsg::class]
@@ -198,7 +198,7 @@ class Plugin implements
 
 		$app['thankyou.datatable.users'] = function ($app) {
 			return new UsersDataTableSource(
-				$app[ThankYous::class],
+				$app[ThankYous\Api::class],
 				$app[SugreUtility::class],
 				$app[Lmsg::class]
 			);
@@ -206,7 +206,7 @@ class Plugin implements
 
 		$app['thankyou.datatable.statistics.tags'] = function ($app) {
 			return new TagsDataTableSource(
-				$app[ThankYous::class],
+				$app[ThankYous\Api::class],
 				$app[SugreUtility::class],
 				$app[Tags\Api::class],
 				$app[Lmsg::class]
@@ -334,7 +334,7 @@ class Plugin implements
 			self::APPLICATION_NAME,
 			lmsg("thankyou.communication.imessages"),
 			[
-				ThankYous::IM_TYPE_THANKYOU
+				ThankYous\Api::IM_TYPE_THANKYOU
 			]
 		];
 	}

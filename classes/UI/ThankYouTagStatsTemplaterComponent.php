@@ -5,8 +5,8 @@ namespace Claromentis\ThankYou\UI;
 use Claromentis\Core\Application;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
-use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Tags;
+use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 
 /**
@@ -21,11 +21,11 @@ class ThankYouTagStatsTemplaterComponent extends TemplaterComponentTmpl
 	private $tag_api;
 
 	/**
-	 * @var Api\ThankYous
+	 * @var ThankYous\Api
 	 */
 	private $thank_you_api;
 
-	public function __construct(Api\ThankYous $thank_you, Tags\Api $tag)
+	public function __construct(ThankYous\Api $thank_you, Tags\Api $tag)
 	{
 		$this->tag_api       = $tag;
 		$this->thank_you_api = $thank_you;
