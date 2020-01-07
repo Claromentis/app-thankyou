@@ -130,7 +130,7 @@ class TagRepository
 
 		if (isset($active))
 		{
-			$query->AddWhereAndClause("active = " . (int) $active);
+			$query->AddWhereAndClause("active = int:active", (int) $active);
 		}
 
 		$query->setLimit($limit, $offset);
