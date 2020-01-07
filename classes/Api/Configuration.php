@@ -5,10 +5,14 @@ namespace Claromentis\ThankYou\Api;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Config\ConfigDialog;
 use Claromentis\Core\Config\WritableConfig;
+use Claromentis\ThankYou\Configuration\ConfigOptions;
 
 // TODO: Move to Configuration directory
 class Configuration
 {
+	/**
+	 * @var ConfigOptions $config_options
+	 */
 	private $config_options;
 
 	/**
@@ -16,7 +20,7 @@ class Configuration
 	 *
 	 * @param $config_options
 	 */
-	public function __construct(\Claromentis\ThankYou\Configuration\Configuration $config_options)
+	public function __construct(ConfigOptions $config_options)
 	{
 		$this->config_options = $config_options;
 	}

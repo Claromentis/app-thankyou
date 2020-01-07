@@ -4,7 +4,7 @@ namespace Claromentis\ThankYou\Configuration;
 
 use Claromentis\Core\Localization\Lmsg;
 
-class Configuration
+class ConfigOptions
 {
 	private $lmsg;
 

@@ -9,7 +9,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Configuration\Configuration;
+use Claromentis\ThankYou\Configuration\ConfigOptions;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
@@ -723,15 +723,15 @@ class ThanksRestV2
 
 	/**
 	 * @param ServerRequestInterface $request
-	 * @param Configuration          $configuration
+	 * @param ConfigOptions          $config_options
 	 * @return JsonPrettyResponse
 	 * @throws RestExBadRequest
 	 */
-	public function SetConfig(ServerRequestInterface $request, Configuration $configuration): JsonPrettyResponse
+	public function SetConfig(ServerRequestInterface $request, ConfigOptions $config_options): JsonPrettyResponse
 	{
 		$post = $this->rest_format->GetJson($request);
 
-		$options = $configuration->GetOptions();
+		$options = $config_options->GetOptions();
 
 		foreach ($post as $config_name => $value)
 		{
