@@ -154,8 +154,8 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			$total_comments = $thank_you->GetComment()->GetTotalComments();
 		}
 
-		$can_edit_thank_you   = isset($id) && $can_edit && $this->api->ThankYous()->CanEditThankYou($thank_you, $context);
-		$can_delete_thank_you = isset($id) && $can_delete && $this->api->ThankYous()->CanDeleteThankYou($thank_you, $context);
+		$can_edit_thank_you   = isset($id) && $can_edit && $this->api->ThankYous()->CanEditThankYou($context, $thank_you);
+		$can_delete_thank_you = isset($id) && $can_delete && $this->api->ThankYous()->CanDeleteThankYou($context, $thank_you);
 
 		$thank_link = ((bool) ($attributes['thank_link'] ?? null)) && isset($id);
 		if ($thank_link)

@@ -6,7 +6,6 @@ use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Thankable\Thankable;
-use InvalidArgumentException;
 use User;
 
 class ThankYouAcl
@@ -36,11 +35,11 @@ class ThankYouAcl
 	/**
 	 * Determines whether a Security Context can Delete a Thank You.
 	 *
-	 * @param ThankYou        $thank_you
 	 * @param SecurityContext $context
+	 * @param ThankYou        $thank_you
 	 * @return bool
 	 */
-	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $context): bool
+	public function CanDeleteThankYou(SecurityContext $context, ThankYou $thank_you): bool
 	{
 		return $thank_you->GetAuthor()->GetId() === $context->GetUser()->GetId() || $this->IsAdmin($context);
 	}
@@ -48,24 +47,13 @@ class ThankYouAcl
 	/**
 	 * Determines whether a Security Context can Edit a Thank You.
 	 *
-	 * @param ThankYou        $thank_you
 	 * @param SecurityContext $context
+	 * @param ThankYou        $thank_you
 	 * @return bool
 	 */
-	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $context): bool
+	public function CanEditThankYou(SecurityContext $context, ThankYou $thank_you): bool
 	{
 		return $thank_you->GetAuthor()->GetId() === $context->GetUser()->GetId() || $this->IsAdmin($context);
-	}
-
-	/**
-	 * Determines whether a Security Context has access to the Thank You Admin.
-	 *
-	 * @param SecurityContext $context
-	 * @return bool
-	 */
-	public function IsAdmin(SecurityContext $context): bool
-	{
-		return $this->admin_panel->IsAccessible($context);
 	}
 
 	/**
@@ -113,6 +101,17 @@ class ThankYouAcl
 		}
 
 		return $this->IsExtranetVisible($user_extranet_id, $context->GetExtranetAreaId());
+	}
+
+	/**
+	 * Determines whether a Security Context has access to the Thank You Admin.
+	 *
+	 * @param SecurityContext $context
+	 * @return bool
+	 */
+	public function IsAdmin(SecurityContext $context): bool
+	{
+		return $this->admin_panel->IsAccessible($context);
 	}
 
 	/**

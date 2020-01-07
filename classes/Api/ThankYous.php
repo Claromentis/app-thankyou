@@ -671,7 +671,7 @@ class ThankYous
 	{
 		$thank_you = $this->GetThankYou($id);
 
-		if (!$this->CanDeleteThankYou($thank_you, $security_context))
+		if (!$this->CanDeleteThankYou($security_context, $thank_you))
 		{
 			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
@@ -683,23 +683,23 @@ class ThankYous
 	}
 
 	/**
-	 * @param ThankYou        $thank_you
 	 * @param SecurityContext $security_context
+	 * @param ThankYou        $thank_you
 	 * @return bool
 	 */
-	public function CanDeleteThankYou(ThankYou $thank_you, SecurityContext $security_context)
+	public function CanDeleteThankYou(SecurityContext $security_context, ThankYou $thank_you)
 	{
-		return $this->acl->CanDeleteThankYou($thank_you, $security_context);
+		return $this->acl->CanDeleteThankYou($security_context, $thank_you);
 	}
 
 	/**
-	 * @param ThankYou        $thank_you
 	 * @param SecurityContext $security_context
+	 * @param ThankYou        $thank_you
 	 * @return bool
 	 */
-	public function CanEditThankYou(ThankYou $thank_you, SecurityContext $security_context)
+	public function CanEditThankYou(SecurityContext $security_context, ThankYou $thank_you)
 	{
-		return $this->acl->CanEditThankYou($thank_you, $security_context);
+		return $this->acl->CanEditThankYou($security_context, $thank_you);
 	}
 
 	/**

@@ -305,7 +305,7 @@ class ThanksRestV2
 		{
 			$thank_you = $this->api->ThankYous()->GetThankYou($id, false, false, true);
 
-			if (!$this->api->ThankYous()->CanEditThankYou($thank_you, $context))
+			if (!$this->api->ThankYous()->CanEditThankYou($context, $thank_you))
 			{
 				return $this->response->GetJsonPrettyResponse([
 					'type'   => 'https://developer.claromentis.com',
