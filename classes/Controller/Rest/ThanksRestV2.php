@@ -266,15 +266,6 @@ class ThanksRestV2
 		} catch (ThankYouNotFound $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown when creating Thank You", null, $exception);
-		} catch (ThankYouAuthor $exception)
-		{
-			$this->logger->error("CreateThankYou Failed unexpectedly", [$exception]);
-
-			return $this->response->GetJsonPrettyResponse([
-				'type'   => 'https://developer.claromentis.com',
-				'title'  => ($this->lmsg)('thankyou.thankyou.error.create'),
-				'status' => 500
-			], 500);
 		} catch (ThankYouException $exception)
 		{
 			$this->logger->error("A Thank You was created but there was an error sending notifications", [$exception]);

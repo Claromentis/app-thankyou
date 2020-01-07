@@ -142,14 +142,7 @@ class ThankYousRepository
 				continue;
 			}
 
-			try
-			{
-				$thank_you = $this->Create(($users[$rows[$id]['author_id']] ?? $rows[$id]['author_id']), $rows[$id]['description'], new Date($rows[$id]['date_created'], new DateTimeZone('UTC')));
-			} catch (ThankYouAuthor $exception)
-			{
-				throw new LogicException("Unexpected Runtime Exception thrown when creating a ThankYou", null, $exception);
-			}
-
+			$thank_you = $this->Create(($users[$rows[$id]['author_id']] ?? $rows[$id]['author_id']), $rows[$id]['description'], new Date($rows[$id]['date_created'], new DateTimeZone('UTC')));
 			$thank_you->SetId($id);
 
 			$thank_yous[$id] = $thank_you;
@@ -628,7 +621,6 @@ class ThankYousRepository
 	 * @param string    $description
 	 * @param Date|null $date_created
 	 * @return ThankYou
-	 * @throws ThankYouAuthor - If the Author could not be loaded.
 	 */
 	public function Create($author, string $description, ?Date $date_created = null)
 	{

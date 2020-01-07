@@ -25,7 +25,6 @@ class ThankYouFactory
 	 * @param string    $description
 	 * @param Date|null $date_created
 	 * @return ThankYou
-	 * @throws ThankYouAuthor - If the Author could not be loaded.
 	 */
 	public function Create($author, ?Date $date_created, string $description)
 	{
