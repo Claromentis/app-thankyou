@@ -96,15 +96,13 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$date_created = clone $thank_you->GetDateCreated();
 			$date_created->setTimezone($time_zone);
 
-			$first_group    = true;
-			$thanked_groups = '';
+			$thanked_groups = [];
 			foreach ($thank_you->GetThankable() as $thankable)
 			{
 				if ($thankable->GetOwnerClass() === PermOClass::GROUP)
 				{
-					$thanked_groups .= $first_group ? $thankable->GetName() : ", " . $thankable->GetName();
+					$thanked_groups[] = $thankable->GetName();
 				}
-				$first_group = false;
 			}
 
 			$thanked_users = $thank_you->GetUsers();
@@ -120,7 +118,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 			$row = [
 				'date_created'        => $date_created->format('d-m-Y'),
-				'thanked_groups'      => $thanked_groups,
+				'thanked_groups'      => implode(', ', $thanked_groups),
 				'total_thanked_users' => $thanked_users_string
 			];
 
