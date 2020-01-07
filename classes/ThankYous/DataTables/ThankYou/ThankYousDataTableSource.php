@@ -139,7 +139,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$row['description'] = [$thank_you->GetDescription(), $this->api->GetThankYouUrl($thank_you)];
 			$row['likes_count'] = $likes_counts[$id] ?? 0;
 
-			if ($this->config_api->IsCommentsEnabled())
+			if ($get_comments)
 			{
 				$row['comments_count'] = $thank_you->GetComment()->GetTotalComments();
 			}
