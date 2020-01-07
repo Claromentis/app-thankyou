@@ -5,39 +5,39 @@ namespace Claromentis\ThankYou\Thankable;
 class Thankable
 {
 	/**
-	 * @var string $name
+	 * @var string
 	 */
 	private $name;
 
 	/**
-	 * @var int|null $extranet_id
+	 * @var int|null
 	 */
 	private $extranet_id;
 
 	/**
-	 * @var int|null $id
+	 * @var int|null
 	 */
 	private $id;
 
 	/**
-	 * @var string|null $image_url
+	 * @var string|null
 	 */
 	private $image_url;
 
 	/**
 	 * PermOClass constant.
 	 *
-	 * @var int|null $owner_class_id
+	 * @var int|null
 	 */
 	private $owner_class_id;
 
 	/**
-	 * @var string|null $owner_class_name
+	 * @var string|null
 	 */
 	private $owner_class_name;
 
 	/**
-	 * @var string|null $object_url
+	 * @var string|null
 	 */
 	private $object_url;
 

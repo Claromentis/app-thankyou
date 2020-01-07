@@ -15,8 +15,14 @@ use Claromentis\ThankYou\ThankYous\ThankYousRepository;
  */
 class ThankYouTagStatsTemplaterComponent extends TemplaterComponentTmpl
 {
+	/**
+	 * @var Tags\Api
+	 */
 	private $tag_api;
 
+	/**
+	 * @var Api\ThankYous
+	 */
 	private $thank_you_api;
 
 	public function __construct(Api\ThankYous $thank_you, Tags\Api $tag)

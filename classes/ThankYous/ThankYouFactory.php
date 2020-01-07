@@ -10,6 +10,9 @@ use User;
 
 class ThankYouFactory
 {
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
 	public function __construct(Lmsg $lmsg)

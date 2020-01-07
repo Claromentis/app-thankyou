@@ -6,6 +6,9 @@ use Claromentis\Core\Localization\Lmsg;
 
 class ConfigOptions
 {
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
 	public function __construct(Lmsg $lmsg)

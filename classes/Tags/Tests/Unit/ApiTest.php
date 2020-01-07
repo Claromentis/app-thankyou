@@ -20,40 +20,43 @@ use User;
 
 class ApiTest extends TestCase
 {
+	/**
+	 * @var Api
+	 */
 	private $api;
 
 	/**
-	 * @var Audit $audit_mock
+	 * @var Audit|MockObject
 	 */
 	private $audit_mock;
 
 	/**
-	 * @var SecurityContext $security_context_mock
+	 * @var SecurityContext|MockObject
 	 */
 	private $security_context_mock;
 
 	/**
-	 * @var TagAcl $tag_acl_mock
+	 * @var TagAcl|MockObject
 	 */
 	private $tag_acl_mock;
 
 	/**
-	 * @var TagFactory $tag_factory_mock
+	 * @var TagFactory|MockObject
 	 */
 	private $tag_factory_mock;
 
 	/**
-	 * @var Tag $tag_mock
+	 * @var Tag|MockObject
 	 */
 	private $tag_mock;
 
 	/**
-	 * @var TagRepository $tag_repository_mock
+	 * @var TagRepository|MockObject
 	 */
 	private $tag_repository_mock;
 
 	/**
-	 * @var User $user_mock
+	 * @var User|MockObject
 	 */
 	private $user_mock;
 

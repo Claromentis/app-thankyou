@@ -6,17 +6,18 @@ use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Thankable\Factory;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FactoryTest extends TestCase
 {
 	/**
-	 * @var Factory $factory
+	 * @var Factory
 	 */
 	private $factory;
 
 	/**
-	 * @var Lmsg $lmsg_mock
+	 * @var Lmsg|MockObject
 	 */
 	private $lmsg_mock;
 

@@ -10,8 +10,14 @@ use Psr\Log\LoggerInterface;
 
 class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 {
+	/**
+	 * @var Configuration\Api
+	 */
 	private $config_api;
 
+	/**
+	 * @var LoggerInterface
+	 */
 	private $logger;
 
 	public function __construct(Configuration\Api $config_api, LoggerInterface $logger)

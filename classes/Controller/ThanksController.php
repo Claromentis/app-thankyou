@@ -16,12 +16,24 @@ use Psr\Log\LoggerInterface;
 
 class ThanksController
 {
+	/**
+	 * @var Api
+	 */
 	private $api;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
+	/**
+	 * @var LoggerInterface
+	 */
 	private $logger;
 
+	/**
+	 * @var SugreUtility
+	 */
 	private $sugre_repository;
 
 	public function __construct(Lmsg $lmsg, Api $api, SugreUtility $sugre_repository, LoggerInterface $logger)

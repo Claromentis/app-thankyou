@@ -10,8 +10,14 @@ use Date;
 
 abstract class FilterDataTableSource implements DataSource
 {
+	/**
+	 * @var ThankYous
+	 */
 	protected $api;
 
+	/**
+	 * @var SugreUtility
+	 */
 	protected $sugre_utility;
 
 	public function __construct(ThankYous $thank_you_api, SugreUtility $sugre_utility)

@@ -46,7 +46,7 @@ class ThankYousRepository
 	private $logger;
 
 	/**
-	 * @var Thankable\Factory $thankable_factory
+	 * @var Thankable\Factory
 	 */
 	private $thankable_factory;
 
@@ -56,7 +56,7 @@ class ThankYousRepository
 	private $thank_you_factory;
 
 	/**
-	 * @var ThankYouUtility $utility
+	 * @var ThankYouUtility
 	 */
 	private $utility;
 

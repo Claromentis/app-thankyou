@@ -8,10 +8,19 @@ use Claromentis\ThankYou\Api\ThankYous;
 
 class Api
 {
+	/**
+	 * @var Configuration\Api
+	 */
 	private $config;
 
+	/**
+	 * @var Tags\Api
+	 */
 	private $tag;
 
+	/**
+	 * @var ThankYous
+	 */
 	private $thank_yous;
 
 	public function __construct(ThankYous $thank_yous, Configuration\Api $config, Tags\Api $tag)

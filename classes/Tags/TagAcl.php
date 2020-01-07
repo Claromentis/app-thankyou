@@ -8,7 +8,7 @@ use Claromentis\Core\Security\SecurityContext;
 class TagAcl
 {
 	/**
-	 * @var AdminPanel $admin_panel
+	 * @var AdminPanel
 	 */
 	private $admin_panel;
 

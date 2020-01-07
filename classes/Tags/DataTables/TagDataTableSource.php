@@ -15,8 +15,14 @@ class TagDataTableSource implements DataSource
 {
 	use ColumnHelper;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
+	/**
+	 * @var TagRepository
+	 */
 	private $repository;
 
 	public function __construct(Lmsg $lmsg, TagRepository $repository)

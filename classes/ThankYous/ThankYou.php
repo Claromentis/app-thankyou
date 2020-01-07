@@ -12,42 +12,42 @@ use User;
 class ThankYou
 {
 	/**
-	 * @var User $author
+	 * @var User
 	 */
 	private $author;
 
 	/**
-	 * @var CommentableThankYou|null $comment
+	 * @var CommentableThankYou|null
 	 */
 	private $comment;
 
 	/**
-	 * @var Date $date_created
+	 * @var Date
 	 */
 	private $date_created;
 
 	/**
-	 * @var string $description
+	 * @var string
 	 */
 	private $description;
 
 	/**
-	 * @var int|null $id
+	 * @var int|null
 	 */
 	private $id;
 
 	/**
-	 * @var Thankable[]|null $thanked
+	 * @var Thankable[]|null
 	 */
 	private $thanked;
 
 	/**
-	 * @var User[]|null $users
+	 * @var User[]|null
 	 */
 	private $users;
 
 	/**
-	 * @var Tag[]|null $tag
+	 * @var Tag[]|null
 	 */
 	private $tags;
 

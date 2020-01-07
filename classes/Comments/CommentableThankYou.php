@@ -22,17 +22,17 @@ use Psr\Log\LoggerInterface;
 class CommentableThankYou implements CommentableInterface, CommentLocationInterface
 {
 	/**
-	 * @var LoggerInterface $logger
+	 * @var LoggerInterface
 	 */
 	private $logger;
 
 	/**
-	 * @var ThanksItem|null $thanks_item
+	 * @var ThanksItem|null
 	 */
 	private $thanks_item;
 
 	/**
-	 * @var int|null $total_comments
+	 * @var int|null
 	 */
 	private $total_comments;
 

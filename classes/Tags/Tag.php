@@ -9,42 +9,42 @@ use User;
 class Tag
 {
 	/**
-	 * @var bool $active
+	 * @var bool
 	 */
 	private $active;
 
 	/**
-	 * @var string|null $bg_colour
+	 * @var string|null
 	 */
 	private $bg_colour;
 
 	/**
-	 * @var User|null $created_by
+	 * @var User|null
 	 */
 	private $created_by;
 
 	/**
-	 * @var Date|null $created_date
+	 * @var Date|null
 	 */
 	private $created_date;
 
 	/**
-	 * @var int|null $id
+	 * @var int|null
 	 */
 	private $id;
 
 	/**
-	 * @var User|null $modified_by
+	 * @var User|null
 	 */
 	private $modified_by;
 
 	/**
-	 * @var Date|null $modified_date
+	 * @var Date|null
 	 */
 	private $modified_date;
 
 	/**
-	 * @var string $name
+	 * @var string
 	 */
 	private $name;
 

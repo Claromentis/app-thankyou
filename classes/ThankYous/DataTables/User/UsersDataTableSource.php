@@ -15,6 +15,9 @@ class UsersDataTableSource extends FilterDataTableSource
 {
 	use ColumnHelper;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
 	public function __construct(Api\ThankYous $thank_you_api, SugreUtility $sugre_utility, Lmsg $lmsg)

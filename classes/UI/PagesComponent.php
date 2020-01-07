@@ -22,8 +22,14 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 {
 	use TemplaterTrait;
 
+	/**
+	 * @var Configuration\Api
+	 */
 	private $config_api;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
 	/**

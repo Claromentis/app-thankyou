@@ -47,12 +47,12 @@ use Claromentis\ThankYou\Thankable\Thankable;
 class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 {
 	/**
-	 * @var Api $api
+	 * @var Api
 	 */
 	private $api;
 
 	/**
-	 * @var Lmsg $lmsg
+	 * @var Lmsg
 	 */
 	private $lmsg;
 

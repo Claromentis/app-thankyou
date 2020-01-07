@@ -42,7 +42,7 @@ class ThanksRestV2
 	private $lmsg;
 
 	/**
-	 * @var LoggerInterface $logger
+	 * @var LoggerInterface
 	 */
 	private $logger;
 
@@ -57,12 +57,12 @@ class ThanksRestV2
 	private $rest_format;
 
 	/**
-	 * @var TagFormatter $tag_formatter
+	 * @var TagFormatter
 	 */
 	private $tag_formatter;
 
 	/**
-	 * @var ThankYouFormatter $thank_you_formatter
+	 * @var ThankYouFormatter
 	 */
 	private $thank_you_formatter;
 

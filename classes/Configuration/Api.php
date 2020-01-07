@@ -10,12 +10,12 @@ use Psr\Http\Message\ServerRequestInterface;
 class Api
 {
 	/**
-	 * @var WritableConfig $config
+	 * @var WritableConfig
 	 */
 	private $config;
 
 	/**
-	 * @var ConfigOptions $config_options
+	 * @var ConfigOptions
 	 */
 	private $config_options;
 

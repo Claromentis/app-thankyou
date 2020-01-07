@@ -5,12 +5,13 @@ namespace Claromentis\ThankYou\Tags\Tests\Unit;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Tag;
 use Claromentis\ThankYou\Tags\TagFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TagFactoryTest extends TestCase
 {
 	/**
-	 * @var TagFactory $tag_factory
+	 * @var TagFactory
 	 */
 	private $tag_factory;
 

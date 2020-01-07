@@ -11,8 +11,14 @@ use Psr\Log\LoggerInterface;
 
 class TagTemplaterComponent extends TemplaterComponentTmpl
 {
+	/**
+	 * @var Api
+	 */
 	private $api;
 
+	/**
+	 * @var LoggerInterface
+	 */
 	private $logger;
 
 	public function __construct(Api $tag_api, LoggerInterface $logger)

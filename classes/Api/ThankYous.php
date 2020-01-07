@@ -40,28 +40,64 @@ class ThankYous
 {
 	const IM_TYPE_THANKYOU = 0x1A0;
 
+	/**
+	 * @var ThankYouAcl
+	 */
 	private $acl;
 
+	/**
+	 * @var AclRepository
+	 */
 	private $acl_repository;
 
+	/**
+	 * @var Audit
+	 */
 	private $audit;
 
+	/**
+	 * @var CommentsRepository
+	 */
 	private $comments_repository;
 
+	/**
+	 * @var Configuration\Api
+	 */
 	private $config_api;
 
+	/**
+	 * @var UserExtranetService
+	 */
 	private $extranet_service;
 
+	/**
+	 * @var Comments\Factory
+	 */
 	private $comments_factory;
 
+	/**
+	 * @var LikesRepository
+	 */
 	private $likes_repository;
 
+	/**
+	 * @var LineManagerNotifier
+	 */
 	private $line_manager_notifier;
 
+	/**
+	 * @var ThankYousRepository
+	 */
 	private $thank_yous_repository;
 
+	/**
+	 * @var ThankYouUtility
+	 */
 	private $utility;
 
+	/**
+	 * @var Tags\Api
+	 */
 	private $tag_api;
 
 	/**

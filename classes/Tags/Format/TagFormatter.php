@@ -9,7 +9,7 @@ use RestFormat;
 class TagFormatter
 {
 	/**
-	 * @var RestFormat $rest_format
+	 * @var RestFormat
 	 */
 	private $rest_format;
 

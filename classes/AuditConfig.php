@@ -11,17 +11,17 @@ use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
 class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 {
 	/**
-	 * @var Tags\Api $tag_api
+	 * @var Tags\Api
 	 */
 	private $tag_api;
 
 	/**
-	 * @var Api\ThankYous $thank_you_api
+	 * @var Api\ThankYous
 	 */
 	private $thank_you_api;
 
 	/**
-	 * @var Lmsg $lmsg
+	 * @var Lmsg
 	 */
 	private $lmsg;
 

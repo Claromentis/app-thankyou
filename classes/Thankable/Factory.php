@@ -10,12 +10,12 @@ use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 class Factory
 {
 	/**
-	 * @var Lmsg $lmsg
+	 * @var Lmsg
 	 */
 	private $lmsg;
 
 	/**
-	 * @var ThankYouUtility $utility
+	 * @var ThankYouUtility
 	 */
 	private $utility;
 

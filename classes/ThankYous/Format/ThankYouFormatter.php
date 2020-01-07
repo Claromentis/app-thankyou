@@ -14,10 +14,19 @@ use InvalidArgumentException;
 
 class ThankYouFormatter
 {
+	/**
+	 * @var ThankYouAcl
+	 */
 	private $acl;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
+	/**
+	 * @var TagFormatter
+	 */
 	private $tag_formatter;
 
 	public function __construct(Lmsg $lmsg, TagFormatter $tag_formatter, ThankYouAcl $thank_you_acl)

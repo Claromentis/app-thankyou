@@ -17,22 +17,22 @@ use User;
 class Api
 {
 	/**
-	 * @var TagAcl $acl
+	 * @var TagAcl
 	 */
 	private $acl;
 
 	/**
-	 * @var Audit $audit
+	 * @var Audit
 	 */
 	private $audit;
 
 	/**
-	 * @var TagFactory $factory
+	 * @var TagFactory
 	 */
 	private $factory;
 
 	/**
-	 * @var TagRepository $repository
+	 * @var TagRepository
 	 */
 	private $repository;
 

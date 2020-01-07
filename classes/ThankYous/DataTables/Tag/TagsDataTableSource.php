@@ -17,8 +17,14 @@ class TagsDataTableSource extends FilterDataTableSource
 {
 	use ColumnHelper;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
+	/**
+	 * @var Tags\Api
+	 */
 	private $tag_api;
 
 	public function __construct(Api\ThankYous $thank_you_api, SugreUtility $sugre_utility, Tags\Api $tag_api, Lmsg $lmsg)

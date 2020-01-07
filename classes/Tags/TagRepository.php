@@ -26,12 +26,24 @@ class TagRepository
 
 	const TAGGING_TABLE = 'thankyou_tagged';
 
+	/**
+	 * @var DbInterface
+	 */
 	private $db;
 
+	/**
+	 * @var LoggerInterface
+	 */
 	protected $logger;
 
+	/**
+	 * @var QueryFactory
+	 */
 	private $query_factory;
 
+	/**
+	 * @var TagFactory
+	 */
 	private $tag_factory;
 
 	public function __construct(DbInterface $db, QueryFactory $query_factory, LoggerInterface $logger, TagFactory $tag_factory)

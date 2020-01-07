@@ -11,12 +11,24 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class StatisticsController
 {
+	/**
+	 * @var Configuration\Api
+	 */
 	private $config_api;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
+	/**
+	 * @var ResponseFactory
+	 */
 	private $response;
 
+	/**
+	 * @var Tags\Api
+	 */
 	private $tag_api;
 
 	public function __construct(ResponseFactory $response_factory, Lmsg $lmsg, Tags\Api $tag_api, Configuration\Api $config_api)

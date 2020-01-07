@@ -18,8 +18,14 @@ class ThankYousDataTableSource extends FilterDataTableSource
 {
 	use ColumnHelper;
 
+	/**
+	 * @var Configuration\Api
+	 */
 	private $config_api;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
 	public function __construct(Api\ThankYous $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Lmsg $lmsg)
