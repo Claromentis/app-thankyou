@@ -22,7 +22,7 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
-use Claromentis\ThankYou\Api\Configuration;
+use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Api\ThankYous;
 use Claromentis\ThankYou\Comments;
@@ -193,7 +193,7 @@ class Plugin implements
 		};
 
 		$app[StatisticsController::class] = function ($app) {
-			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app[self::APPLICATION_NAME . '.config'], $app[Tags\Api::class], $app[Configuration::class]);
+			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app[self::APPLICATION_NAME . '.config'], $app[Tags\Api::class], $app[Configuration\Api::class]);
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
@@ -205,13 +205,13 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.create'] = function ($app) {
-			return new ThankYouCreateTemplaterComponent($app[Configuration::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+			return new ThankYouCreateTemplaterComponent($app[Configuration\Api::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['thankyou.datatable.thank_yous'] = function ($app) {
 			return new ThankYousDataTableSource(
 				$app[ThankYous::class],
-				$app[Configuration::class],
+				$app[Configuration\Api::class],
 				$app[SugreUtility::class],
 				$app[self::APPLICATION_NAME . '.config'],
 				$app[Lmsg::class]

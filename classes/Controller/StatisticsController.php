@@ -6,7 +6,7 @@ use Claromentis\Core\Config\Config;
 use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\ThankYou\Api\Configuration;
+use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Tags;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -22,7 +22,7 @@ class StatisticsController
 
 	private $tag_api;
 
-	public function __construct(ResponseFactory $response_factory, Lmsg $lmsg, Config $config, Tags\Api $tag_api, Configuration $config_api)
+	public function __construct(ResponseFactory $response_factory, Lmsg $lmsg, Config $config, Tags\Api $tag_api, Configuration\Api $config_api)
 	{
 		$this->config     = $config;
 		$this->config_api = $config_api;

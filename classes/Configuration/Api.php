@@ -1,14 +1,12 @@
 <?php
 
-namespace Claromentis\ThankYou\Api;
+namespace Claromentis\ThankYou\Configuration;
 
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Config\ConfigDialog;
 use Claromentis\Core\Config\WritableConfig;
-use Claromentis\ThankYou\Configuration\ConfigOptions;
 
-// TODO: Move to Configuration directory
-class Configuration
+class Api
 {
 	/**
 	 * @var ConfigOptions $config_options

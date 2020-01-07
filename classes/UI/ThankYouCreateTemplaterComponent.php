@@ -5,7 +5,7 @@ namespace Claromentis\ThankYou\UI;
 use Claromentis\Core\Application;
 use Claromentis\Core\Config\Config;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
-use Claromentis\ThankYou\Api\Configuration;
+use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Psr\Log\LoggerInterface;
@@ -16,7 +16,7 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 
 	private $logger;
 
-	public function __construct(Configuration $config_api, LoggerInterface $logger)
+	public function __construct(Configuration\Api $config_api, LoggerInterface $logger)
 	{
 		$this->config_api = $config_api;
 		$this->logger     = $logger;

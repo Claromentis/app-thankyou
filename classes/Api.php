@@ -2,7 +2,7 @@
 
 namespace Claromentis\ThankYou;
 
-use Claromentis\ThankYou\Api\Configuration;
+use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Api\ThankYous;
 
@@ -14,7 +14,7 @@ class Api
 
 	private $thank_yous;
 
-	public function __construct(ThankYous $thank_yous, Configuration $config, Tags\Api $tag)
+	public function __construct(ThankYous $thank_yous, Configuration\Api $config, Tags\Api $tag)
 	{
 		$this->config     = $config;
 		$this->tag        = $tag;

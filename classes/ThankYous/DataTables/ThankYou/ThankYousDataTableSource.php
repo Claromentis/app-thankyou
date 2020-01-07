@@ -11,6 +11,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 use DateClaTimeZone;
 
@@ -24,7 +25,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 	private $lmsg;
 
-	public function __construct(Api\ThankYous $thank_you_api, Api\Configuration $config_api, SugreUtility $sugre_utility, Config $thank_you_config, Lmsg $lmsg)
+	public function __construct(Api\ThankYous $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Config $thank_you_config, Lmsg $lmsg)
 	{
 		$this->config     = $thank_you_config;
 		$this->config_api = $config_api;
