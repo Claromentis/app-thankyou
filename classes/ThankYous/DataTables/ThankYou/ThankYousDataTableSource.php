@@ -3,7 +3,6 @@
 namespace Claromentis\ThankYou\ThankYous\DataTables\ThankYou;
 
 use Claromentis\Core\Acl\PermOClass;
-use Claromentis\Core\Config\Config;
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
 use Claromentis\Core\DataTable\Shared\ColumnHelper;
@@ -19,15 +18,12 @@ class ThankYousDataTableSource extends FilterDataTableSource
 {
 	use ColumnHelper;
 
-	private $config;
-
 	private $config_api;
 
 	private $lmsg;
 
-	public function __construct(Api\ThankYous $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Config $thank_you_config, Lmsg $lmsg)
+	public function __construct(Api\ThankYous $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Lmsg $lmsg)
 	{
-		$this->config     = $thank_you_config;
 		$this->config_api = $config_api;
 		$this->lmsg       = $lmsg;
 
@@ -45,7 +41,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			['total_thanked_users', ($this->lmsg)('thankyou.common.total_thanked_users')]
 		];
 
-		if ($this->config_api->IsTagsEnabled($this->config))
+		if ($this->config_api->IsTagsEnabled())
 		{
 			$columns[] = ['tags', ($this->lmsg)('thankyou.common.tags')];
 		}
@@ -53,7 +49,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 		$columns[] = ['description', ($this->lmsg)('thankyou.common.comment'), new DescriptionDecorator()];
 		$columns[] = ['likes_count', ($this->lmsg)('common.likes')];
 
-		if ($this->config->Get('thank_you_comments') === true)
+		if ($this->config_api->IsCommentsEnabled())
 		{
 			$columns[] = ['comments_count', ($this->lmsg)('common.cla_comments.comments')];
 		}
@@ -73,8 +69,8 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 		$filters = $this->FormatFilters($params->GetFilters());
 
-		$get_tags     = $this->config_api->IsTagsEnabled($this->config);
-		$get_comments = (bool) $this->config->Get('thank_you_comments');
+		$get_tags     = $this->config_api->IsTagsEnabled();
+		$get_comments = $this->config_api->IsCommentsEnabled();
 
 		$rows = [];
 
@@ -138,7 +134,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$row['description'] = ['description' => $thank_you->GetDescription(), 'thank_you_url' => $this->api->GetThankYouUrl($thank_you)];
 			$row['likes_count'] = $likes_counts[$id] ?? 0;
 
-			if ($this->config->Get('thank_you_comments') === true)
+			if ($this->config_api->IsCommentsEnabled())
 			{
 				$row['comments_count'] = $thank_you->GetComment()->GetTotalComments();
 			}

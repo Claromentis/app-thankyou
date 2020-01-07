@@ -103,12 +103,8 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		 * @var SecurityContext $context
 		 */
 		$context = $app[SecurityContext::class];
-		/**
-		 * @var Config $config
-		 */
-		$config = $app[Plugin::APPLICATION_NAME . '.config'];
 
-		$tags_enabled = $this->api->Configuration()->IsTagsEnabled($config);
+		$tags_enabled = $this->api->Configuration()->IsTagsEnabled();
 
 		$time_zone      = DateClaTimeZone::GetCurrentTZ();
 		$can_delete     = (bool) ($attributes['delete'] ?? null);
@@ -143,7 +139,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 
 		$id = $thank_you->GetId();
 
-		$display_comments_count = (bool) $config->Get('thank_you_comments') && isset($id);
+		$display_comments_count = $this->api->Configuration()->IsCommentsEnabled() && isset($id);
 		$access_comments        = $display_comments_count && (bool) ($attributes['comments'] ?? null);
 		$display_comments       = ($access_comments && (int) $attributes['comments'] === 2);
 

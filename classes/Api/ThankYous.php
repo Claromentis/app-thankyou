@@ -7,13 +7,13 @@ use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\Exception\InvalidSubjectException;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Audit\Audit;
-use Claromentis\Core\Config\Config;
 use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments;
+use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
@@ -48,7 +48,7 @@ class ThankYous
 
 	private $comments_repository;
 
-	private $config;
+	private $config_api;
 
 	private $extranet_service;
 
@@ -64,11 +64,27 @@ class ThankYous
 
 	private $tag_api;
 
+	/**
+	 * ThankYous constructor.
+	 *
+	 * @param Audit               $audit
+	 * @param LineManagerNotifier $line_manager_notifier
+	 * @param ThankYousRepository $thank_yous_repository
+	 * @param Configuration\Api   $config_api
+	 * @param ThankYouAcl         $acl
+	 * @param ThankYouUtility     $thank_you_utility
+	 * @param CommentsRepository  $comments_repository
+	 * @param Comments\Factory    $comments_factory
+	 * @param LikesRepository     $likes_repository
+	 * @param AclRepository       $acl_repository
+	 * @param UserExtranetService $user_extranet_service
+	 * @param Tags\Api            $tag_api
+	 */
 	public function __construct(
 		Audit $audit,
 		LineManagerNotifier $line_manager_notifier,
 		ThankYousRepository $thank_yous_repository,
-		Config $config,
+		Configuration\Api $config_api,
 		ThankYouAcl $acl,
 		ThankYouUtility $thank_you_utility,
 		CommentsRepository $comments_repository,
@@ -83,7 +99,7 @@ class ThankYous
 		$this->audit                 = $audit;
 		$this->comments_factory      = $comments_factory;
 		$this->comments_repository   = $comments_repository;
-		$this->config                = $config;
+		$this->config_api            = $config_api;
 		$this->extranet_service      = $user_extranet_service;
 		$this->likes_repository      = $likes_repository;
 		$this->line_manager_notifier = $line_manager_notifier;
@@ -778,7 +794,7 @@ class ThankYous
 			];
 			NotificationMessage::Send('thankyou.new_thanks', $params, $all_users_ids, self::IM_TYPE_THANKYOU);
 
-			if ($this->config->Get('notify_line_manager'))
+			if ($this->config_api->IsLineManagerNotificationEnabled())
 			{
 				$thankables = $thank_you->GetThankable();
 				if (!isset($thankables))

@@ -2,14 +2,12 @@
 
 namespace Claromentis\ThankYou\Controller\Rest;
 
-use Claromentis\Core\Config\WritableConfig;
 use Claromentis\Core\Http\JsonPrettyResponse;
 use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Configuration\ConfigOptions;
 use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
@@ -37,11 +35,6 @@ class ThanksRestV2
 	 * @var Api
 	 */
 	private $api;
-
-	/**
-	 * @var WritableConfig
-	 */
-	private $config;
 
 	/**
 	 * @var Lmsg
@@ -81,7 +74,6 @@ class ThanksRestV2
 	 * @param LoggerInterface   $logger
 	 * @param RestFormat        $rest_format
 	 * @param Lmsg              $lmsg
-	 * @param WritableConfig    $config
 	 * @param ThankYouFormatter $thank_you_formatter
 	 * @param TagFormatter      $tag_formatter
 	 */
@@ -91,12 +83,10 @@ class ThanksRestV2
 		LoggerInterface $logger,
 		RestFormat $rest_format,
 		Lmsg $lmsg,
-		WritableConfig $config,
 		ThankYouFormatter $thank_you_formatter,
 		TagFormatter $tag_formatter
 	) {
 		$this->api                 = $api;
-		$this->config              = $config;
 		$this->lmsg                = $lmsg;
 		$this->logger              = $logger;
 		$this->response            = $response_factory;
@@ -205,12 +195,12 @@ class ThanksRestV2
 			$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
 		}
 
-		if ($this->api->Configuration()->IsTagsMandatory($this->config) && (!isset($tag_ids) || count($tag_ids) === 0))
+		if ($this->api->Configuration()->IsTagsMandatory() && (!isset($tag_ids) || count($tag_ids) === 0))
 		{
 			$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 		} elseif (isset($tag_ids))
 		{
-			if (!$this->api->Configuration()->IsTagsEnabled($this->config))
+			if (!$this->api->Configuration()->IsTagsEnabled())
 			{
 				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.disabled')];
 			} else
@@ -388,7 +378,7 @@ class ThanksRestV2
 			{
 				if (is_array($tag_ids))
 				{
-					if ($this->api->Configuration()->IsTagsEnabled($this->config))
+					if ($this->api->Configuration()->IsTagsEnabled())
 					{
 						$tag_ids_valid = true;
 						foreach ($tag_ids as $tag_id)
@@ -423,7 +413,7 @@ class ThanksRestV2
 				{
 					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_array')];
 				}
-			} elseif ($this->api->Configuration()->IsTagsMandatory($this->config) && count($current_tags))
+			} elseif ($this->api->Configuration()->IsTagsMandatory() && count($current_tags))
 			{
 				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
 			}
@@ -722,16 +712,17 @@ class ThanksRestV2
 	}
 
 	/**
+	 * Update the value of a Thank You Configuration.
+	 *
 	 * @param ServerRequestInterface $request
-	 * @param ConfigOptions          $config_options
 	 * @return JsonPrettyResponse
 	 * @throws RestExBadRequest
 	 */
-	public function SetConfig(ServerRequestInterface $request, ConfigOptions $config_options): JsonPrettyResponse
+	public function SetConfig(ServerRequestInterface $request): JsonPrettyResponse
 	{
 		$post = $this->rest_format->GetJson($request);
 
-		$options = $config_options->GetOptions();
+		$options = $this->api->Configuration()->GetConfigOptions();
 
 		foreach ($post as $config_name => $value)
 		{
@@ -747,10 +738,10 @@ class ThanksRestV2
 				throw new RestExBadRequest();
 			}
 
-			$this->config->Set($config_name, $value);
+			$this->api->Configuration()->SetConfigValue($config_name, $value);
 		}
 
-		$this->api->Configuration()->SaveConfig($this->config);
+		$this->api->Configuration()->SaveConfig();
 
 		return $this->response->GetJsonPrettyResponse(true);
 	}

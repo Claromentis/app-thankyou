@@ -2,7 +2,6 @@
 
 namespace Claromentis\ThankYou\Controller;
 
-use Claromentis\Core\Config\Config;
 use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\Core\Localization\Lmsg;
@@ -12,8 +11,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class StatisticsController
 {
-	private $config;
-
 	private $config_api;
 
 	private $lmsg;
@@ -22,9 +19,8 @@ class StatisticsController
 
 	private $tag_api;
 
-	public function __construct(ResponseFactory $response_factory, Lmsg $lmsg, Config $config, Tags\Api $tag_api, Configuration\Api $config_api)
+	public function __construct(ResponseFactory $response_factory, Lmsg $lmsg, Tags\Api $tag_api, Configuration\Api $config_api)
 	{
-		$this->config     = $config;
 		$this->config_api = $config_api;
 		$this->lmsg       = $lmsg;
 		$this->response   = $response_factory;
@@ -49,7 +45,7 @@ class StatisticsController
 	{
 		$args = ['nav_statistics.+class' => 'active'];
 
-		if ($this->config_api->IsTagsEnabled($this->config))
+		if ($this->config_api->IsTagsEnabled())
 		{
 			$tag_options = [['tag_option.body' => ($this->lmsg)('thankyou.tag.all'), 'tag_option.value' => null, 'tag_option.selected' => "selected"]];
 
@@ -90,7 +86,7 @@ class StatisticsController
 			'users'     => ['name' => ($this->lmsg)('common.users'), 'datatable_service' => 'thankyou.datatable.users']
 		];
 
-		if ($this->config_api->IsTagsEnabled($this->config))
+		if ($this->config_api->IsTagsEnabled())
 		{
 			$reports ['tags'] = ['name' => ($this->lmsg)('thankyou.common.tags'), 'datatable_service' => 'thankyou.datatable.statistics.tags'];
 		}

@@ -3,7 +3,6 @@
 namespace Claromentis\ThankYou\Controller;
 
 use Claromentis\Core\Config\Exception\DialogException;
-use Claromentis\Core\Config\WritableConfig;
 use Claromentis\Core\Http\RequestData;
 use Claromentis\Core\Http\RequestDataTokenException;
 use Claromentis\Core\Http\TemplaterCallResponse;
@@ -19,18 +18,15 @@ class ThanksController
 {
 	private $api;
 
-	private $config;
-
 	private $lmsg;
 
 	private $logger;
 
 	private $sugre_repository;
 
-	public function __construct(Lmsg $lmsg, Api $api, SugreUtility $sugre_repository, WritableConfig $config, LoggerInterface $logger)
+	public function __construct(Lmsg $lmsg, Api $api, SugreUtility $sugre_repository, LoggerInterface $logger)
 	{
 		$this->api              = $api;
-		$this->config           = $config;
 		$this->lmsg             = $lmsg;
 		$this->logger           = $logger;
 		$this->sugre_repository = $sugre_repository;
@@ -51,7 +47,7 @@ class ThanksController
 			throw new AccessDeniedException();
 		}
 
-		$config_dialog = $this->api->Configuration()->GetConfigDialog($this->config);
+		$config_dialog = $this->api->Configuration()->GetConfigDialog();
 
 		$error_message = false;
 
@@ -63,9 +59,7 @@ class ThanksController
 
 			try
 			{
-				$config_dialog->Update($request);
-
-				$this->api->Configuration()->SaveConfig($this->config);
+				$this->api->Configuration()->SaveConfigFromConfigDialogRequest($request);
 				$user_message = ($this->lmsg)('common.configuration_saved');
 			} catch (DialogException $dialog_exception)
 			{
@@ -92,8 +86,8 @@ class ThanksController
 
 	public function CoreValues()
 	{
-		$tags_enabled   = $this->api->Configuration()->IsTagsEnabled($this->config);
-		$tags_mandatory = $this->api->Configuration()->IsTagsMandatory($this->config);
+		$tags_enabled   = $this->api->Configuration()->IsTagsEnabled();
+		$tags_mandatory = $this->api->Configuration()->IsTagsMandatory();
 
 		$args = [
 			'nav_tags.+class'                => 'active',
@@ -130,7 +124,7 @@ class ThanksController
 			$args['ty_list.limit']  = $limit;
 			$args['ty_list.offset'] = $offset;
 
-			$tags_enabled = $this->api->Configuration()->IsTagsEnabled($this->config);
+			$tags_enabled = $this->api->Configuration()->IsTagsEnabled();
 			if ($tags_enabled)
 			{
 				$args['thankyou_list_container.+class'] = "col-sm-9 col-md-pull-3";

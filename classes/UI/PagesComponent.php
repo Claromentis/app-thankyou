@@ -8,9 +8,9 @@ use Claromentis\Core\Component\Exception\ComponentRuntimeException;
 use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
-use Claromentis\Core\Config\Config;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Api\ThankYous;
+use Claromentis\ThankYou\Configuration;
 use ClaText;
 
 /**
@@ -22,20 +22,20 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 {
 	use TemplaterTrait;
 
-	private $config;
+	private $config_api;
 
 	private $lmsg;
 
 	/**
 	 * PagesComponent constructor.
 	 *
-	 * @param Lmsg   $lmsg
-	 * @param Config $config
+	 * @param Lmsg              $lmsg
+	 * @param Configuration\Api $config_api
 	 */
-	public function __construct(Lmsg $lmsg, Config $config)
+	public function __construct(Lmsg $lmsg, Configuration\Api $config_api)
 	{
-		$this->config = $config;
-		$this->lmsg   = $lmsg;
+		$this->config_api = $config_api;
+		$this->lmsg       = $lmsg;
 	}
 
 	/**
@@ -219,14 +219,14 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	 *
 	 * Input and output are the same array that GetOptions() returns, plus each items current value -
 	 *
-	 * array(
+	 * [
 	 *   'option_name' => ['type' => ...,
 	 *                     'default' => ...,
 	 *                     'title' => ...,
 	 *                     'value' => ...,
 	 *                    ],
 	 *   'other_option' => ...
-	 * )
+	 * ]
 	 *
 	 * @param array $options
 	 *
@@ -239,7 +239,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			unset($options['title']);
 		}
 
-		if ($this->config->Get('thank_you_comments') !== true)
+		if ($this->config_api->IsCommentsEnabled())
 		{
 			unset($options['comments']);
 		}

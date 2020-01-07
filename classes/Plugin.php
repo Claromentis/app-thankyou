@@ -1,18 +1,14 @@
 <?php
 namespace Claromentis\ThankYou;
 
-use Claromentis\Comments\CommentsRepository;
-use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Application;
-use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Event\LazyResolver;
 use Claromentis\Core\Http\ResponseFactory;
-use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
@@ -25,7 +21,6 @@ use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Api\ThankYous;
-use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controller\StatisticsController;
@@ -81,6 +76,15 @@ class Plugin implements
 	 */
 	public function register(Container $app)
 	{
+		//Configuration
+		$app[self::APPLICATION_NAME . '.config'] = function ($app) {
+			return $app['config.factory'](self::APPLICATION_NAME);
+		};
+
+		$app[Configuration\Api::class] = function ($app) {
+			return new Configuration\Api($app[Configuration\ConfigOptions::class], $app[self::APPLICATION_NAME . '.config']);
+		};
+
 		//Tags
 		$app[TagAcl::class] = function ($app) {
 			return new TagAcl($app['admin.panels_list']->GetOne(self::APPLICATION_NAME));
@@ -158,30 +162,9 @@ class Plugin implements
 			return new ThankYouAcl($app['admin.panels_list']->GetOne(self::APPLICATION_NAME), $app[UserExtranetService::class]);
 		};
 
-		$app[self::APPLICATION_NAME . '.config'] = function ($app) {
-			return $app['config.factory'](self::APPLICATION_NAME);
-		};
-
 		// Pages component
 		$app['pages.component.thankyou'] = function ($app) {
-			return new UI\PagesComponent($app[Lmsg::class], $app[self::APPLICATION_NAME . '.config']);
-		};
-
-		$app[ThankYous::class] = function ($app) {
-			return new ThankYous(
-				$app[Audit::class],
-				$app[LineManagerNotifier::class],
-				$app[ThankYousRepository::class],
-				$app[self::APPLICATION_NAME . '.config'],
-				$app[ThankYouAcl::class],
-				$app[ThankYouUtility::class],
-				$app[CommentsRepository::class],
-				$app[Comments\Factory::class],
-				$app[LikesRepository::class],
-				$app[AclRepository::class],
-				$app[UserExtranetService::class],
-				$app[Tags\Api::class]
-			);
+			return new UI\PagesComponent($app[Lmsg::class], $app[Configuration\Api::class]);
 		};
 
 		$app['audit.application.thankyou'] = function ($app) {
@@ -189,11 +172,7 @@ class Plugin implements
 		};
 
 		$app[ThanksController::class] = function ($app) {
-			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app[self::APPLICATION_NAME . '.config'], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
-		};
-
-		$app[StatisticsController::class] = function ($app) {
-			return new StatisticsController($app[ResponseFactory::class], $app[Lmsg::class], $app[self::APPLICATION_NAME . '.config'], $app[Tags\Api::class], $app[Configuration\Api::class]);
+			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
@@ -213,7 +192,6 @@ class Plugin implements
 				$app[ThankYous::class],
 				$app[Configuration\Api::class],
 				$app[SugreUtility::class],
-				$app[self::APPLICATION_NAME . '.config'],
 				$app[Lmsg::class]
 			);
 		};
@@ -242,7 +220,6 @@ class Plugin implements
 				$app['logger_factory']->GetLogger('tags'),
 				$app['rest.formatter'],
 				$app[Lmsg::class],
-				$app[self::APPLICATION_NAME . '.config'],
 				$app[ThankYouFormatter::class],
 				$app[TagFormatter::class]
 			);
