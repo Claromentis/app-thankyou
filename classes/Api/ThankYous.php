@@ -14,7 +14,6 @@ use Claromentis\People\Service\UserExtranetService;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Configuration;
-use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
@@ -434,9 +433,9 @@ class ThankYous
 	 * @return string|string[]
 	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
 	 */
-	public function GetOwnerClassNamesFromIds(array $object_types_id)
+	public function GetOwnerClassNames(array $object_types_id)
 	{
-		return $this->utility->GetOwnerClassNamesFromIds($object_types_id);
+		return $this->utility->GetOwnerClassNames($object_types_id);
 	}
 
 	/**

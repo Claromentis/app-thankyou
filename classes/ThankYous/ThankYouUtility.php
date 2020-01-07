@@ -11,13 +11,25 @@ use InvalidArgumentException;
 class ThankYouUtility
 {
 	/**
+	 * Given the an Owner Class' ID, returns it's Name.
+	 *
+	 * @param int $id
+	 * @return string
+	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
+	 */
+	public function GetOwnerClassName(int $id): string
+	{
+		return $this->GetOwnerClassNames([$id])[$id];
+	}
+
+	/**
 	 * Returns an array of Owner Class Names indexed by their IDs.
 	 *
 	 * @param int[] $ids
 	 * @return string[]
 	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
 	 */
-	public function GetOwnerClassNamesFromIds(array $ids): array
+	public function GetOwnerClassNames(array $ids): array
 	{
 		$names = [];
 		foreach ($ids as $id)

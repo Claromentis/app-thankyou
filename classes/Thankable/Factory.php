@@ -101,7 +101,7 @@ class Factory
 	{
 		try
 		{
-			return $this->utility->GetOwnerClassNamesFromIds([$owner_class_id])[$owner_class_id];
+			return $this->utility->GetOwnerClassName($owner_class_id);
 		} catch (ThankYouOClass $exception)
 		{
 			return ($this->lmsg)('thankyou.owner_class.not_found');
