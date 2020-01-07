@@ -67,7 +67,7 @@ class ThankYouAcl
 	{
 		$thankable_extranet_id = $thankable->GetExtranetId();
 
-		return !isset($thankable_extranet_id) || $this->IsExtranetVisible($thankable_extranet_id, $context->GetExtranetAreaId());
+		return !isset($thankable_extranet_id) || $this->IsExtranetVisible($context, $thankable_extranet_id);
 	}
 
 	/**
@@ -100,7 +100,7 @@ class ThankYouAcl
 			return false;
 		}
 
-		return $this->IsExtranetVisible($user_extranet_id, $context->GetExtranetAreaId());
+		return $this->IsExtranetVisible($context, $user_extranet_id);
 	}
 
 	/**
@@ -115,17 +115,17 @@ class ThankYouAcl
 	}
 
 	/**
-	 * Determines whether an Extranet Area is visible. If the second parameter is provided, this will be relative to
-	 * that Extranet.
+	 * Determines whether an Extranet Area is visible to a particular User.
 	 *
-	 * @param int      $target_extranet_id
-	 * @param int|null $viewers_extranet_id
+	 * @param SecurityContext $context
+	 * @param int             $target_extranet_id
 	 * @return bool
 	 */
-	public function IsExtranetVisible(int $target_extranet_id, ?int $viewers_extranet_id = null): bool
+	public function IsExtranetVisible(SecurityContext $context, int $target_extranet_id): bool
 	{
+		$user_extranet_id    = $context->GetExtranetAreaId();
 		$primary_extranet_id = (int) $this->user_extranet->GetPrimaryId();
 
-		return $target_extranet_id === $primary_extranet_id || $viewers_extranet_id === $primary_extranet_id || $target_extranet_id === $viewers_extranet_id;
+		return $target_extranet_id === $primary_extranet_id || $user_extranet_id === $primary_extranet_id || $target_extranet_id === $user_extranet_id;
 	}
 }

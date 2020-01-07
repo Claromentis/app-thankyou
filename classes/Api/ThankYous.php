@@ -744,19 +744,6 @@ class ThankYous
 	}
 
 	/**
-	 * Determines whether an Extranet Area is visible. If the second parameter is provided, this will be relative to
-	 * that Extranet.
-	 *
-	 * @param int      $target_extranet_id
-	 * @param int|null $viewers_extranet_id
-	 * @return bool
-	 */
-	public function IsExtranetVisible(int $target_extranet_id, ?int $viewers_extranet_id = null): bool
-	{
-		return $this->acl->IsExtranetVisible($target_extranet_id, $viewers_extranet_id);
-	}
-
-	/**
 	 * @param ThankYou $thank_you
 	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
