@@ -23,7 +23,6 @@ class Factory
 	 * @param mixed $object
 	 * @return bool
 	 */
-
 	public function IsCommentInstance($object): bool
 	{
 		return is_object($object) && $object instanceof CommentableThankYou;
