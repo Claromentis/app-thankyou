@@ -319,8 +319,8 @@ class ThankYousRepository
 			$order = $this->utility->BuildOrderString($orders);
 		}
 
-		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS " . self::THANK_YOU_TAGS_TABLE . ".total_uses";
-		$query_string .= ", " . self::TAG_TABLE . ".id AS " . self::TAG_TABLE . ".id";
+		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
+		$query_string .= ", " . self::TAG_TABLE . ".id AS \"" . self::TAG_TABLE . ".id\"";
 		$query_string .= " FROM " . self::TAG_TABLE;
 		$query_string .= $order;
 		$query_string .= " GROUP BY " . self::TAG_TABLE . ".id";
