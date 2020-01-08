@@ -457,24 +457,6 @@ class Api
 			$id        = $owner_class_member['id'] ?? null;
 			$oclass_id = $owner_class_member['oclass'] ?? null;
 
-			if (!isset($id))
-			{
-				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, one or more Owner Class Members does not have an ID");
-			}
-			if (!is_int($id) || !($id > 0))
-			{
-				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, Owner Class Member ID " . (string) $id . " is not a natural number");
-			}
-
-			if (!isset($oclass_id))
-			{
-				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, one or more Owner Class Members does not have an Owner Class ID");
-			}
-			if (!is_int($oclass_id))
-			{
-				throw new InvalidArgumentException("Failed to Get Distinct User IDs From Owner Classes, Owner Class ID " . (string) $oclass_id . " is not an integer");
-			}
-
 			try
 			{
 				$acl->Add(0, $oclass_id, $id);
