@@ -457,13 +457,7 @@ class Api
 			$id        = $owner_class_member['id'] ?? null;
 			$oclass_id = $owner_class_member['oclass'] ?? null;
 
-			try
-			{
-				$acl->Add(0, $oclass_id, $id);
-			} catch (InvalidSubjectException $invalid_subject_exception)
-			{
-				throw new LogicException("Unexpected Exception thrown by Acl method Add", null, $invalid_subject_exception);
-			}
+			$acl->Add(0, $oclass_id, $id);
 		}
 
 		$user_ids = $acl->GetIndividualsList(0);
