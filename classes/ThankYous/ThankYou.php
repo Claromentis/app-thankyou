@@ -108,7 +108,7 @@ class ThankYou
 	/**
 	 * @return Thankable[]|null
 	 */
-	public function GetThankable(): ?array
+	public function GetThankables(): ?array
 	{
 		return $this->thanked;
 	}

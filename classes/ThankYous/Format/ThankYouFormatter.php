@@ -111,7 +111,7 @@ class ThankYouFormatter
 			'id'           => $thank_you->GetId()
 		];
 
-		$thanked = $thank_you->GetThankable();
+		$thanked = $thank_you->GetThankables();
 		if (isset($thanked))
 		{
 			foreach ($thanked as $offset => $thank)

@@ -4,7 +4,6 @@ namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
-use Claromentis\Core\Acl\Exception\InvalidSubjectException;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Like\LikesRepository;
@@ -712,7 +711,7 @@ class Api
 	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
 	{
-		$thankables = $thank_you->GetThankable();
+		$thankables = $thank_you->GetThankables();
 
 		if (!isset($thankables))
 		{
@@ -783,7 +782,7 @@ class Api
 
 			if ($this->config_api->IsLineManagerNotificationEnabled())
 			{
-				$thankables = $thank_you->GetThankable();
+				$thankables = $thank_you->GetThankables();
 				if (!isset($thankables))
 				{
 					throw new ThankYouException("Failed to Notify Thanked User's Line Managers");

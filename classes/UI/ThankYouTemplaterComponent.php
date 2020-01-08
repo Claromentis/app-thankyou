@@ -189,7 +189,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		$date_created->setTimezone($time_zone);
 
 		$thanked_args = [];
-		$thankables   = $thank_you->GetThankable();
+		$thankables   = $thank_you->GetThankables();
 
 		if (isset($thankables))
 		{

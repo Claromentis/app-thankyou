@@ -825,7 +825,7 @@ class ThankYousRepository
 
 		$thank_you->SetId($id);
 
-		$thankees = $thank_you->GetThankable();
+		$thankees = $thank_you->GetThankables();
 		if (isset($thankees))
 		{
 			$this->DeleteThankYouThankees($id);
