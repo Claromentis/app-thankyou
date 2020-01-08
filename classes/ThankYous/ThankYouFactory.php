@@ -3,7 +3,6 @@
 namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Date;
 use InvalidArgumentException;
 use User;
