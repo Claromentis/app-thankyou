@@ -498,7 +498,7 @@ class Api
 		{
 			if (!($thank_you instanceof ThankYou))
 			{
-				throw new InvalidArgumentException("Failed to Load Thank Yous Comments, one or more Thank You given is not a Thank You");
+				continue;
 			}
 
 			$id = $thank_you->GetId();
