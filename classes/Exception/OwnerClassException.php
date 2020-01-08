@@ -2,7 +2,7 @@
 
 namespace Claromentis\ThankYou\Exception;
 
-class ThankYouOClass extends ThankYouException
+interface OwnerClassException
 {
 
 }

@@ -12,7 +12,7 @@ use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClass;
 use Claromentis\ThankYou\Thankable;
 use Date;
 use DateTimeZone;
@@ -248,7 +248,7 @@ class ThankYousRepository
 		try
 		{
 			$thankeds = $this->CreateThankablesFromOClasses($thankeds);
-		} catch (ThankYouOClass $exception)
+		} catch (UnsupportedThankYouOwnerClass $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown", null, $exception);
 		}
@@ -632,7 +632,7 @@ class ThankYousRepository
 	 *
 	 * @param array $thankeds
 	 * @return Thankable\Thankable[]
-	 * @throws ThankYouOClass - If one or more of the Owner Classes given is not supported.
+	 * @throws UnsupportedThankYouOwnerClass - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $thankeds): array
 	{
@@ -647,7 +647,7 @@ class ThankYousRepository
 
 			if (!in_array($thanked['oclass'], self::THANKABLES))
 			{
-				throw new ThankYouOClass("Failed to Get Permission Object Classes Names, Object class is not supported");
+				throw new UnsupportedThankYouOwnerClass("Failed to Get Permission Object Classes Names, Object class is not supported");
 			}
 
 			if (!isset($thanked['id']) || !is_int($thanked['id']))

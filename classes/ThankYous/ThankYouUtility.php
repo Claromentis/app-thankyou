@@ -3,7 +3,7 @@
 namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\Core\Acl\PermOClass;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\Exception\OwnerClassNameException;
 use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -15,7 +15,7 @@ class ThankYouUtility
 	 *
 	 * @param int $id
 	 * @return string
-	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
+	 * @throws OwnerClassNameException - If the Name of the oClass could not be determined.
 	 */
 	public function GetOwnerClassName(int $id): string
 	{
@@ -27,7 +27,7 @@ class ThankYouUtility
 	 *
 	 * @param int[] $ids
 	 * @return string[]
-	 * @throws ThankYouOClass - If the Name of the oClass could not be determined.
+	 * @throws OwnerClassNameException - If the Name of the oClass could not be determined.
 	 */
 	public function GetOwnerClassNames(array $ids): array
 	{
@@ -41,7 +41,7 @@ class ThankYouUtility
 			$names[$id] = PermOClass::GetName($id);
 			if (!is_string($names[$id]))
 			{
-				throw new ThankYouOClass("Failed to Get Thankable Object Type's Name From ID, oClass did not return string");
+				throw new OwnerClassNameException("Failed to Get Thankable Object Type's Name From ID, oClass did not return string");
 			}
 		}
 

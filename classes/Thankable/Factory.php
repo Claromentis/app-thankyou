@@ -4,7 +4,7 @@ namespace Claromentis\ThankYou\Thankable;
 
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\Exception\OwnerClassNameException;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
 
 class Factory
@@ -102,7 +102,7 @@ class Factory
 		try
 		{
 			return $this->utility->GetOwnerClassName($owner_class_id);
-		} catch (ThankYouOClass $exception)
+		} catch (OwnerClassNameException $exception)
 		{
 			return ($this->lmsg)('thankyou.owner_class.not_found');
 		}

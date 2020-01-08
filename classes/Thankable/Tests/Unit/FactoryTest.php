@@ -2,7 +2,7 @@
 
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Localization\Lmsg;
-use Claromentis\ThankYou\Exception\ThankYouOClass;
+use Claromentis\ThankYou\Exception\OwnerClassNameException;
 use Claromentis\ThankYou\Thankable\Factory;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
@@ -22,7 +22,7 @@ class FactoryTest extends TestCase
 	private $lmsg_mock;
 
 	/**
-	 * @var ThankYouUtility $thank_you_utility_mock
+	 * @var ThankYouUtility|MockObject
 	 */
 	private $thank_you_utility_mock;
 
@@ -37,7 +37,7 @@ class FactoryTest extends TestCase
 	{
 		$owner_class_name = "Some Owner Class Name";
 		$owner_class_id   = 1;
-		$this->thank_you_utility_mock->method('GetOwnerClassNamesFromIds')->willReturn([$owner_class_id => $owner_class_name]);
+		$this->thank_you_utility_mock->method('GetOwnerClassName')->willReturn($owner_class_name);
 		$thankable = $this->factory->Create('a string', null, $owner_class_id);
 
 		$this->assertTrue($thankable instanceof Thankable);
@@ -47,7 +47,7 @@ class FactoryTest extends TestCase
 	public function testCreateSuccessfulUnrecognisedOwnerClass()
 	{
 		$unknown_owner_class = "dno what you're on about!";
-		$this->thank_you_utility_mock->method('GetOwnerClassNamesFromIds')->willThrowException(new ThankYouOClass());
+		$this->thank_you_utility_mock->method('GetOwnerClassName')->willThrowException(new OwnerClassNameException());
 		$this->lmsg_mock->method('__invoke')->willReturn($unknown_owner_class);
 		$thankable = $this->factory->Create('a string', null, 1);
 
@@ -72,8 +72,8 @@ class FactoryTest extends TestCase
 		$owner_class_name = "Some Owner Class Name";
 		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.user.not_found')
 			->willReturn($name);
-		$this->thank_you_utility_mock->method('GetOwnerClassNamesFromIds')
-			->willReturn([$owner_class_id => $owner_class_name]);
+		$this->thank_you_utility_mock->method('GetOwnerClassName')
+			->willReturn($owner_class_name);
 		$thankable_unknown_user = $this->factory->CreateUnknown(null, $owner_class_id);
 
 		$this->assertSame($name, $thankable_unknown_user->GetName());
@@ -87,8 +87,8 @@ class FactoryTest extends TestCase
 		$owner_class_name = "Some Owner Class Name";
 		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.group.not_found')
 			->willReturn($name);
-		$this->thank_you_utility_mock->method('GetOwnerClassNamesFromIds')
-			->willReturn([$owner_class_id => $owner_class_name]);
+		$this->thank_you_utility_mock->method('GetOwnerClassName')
+			->willReturn($owner_class_name);
 		$thankable_unknown_group = $this->factory->CreateUnknown(null, $owner_class_id);
 
 		$this->assertSame($name, $thankable_unknown_group->GetName());
