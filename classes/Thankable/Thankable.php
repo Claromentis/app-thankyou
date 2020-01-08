@@ -17,7 +17,7 @@ class Thankable
 	/**
 	 * @var int|null
 	 */
-	private $id;
+	private $item_id;
 
 	/**
 	 * @var string|null
@@ -68,19 +68,27 @@ class Thankable
 	}
 
 	/**
-	 * @return int|null
-	 */
-	public function GetId(): ?int
-	{
-		return $this->id;
-	}
-
-	/**
 	 * @return string|null
 	 */
 	public function GetImageUrl(): ?string
 	{
 		return $this->image_url;
+	}
+
+	/**
+	 * @return int|null
+	 */
+	public function GetItemId(): ?int
+	{
+		return $this->item_id;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function GetObjectUrl(): ?string
+	{
+		return $this->object_url;
 	}
 
 	/**
@@ -100,14 +108,6 @@ class Thankable
 	}
 
 	/**
-	 * @return string|null
-	 */
-	public function GetObjectUrl(): ?string
-	{
-		return $this->object_url;
-	}
-
-	/**
 	 * @param string $name
 	 */
 	public function SetName(string $name)
@@ -121,16 +121,27 @@ class Thankable
 	}
 
 	/**
-	 * @param int|null $id
+	 * @param string|null $url
 	 */
-	public function SetId(?int $id)
-	{
-		$this->id = $id;
-	}
-
 	public function SetImageUrl(?string $url)
 	{
 		$this->image_url = $url;
+	}
+
+	/**
+	 * @param int|null $item_id
+	 */
+	public function SetItemId(?int $item_id)
+	{
+		$this->item_id = $item_id;
+	}
+
+	/**
+	 * @param string|null $url
+	 */
+	public function SetObjectUrl(?string $url)
+	{
+		$this->object_url = $url;
 	}
 
 	/**
@@ -147,10 +158,5 @@ class Thankable
 	public function SetOwnerClassName(?string $name)
 	{
 		$this->owner_class_name = $name;
-	}
-
-	public function SetObjectUrl(?string $url)
-	{
-		$this->object_url = $url;
 	}
 }

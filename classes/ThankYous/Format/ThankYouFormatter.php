@@ -190,7 +190,7 @@ class ThankYouFormatter
 		}
 
 		$output = [
-			'id'               => $thankable->GetId(),
+			'id'               => $thankable->GetItemId(),
 			'extranet_area_id' => $thankable->GetExtranetId(),
 			'name'             => $name,
 			'object_type'      => $object_type

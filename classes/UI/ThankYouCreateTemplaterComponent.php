@@ -53,7 +53,7 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 					if ($thankable instanceof Thankable)
 					{
 						$preselected_thankables[] = [
-							'id'          => $thankable->GetId(),
+							'id'          => $thankable->GetItemId(),
 							'name'        => $thankable->GetName(),
 							'object_type' => [
 								'id'   => $thankable->GetOwnerClass(),

@@ -33,14 +33,21 @@ class Factory
 
 	/**
 	 * @param string      $name
-	 * @param int|null    $id
+	 * @param int|null    $item_id
 	 * @param int|null    $owner_class_id
 	 * @param int|null    $extranet_id
 	 * @param string|null $image_url
 	 * @param string|null $profile_url
 	 * @return Thankable
 	 */
-	public function Create(string $name, ?int $id = null, ?int $owner_class_id = null, ?int $extranet_id = null, ?string $image_url = null, ?string $profile_url = null)
+	public function Create(
+		string $name,
+		?int $item_id = null,
+		?int $owner_class_id = null,
+		?int $extranet_id = null,
+		?string $image_url = null,
+		?string $profile_url = null
+	)
 	{
 		$owner_class_name = null;
 		if (isset($owner_class_id))
@@ -50,7 +57,7 @@ class Factory
 
 		$thankable = new Thankable($name);
 		$thankable->SetExtranetId($extranet_id);
-		$thankable->SetId($id);
+		$thankable->SetItemId($item_id);
 		$thankable->SetImageUrl($image_url);
 		$thankable->SetOwnerClassId($owner_class_id);
 		$thankable->SetOwnerClassName($owner_class_name);
@@ -62,11 +69,11 @@ class Factory
 	/**
 	 * Creates and returns a Thankable to represent Thanked objects which could not be identified.
 	 *
-	 * @param int|null $id
+	 * @param int|null $item_id
 	 * @param int|null $owner_class_id
 	 * @return Thankable
 	 */
-	public function CreateUnknown(?int $id = null, ?int $owner_class_id = null)
+	public function CreateUnknown(?int $item_id = null, ?int $owner_class_id = null)
 	{
 		$owner_class_name = null;
 		if (isset($owner_class_id))
@@ -86,7 +93,7 @@ class Factory
 		}
 
 		$thankable = new Thankable($name);
-		$thankable->SetId($id);
+		$thankable->SetItemId($item_id);
 		$thankable->SetOwnerClassId($owner_class_id);
 		$thankable->SetOwnerClassName($owner_class_name);
 

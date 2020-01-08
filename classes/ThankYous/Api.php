@@ -724,7 +724,7 @@ class Api
 		$owner_classes = [];
 		foreach ($thankables as $thankable)
 		{
-			$id        = $thankable->GetId();
+			$id        = $thankable->GetItemId();
 			$oclass_id = $thankable->GetOwnerClass();
 
 			if (!isset($id) || !isset($oclass_id))
@@ -793,7 +793,7 @@ class Api
 				foreach ($thankables as $thankable)
 				{
 					$owner_class_id = $thankable->GetOwnerClass();
-					$thanked_id     = $thankable->GetId();
+					$thanked_id     = $thankable->GetItemId();
 					if ($owner_class_id === PermOClass::INDIVIDUAL && isset($id))
 					{
 						$user_ids[] = $thanked_id;
