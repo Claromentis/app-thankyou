@@ -7,6 +7,7 @@ use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Like\LikesRepository;
+use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\Service\UserExtranetService;
@@ -630,6 +631,7 @@ class Api
 	 * @param int             $id
 	 * @throws ThankYouNotFoundException - If the Thank You could not be found.
 	 * @throws ThankYouForbiddenException - If the Security Context's User does not have permission.
+	 * @throws StorageException - If the Thank You could not be deleted from the repository.
 	 */
 	public function Delete(SecurityContext $security_context, int $id)
 	{

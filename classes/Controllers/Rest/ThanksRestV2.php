@@ -461,6 +461,13 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.error.thanks_not_found'),
 				'status' => 404
 			], 404);
+		} catch (StorageException $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.delete.error.repository'),
+				'status' => 500
+			], 500);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true, 200);

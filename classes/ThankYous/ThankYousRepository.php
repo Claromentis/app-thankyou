@@ -4,9 +4,11 @@ namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\CDN\CDNSystemException;
+use Claromentis\Core\DAL\Exceptions\TransactionException;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
+use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Exception\ThankableException;
@@ -849,13 +851,24 @@ class ThankYousRepository
 	}
 
 	/**
+	 * Given a Thank You ID, deletes the Thank You and any hard dependencies from the repository.
+	 *
 	 * @param int $id
+	 * @throws StorageException - If the Thank You could not be deleted from the repository.
 	 */
 	public function Delete(int $id)
 	{
-		$this->DeleteThankYouUsers($id);
-		$this->DeleteThankYouThanked($id);
-		$this->DeleteThankYou($id);
+		try
+		{
+			$this->db->DoTransaction(function () use ($id) {
+				$this->DeleteThankYouUsers($id);
+				$this->DeleteThankYouThanked($id);
+				$this->DeleteThankYou($id);
+			});
+		} catch (TransactionException $exception)
+		{
+			throw new StorageException("Failed to Delete Thank You from Repository", null, $exception);
+		}
 	}
 
 	/**
@@ -982,6 +995,11 @@ class ThankYousRepository
 		$this->db->query($query);
 	}
 
+	/**
+	 * Given a Thank You's repository ID, deletes the Thank You from the repository.
+	 *
+	 * @param int $thank_you_id
+	 */
 	private function DeleteThankYou(int $thank_you_id)
 	{
 		$query_string = "DELETE FROM " . self::THANK_YOU_TABLE . " WHERE id=int:thank_you_id";
@@ -990,7 +1008,7 @@ class ThankYousRepository
 	}
 
 	/**
-	 * Deletes all of a Thank You's Thanked.
+	 * Given a Thank You's deletes all of a Thank You's Thanked.
 	 *
 	 * @param int $thank_you_id
 	 */
