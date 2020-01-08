@@ -519,22 +519,19 @@ class Api
 	 * Sets Thank Yous Comments' Total Comments.
 	 *
 	 * @param Comments\CommentableThankYou[] $thank_yous_comments
-	 * @return array
 	 */
-	public function LoadThankYousCommentsTotalComments(array $thank_yous_comments): array
+	public function LoadThankYousCommentsTotalComments(array $thank_yous_comments)
 	{
 		foreach ($thank_yous_comments as $thank_you_comments)
 		{
 			if (!$this->comments_factory->IsCommentInstance($thank_you_comments))
 			{
-				throw new InvalidArgumentException("Failed to Load Thank Yous' Comments Total Comments, one ore more entities provided is not a Thank You Comments");
+				continue;
 			}
 
 			$comments_total_count = (int) $this->comments_repository->GetCommentsCount($thank_you_comments);
 			$thank_you_comments->SetTotalComments($comments_total_count);
 		}
-
-		return $thank_yous_comments;
 	}
 
 	/**
