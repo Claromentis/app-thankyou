@@ -115,6 +115,9 @@ class Plugin implements
 		};
 
 		//Thank Yous
+		$app[LineManagerNotifier::class] = function ($app) {
+			return new LineManagerNotifier($app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+		};
 
 		// Localization domain
 		$app['localization.domain.thankyou'] = function ($app) {
