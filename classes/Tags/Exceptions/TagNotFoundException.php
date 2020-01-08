@@ -2,7 +2,7 @@
 
 namespace Claromentis\ThankYou\Tags\Exceptions;
 
-class TagNotFound extends TagException
+class TagNotFoundException extends TagException
 {
 
 }

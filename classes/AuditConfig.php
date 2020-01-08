@@ -6,7 +6,7 @@ use Claromentis\Core\Audit\ApplicationAuditConfig;
 use Claromentis\Core\Audit\ApplicationAuditUrlConfig;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\ThankYou\Tags;
-use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 
 class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 {
@@ -70,7 +70,7 @@ class AuditConfig implements ApplicationAuditConfig, ApplicationAuditUrlConfig
 				$tag = $this->tag_api->GetTag($object_id);
 
 				return $tag->GetName();
-			} catch (TagNotFound $exception)
+			} catch (TagNotFoundException $exception)
 			{
 				return ($this->lmsg)('thankyou.tag.name');
 			}

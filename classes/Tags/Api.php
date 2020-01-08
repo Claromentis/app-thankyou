@@ -7,9 +7,9 @@ use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
+use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Date;
 use InvalidArgumentException;
 use User;
@@ -55,7 +55,7 @@ class Api
 	/**
 	 * @param int $id
 	 * @return Tag
-	 * @throws TagNotFound - If the Tag could not be found in the Repository.
+	 * @throws TagNotFoundException - If the Tag could not be found in the Repository.
 	 */
 	public function GetTag(int $id): Tag
 	{
@@ -63,7 +63,7 @@ class Api
 
 		if (!isset($tags[$id]))
 		{
-			throw new TagNotFound("Failed to Get Tag, Tag with ID '" . $id . "' could not be found");
+			throw new TagNotFoundException("Failed to Get Tag, Tag with ID '" . $id . "' could not be found");
 		}
 
 		return $tags[$id];
@@ -207,15 +207,15 @@ class Api
 	/**
 	 * @param int             $id
 	 * @param SecurityContext $context
-	 * @throws TagForbidden - If the SecurityContext does not allow the Tag to be deleted.
-	 * @throws TagNotFound - If the Tag cannot be found in the Repository.
+	 * @throws TagForbiddenException - If the SecurityContext does not allow the Tag to be deleted.
+	 * @throws TagNotFoundException - If the Tag cannot be found in the Repository.
 	 * @throws StorageException - If the Tag could not be Deleted from the Repository.
 	 */
 	public function Delete(int $id, SecurityContext $context)
 	{
 		if (!$this->acl->CanDeleteTag($context))
 		{
-			throw new TagForbidden("User does not have Permission to Delete a Tag");
+			throw new TagForbiddenException("User does not have Permission to Delete a Tag");
 		}
 
 		$tag = $this->GetTag($id);
@@ -233,7 +233,7 @@ class Api
 	 * @param int $aggregation_id
 	 * @param Tag $tag
 	 * @return int
-	 * @throws TagNotFound If the Tag could not be found in the Repository.
+	 * @throws TagNotFoundException If the Tag could not be found in the Repository.
 	 */
 	public function AddTagging(int $taggable_id, int $aggregation_id, Tag $tag): int
 	{
@@ -255,7 +255,7 @@ class Api
 	 * @param int   $aggregation_id
 	 * @param Tag[] $tags
 	 * @return int[]
-	 * @throws TagNotFound If one or more of the Tags could not be found in the Repository.
+	 * @throws TagNotFoundException If one or more of the Tags could not be found in the Repository.
 	 */
 	public function AddTaggings(int $taggable_id, int $aggregation_id, array $tags): array
 	{

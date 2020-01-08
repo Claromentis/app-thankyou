@@ -12,7 +12,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use DateClaTimeZone;
@@ -127,7 +127,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			try
 			{
 				$thank_you = $this->api->ThankYous()->GetThankYou($thank_you, true, false, true);
-			} catch (ThankYouNotFound $exception)
+			} catch (ThankYouNotFoundException $exception)
 			{
 				return ($this->lmsg)('thankyou.error.thanks_not_found');
 			}

@@ -12,7 +12,7 @@ use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Date;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -322,14 +322,14 @@ class TagRepository
 	 * @param int      $tag_id
 	 * @param int|null $id
 	 * @return int
-	 * @throws TagNotFound If the Tag with the given ID could not be found.
+	 * @throws TagNotFoundException If the Tag with the given ID could not be found.
 	 */
 	public function SaveTagging(int $taggable_id, int $aggregation_id, int $tag_id, ?int $id = null): int
 	{
 		$tags = $this->GetTags([$tag_id]);
 		if (!isset($tags[$tag_id]))
 		{
-			throw new TagNotFound("Failed to Save Taggable's Tag, Tag with ID '" . (string) $tag_id . "' could not be found");
+			throw new TagNotFoundException("Failed to Save Taggable's Tag, Tag with ID '" . (string) $tag_id . "' could not be found");
 		}
 
 		$db_fields = [

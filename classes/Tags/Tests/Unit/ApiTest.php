@@ -6,8 +6,8 @@ use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Tags\Api;
-use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
-use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
+use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Claromentis\ThankYou\Tags\Tag;
 use Claromentis\ThankYou\Tags\TagAcl;
 use Claromentis\ThankYou\Tags\TagFactory;
@@ -83,7 +83,7 @@ class ApiTest extends TestCase
 	public function testGetTagNotFound()
 	{
 		$this->tag_repository_mock->method('GetTags')->willReturn([]);
-		$this->expectException(TagNotFound::class);
+		$this->expectException(TagNotFoundException::class);
 
 		$this->api->GetTag(1);
 	}
@@ -209,7 +209,7 @@ class ApiTest extends TestCase
 	{
 		$this->tag_repository_mock->method('GetTags')->willReturn([]);
 		$this->tag_acl_mock->expects($this->any())->method('CanDeleteTag')->with($this->security_context_mock)->willReturn(true);
-		$this->expectException(TagNotFound::class);
+		$this->expectException(TagNotFoundException::class);
 
 		$this->api->Delete(1, $this->security_context_mock);
 	}
@@ -217,7 +217,7 @@ class ApiTest extends TestCase
 	public function testDeleteForbidden()
 	{
 		$this->tag_acl_mock->expects($this->any())->method('CanDeleteTag')->with($this->security_context_mock)->willReturn(false);
-		$this->expectException(TagForbidden::class);
+		$this->expectException(TagForbiddenException::class);
 
 		$this->api->Delete(1, $this->security_context_mock);
 	}

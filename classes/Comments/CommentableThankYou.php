@@ -14,7 +14,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Services;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouNotFound;
+use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\ThanksItem;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -189,7 +189,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 		try
 		{
 			$thank_you = $api->ThankYous()->GetThankYou($this->thanks_item->GetId(), false, true);
-		} catch (ThankYouNotFound $exception)
+		} catch (ThankYouNotFoundException $exception)
 		{
 			$this->logger->error("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", [$exception]);
 

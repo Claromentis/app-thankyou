@@ -9,13 +9,13 @@ use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouException;
-use Claromentis\ThankYou\Exception\ThankYouForbidden;
-use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClass;
+use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
+use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
+use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClassException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagForbidden;
+use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
-use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
 use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Date;
@@ -112,7 +112,7 @@ class ThanksRestV2
 		try
 		{
 			$thank_you = $this->api->ThankYous()->GetThankYou($id, $thanked, $users, $tags);
-		} catch (ThankYouNotFound $exception)
+		} catch (ThankYouNotFoundException $exception)
 		{
 			throw new RestExNotFound(($this->lmsg)('thankyou.error.thanks_not_found'), "Not found", $exception);
 		}
@@ -177,7 +177,7 @@ class ThanksRestV2
 			{
 				$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
 			}
-		} catch (UnsupportedThankYouOwnerClass $exception)
+		} catch (UnsupportedThankYouOwnerClassException $exception)
 		{
 			$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
 			$first   = true;
@@ -257,12 +257,12 @@ class ThanksRestV2
 			try
 			{
 				$this->api->ThankYous()->Save($thank_you);
-			} catch (TagNotFound $exception)
+			} catch (TagNotFoundException $exception)
 			{
 				throw new LogicException("Unexpected TagNotFound Exception thrown when saving Thank You's Tags, Tags have already been pulled from the Repository!", null, $exception);
 			}
 			$this->api->ThankYous()->Notify($thank_you);
-		} catch (ThankYouNotFound $exception)
+		} catch (ThankYouNotFoundException $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown when creating Thank You", null, $exception);
 		} catch (ThankYouException $exception)
@@ -342,7 +342,7 @@ class ThanksRestV2
 						$thankables = $this->api->ThankYous()->CreateThankablesFromOClasses($thanked);
 						$thank_you->SetThanked($thankables);
 						$this->api->ThankYous()->PopulateThankYouUsersFromThankables($thank_you);
-					} catch (UnsupportedThankYouOwnerClass $exception)
+					} catch (UnsupportedThankYouOwnerClassException $exception)
 					{
 						$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
 						$first   = true;
@@ -421,11 +421,11 @@ class ThanksRestV2
 			try
 			{
 				$this->api->ThankYous()->Save($thank_you);
-			} catch (TagNotFound $exception)
+			} catch (TagNotFoundException $exception)
 			{
 				throw new LogicException("Unexpected TagNotFound Exception thrown when saving Thank You's Tags, Tags have already been pulled from the Repository!", null, $exception);
 			}
-		} catch (ThankYouNotFound $exception)
+		} catch (ThankYouNotFoundException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
@@ -447,14 +447,14 @@ class ThanksRestV2
 		try
 		{
 			$this->api->ThankYous()->Delete($context, $id);
-		} catch (ThankYouForbidden $exception)
+		} catch (ThankYouForbiddenException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
 				'title'  => ($this->lmsg)('thankyou.error.no_edit_permission'),
 				'status' => 401
 			], 401);
-		} catch (ThankYouNotFound $exception)
+		} catch (ThankYouNotFoundException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
@@ -476,7 +476,7 @@ class ThanksRestV2
 		try
 		{
 			$tag = $this->api->Tag()->GetTag($id);
-		} catch (TagNotFound $exception)
+		} catch (TagNotFoundException $exception)
 		{
 			throw new RestExNotFound(($this->lmsg)('thankyou.tag.error.id.not_found', $id), "Not Found", $exception);
 		}
@@ -650,7 +650,7 @@ class ThanksRestV2
 			}
 
 			$this->api->Tag()->Save($tag);
-		} catch (TagNotFound $exception)
+		} catch (TagNotFoundException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
@@ -675,14 +675,14 @@ class ThanksRestV2
 		try
 		{
 			$this->api->Tag()->Delete($id, $context);
-		} catch (TagForbidden $exception)
+		} catch (TagForbiddenException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
 				'title'  => ($this->lmsg)('thankyou.tag.delete.error.permission'),
 				'status' => 401
 			], 401);
-		} catch (TagNotFound $exception)
+		} catch (TagNotFoundException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',

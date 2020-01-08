@@ -11,8 +11,8 @@ use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Exception\ThankYouException;
-use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClass;
+use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
+use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClassException;
 use Claromentis\ThankYou\Thankable;
 use Date;
 use DateTimeZone;
@@ -248,7 +248,7 @@ class ThankYousRepository
 		try
 		{
 			$thankeds = $this->CreateThankablesFromOClasses($thankeds);
-		} catch (UnsupportedThankYouOwnerClass $exception)
+		} catch (UnsupportedThankYouOwnerClassException $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown", null, $exception);
 		}
@@ -632,7 +632,7 @@ class ThankYousRepository
 	 *
 	 * @param array $thankeds
 	 * @return Thankable\Thankable[]
-	 * @throws UnsupportedThankYouOwnerClass - If one or more of the Owner Classes given is not supported.
+	 * @throws UnsupportedThankYouOwnerClassException - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $thankeds): array
 	{
@@ -647,7 +647,7 @@ class ThankYousRepository
 
 			if (!in_array($thanked['oclass'], self::THANKABLES))
 			{
-				throw new UnsupportedThankYouOwnerClass("Failed to Get Permission Object Classes Names, Object class is not supported");
+				throw new UnsupportedThankYouOwnerClassException("Failed to Get Permission Object Classes Names, Object class is not supported");
 			}
 
 			if (!isset($thanked['id']) || !is_int($thanked['id']))
@@ -798,7 +798,7 @@ class ThankYousRepository
 	 *
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
-	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
+	 * @throws ThankYouNotFoundException - If the Thank You could not be found in the Repository.
 	 */
 	public function Save(ThankYou $thank_you)
 	{
@@ -808,7 +808,7 @@ class ThankYousRepository
 			$thank_yous = $this->GetThankYous([$id]);
 			if (!isset($thank_yous[$id]))
 			{
-				throw new ThankYouNotFound("Failed to Save Update to Thank You, Thank You not found");
+				throw new ThankYouNotFoundException("Failed to Save Update to Thank You, Thank You not found");
 			}
 		}
 

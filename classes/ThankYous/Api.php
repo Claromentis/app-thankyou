@@ -15,13 +15,13 @@ use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Exception\OwnerClassNameException;
 use Claromentis\ThankYou\Exception\ThankYouException;
-use Claromentis\ThankYou\Exception\ThankYouForbidden;
-use Claromentis\ThankYou\Exception\ThankYouNotFound;
-use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClass;
+use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
+use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
+use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClassException;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags;
-use Claromentis\ThankYou\Tags\Exceptions\TagNotFound;
+use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Claromentis\ThankYou\Thankable\Thankable;
 use Date;
 use DateTime;
@@ -145,14 +145,14 @@ class Api
 	 * @param bool $users
 	 * @param bool $tags
 	 * @return ThankYou
-	 * @throws ThankYouNotFound - If the Thank You could not be found.
+	 * @throws ThankYouNotFoundException - If the Thank You could not be found.
 	 */
 	public function GetThankYou(int $id, bool $thanked = false, bool $users = false, bool $tags = false): ThankYou
 	{
 		$thank_yous = $this->GetThankYous([$id], $thanked, $users, $tags);
 		if (!isset($thank_yous[$id]))
 		{
-			throw new ThankYouNotFound("Failed to load Thank You, the Thank You could not be found");
+			throw new ThankYouNotFoundException("Failed to load Thank You, the Thank You could not be found");
 		}
 
 		return $thank_yous[$id];
@@ -574,7 +574,7 @@ class Api
 	 * @param int $o_class
 	 * @param int $id
 	 * @return Thankable
-	 * @throws UnsupportedThankYouOwnerClass - If the Owner Class given is not supported.
+	 * @throws UnsupportedThankYouOwnerClassException - If the Owner Class given is not supported.
 	 */
 	public function CreateThankableFromOClass(int $o_class, int $id)
 	{
@@ -587,7 +587,7 @@ class Api
 	 *
 	 * @param array $oclasses
 	 * @return Thankable[]
-	 * @throws UnsupportedThankYouOwnerClass - If one or more of the Owner Classes given is not supported.
+	 * @throws UnsupportedThankYouOwnerClassException - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $oclasses)
 	{
@@ -598,8 +598,8 @@ class Api
 	 * Save a Thank You to the Repository and generate an Audit. If the Thank You doesn't have an ID, one will be set.
 	 *
 	 * @param ThankYou $thank_you
-	 * @throws ThankYouNotFound - If the Thank You could not be found in the Repository.
-	 * @throws TagNotFound If one or more of the Thank You's Tags could not be found in the Repository.
+	 * @throws ThankYouNotFoundException - If the Thank You could not be found in the Repository.
+	 * @throws TagNotFoundException If one or more of the Thank You's Tags could not be found in the Repository.
 	 */
 	public function Save(ThankYou $thank_you)
 	{
@@ -628,8 +628,8 @@ class Api
 	/**
 	 * @param SecurityContext $security_context
 	 * @param int             $id
-	 * @throws ThankYouNotFound - If the Thank You could not be found.
-	 * @throws ThankYouForbidden - If the Security Context's User does not have permission.
+	 * @throws ThankYouNotFoundException - If the Thank You could not be found.
+	 * @throws ThankYouForbiddenException - If the Security Context's User does not have permission.
 	 */
 	public function Delete(SecurityContext $security_context, int $id)
 	{
@@ -637,7 +637,7 @@ class Api
 
 		if (!$this->CanDeleteThankYou($security_context, $thank_you))
 		{
-			throw new ThankYouForbidden("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
+			throw new ThankYouForbiddenException("Failed to Update Thank You, User is not the Author and does not have administrative privileges");
 		}
 
 		$this->tag_api->RemoveAllTaggableTaggings($id, ThankYousRepository::AGGREGATION_ID);
