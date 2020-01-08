@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\Controller\Rest;
+namespace Claromentis\ThankYou\Controllers\Rest;
 
 use Claromentis\Core\Http\JsonPrettyResponse;
 use Claromentis\Core\Http\ResponseFactory;
@@ -8,7 +8,6 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouAuthor;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbidden;
 use Claromentis\ThankYou\Exception\ThankYouNotFound;

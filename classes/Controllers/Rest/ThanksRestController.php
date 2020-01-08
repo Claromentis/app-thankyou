@@ -1,5 +1,5 @@
 <?php
-namespace Claromentis\ThankYou\Controller\Rest;
+namespace Claromentis\ThankYou\Controllers\Rest;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Http\JsonPrettyResponse;

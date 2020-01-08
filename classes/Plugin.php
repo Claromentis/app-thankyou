@@ -19,12 +19,13 @@ use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Configuration;
+use Claromentis\ThankYou\Controllers\Admin;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\ThankYous;
-use Claromentis\ThankYou\Controller\Rest\ThanksRestController;
-use Claromentis\ThankYou\Controller\Rest\ThanksRestV2;
-use Claromentis\ThankYou\Controller\StatisticsController;
-use Claromentis\ThankYou\Controller\ThanksController;
+use Claromentis\ThankYou\Controllers\Rest\ThanksRestController;
+use Claromentis\ThankYou\Controllers\Rest\ThanksRestV2;
+use Claromentis\ThankYou\Controllers\Statistics;
+use Claromentis\ThankYou\Controllers\Thanks;
 use Claromentis\ThankYou\Exception\ThankYouOClass;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\DataTables\TagDataTableSource;
@@ -171,10 +172,6 @@ class Plugin implements
 			return new AuditConfig($app[Lmsg::class], $app[Tags\Api::class], $app[ThankYous\Api::class]);
 		};
 
-		$app[ThanksController::class] = function ($app) {
-			return new ThanksController($app[Lmsg::class], $app[Api::class], $app[SugreUtility::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
-		};
-
 		$app['templater.ui.thankyou.list'] = function ($app) {
 			return new ThankYousListTemplaterComponent($app[Api::class], $app[Lmsg::class]);
 		};
@@ -278,14 +275,14 @@ class Plugin implements
 		return [
 			'/thankyou' => function (ControllerCollection $routes) use ($app) {
 				$routes->secure('html', 'user');
-				$routes->get('/thanks', ThanksController::class . ':View');
-				$routes->get('/thanks/{id}', ThanksController::class . ':View');
+				$routes->get('/thanks', Thanks::class . ':View');
+				$routes->get('/thanks/{id}', Thanks::class . ':View');
 
 				$routes->secure('html', 'admin', ['panel_code' => self::APPLICATION_NAME]);
-				$routes->get('/admin', StatisticsController::class . ':Reports');
-				$routes->match('/admin/configuration', ThanksController::class . ':Configuration')->method('GET|POST');
-				$routes->get('/admin/core_values', ThanksController::class . ':CoreValues');
-				$routes->get('/admin/statistics/{report_index}', StatisticsController::class . ':View');
+				$routes->get('/admin', Statistics::class . ':Reports');
+				$routes->match('/admin/configuration', Admin::class . ':Configuration')->method('GET|POST');
+				$routes->get('/admin/core_values', Admin::class . ':CoreValues');
+				$routes->get('/admin/statistics/{report_index}', Statistics::class . ':View');
 			}
 		];
 	}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\Controller;
+namespace Claromentis\ThankYou\Controllers;
 
 use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Http\TemplaterCallResponse;
@@ -9,7 +9,7 @@ use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Tags;
 use Psr\Http\Message\ServerRequestInterface;
 
-class StatisticsController
+class Statistics
 {
 	/**
 	 * @var Configuration\Api
