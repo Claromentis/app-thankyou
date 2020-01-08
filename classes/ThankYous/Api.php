@@ -203,7 +203,6 @@ class Api
 				$ids[$id] = true;
 			}
 		}
-
 		$ids = array_keys($ids);
 
 		$thankeds = $this->thank_yous_repository->GetThankYousThankedsByThankYouIds($ids);
@@ -211,7 +210,7 @@ class Api
 		foreach ($thank_yous as $thank_you)
 		{
 			$id = $thank_you->GetId();
-			if (isset($id) && isset($thankeds[$id]))
+			if (isset($thankeds[$id]))
 			{
 				$thank_you->SetThanked($thankeds[$id]);
 			} else
@@ -235,7 +234,6 @@ class Api
 				$ids[$id] = true;
 			}
 		}
-
 		$ids = array_keys($ids);
 
 		$thank_you_users = $this->thank_yous_repository->GetThankYousUsersByThankYouIds($ids);
@@ -243,7 +241,7 @@ class Api
 		foreach ($thank_yous as $thank_you)
 		{
 			$id = $thank_you->GetId();
-			if (isset($id) && isset($thank_you_users[$id]))
+			if (isset($thank_you_users[$id]))
 			{
 				$thank_you->SetUsers($thank_you_users[$id]);
 			} else
@@ -264,13 +262,11 @@ class Api
 		foreach ($thank_yous as $thank_you)
 		{
 			$id = $thank_you->GetId();
-			if (!isset($id))
+			if (isset($id))
 			{
-				throw new InvalidArgumentException("Failed to Load Thank You's Tags, one or more Thank You does not have an ID");
+				$ids[$id] = true;
 			}
-			$ids[$id] = true;
 		}
-
 		$ids = array_keys($ids);
 
 		$taggeds_tags = $this->tag_api->GetTaggablesTags($ids, ThankYousRepository::AGGREGATION_ID);
@@ -278,12 +274,13 @@ class Api
 		foreach ($thank_yous as $thank_you)
 		{
 			$id = $thank_you->GetId();
-			if (!isset($taggeds_tags[$id]))
+			if (isset($taggeds_tags[$id]))
 			{
-				throw new LogicException("Failed to Load Thank Yous Tags, Thank You's Tags missing");
+				$thank_you->SetTags($taggeds_tags[$id]);
+			} else
+			{
+				$thank_you->SetTags([]);
 			}
-
-			$thank_you->SetTags($taggeds_tags[$id]);
 		}
 	}
 
