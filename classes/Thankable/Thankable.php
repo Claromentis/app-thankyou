@@ -17,6 +17,11 @@ class Thankable
 	/**
 	 * @var int|null
 	 */
+	private $id;
+
+	/**
+	 * @var int|null
+	 */
 	private $item_id;
 
 	/**
@@ -65,6 +70,16 @@ class Thankable
 	public function GetExtranetId(): ?int
 	{
 		return $this->extranet_id;
+	}
+
+	/**
+	 * Returns the Repository ID.
+	 *
+	 * @return int|null
+	 */
+	public function GetId(): ?int
+	{
+		return $this->id;
 	}
 
 	/**
@@ -118,6 +133,16 @@ class Thankable
 	public function SetExtranetId(?int $id)
 	{
 		$this->extranet_id = $id;
+	}
+
+	/**
+	 * Set the Repository ID.
+	 *
+	 * @param int|null $id
+	 */
+	public function SetId(?int $id)
+	{
+		$this->id = $id;
 	}
 
 	/**

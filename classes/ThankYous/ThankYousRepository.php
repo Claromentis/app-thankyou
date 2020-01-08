@@ -798,6 +798,7 @@ class ThankYousRepository
 	/**
 	 * Saves a Thank You to the repository, including its Users and Thankeds, but excluding Tags.
 	 * If the Thank You is new the ID its ID will also be set.
+	 * If a Thanked is new its ID will also be set.
 	 *
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
@@ -818,8 +819,8 @@ class ThankYousRepository
 			{
 				try
 				{
-					//TODO: Add Thanked ID to Thanked once tracked
 					$thanked_id = $this->SaveThanked($id, $thanked);
+					$thanked->SetId($thanked_id);
 				} catch (ThankableException $exception)
 				{
 					$this->logger->warning("Could not save a Thank You's Thanked, not enough data", [$exception]);
@@ -920,8 +921,7 @@ class ThankYousRepository
 	 */
 	private function SaveThanked(int $thank_you_id, Thankable\Thankable $thankable): int
 	{
-		//TODO: Implement Thankable IDs.
-		$id             = null;
+		$id             = $thankable->GetId();
 		$owner_class_id = $thankable->GetOwnerClass();
 		$item_id        = $thankable->GetItemId();
 
