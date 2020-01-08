@@ -602,7 +602,7 @@ class Api
 	 */
 	public function Save(ThankYou $thank_you)
 	{
-		$new = ($thank_you->GetId() === null) ? true : false;
+		$new = $thank_you->GetId() === null;
 
 		$this->thank_yous_repository->Save($thank_you);
 
