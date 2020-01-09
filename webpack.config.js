@@ -19,9 +19,6 @@ externals['moment'] = { amd: 'moment' };
 var tags = {
     context: __dirname,
     entry: {
-        'tags': [
-            './js/src/tags.js'
-        ],
         'thankyou': [
             './js/src/thankyou.js'
         ]
