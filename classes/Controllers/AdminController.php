@@ -12,7 +12,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Admin
+class AdminController
 {
 	/**
 	 * @var Api

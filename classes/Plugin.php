@@ -19,13 +19,13 @@ use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Configuration;
-use Claromentis\ThankYou\Controllers\Admin;
+use Claromentis\ThankYou\Controllers\AdminController;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\Controllers\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controllers\Rest\ThanksRestV2;
-use Claromentis\ThankYou\Controllers\Statistics;
-use Claromentis\ThankYou\Controllers\Thanks;
+use Claromentis\ThankYou\Controllers\StatisticsController;
+use Claromentis\ThankYou\Controllers\ThankYouController;
 use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClassException;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\DataTables\TagDataTableSource;
@@ -278,14 +278,14 @@ class Plugin implements
 		return [
 			'/thankyou' => function (ControllerCollection $routes) use ($app) {
 				$routes->secure('html', 'user');
-				$routes->get('/thanks', Thanks::class . ':View');
-				$routes->get('/thanks/{id}', Thanks::class . ':View');
+				$routes->get('/thanks', ThankYouController::class . ':View');
+				$routes->get('/thanks/{id}', ThankYouController::class . ':View');
 
 				$routes->secure('html', 'admin', ['panel_code' => self::APPLICATION_NAME]);
-				$routes->get('/admin', Statistics::class . ':Reports');
-				$routes->match('/admin/configuration', Admin::class . ':Configuration')->method('GET|POST');
-				$routes->get('/admin/core_values', Admin::class . ':CoreValues');
-				$routes->get('/admin/statistics/{report_index}', Statistics::class . ':View');
+				$routes->get('/admin', StatisticsController::class . ':Reports');
+				$routes->match('/admin/configuration', AdminController::class . ':Configuration')->method('GET|POST');
+				$routes->get('/admin/core_values', AdminController::class . ':CoreValues');
+				$routes->get('/admin/statistics/{report_index}', StatisticsController::class . ':View');
 			}
 		];
 	}

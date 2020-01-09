@@ -8,7 +8,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Thanks
+class ThankYouController
 {
 	/**
 	 * @var Api

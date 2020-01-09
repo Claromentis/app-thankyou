@@ -9,7 +9,7 @@ use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Tags;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Statistics
+class StatisticsController
 {
 	/**
 	 * @var Configuration\Api
