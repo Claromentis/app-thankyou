@@ -1038,16 +1038,6 @@ class ThankYousRepository
 		$lower_date = $date_range[0] ?? null;
 		$upper_date = $date_range[1] ?? null;
 
-		if (!isset($lower_date))
-		{
-			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Lower Date not found at offset 0");
-		}
-
-		if (!isset($upper_date))
-		{
-			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Upper Date not found at offset 1");
-		}
-
 		if (!is_int($lower_date))
 		{
 			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Lower Date is not an integer");
