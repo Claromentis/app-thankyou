@@ -20,6 +20,7 @@ use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Controllers\AdminController;
+use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\Controllers\Rest\ThanksRestController;
@@ -341,7 +342,7 @@ class Plugin implements
 
 	/**
 	 * This Method is required by ClaPlugins::IsObjectValid, in order for Sending Messages/Notifications to work.
-	 * It will be deprecated as soon as possible and should be not be
+	 * It will be deprecated as soon as possible and should be not be used elsewhere.
 	 *
 	 * @param int $aggregation_id
 	 * @param int $object_id
@@ -349,15 +350,19 @@ class Plugin implements
 	 */
 	public function IsObjectValid(int $aggregation_id, int $object_id)
 	{
-		/**
-		 * @var ThanksItemFactory $thanks_item_factory
-		 */
-		$thanks_item_factory = Services::I()->{ThanksItemFactory::class};
+		try
+		{
+			/**
+			 * @var ThankYous\Api $thank_you_api
+			 */
+			$thank_you_api = Services::I()->{ThankYous\Api::class};
+			$thank_you_api->GetThankYou($object_id);
 
-		$thanks_item = $thanks_item_factory->Create();
-		$thanks_item->Load($object_id);
-
-		return !$thanks_item->IsError();
+			return true;
+		} catch (ThankYouNotFoundException $exception)
+		{
+			return false;
+		}
 	}
 
 	/**
