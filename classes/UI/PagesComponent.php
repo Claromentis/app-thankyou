@@ -4,7 +4,6 @@ namespace Claromentis\ThankYou\UI;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\ComponentInterface;
-use Claromentis\Core\Component\Exception\ComponentRuntimeException;
 use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
@@ -95,7 +94,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		$args['ty_list.limit'] = $options->Get('limit');
 		if (!is_int($args['ty_list.limit']))
 		{
-			throw new ComponentRuntimeException("Failed to Show Thank You Component, Limit is not an integer");
+			$args['ty_list.limit'] = 20;
 		}
 
 		$args['ty_list.create']         = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
