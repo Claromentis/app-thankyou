@@ -9,7 +9,6 @@ lm	thankyou.audit.delete_thank_you
 lm	thankyou.audit.edit_thank_you		
 lm	thankyou.common.actions		
 lm	thankyou.common.add_description		
-lm	thankyou.common.comment		
 lm	thankyou.common.filter_by_groups		
 lm	thankyou.common.select_core_values		
 lm	thankyou.common.tags		
@@ -103,6 +102,7 @@ lt	thankyou:admin:notifications_help.body		Foydalanuvchilarga minnatdorchilik bi
 lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']	
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
+lt	thankyou:common:description.body	$lm['common.description']	
 lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
 lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	

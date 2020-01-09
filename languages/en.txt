@@ -9,7 +9,6 @@ lm	thankyou.audit.delete_thank_you		Deleted Thank You
 lm	thankyou.audit.edit_thank_you		Edited Thank You
 lm	thankyou.common.actions		Actions
 lm	thankyou.common.add_description		Add a description
-lm	thankyou.common.comment		Comment
 lm	thankyou.common.filter_by_groups		Filter by Groups
 lm	thankyou.common.select_core_values		Select Core Values
 lm	thankyou.common.tags		Core Values
@@ -103,6 +102,7 @@ lt	thankyou:admin:notifications_help.body		Users will be notified whenever they'
 lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']	
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
+lt	thankyou:common:description.body	$lm['common.description']	
 lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
 lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	

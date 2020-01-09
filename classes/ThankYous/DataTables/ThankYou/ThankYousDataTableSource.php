@@ -53,7 +53,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$columns[] = ['tags', ($this->lmsg)('thankyou.common.tags')];
 		}
 
-		$columns[] = ['description', ($this->lmsg)('thankyou.common.comment'), new Link()];
+		$columns[] = ['description', ($this->lmsg)('common.description'), new Link()];
 		$columns[] = ['likes_count', ($this->lmsg)('common.likes')];
 
 		if ($this->config_api->IsCommentsEnabled())
