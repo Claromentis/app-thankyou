@@ -753,6 +753,9 @@ class Api
 	}
 
 	/**
+	 * Given a Thank You, sends Notifications to its Thanked Users. Depending on Configuration, it may also send
+	 * Notifications to the Users' Line Managers.
+	 *
 	 * @param ThankYou $thank_you
 	 * @throws ThankYouException
 	 */
