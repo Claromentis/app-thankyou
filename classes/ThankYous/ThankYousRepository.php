@@ -839,13 +839,7 @@ class ThankYousRepository
 
 			foreach ($thanked_users as $thanked_user)
 			{
-				try
-				{
-					$this->SaveUser($id, $thanked_user);
-				} catch (ThankYouUserException $exception)
-				{
-					$this->logger->warning("Could not save a Thank You's User, User's ID unknown", [$exception]);
-				}
+				$this->SaveUser($id, $thanked_user);
 			}
 		}
 
@@ -977,20 +971,12 @@ class ThankYousRepository
 	 *
 	 * @param int  $thank_you_id
 	 * @param User $user
-	 * @throws ThankYouUserException - If the User's ID is unknown.
 	 */
 	private function SaveUser(int $thank_you_id, User $user)
 	{
-		$user_id = $user->GetId();
-
-		if (!isset($user_id))
-		{
-			throw new ThankYouUserException("Failed to Save Thank You User, User's ID is not defined");
-		}
-
 		$db_fields = [
 			'int:thanks_id' => $thank_you_id,
-			'int:user_id'   => $user_id
+			'int:user_id'   => $user->GetId()
 		];
 
 		$query = $this->query_factory->GetQueryInsert(self::THANKED_USERS_TABLE, $db_fields);
