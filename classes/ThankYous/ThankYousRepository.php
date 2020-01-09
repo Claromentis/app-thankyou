@@ -1122,7 +1122,7 @@ class ThankYousRepository
 
 		if ($allow_absence)
 		{
-			$where .= " OR " . self::USER_TABLE . ".ex_area_id IS NULL";
+			$where .= " OR " . self::USER_TABLE . ".id IS NULL";
 		}
 
 		$where .= ")";
