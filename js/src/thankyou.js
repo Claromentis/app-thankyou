@@ -255,7 +255,7 @@ define(['jquery', 'cla_select2'], function ($) {
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',
-            data: JSON.stringify(body),
+            data: body,
             error: function (response) {
                 var body = response.responseJSON;
 
@@ -278,7 +278,7 @@ define(['jquery', 'cla_select2'], function ($) {
                 }
             },
             success: function (response) {
-                location.reload();
+                window.location.reload();
             }
         });
     };
