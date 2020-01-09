@@ -254,7 +254,9 @@ class ThankYousRepository
 			$thankeds = $this->CreateThankablesFromOClasses($thankeds);
 		} catch (UnsupportedOwnerClassException $exception)
 		{
-			throw new LogicException("Unexpected Exception thrown", null, $exception);
+			$this->logger->error("One or more Thanked in the Repository is invalid", [$exception]);
+
+			return [];
 		}
 
 		foreach ($thank_yous_thankeds as $thank_you_id => $thank_you_thankeds)
