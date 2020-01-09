@@ -117,10 +117,11 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 			];
 		}
 
-		$args['thank_yous.datasrc'] = $view_thank_yous;
-		$class                      = uniqid();
-		$args['list.+class']        = $class;
-		$args['class.json']         = $class;
+		$args['thank_yous.datasrc']                = $view_thank_yous;
+		$class                                     = uniqid();
+		$args['list.+class']                       = $class;
+		$args['class.json']                        = $class;
+		$args['thank_you_description.placeholder'] = ($this->lmsg)('thankyou.common.add_description');
 
 		$args['thank_you_form_tags_segment.visible'] = $this->api->Configuration()->IsTagsEnabled();
 

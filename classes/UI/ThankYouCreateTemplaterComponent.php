@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
+use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Thankable\Thankable;
@@ -16,13 +17,19 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 	private $config_api;
 
 	/**
+	 * @var Lmsg
+	 */
+	private $lmsg;
+
+	/**
 	 * @var LoggerInterface
 	 */
 	private $logger;
 
-	public function __construct(Configuration\Api $config_api, LoggerInterface $logger)
+	public function __construct(Configuration\Api $config_api, Lmsg $lmsg, LoggerInterface $logger)
 	{
 		$this->config_api = $config_api;
+		$this->lmsg       = $lmsg;
 		$this->logger     = $logger;
 	}
 
@@ -37,6 +44,7 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 		$args['create_container.+class']             = $class;
 		$args['class.json']                          = $class;
 		$args['thank_you_form_tags_segment.visible'] = $this->config_api->IsTagsEnabled();
+		$args['thank_you_description.placeholder']   = ($this->lmsg)('thankyou.common.add_description');
 
 		if (isset($thankables))
 		{

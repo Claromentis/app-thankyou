@@ -286,7 +286,8 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 
 			'thank_you_user.filter_perm_oclasses' => $thankable_object_types,
 			'thank_you_user.placeholder'          => ($this->lmsg)('thankyou.thank.placeholder'),
-			'thank_you_form.visible'              => $form
+			'thank_you_form.visible'              => $form,
+			'thank_you_description.placeholder'   => ($this->lmsg)('thankyou.common.add_description')
 		];
 
 		return $this->CallTemplater('thankyou/UI/thank_you_templater_component.html', $args);

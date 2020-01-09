@@ -185,7 +185,7 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.create'] = function ($app) {
-			return new ThankYouCreateTemplaterComponent($app[Configuration\Api::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+			return new ThankYouCreateTemplaterComponent($app[Configuration\Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['thankyou.datatable.thank_yous'] = function ($app) {

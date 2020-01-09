@@ -8,10 +8,12 @@ lm	thankyou.audit.create_thank_you
 lm	thankyou.audit.delete_thank_you		
 lm	thankyou.audit.edit_thank_you		
 lm	thankyou.common.actions		
+lm	thankyou.common.add_description		
 lm	thankyou.common.comment		
 lm	thankyou.common.filter_by_groups		
 lm	thankyou.common.select_core_values		
 lm	thankyou.common.tags		
+lm	thankyou.common.tags.multiselect		
 lm	thankyou.common.thank_you_message		Köszönőüzenet
 lm	thankyou.common.thank_you_messages		Köszönőüzenet
 lm	thankyou.common.thank_yous		

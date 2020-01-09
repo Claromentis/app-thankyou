@@ -8,10 +8,12 @@ lm	thankyou.audit.create_thank_you		Created Thank You
 lm	thankyou.audit.delete_thank_you		Deleted Thank You
 lm	thankyou.audit.edit_thank_you		Edited Thank You
 lm	thankyou.common.actions		Actions
+lm	thankyou.common.add_description		Add a description
 lm	thankyou.common.comment		Comment
 lm	thankyou.common.filter_by_groups		Filter by Groups
 lm	thankyou.common.select_core_values		Select Core Values
 lm	thankyou.common.tags		Core Values
+lm	thankyou.common.tags.multiselect		Select one or more Core Values
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
 lm	thankyou.common.thank_yous		Thank You notes

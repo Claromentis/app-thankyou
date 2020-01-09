@@ -5,7 +5,7 @@ define(['jquery', 'cla_select2'], function ($) {
         this.form = this.modal.find('.js-thank_you-form');
         this.delete_modal = list.find('.js-thank_you-delete-modal');
         this.delete_form = this.delete_modal.find('.js-thank_you-delete-form');
-        this.form_error_template = this.modal.find('.js-form-error-template');
+        this.form_error_template = _.template(this.modal.find('.js-form-error-template').html());
 
         this.tags_config = {
             width: '100%',
@@ -27,7 +27,8 @@ define(['jquery', 'cla_select2'], function ($) {
 
                     return {results: results};
                 }
-            }
+            },
+            placeholder: lmsg('thankyou.common.tags.multiselect')
         };
 
         this.configureTags();
@@ -288,8 +289,7 @@ define(['jquery', 'cla_select2'], function ($) {
     };
 
     ThankYou.prototype.addError = function (container, message) {
-        var error = $(_.template(this.form_error_template.html())({}));
-        error.text(message);
+        var error = $(this.form_error_template({message: message}));
         container.append(error);
     };
 
