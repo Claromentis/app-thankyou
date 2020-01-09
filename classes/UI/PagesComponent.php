@@ -244,7 +244,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			unset($options['title']);
 		}
 
-		if ($this->config_api->IsCommentsEnabled())
+		if (!$this->config_api->IsCommentsEnabled())
 		{
 			unset($options['comments']);
 		}
