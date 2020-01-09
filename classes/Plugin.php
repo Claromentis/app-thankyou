@@ -26,7 +26,7 @@ use Claromentis\ThankYou\Controllers\Rest\ThanksRestController;
 use Claromentis\ThankYou\Controllers\Rest\ThanksRestV2;
 use Claromentis\ThankYou\Controllers\StatisticsController;
 use Claromentis\ThankYou\Controllers\ThankYouController;
-use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClassException;
+use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
 use Claromentis\ThankYou\Subscriber\CommentsSubscriber;
 use Claromentis\ThankYou\Tags\DataTables\TagDataTableSource;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
@@ -412,7 +412,7 @@ class Plugin implements
 					{
 						$create = $thankable;
 					}
-				} catch (UnsupportedThankYouOwnerClassException $exception)
+				} catch (UnsupportedOwnerClassException $exception)
 				{
 					$logger->error("Failed to lock Thank You Creation to User Id '" . $user_id . "' on User's Profile", [$exception]);
 				}

@@ -18,7 +18,7 @@ use Claromentis\ThankYou\Exception\OwnerClassNameException;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
-use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClassException;
+use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags;
@@ -575,7 +575,7 @@ class Api
 	 * @param int $o_class
 	 * @param int $id
 	 * @return Thankable
-	 * @throws UnsupportedThankYouOwnerClassException - If the Owner Class given is not supported.
+	 * @throws UnsupportedOwnerClassException - If the Owner Class given is not supported.
 	 */
 	public function CreateThankableFromOClass(int $o_class, int $id)
 	{
@@ -588,7 +588,7 @@ class Api
 	 *
 	 * @param array $oclasses
 	 * @return Thankable[]
-	 * @throws UnsupportedThankYouOwnerClassException - If one or more of the Owner Classes given is not supported.
+	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThankablesFromOClasses(array $oclasses)
 	{

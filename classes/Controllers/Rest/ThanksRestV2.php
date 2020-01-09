@@ -11,7 +11,7 @@ use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
-use Claromentis\ThankYou\Exception\UnsupportedThankYouOwnerClassException;
+use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
@@ -177,7 +177,7 @@ class ThanksRestV2
 			{
 				$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
 			}
-		} catch (UnsupportedThankYouOwnerClassException $exception)
+		} catch (UnsupportedOwnerClassException $exception)
 		{
 			$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
 			$first   = true;
@@ -342,7 +342,7 @@ class ThanksRestV2
 						$thankables = $this->api->ThankYous()->CreateThankablesFromOClasses($thanked);
 						$thank_you->SetThanked($thankables);
 						$this->api->ThankYous()->PopulateThankYouUsersFromThankables($thank_you);
-					} catch (UnsupportedThankYouOwnerClassException $exception)
+					} catch (UnsupportedOwnerClassException $exception)
 					{
 						$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
 						$first   = true;
