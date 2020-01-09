@@ -271,6 +271,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			'comments_link.visible'       => $display_comments_count,
 			'comments_link.href'          => $access_comments ? 'javascript:void(0)' : ($thank_you_url ?? null),
 			'comments_link.+class'        => $access_comments ? 'js-comments-reveal' : null,
+			'comment_list.visible'        => $access_comments,
 			'comment_list.style'          => $display_comments ? '' : 'display:none;',
 
 			'like_component.object_id' => $id,

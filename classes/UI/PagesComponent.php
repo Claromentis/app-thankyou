@@ -8,6 +8,7 @@ use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\Configuration;
 use ClaText;
@@ -86,6 +87,12 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 		 */
 		$api = $app[ThankYous\Api::class];
 
+		/**
+		 * @var SecurityContext $context
+		 */
+		$context          = $app[SecurityContext::class];
+		$viewer_logged_in = !($context->GetUserId() === 0);
+
 		$thank_user_id = $options->Get('user_id');
 		$group_ids     = $options->Get('group_ids');
 
@@ -99,7 +106,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		$args['ty_list.create']         = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
 		$args['ty_list.thanked_images'] = (bool) $options->Get('profile_images');
-		$args['ty_list.comments']       = (bool) $options->Get('comments');
+		$args['ty_list.comments']       = (bool) $options->Get('comments') && $viewer_logged_in;
 
 		$thanked_owner_classes = [];
 		if (isset($thank_user_id) && $thank_user_id > 0)
