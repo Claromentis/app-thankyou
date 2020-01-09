@@ -1,6 +1,26 @@
 # Change Log
 
 ## Version 4.0.0 - Unreleased
+### New Features
+* Added the Thank You v2 API.
+* Added thanking User Groups.
+* Added Core Values to Thank Yous.
+* Added the Thank You application page.
+* Added comments to Thank Yous.
+
+### Improvements
+* Rebuilt Reports:
+    * **Thank You Notes** Replaces the original Export report. Contains information on Thank Yous including:
+        * Date Created
+        * Thanked Groups
+        * Total Thanked Users
+        * Core Values
+        * Description
+        * Likes
+        * Comments
+    * **Users** Displays how many Thank Yous an individual User has received.
+    * **Core Values** Displays usage of Core Values.
+
 ### Developer Notes
 * The REST API v1 has been deprecated, along with `Claromentis\ThankYou\Controller\Rest\ThanksRestController` and `Claromentis\ThankYou\ThanksRepository`.
 
