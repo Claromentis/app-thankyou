@@ -12,7 +12,6 @@ use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Exception\ThankableException;
-use Claromentis\ThankYou\Exception\ThankYouUserException;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
