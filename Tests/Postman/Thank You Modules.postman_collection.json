@@ -1,0 +1,630 @@
+{
+	"info": {
+		"_postman_id": "4fca2d41-e74d-4782-8e31-ceacf627ff89",
+		"name": "Thank You Modules",
+		"description": "API Tests for the Thank You Module",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "v2",
+			"item": [
+				{
+					"name": "Tag",
+					"item": [
+						{
+							"name": "Create, Update and Delete",
+							"item": [
+								{
+									"name": "Create Tag",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0461c3b3-fbe1-4f5c-8d1a-a8f334a4ebab",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));\r",
+													"\r",
+													"commonTests.header.status.created();\r",
+													"\r",
+													"let response = pm.response.json();\r",
+													"\r",
+													"if ('id' in response) {\r",
+													"    pm.environment.set('tag_id', response.id);\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "f9a107ab-306d-4a7c-aacf-ff6594f553b2",
+												"exec": [
+													"let tag_name = \"Some Tag Name\";",
+													"",
+													"pm.environment.set('tag_name', tag_name);",
+													"",
+													"let body = {",
+													"    name: tag_name",
+													"};",
+													"pm.variables.set('body', JSON.stringify(body));"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{{body}}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags"
+											]
+										},
+										"description": "Create a Tag"
+									},
+									"response": []
+								},
+								{
+									"name": "Get Tag",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0461c3b3-fbe1-4f5c-8d1a-a8f334a4ebab",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));\r",
+													"let expected_tag_name = pm.environment.get('tag_name');\r",
+													"\r",
+													"commonTests.header.status.ok();\r",
+													"commonTests.header.contentType.json();\r",
+													"\r",
+													"let response = pm.response.json();\r",
+													"\r",
+													"pm.test('testTagNameMatch', function() {\r",
+													"    pm.expect(response.name).to.equal(expected_tag_name);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "f9a107ab-306d-4a7c-aacf-ff6594f553b2",
+												"exec": [
+													"if (pm.environment.get('tag_id') == null) {",
+													"    throw new Error('Could not Get Tag, Environment Variable \\'tag_id\\' undefined');",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags/{{tag_id}}",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags",
+												"{{tag_id}}"
+											]
+										},
+										"description": "Create a Tag"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Tag Name",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "956784d7-d22d-4e41-be68-ea7ecc1834b2",
+												"exec": [
+													"let tag_name = \"Some new Tag Name\";",
+													"",
+													"pm.environment.set('tag_name', tag_name);",
+													"",
+													"let body = {",
+													"    name: tag_name",
+													"};",
+													"pm.variables.set('body', JSON.stringify(body));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "b4f4cd04-23e7-461a-a0d4-1983aec76d5b",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));\r",
+													"\r",
+													"commonTests.header.status.ok();"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{{body}}"
+										},
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags/{{tag_id}}",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags",
+												"{{tag_id}}"
+											]
+										},
+										"description": "Update the Tag's Name"
+									},
+									"response": []
+								},
+								{
+									"name": "Get Tag with new Name",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0461c3b3-fbe1-4f5c-8d1a-a8f334a4ebab",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));\r",
+													"let expected_tag_name = pm.environment.get('tag_name');\r",
+													"\r",
+													"commonTests.header.status.ok();\r",
+													"commonTests.header.contentType.json();\r",
+													"\r",
+													"let response = pm.response.json();\r",
+													"\r",
+													"pm.test('testTagNameMatch', function() {\r",
+													"    pm.expect(response.name).to.equal(expected_tag_name);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "f9a107ab-306d-4a7c-aacf-ff6594f553b2",
+												"exec": [
+													"if (pm.environment.get('tag_id') == null) {",
+													"    throw new Error('Could not Get Tag with new Name, Environment Variable \\'tag_id\\' undefined');",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags/{{tag_id}}",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags",
+												"{{tag_id}}"
+											]
+										},
+										"description": "Create a Tag"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Tag",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "e2035581-d85a-4a65-a04a-c18ce9189c21",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));\r",
+													"\r",
+													"commonTests.header.status.ok();"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "5a5c9268-0bd4-4212-8fce-e7a084b2ae23",
+												"exec": [
+													"if (pm.environment.get('tag_id') == null) {",
+													"    throw new Error('Could not delete Tag, Environment Variable \\'tag_id\\' undefined');",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags/{{tag_id}}",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags",
+												"{{tag_id}}"
+											]
+										},
+										"description": "Delete a Tag"
+									},
+									"response": []
+								},
+								{
+									"name": "Get Tag Not Found",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0461c3b3-fbe1-4f5c-8d1a-a8f334a4ebab",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));\r",
+													"\r",
+													"commonTests.header.status.notFound();"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "f9a107ab-306d-4a7c-aacf-ff6594f553b2",
+												"exec": [
+													"if (pm.environment.get('tag_id') == null) {",
+													"    throw new Error('Could not run request Get Tag Not Found, Environment Variable \\'tag_id\\' undefined');",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags/{{tag_id}}",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags",
+												"{{tag_id}}"
+											]
+										},
+										"description": "Check that a Tag does not exist given an ID."
+									},
+									"response": []
+								}
+							],
+							"description": "Create a Tag, update it, and then delete it.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Get Tags",
+							"item": [
+								{
+									"name": "Get Tags",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "345f0889-0cc0-45de-9ad5-e865539cc5b8",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));",
+													"",
+													"commonTests.header.status.ok();",
+													"commonTests.header.contentType.json();"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags"
+											]
+										},
+										"description": "Retreive an array of Tags."
+									},
+									"response": []
+								}
+							],
+							"description": "Test requesting multiple anonamous Tags.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Get Total Tags",
+							"item": [
+								{
+									"name": "Get Total Tags",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "78348e4f-6a70-4f11-a1bf-d2d9f80e844e",
+												"exec": [
+													"let commonTests = eval(pm.collectionVariables.get('functionLoadCommonTests'));",
+													"",
+													"commonTests.header.status.ok();",
+													"commonTests.header.contentType.json();",
+													"commonTests.responseIsNumber();"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{scheme}}://{{host}}/api/thankyou/v2/tags/total",
+											"protocol": "{{scheme}}",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"thankyou",
+												"v2",
+												"tags",
+												"total"
+											]
+										},
+										"description": "Test the endpoint for retreriving total Tags."
+									},
+									"response": []
+								}
+							],
+							"description": "Test retreiving the total Tags.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "14e21f37-a5ba-4750-93c0-6fc87dc9f90a",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "6ad939e8-45bf-4ced-9b28-d8431cddb74c",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.unset('id');"
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{admin_password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{admin_username}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e13b2ac1-21d0-4c95-ab97-32cb5dace1eb",
+				"type": "text/javascript",
+				"exec": [
+					"let commonTestsFunction = function commonTestsCollection() {",
+					"    return {",
+					"        header: {",
+					"            contentType: {",
+					"                json: function() {",
+					"                    pm.test(\"testHeaderContentTypeJson\", function() {",
+					"                       pm.response.to.have.header('content-type');",
+					"                       pm.expect(pm.response.headers.get('content-type')).to.include(\"application/json\");",
+					"                    });",
+					"                }",
+					"            },",
+					"            status: {",
+					"                equals: function (status) {",
+					"                    pm.test(\"Header Status is \" + status, function() {",
+					"                        pm.response.to.have.status(status);",
+					"                    });",
+					"                },",
+					"                ok: function() {",
+					"                    pm.test(\"Header Status is Ok\", function() {",
+					"                        pm.response.to.have.status(200);",
+					"                    });",
+					"                },",
+					"                created: function() {",
+					"                    pm.test(\"Header Status is Created\", function() {",
+					"                        pm.response.to.have.status(201);",
+					"                    });",
+					"                },",
+					"                badRequest: function() {",
+					"                    pm.test(\"Header Statu is Bad Request\", function() {",
+					"                        pm.response.to.have.status(400);",
+					"                    });",
+					"                },",
+					"                unauthorised: function() {",
+					"                    pm.test(\"Header Status is Unauthorised\", function() {",
+					"                        pm.response.to.have.status(401);",
+					"                    });",
+					"                },",
+					"                forbidden: function() {",
+					"                    pm.test(\"Header Status is Forbidden\", function() {",
+					"                        pm.response.to.have.status(403);",
+					"                    });",
+					"                },",
+					"                notFound: function() {",
+					"                    pm.test(\"Header Status is Not Found\", function() {",
+					"                        pm.response.to.have.status(404);",
+					"                    });",
+					"                }",
+					"            }",
+					"        },",
+					"        responseIsNumber: function() {",
+					"            pm.test(\"Response is a number\", function() {",
+					"               let response = pm.response.json();",
+					"               pm.expect(typeof response).to.equal('number');",
+					"            });",
+					"        }",
+					"    };",
+					"};",
+					"",
+					"let commonTestsString = commonTestsFunction + '; commonTestsCollection();';",
+					"",
+					"pm.collectionVariables.set('functionLoadCommonTests', commonTestsString);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "cd6ff020-11ed-4d93-bd25-0ccfad95b575",
+				"type": "text/javascript",
+				"exec": [
+					"pm.cookies.jar().clear(pm.request.url, function (error) {",
+					"    if (error) {",
+					"        console.log(error);",
+					"    }",
+					"});",
+					"",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "94861b9f-5a17-4d95-a207-7783bc1fc724",
+			"key": "functionLoadCommonTests",
+			"value": "function commonTestsCollection() {\n    return {\n        header: {\n            contentType: {\n                json: function() {\n                    pm.test(\"testHeaderContentTypeJson\", function() {\n                       pm.response.to.have.header('content-type');\n                       pm.expect(pm.response.headers.get('content-type')).to.include(\"application/json\");\n                    });\n                }\n            },\n            status: {\n                equals: function (status) {\n                    pm.test(\"Header Status is \" + status, function() {\n                        pm.response.to.have.status(status);\n                    });\n                },\n                ok: function() {\n                    pm.test(\"Header Status is Ok\", function() {\n                        pm.response.to.have.status(200);\n                    });\n                },\n                created: function() {\n                    pm.test(\"Header Status is Created\", function() {\n                        pm.response.to.have.status(201);\n                    });\n                },\n                badRequest: function() {\n                    pm.test(\"Header Statu is Bad Request\", function() {\n                        pm.response.to.have.status(400);\n                    });\n                },\n                unauthorised: function() {\n                    pm.test(\"Header Status is Unauthorised\", function() {\n                        pm.response.to.have.status(401);\n                    });\n                },\n                forbidden: function() {\n                    pm.test(\"Header Status is Forbidden\", function() {\n                        pm.response.to.have.status(403);\n                    });\n                },\n                notFound: function() {\n                    pm.test(\"Header Status is Not Found\", function() {\n                        pm.response.to.have.status(404);\n                    });\n                }\n            }\n        },\n        responseIsNumber: function() {\n            pm.test(\"Response is a number\", function() {\n               let response = pm.response.json();\n               pm.expect(typeof response).to.equal('number');\n            });\n        }\n    };\n}; commonTestsCollection();",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
