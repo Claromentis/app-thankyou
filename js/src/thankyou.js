@@ -255,7 +255,7 @@ define(['jquery', 'cla_select2'], function ($) {
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',
-            data: body,
+            data: JSON.stringify(body),
             error: function (response) {
                 var body = response.responseJSON;
 
