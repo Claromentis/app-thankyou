@@ -107,26 +107,6 @@
     }
 }
 
-.panel .panel-heading .btn.pull-right.thank-you--button {
-    position: absolute;
-    right: 23px;
-    top: 14px;
-}
-
-.tile-thank-you.grid-stack-item-6[data-gs-width="1"] {
-    .thank-title {
-        display: none;
-    }
-}
-
-@media only screen and (max-width: 768px) {
-    .tile-thank-you {
-        .thank-title {
-            display: none;
-        }
-    }
-}
-
 .comments-toggle-wrapper.comments-border {
     border-left: 1px solid #e7e7e7;
     margin-left: 3px;
@@ -153,5 +133,47 @@
 
     .lia-heading {
         text-align: center;
+    }
+}
+
+// ------------------------------
+// ---- COMPONENT SPECIFIC STYLES
+// ------------------------------
+.tile-thank-you {
+    &.grid-stack-item-6[data-gs-width="1"] {
+        .thank-title {
+            display: none;
+        }
+    }
+
+    .thank-title {
+        @media only screen and (max-width: 768px) {
+            display: none;
+        }
+    }
+
+    .panel-heading {
+        .thank-you--button {
+            position: absolute;
+            right: 7px;
+            top: 7px;
+        }
+
+        .modal-title, .modal-body {
+            color: initial;
+            font-size: initial;
+        }
+
+        .modal-body {
+            label {
+                font-size: 14px;
+                text-align: right;
+                white-space: normal;
+            }
+        }
+    }
+
+    .core-values-label {
+        padding-top: 0;
     }
 }
