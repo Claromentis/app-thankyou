@@ -15,7 +15,6 @@ use Claromentis\People\Service\UserExtranetService;
 use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Configuration;
-use Claromentis\ThankYou\Exception\OwnerClassNameException;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
@@ -444,16 +443,6 @@ class Api
 		$extranet_ids = $this->GetVisibleExtranetIds($context);
 
 		return $this->thank_yous_repository->GetTotalTags($extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
-	}
-
-	/**
-	 * @param int|int[] $object_types_id
-	 * @return string|string[]
-	 * @throws OwnerClassNameException - If the Name of the oClass could not be determined.
-	 */
-	public function GetOwnerClassNames(array $object_types_id)
-	{
-		return $this->utility->GetOwnerClassNames($object_types_id);
 	}
 
 	/**
