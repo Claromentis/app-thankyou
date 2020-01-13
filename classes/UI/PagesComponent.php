@@ -125,7 +125,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			}
 		}
 
-		$user_ids = $api->GetDistinctUserIdsFromOwnerClasses($thanked_owner_classes);
+		$user_ids = $api->GetOwnersUserIds($thanked_owner_classes);
 
 		if (count($user_ids) > 0)
 		{

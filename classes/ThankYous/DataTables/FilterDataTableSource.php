@@ -44,7 +44,7 @@ abstract class FilterDataTableSource implements DataSource
 		if (is_array($owner_classes) && count($owner_classes) > 0)
 		{
 			$owner_classes = $this->sugre_utility->DecodeOutput($owner_classes);
-			$user_ids      = $this->api->GetDistinctUserIdsFromOwnerClasses($owner_classes);
+			$user_ids      = $this->api->GetOwnersUserIds($owner_classes);
 		}
 
 		$date_range = null;

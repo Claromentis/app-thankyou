@@ -473,7 +473,7 @@ class Api
 	 * @param array $owner_classes
 	 * @return int[]
 	 */
-	public function GetDistinctUserIdsFromOwnerClasses(array $owner_classes)
+	public function GetOwnersUserIds(array $owner_classes)
 	{
 		$acl = $this->acl_repository->Get(0, 0);
 
@@ -879,7 +879,7 @@ class Api
 			$owner_classes[] = ['oclass' => $oclass_id, 'id' => $id];
 		}
 
-		$user_ids = $this->GetDistinctUserIdsFromOwnerClasses($owner_classes);
+		$user_ids = $this->GetOwnersUserIds($owner_classes);
 
 		$users_list_provider = new UsersListProvider();
 		$users_list_provider->SetFilterIds($user_ids);
