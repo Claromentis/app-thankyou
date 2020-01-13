@@ -7,6 +7,7 @@ use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Like\LikesRepository;
+use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\InvalidFieldIsNotSingle;
@@ -15,16 +16,15 @@ use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Exception\OwnerClassNameException;
-use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
+use Claromentis\ThankYou\Exception\ValidationException;
 use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Claromentis\ThankYou\Thankable\Thankable;
-use Date;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
@@ -82,6 +82,21 @@ class Api
 	private $line_manager_notifier;
 
 	/**
+	 * @var Lmsg
+	 */
+	private $lmsg;
+
+	/**
+	 * @var Tags\Api
+	 */
+	private $tag_api;
+
+	/**
+	 * @var ThankYouFactory
+	 */
+	private $thank_you_factory;
+
+	/**
 	 * @var ThankYousRepository
 	 */
 	private $thank_yous_repository;
@@ -92,9 +107,9 @@ class Api
 	private $utility;
 
 	/**
-	 * @var Tags\Api
+	 * @var Validator
 	 */
-	private $tag_api;
+	private $validator;
 
 	/**
 	 * ThankYous constructor.
@@ -102,9 +117,12 @@ class Api
 	 * @param Audit               $audit
 	 * @param LineManagerNotifier $line_manager_notifier
 	 * @param ThankYousRepository $thank_yous_repository
+	 * @param ThankYouFactory     $thank_you_factory
 	 * @param Configuration\Api   $config_api
+	 * @param Lmsg                $lmsg
 	 * @param ThankYouAcl         $acl
 	 * @param ThankYouUtility     $thank_you_utility
+	 * @param Validator           $validator
 	 * @param CommentsRepository  $comments_repository
 	 * @param Comments\Factory    $comments_factory
 	 * @param LikesRepository     $likes_repository
@@ -116,9 +134,12 @@ class Api
 		Audit $audit,
 		LineManagerNotifier $line_manager_notifier,
 		ThankYousRepository $thank_yous_repository,
+		ThankYouFactory $thank_you_factory,
 		Configuration\Api $config_api,
+		Lmsg $lmsg,
 		ThankYouAcl $acl,
 		ThankYouUtility $thank_you_utility,
+		Validator $validator,
 		CommentsRepository $comments_repository,
 		Comments\Factory $comments_factory,
 		LikesRepository $likes_repository,
@@ -129,14 +150,17 @@ class Api
 		$this->acl                   = $acl;
 		$this->acl_repository        = $acl_repository;
 		$this->audit                 = $audit;
+		$this->thank_you_factory     = $thank_you_factory;
 		$this->comments_factory      = $comments_factory;
 		$this->comments_repository   = $comments_repository;
 		$this->config_api            = $config_api;
 		$this->extranet_service      = $user_extranet_service;
 		$this->likes_repository      = $likes_repository;
 		$this->line_manager_notifier = $line_manager_notifier;
+		$this->lmsg                  = $lmsg;
 		$this->thank_yous_repository = $thank_yous_repository;
 		$this->utility               = $thank_you_utility;
+		$this->validator             = $validator;
 		$this->tag_api               = $tag_api;
 	}
 
@@ -561,14 +585,124 @@ class Api
 	}
 
 	/**
-	 * @param User|int  $author
-	 * @param string    $description
-	 * @param Date|null $date_created
+	 * Given an array, attempts to create a Thank You.
+	 *
+	 * @param array $data
 	 * @return ThankYou
+	 * @throws ValidationException - If the Thank You could not be created from the parameter provided.
+	 * @throws ThankYouNotFoundException - If the Thank You could not be found.
 	 */
-	public function Create($author, string $description, ?Date $date_created = null)
+	public function CreateFromArray(array $data)
 	{
-		return $this->thank_yous_repository->Create($author, $description, $date_created);
+		$id          = $data['id'] ?? null;
+		$author      = $data['author'] ?? null;
+		$description = $data['description'] ?? null;
+
+		$thanked = $data['thanked'] ?? null;
+		$tag_ids = $data['tags'] ?? null;
+
+		$errors = [];
+
+		if (isset($id))
+		{
+			$thank_you = $this->GetThankYou($id);
+			if (isset($description))
+			{
+				$thank_you->SetDescription($description);
+			}
+		} else
+		{
+			if (!isset($description))
+			{
+				$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
+			}
+
+			if (!isset($author))
+			{
+				$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.undefined')];
+			} elseif (!is_int($author) && !($author instanceof User))
+			{
+				$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.invalid')];
+			}
+
+			if (!empty($errors))
+			{
+				throw new ValidationException($errors);
+			}
+
+			$thank_you = $this->thank_you_factory->Create($author, $description, null);
+
+			if (isset($id) && !is_int($id))
+			{
+				$errors[] = ['name' => 'id', 'reason' => ($this->lmsg)('thankyou.thankyou.id.error.invalid')];
+			} else
+			{
+				$thank_you->SetId($id);
+			}
+		}
+
+		if (isset($thanked))
+		{
+			if (!is_array($thanked))
+			{
+				$errors[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thanked.error.invalid')];
+			} else
+			{
+				foreach ($thanked as $offset => $oclass)
+				{
+					$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
+				}
+				try
+				{
+					$thankables = $this->CreateThankablesFromOClasses($thanked);
+					$thank_you->SetThanked($thankables);
+				} catch (UnsupportedOwnerClassException $exception)
+				{
+					$errors[] = [
+						'name'   => 'thanked',
+						'reason' => ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported',
+							implode(', ', $this->GetThankableObjectTypes())
+						)
+					];
+				}
+			}
+		}
+
+		if (isset($tag_ids))
+		{
+			foreach ($tag_ids as $offset => $tag_id)
+			{
+				if (!is_int($tag_id))
+				{
+					$invalid_params[] = [
+						'name'   => 'tags',
+						'reason' => ($this->lmsg)('thankyou.tag.error.id.invalid', (string) $tag_id)
+					];
+					unset($tag_ids[$offset]);
+				}
+			}
+			$tags = $this->tag_api->GetTagsById($tag_ids);
+			foreach ($tag_ids as $tag_id)
+			{
+				if (!isset($tags[$tag_id]))
+				{
+					$invalid_params[] = [
+						'name'   => 'tags',
+						'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)
+					];
+				}
+			}
+			$thank_you->SetTags($tags);
+		}
+
+		if (!empty($errors))
+		{
+			throw new ValidationException($errors);
+		}
+
+		$this->PopulateThankYouUsersFromThankables($thank_you);
+
+		return $thank_you;
 	}
 
 	/**
@@ -598,12 +732,20 @@ class Api
 	/**
 	 * Save a Thank You to the Repository and generate an Audit. If the Thank You doesn't have an ID, one will be set.
 	 *
-	 * @param ThankYou $thank_you
-	 * @throws ThankYouNotFoundException - If the Thank You could not be found in the Repository.
-	 * @throws TagNotFoundException If one or more of the Thank You's Tags could not be found in the Repository.
+	 * @param SecurityContext $security_context
+	 * @param ThankYou        $thank_you
+	 * @throws TagNotFoundException - If one or more of the Thank You's Tags could not be found in the Repository.
+	 * @throws ThankYouForbiddenException - If the given User is does not have Permission to edit the Thank You.
+	 * @throws ValidationException - If the Thank You is not in a Valid state to be saved.
 	 */
-	public function Save(ThankYou $thank_you)
+	public function Save(SecurityContext $security_context, ThankYou $thank_you)
 	{
+		if (!$this->CanEditThankYou($security_context, $thank_you))
+		{
+			throw new ThankYouForbiddenException("The given User does not have Permission to Edit this Thank You");
+		}
+
+		$this->validator->ValidateThankYou($thank_you);
 		$new = $thank_you->GetId() === null;
 
 		$this->thank_yous_repository->Save($thank_you);
@@ -620,6 +762,7 @@ class Api
 		if ($new)
 		{
 			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_create', $id, $thank_you->GetDescription());
+			$this->Notify($thank_you);
 		} else
 		{
 			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_edit', $id, $thank_you->GetDescription());
@@ -757,14 +900,13 @@ class Api
 	 * Notifications to the Users' Line Managers.
 	 *
 	 * @param ThankYou $thank_you
-	 * @throws ThankYouException
 	 */
-	public function Notify(ThankYou $thank_you)
+	private function Notify(ThankYou $thank_you)
 	{
 		$thanked_users = $thank_you->GetUsers();
 		if (!isset($thanked_users))
 		{
-			throw new ThankYouException("Failed to Notify Thanked Users, Thanked Users haven't been set");
+			return;
 		}
 
 		$all_users_ids = [];
@@ -791,7 +933,7 @@ class Api
 				$thankables = $thank_you->GetThankables();
 				if (!isset($thankables))
 				{
-					throw new ThankYouException("Failed to Notify Thanked User's Line Managers");
+					return;
 				}
 
 				$user_ids = [];
@@ -806,9 +948,6 @@ class Api
 				}
 				$this->line_manager_notifier->SendMessage($description, $user_ids);
 			}
-		} catch (ThankYouException $exception)
-		{
-			throw $exception;
 		} catch (Exception $exception)
 		{
 			throw new LogicException("Unexpected Exception thrown by NotificationMessage library", null, $exception);

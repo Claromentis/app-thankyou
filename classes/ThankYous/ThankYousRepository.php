@@ -805,7 +805,6 @@ class ThankYousRepository
 	 *
 	 * @param ThankYou $thank_you
 	 * @return int ID of saved Thank You
-	 * @throws ThankYouNotFoundException - If the Thank You could not be found in the Repository.
 	 */
 	public function Save(ThankYou $thank_you)
 	{
@@ -872,19 +871,10 @@ class ThankYousRepository
 	 *
 	 * @param ThankYou $thank_you - The Thank You to be saved.
 	 * @return int - The ID of the Thank You.
-	 * @throws ThankYouNotFoundException - If the Thank You could not be found in the Repository.
 	 */
 	private function SaveThankYou(ThankYou $thank_you): int
 	{
 		$id = $thank_you->GetId();
-		if (isset($id))
-		{
-			$thank_yous = $this->GetThankYous([$id]);
-			if (!isset($thank_yous[$id]))
-			{
-				throw new ThankYouNotFoundException("Failed to Save Update to Thank You, Thank You not found");
-			}
-		}
 
 		$author_id = $thank_you->GetAuthor()->GetId();
 

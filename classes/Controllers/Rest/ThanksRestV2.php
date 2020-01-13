@@ -8,10 +8,9 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Exception\ThankYouException;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
-use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
+use Claromentis\ThankYou\Exception\ValidationException;
 use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
@@ -158,116 +157,24 @@ class ThanksRestV2
 			throw new RestExBadRequest();
 		}
 
-		$thanked     = (array) ($post['thanked'] ?? null);
-		$description = (string) ($post['description'] ?? null);
-		$tag_ids     = $post['tags'] ?? null;
-
-		$invalid_params = [];
-
-		foreach ($thanked as $offset => $oclass)
-		{
-			$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
-		}
+		unset($post['id']);
+		$post['author'] = $context->GetUser();
 
 		try
 		{
-			$thankables = $this->api->ThankYous()->CreateThankablesFromOClasses($thanked);
-
-			if (count($thankables) === 0)
-			{
-				$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
-			}
-		} catch (UnsupportedOwnerClassException $exception)
-		{
-			$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
-			$first   = true;
-			foreach ($this->api->ThankYous()->GetThankableObjectTypes() as $owner_class)
-			{
-				$message .= $first ? $owner_class : ", " . $owner_class;
-				$first   = false;
-			}
-			$invalid_params[] = ['name' => 'thanked', 'reason' => $message];
-		}
-
-		if ($description === '')
-		{
-			$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
-		}
-
-		if ($this->api->Configuration()->IsTagsMandatory() && (!isset($tag_ids) || count($tag_ids) === 0))
-		{
-			$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
-		} elseif (isset($tag_ids))
-		{
-			if (!$this->api->Configuration()->IsTagsEnabled())
-			{
-				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.disabled')];
-			} else
-			{
-				if (!is_array($tag_ids))
-				{
-					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_array')];
-				}
-
-				$tag_ids_valid = true;
-				foreach ($tag_ids as $tag_id)
-				{
-					if (!is_int($tag_id))
-					{
-						$tag_ids_valid    = false;
-						$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
-						break;
-					}
-				}
-
-				if ($tag_ids_valid)
-				{
-					$tags = $this->api->Tag()->GetTagsById($tag_ids);
-
-					foreach ($tag_ids as $tag_id)
-					{
-						if (!isset($tags[$tag_id]))
-						{
-							$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)];
-						}
-					}
-				}
-			}
-		}
-
-		if (count($invalid_params) > 0)
+			$thank_you = $this->api->ThankYous()->CreateFromArray($post);
+			$this->api->ThankYous()->Save($context, $thank_you);
+		} catch (ValidationException $validation_exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'           => 'https://developer.claromentis.com',
 				'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
 				'status'         => 400,
-				'invalid-params' => $invalid_params
+				'invalid-params' => $validation_exception->GetErrors()
 			], 400);
-		}
-
-		try
+		} catch (ThankYouForbiddenException | ThankYouNotFoundException | TagNotFoundException $exception)
 		{
-			$thank_you = $this->api->ThankYous()->Create($context->GetUser(), $description, null);
-			$thank_you->SetThanked($thankables);
-			if (isset($tags))
-			{
-				$thank_you->SetTags($tags);
-			}
-			$this->api->ThankYous()->PopulateThankYouUsersFromThankables($thank_you);
-			try
-			{
-				$this->api->ThankYous()->Save($thank_you);
-			} catch (TagNotFoundException $exception)
-			{
-				throw new LogicException("Unexpected TagNotFound Exception thrown when saving Thank You's Tags, Tags have already been pulled from the Repository!", null, $exception);
-			}
-			$this->api->ThankYous()->Notify($thank_you);
-		} catch (ThankYouNotFoundException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown when creating Thank You", null, $exception);
-		} catch (ThankYouException $exception)
-		{
-			$this->logger->error("A Thank You was created but there was an error sending notifications", [$exception]);
+			throw new LogicException("Unexpected Exception", null, $exception);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);
@@ -289,149 +196,37 @@ class ThanksRestV2
 			throw new RestExBadRequest();
 		}
 
-		$invalid_params = [];
+		$post['id'] = $id;
 
 		try
 		{
-			$thank_you = $this->api->ThankYous()->GetThankYou($id, false, false, true);
-
-			if (!$this->api->ThankYous()->CanEditThankYou($context, $thank_you))
-			{
-				return $this->response->GetJsonPrettyResponse([
-					'type'   => 'https://developer.claromentis.com',
-					'title'  => ($this->lmsg)('thankyou.error.no_edit_permission'),
-					'status' => 401
-				], 401);
-			}
-
-			$description = $post['description'] ?? null;
-
-			if (isset($description))
-			{
-				if (!is_string($description))
-				{
-					$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.not_string')];
-				} elseif ($description === '')
-				{
-					$invalid_params[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
-				} else
-				{
-					$thank_you->SetDescription($description);
-				}
-			}
-
-			$thanked = $post['thanked'] ?? null;
-
-			if (isset($thanked))
-			{
-				if (!is_array($thanked))
-				{
-					$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.not_array')];
-				} elseif (count($thanked) === 0)
-				{
-					$invalid_params[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thankyou.thanked.error.empty')];
-				} else
-				{
-					foreach ($thanked as $offset => $oclass)
-					{
-						$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
-					}
-
-					try
-					{
-						$thankables = $this->api->ThankYous()->CreateThankablesFromOClasses($thanked);
-						$thank_you->SetThanked($thankables);
-						$this->api->ThankYous()->PopulateThankYouUsersFromThankables($thank_you);
-					} catch (UnsupportedOwnerClassException $exception)
-					{
-						$message = ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported');
-						$first   = true;
-						foreach ($this->api->ThankYous()->GetThankableObjectTypes() as $owner_class)
-						{
-							$message .= $first ? $owner_class : ", " . $owner_class;
-							$first   = false;
-						}
-						$invalid_params[] = ['name' => 'thanked', 'reason' => $message];
-					}
-				}
-			}
-
-			$tag_ids = $post['tags'] ?? null;
-			if (array_key_exists('tags', $post) && !isset($tag_ids))
-			{
-				$tag_ids = [];
-			}
-
-			$current_tags = $thank_you->GetTags();
-
-			if (isset($tag_ids))
-			{
-				if (is_array($tag_ids))
-				{
-					if ($this->api->Configuration()->IsTagsEnabled())
-					{
-						$tag_ids_valid = true;
-						foreach ($tag_ids as $tag_id)
-						{
-							if (!is_int($tag_id))
-							{
-								$tag_ids_valid    = false;
-								$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_integers')];
-								break;
-							}
-						}
-
-						if ($tag_ids_valid)
-						{
-							$tags = $this->api->Tag()->GetTagsById($tag_ids);
-
-							foreach ($tag_ids as $tag_id)
-							{
-								if (!isset($tags[$tag_id]))
-								{
-									$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)];
-								}
-							}
-
-							$thank_you->SetTags($tags);
-						}
-					} else
-					{
-						$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.disabled')];
-					}
-				} else
-				{
-					$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.tags.error.not_array')];
-				}
-			} elseif ($this->api->Configuration()->IsTagsMandatory() && count($current_tags))
-			{
-				$invalid_params[] = ['name' => 'tags', 'reason' => ($this->lmsg)('thankyou.thankyou.core_values.empty')];
-			}
-
-			if (count($invalid_params) > 0)
-			{
-				return $this->response->GetJsonPrettyResponse([
-					'type'           => 'https://developer.claromentis.com',
-					'title'          => ($this->lmsg)('thankyou.thankyou.error.modify'),
-					'status'         => 400,
-					'invalid-params' => $invalid_params
-				], 400);
-			}
-
-			try
-			{
-				$this->api->ThankYous()->Save($thank_you);
-			} catch (TagNotFoundException $exception)
-			{
-				throw new LogicException("Unexpected TagNotFound Exception thrown when saving Thank You's Tags, Tags have already been pulled from the Repository!", null, $exception);
-			}
-		} catch (ThankYouNotFoundException $exception)
+			$thank_you = $this->api->ThankYous()->CreateFromArray($post);
+			$this->api->ThankYous()->Save($context, $thank_you);
+		} catch (ValidationException $validation_exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
+				'status'         => 400,
+				'invalid-params' => $validation_exception->GetErrors()
+			], 400);
+		} catch (ThankYouForbiddenException $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.error.no_edit_permission'),
+				'status' => 401
+			], 401);
+		} catch (ThankYouNotFoundException $e)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
 				'title'  => ($this->lmsg)('thankyou.error.thanks_not_found'),
 				'status' => 404
 			], 404);
+		} catch (TagNotFoundException $exception)
+		{
+			throw new LogicException("Unexpected Exception", null, $exception);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);

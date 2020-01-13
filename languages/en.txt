@@ -58,6 +58,7 @@ lm	thankyou.tag.error.active.invalid		Invalid Core Value Active status
 lm	thankyou.tag.error.background.invalid		Invalid Background
 lm	thankyou.tag.error.background.undefined		Core Value Background Colour must be set
 lm	thankyou.tag.error.create		Could not create Core Value
+lm	thankyou.tag.error.id.invalid		Invalid Core Value ID %s
 lm	thankyou.tag.error.id.not_found		Core Value with ID %d could not be found
 lm	thankyou.tag.error.modify		Could not modify Core Value
 lm	thankyou.tag.error.name.invalid		Core Value Name must be a string if defined
@@ -69,7 +70,7 @@ lm	thankyou.tag.total_uses		Number of times selected
 lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
 lm	thankyou.thankable.not_found		Thankable not found
-lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to: 
+lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to %s
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
 lm	thankyou.thankyou.core_values.empty		One or more Core Values must be selected
 lm	thankyou.thankyou.description.error.empty		A description must be given
