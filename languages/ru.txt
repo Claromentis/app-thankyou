@@ -71,15 +71,25 @@ lm	thankyou.thank.placeholder
 lm	thankyou.thankable.error.unsuitable_owner_classes		
 lm	thankyou.thankable.not_found		
 lm	thankyou.thankable.owner_class.error.not_supported		
+lm	thankyou.thanked.error.invalid		
+lm	thankyou.thanked.item_id.error.undefined		
+lm	thankyou.thanked.owner_class.error.undefined		
 lm	thankyou.thanks_list.no_thanks		
+lm	thankyou.thankyou.author.error.invalid		
+lm	thankyou.thankyou.author.error.not_found		
+lm	thankyou.thankyou.author.error.undefined		
 lm	thankyou.thankyou.core_values.empty		
+lm	thankyou.thankyou.date_created.error.future		
 lm	thankyou.thankyou.description.error.empty		
 lm	thankyou.thankyou.description.error.not_string		
 lm	thankyou.thankyou.error.create		
 lm	thankyou.thankyou.error.modify		
 lm	thankyou.thankyou.error.server		
+lm	thankyou.thankyou.id.error.invalid		
+lm	thankyou.thankyou.id.error.not_found		
 lm	thankyou.thankyou.name		
 lm	thankyou.thankyou.tags.error.disabled		
+lm	thankyou.thankyou.tags.error.empty		
 lm	thankyou.thankyou.tags.error.not_array		
 lm	thankyou.thankyou.thanked.error.empty		
 lm	thankyou.thankyou.thanked.error.not_array		
@@ -87,6 +97,8 @@ lm	thankyou.thankyou.thanked.id.error.not_integer
 lm	thankyou.thankyou.thanked.id.error.undefined		
 lm	thankyou.thankyou.thanked.oclass.error.not_integer		
 lm	thankyou.thankyou.thanked.oclass.error.undefined		
+lm	thankyou.thankyou.users.error.empty		
+lm	thankyou.thankyou.users.user.id.error.invalid		
 lm	thankyou.user.not_found		
 lm	thankyou.user_profile.tab_name		Спасибо
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	

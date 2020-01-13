@@ -71,15 +71,25 @@ lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
 lm	thankyou.thankable.not_found		Thankable not found
 lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to %s
+lm	thankyou.thanked.error.invalid		Invalid Thanked given
+lm	thankyou.thanked.item_id.error.undefined		Thanked Item undefined
+lm	thankyou.thanked.owner_class.error.undefined		Thanked Owner Class is undefined
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
+lm	thankyou.thankyou.author.error.invalid		Invalid Author given
+lm	thankyou.thankyou.author.error.not_found		User with ID %d could not be found
+lm	thankyou.thankyou.author.error.undefined		The Thank You's Author must be defined
 lm	thankyou.thankyou.core_values.empty		One or more Core Values must be selected
+lm	thankyou.thankyou.date_created.error.future		A Thank You's Created Date may only be in the past
 lm	thankyou.thankyou.description.error.empty		A description must be given
 lm	thankyou.thankyou.description.error.not_string		A Thank You's Description must be a string
 lm	thankyou.thankyou.error.create		Could not create Thank You
 lm	thankyou.thankyou.error.modify		Could not modify Thank You
 lm	thankyou.thankyou.error.server		The Thank You you've requested could not be loaded due to a server error
+lm	thankyou.thankyou.id.error.invalid		Invalid Thank You ID given
+lm	thankyou.thankyou.id.error.not_found		Thank You with ID %d could not be found
 lm	thankyou.thankyou.name		Thank You
 lm	thankyou.thankyou.tags.error.disabled		Core Values are disabled for Thank Yous
+lm	thankyou.thankyou.tags.error.empty		One or more Core Values must be given
 lm	thankyou.thankyou.tags.error.not_array		Thank You Core Values must be given as an array of integers
 lm	thankyou.thankyou.thanked.error.empty		Nothing has been thanked
 lm	thankyou.thankyou.thanked.error.not_array		A Thank You's Thanked must be an array if defined
@@ -87,6 +97,8 @@ lm	thankyou.thankyou.thanked.id.error.not_integer		Thanked ID must be an integer
 lm	thankyou.thankyou.thanked.id.error.undefined		Thanked must contain an ID
 lm	thankyou.thankyou.thanked.oclass.error.not_integer		Thanked oclass must be an integer
 lm	thankyou.thankyou.thanked.oclass.error.undefined		Thanked must contain an oclass
+lm	thankyou.thankyou.users.error.empty		No Users have been thanked
+lm	thankyou.thankyou.users.user.id.error.invalid		User %d cannot be thanked
 lm	thankyou.user.not_found		User not found
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
