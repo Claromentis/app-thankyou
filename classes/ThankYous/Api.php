@@ -663,7 +663,7 @@ class Api
 			{
 				if (!is_int($tag_id))
 				{
-					$invalid_params[] = [
+					$errors[] = [
 						'name'   => 'tags',
 						'reason' => ($this->lmsg)('thankyou.tag.error.id.invalid', (string) $tag_id)
 					];
@@ -675,7 +675,7 @@ class Api
 			{
 				if (!isset($tags[$tag_id]))
 				{
-					$invalid_params[] = [
+					$errors[] = [
 						'name'   => 'tags',
 						'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)
 					];
