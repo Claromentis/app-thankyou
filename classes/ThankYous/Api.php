@@ -29,6 +29,7 @@ use Exception;
 use InvalidArgumentException;
 use LogicException;
 use NotificationMessage;
+use Psr\Log\LoggerInterface;
 use User;
 
 class Api
@@ -86,6 +87,11 @@ class Api
 	private $lmsg;
 
 	/**
+	 * @var LoggerInterface
+	 */
+	private $logger;
+
+	/**
 	 * @var Tags\Api
 	 */
 	private $tag_api;
@@ -128,6 +134,7 @@ class Api
 	 * @param AclRepository       $acl_repository
 	 * @param UserExtranetService $user_extranet_service
 	 * @param Tags\Api            $tag_api
+	 * @param LoggerInterface     $logger
 	 */
 	public function __construct(
 		Audit $audit,
@@ -144,7 +151,8 @@ class Api
 		LikesRepository $likes_repository,
 		AclRepository $acl_repository,
 		UserExtranetService $user_extranet_service,
-		Tags\Api $tag_api
+		Tags\Api $tag_api,
+		LoggerInterface $logger
 	) {
 		$this->acl                   = $acl;
 		$this->acl_repository        = $acl_repository;
@@ -157,6 +165,7 @@ class Api
 		$this->likes_repository      = $likes_repository;
 		$this->line_manager_notifier = $line_manager_notifier;
 		$this->lmsg                  = $lmsg;
+		$this->logger                = $logger;
 		$this->thank_yous_repository = $thank_yous_repository;
 		$this->utility               = $thank_you_utility;
 		$this->validator             = $validator;
@@ -574,16 +583,16 @@ class Api
 	}
 
 	/**
-	 * Given an array, attempts to create a Thank You.
+	 * Given an array, attempts to create a Thank You and save it to the Repository.
+	 * If successful, returns the Thank You's ID.
 	 *
 	 * @param array $data
-	 * @return ThankYou
+	 * @return int
 	 * @throws ValidationException - If the Thank You could not be created from the parameter provided.
-	 * @throws ThankYouNotFoundException - If the Thank You could not be found.
+	 * @throws TagNotFoundException - If one or more Tags could not be found.
 	 */
-	public function CreateFromArray(array $data)
+	public function CreateAndSave(array $data): int
 	{
-		$id          = $data['id'] ?? null;
 		$author      = $data['author'] ?? null;
 		$description = $data['description'] ?? null;
 
@@ -592,96 +601,37 @@ class Api
 
 		$errors = [];
 
-		if (isset($id))
+		if (!isset($description))
 		{
-			$thank_you = $this->GetThankYou($id);
-			if (isset($description))
-			{
-				$thank_you->SetDescription($description);
-			}
-		} else
+			$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
+		} elseif (!is_string($description))
 		{
-			if (!isset($description))
-			{
-				$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
-			}
-
-			if (!isset($author))
-			{
-				$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.undefined')];
-			} elseif (!is_int($author) && !($author instanceof User))
-			{
-				$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.invalid')];
-			}
-
-			if (!empty($errors))
-			{
-				throw new ValidationException($errors);
-			}
-
-			$thank_you = $this->thank_you_factory->Create($author, $description, null);
-
-			if (isset($id) && !is_int($id))
-			{
-				$errors[] = ['name' => 'id', 'reason' => ($this->lmsg)('thankyou.thankyou.id.error.invalid')];
-			} else
-			{
-				$thank_you->SetId($id);
-			}
+			$errors[] = ['name' => 'description', 'reason' => ($this->lmsg){'thankyou.thankyou.description.error.not_string'}];
 		}
+
+		if (!isset($author))
+		{
+			$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.undefined')];
+		} elseif (!is_int($author) && !($author instanceof User))
+		{
+			$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.invalid')];
+		}
+
+		if (!empty($errors))
+		{
+			throw new ValidationException($errors);
+		}
+
+		$thank_you = $this->thank_you_factory->Create($author, $description, null);
 
 		if (isset($thanked))
 		{
-			if (!is_array($thanked))
-			{
-				$errors[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thanked.error.invalid')];
-			} else
-			{
-				foreach ($thanked as $offset => $oclass)
-				{
-					$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
-				}
-				try
-				{
-					$thankables = $this->CreateThankablesFromOClasses($thanked);
-					$thank_you->SetThanked($thankables);
-				} catch (UnsupportedOwnerClassException $exception)
-				{
-					$errors[] = [
-						'name'   => 'thanked',
-						'reason' => ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported',
-							implode(', ', $this->GetThankableObjectTypes())
-						)
-					];
-				}
-			}
+			$this->SetThankedFromArray($thank_you, $thanked);
 		}
 
 		if (isset($tag_ids))
 		{
-			foreach ($tag_ids as $offset => $tag_id)
-			{
-				if (!is_int($tag_id))
-				{
-					$errors[] = [
-						'name'   => 'tags',
-						'reason' => ($this->lmsg)('thankyou.tag.error.id.invalid', (string) $tag_id)
-					];
-					unset($tag_ids[$offset]);
-				}
-			}
-			$tags = $this->tag_api->GetTagsById($tag_ids);
-			foreach ($tag_ids as $tag_id)
-			{
-				if (!isset($tags[$tag_id]))
-				{
-					$errors[] = [
-						'name'   => 'tags',
-						'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)
-					];
-				}
-			}
-			$thank_you->SetTags($tags);
+			$this->SetTagsFromArray($thank_you, $tag_ids);
 		}
 
 		if (!empty($errors))
@@ -691,7 +641,70 @@ class Api
 
 		$this->PopulateThankYouUsersFromThankables($thank_you);
 
-		return $thank_you;
+		return $this->SaveNew($thank_you);
+	}
+
+	/**
+	 * @param SecurityContext $context
+	 * @param int             $id
+	 * @param array           $data
+	 * @return int
+	 * @throws TagNotFoundException
+	 * @throws ThankYouForbiddenException
+	 * @throws ThankYouNotFoundException
+	 * @throws ValidationException
+	 */
+	public function UpdateAndSave(SecurityContext $context, int $id, array $data): int
+	{
+		$description = $data['description'] ?? null;
+
+		$thanked = $data['thanked'] ?? null;
+		$tag_ids = $data['tags'] ?? null;
+
+		$errors = [];
+
+		$thank_you = $this->GetThankYou($id);
+
+		if (isset($description))
+		{
+			if (!is_string($description))
+			{
+				$errors[] = ['name' => 'description', 'reason' => ($this->lmsg){'thankyou.thankyou.description.error.not_string'}];
+			} else
+			{
+				$thank_you->SetDescription($description);
+			}
+		}
+
+		if (isset($thanked))
+		{
+			try
+			{
+				$this->SetThankedFromArray($thank_you, $thanked);
+				$this->PopulateThankYouUsersFromThankables($thank_you);
+			} catch (ValidationException $exception)
+			{
+				$errors = array_merge($errors, $exception->GetErrors());
+			}
+		}
+
+		if (isset($tag_ids))
+		{
+			try
+			{
+				$this->SetTagsFromArray($thank_you, $tag_ids);
+			} catch (ValidationException $exception)
+			{
+				$errors = array_merge($errors, $exception->GetErrors());
+			}
+		}
+
+		if (!empty($errors))
+		{
+			throw new ValidationException($errors);
+		}
+
+		return $this->SaveUpdate($context, $thank_you);
 	}
 
 	/**
@@ -716,46 +729,6 @@ class Api
 	public function CreateThankablesFromOClasses(array $oclasses)
 	{
 		return $this->thank_yous_repository->CreateThankablesFromOClasses($oclasses);
-	}
-
-	/**
-	 * Save a Thank You to the Repository and generate an Audit. If the Thank You doesn't have an ID, one will be set.
-	 *
-	 * @param SecurityContext $security_context
-	 * @param ThankYou        $thank_you
-	 * @throws TagNotFoundException - If one or more of the Thank You's Tags could not be found in the Repository.
-	 * @throws ThankYouForbiddenException - If the given User is does not have Permission to edit the Thank You.
-	 * @throws ValidationException - If the Thank You is not in a Valid state to be saved.
-	 */
-	public function Save(SecurityContext $security_context, ThankYou $thank_you)
-	{
-		if (!$this->CanEditThankYou($security_context, $thank_you))
-		{
-			throw new ThankYouForbiddenException("The given User does not have Permission to Edit this Thank You");
-		}
-
-		$this->validator->ValidateThankYou($thank_you);
-		$new = $thank_you->GetId() === null;
-
-		$this->thank_yous_repository->Save($thank_you);
-
-		$id = $thank_you->GetId();
-
-		$tags = $thank_you->GetTags();
-		if (isset($tags))
-		{
-			$this->tag_api->RemoveAllTaggableTaggings($id, ThankYousRepository::AGGREGATION_ID);
-			$this->tag_api->AddTaggings($id, ThankYousRepository::AGGREGATION_ID, $tags);
-		}
-
-		if ($new)
-		{
-			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_create', $id, $thank_you->GetDescription());
-			$this->Notify($thank_you);
-		} else
-		{
-			$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_edit', $id, $thank_you->GetDescription());
-		}
 	}
 
 	/**
@@ -885,6 +858,78 @@ class Api
 	}
 
 	/**
+	 * Save a new Thank You to the Repository and generate an Audit. The Thank You's ID will also be set.
+	 *
+	 * @param ThankYou $thank_you
+	 * @return int
+	 * @throws TagNotFoundException - If one or more of the Thank You's Tags could not be found in the Repository.
+	 * @throws ValidationException - If the Thank You is not in a Valid state to be saved.
+	 */
+	private function SaveNew(ThankYou $thank_you): int
+	{
+		$thank_you->SetId(null);
+
+		$this->validator->ValidateThankYou($thank_you);
+		$this->thank_yous_repository->Save($thank_you);
+
+		$id = $thank_you->GetId();
+
+		$tags = $thank_you->GetTags();
+		if (isset($tags))
+		{
+			$this->tag_api->RemoveAllTaggableTaggings($id, ThankYousRepository::AGGREGATION_ID);
+			$this->tag_api->AddTaggings($id, ThankYousRepository::AGGREGATION_ID, $tags);
+		}
+
+		$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_create', $id, $thank_you->GetDescription());
+		$this->Notify($thank_you);
+
+		return $id;
+	}
+
+	/**
+	 * Updates a Thank You in the Repository and generates an Audit.
+	 * Returns the Thank You's ID.
+	 *
+	 * @param SecurityContext $security_context
+	 * @param ThankYou        $thank_you
+	 * @return int
+	 * @throws TagNotFoundException
+	 * @throws ThankYouForbiddenException
+	 * @throws ValidationException
+	 * @throws ThankYouNotFoundException - If the Thank You does not have an ID set.
+	 */
+	private function SaveUpdate(SecurityContext $security_context, ThankYou $thank_you): int
+	{
+		$id = $thank_you->GetId();
+
+		if (!isset($id))
+		{
+			throw new ThankYouNotFoundException("Failed to Update Thank You, ID undefined");
+		}
+
+		if (!$this->CanEditThankYou($security_context, $thank_you))
+		{
+			throw new ThankYouForbiddenException("The given User does not have Permission to Edit this Thank You");
+		}
+
+		$this->validator->ValidateThankYou($thank_you);
+
+		$this->thank_yous_repository->Save($thank_you);
+
+		$tags = $thank_you->GetTags();
+		if (isset($tags))
+		{
+			$this->tag_api->RemoveAllTaggableTaggings($id, ThankYousRepository::AGGREGATION_ID);
+			$this->tag_api->AddTaggings($id, ThankYousRepository::AGGREGATION_ID, $tags);
+		}
+
+		$this->audit->Store(Audit::AUDIT_SUCCESS, Plugin::APPLICATION_NAME, 'thank_you_edit', $id, $thank_you->GetDescription());
+
+		return $id;
+	}
+
+	/**
 	 * Given a Thank You, sends Notifications to its Thanked Users. Depending on Configuration, it may also send
 	 * Notifications to the Users' Line Managers.
 	 *
@@ -939,7 +984,86 @@ class Api
 			}
 		} catch (Exception $exception)
 		{
-			throw new LogicException("Unexpected Exception thrown by NotificationMessage library", null, $exception);
+			$this->logger->error("Failed to send Thank You Notifications", [$exception]);
 		}
+	}
+
+	/**
+	 * Given a Thank You and an array, tries to populate the Thank You's Thanked.
+	 *
+	 * @param ThankYou $thank_you
+	 * @param array    $thanked
+	 * @throws ValidationException - If the Thank You's Thanked could not be set from the given array.
+	 */
+	private function SetThankedFromArray(ThankYou $thank_you, array $thanked)
+	{
+		if (!is_array($thanked))
+		{
+			$errors[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thanked.error.invalid')];
+		} else
+		{
+			foreach ($thanked as $offset => $oclass)
+			{
+				$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
+			}
+			try
+			{
+				$thankables = $this->CreateThankablesFromOClasses($thanked);
+				$thank_you->SetThanked($thankables);
+			} catch (UnsupportedOwnerClassException $exception)
+			{
+				$errors[] = [
+					'name'   => 'thanked',
+					'reason' => ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported',
+						implode(', ', $this->GetThankableObjectTypes())
+					)
+				];
+			}
+		}
+
+		if (!empty($errors))
+		{
+			throw new ValidationException($errors);
+		}
+	}
+
+	/**
+	 * Given a Thank You and array of Tag IDs, tries to set the Thank You's Tags.
+	 *
+	 * @param ThankYou $thank_you
+	 * @param array    $tag_ids
+	 * @throws ValidationException - If the Thank You's Tags could not be set.
+	 */
+	private function SetTagsFromArray(ThankYou $thank_you, array $tag_ids)
+	{
+		foreach ($tag_ids as $offset => $tag_id)
+		{
+			if (!is_int($tag_id))
+			{
+				$errors[] = [
+					'name'   => 'tags',
+					'reason' => ($this->lmsg)('thankyou.tag.error.id.invalid', (string) $tag_id)
+				];
+				unset($tag_ids[$offset]);
+			}
+		}
+		$tags = $this->tag_api->GetTagsById($tag_ids);
+		foreach ($tag_ids as $tag_id)
+		{
+			if (!isset($tags[$tag_id]))
+			{
+				$errors[] = [
+					'name'   => 'tags',
+					'reason' => ($this->lmsg)('thankyou.tag.error.id.not_found', $tag_id)
+				];
+			}
+		}
+
+		if (!empty($errors))
+		{
+			throw new ValidationException($errors);
+		}
+
+		$thank_you->SetTags($tags);
 	}
 }

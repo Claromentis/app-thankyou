@@ -91,6 +91,7 @@ lm	thankyou.thankyou.name
 lm	thankyou.thankyou.tags.error.disabled		
 lm	thankyou.thankyou.tags.error.empty		
 lm	thankyou.thankyou.tags.error.not_array		
+lm	thankyou.thankyou.tags.error.not_found		
 lm	thankyou.thankyou.thanked.error.empty		
 lm	thankyou.thankyou.thanked.error.not_array		
 lm	thankyou.thankyou.thanked.id.error.not_integer		

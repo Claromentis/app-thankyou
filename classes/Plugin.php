@@ -1,14 +1,18 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use Claromentis\Comments\CommentsRepository;
+use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Application;
+use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Component\TemplaterTrait;
 use Claromentis\Core\ControllerCollection;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Event\LazyResolver;
 use Claromentis\Core\Http\ResponseFactory;
+use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\REST\RestServiceInterface;
 use Claromentis\Core\RouteProviderInterface;
@@ -18,6 +22,7 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
 use Claromentis\People\Service\UserExtranetService;
+use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Controllers\AdminController;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
@@ -118,6 +123,27 @@ class Plugin implements
 		//Thank Yous
 		$app[LineManagerNotifier::class] = function ($app) {
 			return new LineManagerNotifier($app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+		};
+
+		$app[ThankYous\Api::class] = function ($app) {
+			return new ThankYous\Api(
+				$app[Audit::class],
+				$app[LineManagerNotifier::class],
+				$app[ThankYousRepository::class],
+				$app[ThankYouFactory::class],
+				$app[Configuration\Api::class],
+				$app[Lmsg::class],
+				$app[ThankYouAcl::class],
+				$app[ThankYouUtility::class],
+				$app[ThankYous\Validator::class],
+				$app[CommentsRepository::class],
+				$app[Comments\Factory::class],
+				$app[LikesRepository::class],
+				$app[AclRepository::class],
+				$app[UserExtranetService::class],
+				$app[Tags\Api::class],
+				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
+			);
 		};
 
 		// Localization domain

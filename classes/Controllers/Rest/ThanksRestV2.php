@@ -19,7 +19,6 @@ use Claromentis\ThankYou\Tags\Format\TagFormatter;
 use Claromentis\ThankYou\ThankYous\Format\ThankYouFormatter;
 use Date;
 use DateClaTimeZone;
-use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use RestExBadRequest;
@@ -157,13 +156,11 @@ class ThanksRestV2
 			throw new RestExBadRequest();
 		}
 
-		unset($post['id']);
 		$post['author'] = $context->GetUser();
 
 		try
 		{
-			$thank_you = $this->api->ThankYous()->CreateFromArray($post);
-			$this->api->ThankYous()->Save($context, $thank_you);
+			$this->api->ThankYous()->CreateAndSave($post);
 		} catch (ValidationException $validation_exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -172,9 +169,13 @@ class ThanksRestV2
 				'status'         => 400,
 				'invalid-params' => $validation_exception->GetErrors()
 			], 400);
-		} catch (ThankYouForbiddenException | ThankYouNotFoundException | TagNotFoundException $exception)
+		} catch (TagNotFoundException $exception)
 		{
-			throw new LogicException("Unexpected Exception", null, $exception);
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.thankyou.tags.error.not_found'),
+				'status' => 404
+			], 404);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);
@@ -200,8 +201,7 @@ class ThanksRestV2
 
 		try
 		{
-			$thank_you = $this->api->ThankYous()->CreateFromArray($post);
-			$this->api->ThankYous()->Save($context, $thank_you);
+			$this->api->ThankYous()->UpdateAndSave($context, $id, $post);
 		} catch (ValidationException $validation_exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -217,7 +217,7 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.error.no_edit_permission'),
 				'status' => 401
 			], 401);
-		} catch (ThankYouNotFoundException $e)
+		} catch (ThankYouNotFoundException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'   => 'https://developer.claromentis.com',
@@ -226,7 +226,11 @@ class ThanksRestV2
 			], 404);
 		} catch (TagNotFoundException $exception)
 		{
-			throw new LogicException("Unexpected Exception", null, $exception);
+			return $this->response->GetJsonPrettyResponse([
+				'type'   => 'https://developer.claromentis.com',
+				'title'  => ($this->lmsg)('thankyou.thankyou.tags.error.not_found'),
+				'status' => 404
+			], 404);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);
