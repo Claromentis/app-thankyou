@@ -606,7 +606,7 @@ class Api
 			$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
 		} elseif (!is_string($description))
 		{
-			$errors[] = ['name' => 'description', 'reason' => ($this->lmsg){'thankyou.thankyou.description.error.not_string'}];
+			$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.not_string')];
 		}
 
 		if (!isset($author))
@@ -669,7 +669,7 @@ class Api
 		{
 			if (!is_string($description))
 			{
-				$errors[] = ['name' => 'description', 'reason' => ($this->lmsg){'thankyou.thankyou.description.error.not_string'}];
+				$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.not_string')];
 			} else
 			{
 				$thank_you->SetDescription($description);
