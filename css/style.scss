@@ -177,3 +177,9 @@
         padding-top: 0;
     }
 }
+
+.js-thank_you-picker-container.thank_you-picker-container {
+    .select2-container {
+        max-width: 362px;
+    }
+}
