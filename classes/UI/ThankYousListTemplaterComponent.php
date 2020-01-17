@@ -2,12 +2,14 @@
 
 namespace Claromentis\ThankYou\UI;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\Application;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Thankable\Thankable;
+use Psr\Log\LoggerInterface;
 
 /**
  * Templater Component for displaying a list of recent Thank Yous and for submitting a new one.
@@ -57,15 +59,22 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 	private $lmsg;
 
 	/**
+	 * @var LoggerInterface
+	 */
+	private $logger;
+
+	/**
 	 * ThankYousList constructor.
 	 *
-	 * @param Api  $api
-	 * @param Lmsg $lmsg
+	 * @param Api             $api
+	 * @param Lmsg            $lmsg
+	 * @param LoggerInterface $logger
 	 */
-	public function __construct(Api $api, Lmsg $lmsg)
+	public function __construct(Api $api, Lmsg $lmsg, LoggerInterface $logger)
 	{
-		$this->api  = $api;
-		$this->lmsg = $lmsg;
+		$this->api    = $api;
+		$this->lmsg   = $lmsg;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -95,7 +104,14 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		$thanks_links      = (bool) ($attributes['thanks_links'] ?? null);
 		$user_ids          = $attributes['user_ids'] ?? null;
 
-		$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset, null, $user_ids, null);
+		try
+		{
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset, null, $user_ids, null);
+		} catch (MappingException $exception)
+		{
+			$thank_yous = [];
+			$this->logger->error("Unexpected MappingException", [$exception]);
+		}
 
 		if ($display_comments)
 		{

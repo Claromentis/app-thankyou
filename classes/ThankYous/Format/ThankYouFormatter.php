@@ -98,12 +98,12 @@ class ThankYouFormatter
 			$author_name = ($this->lmsg)('common.perms.hidden_name');
 		} else
 		{
-			$author_name = $thank_you->GetAuthor()->GetFullname();
+			$author_name = $thank_you->GetAuthor()->getFullnameAttribute();
 		}
 
 		$output = [
 			'author'       => [
-				'id'   => $thank_you->GetAuthor()->GetId(),
+				'id'   => $thank_you->GetAuthor()->id,
 				'name' => $author_name
 			],
 			'date_created' => $date_created,
@@ -124,10 +124,10 @@ class ThankYouFormatter
 		$users = $thank_you->GetUsers();
 		if (isset($users))
 		{
-			foreach ($users as $offset => $user)
+			foreach ($users as $index => $user)
 			{
-				$user_name      = (isset($security_context) && !$this->acl->CanSeeUser($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->GetFullname();
-				$users[$offset] = ['id' => $user->GetId(), 'name' => $user_name];
+				$user_name     = (isset($security_context) && !$this->acl->CanSeeThankedUser($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->getFullnameAttribute();
+				$users[$index] = ['id' => $user->id, 'name' => $user_name];
 			}
 		}
 		$output['users'] = $users;
@@ -142,8 +142,8 @@ class ThankYouFormatter
 	}
 
 	/**
-	 * @param Thankable[] $thankables
-	 * @param SecurityContext|null  $security_context
+	 * @param Thankable[]          $thankables
+	 * @param SecurityContext|null $security_context
 	 * @return array
 	 */
 	public function ConvertThankablesToArrays(array $thankables, ?SecurityContext $security_context = null): array
@@ -153,6 +153,7 @@ class ThankYouFormatter
 		{
 			$thankables_array[] = $this->ConvertThankableToArray($thankable, $security_context);
 		}
+
 		return $thankables_array;
 	}
 
@@ -181,7 +182,7 @@ class ThankYouFormatter
 			$object_type = ['id' => $object_type_id, 'name' => $owner_class_name];
 		}
 
-		if (isset($security_context) && !$this->acl->CanSeeThankableName($security_context, $thankable))
+		if (isset($security_context) && !$this->acl->CanSeeThankedName($security_context, $thankable))
 		{
 			$name = ($this->lmsg)('common.perms.hidden_name');
 		} else

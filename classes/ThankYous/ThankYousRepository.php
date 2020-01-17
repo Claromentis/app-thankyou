@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\CDN\CDNSystemException;
 use Claromentis\Core\DAL\Exceptions\TransactionException;
@@ -9,18 +10,14 @@ use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Repository\Exception\StorageException;
-use Claromentis\People\InvalidFieldIsNotSingle;
-use Claromentis\People\UsersListProvider;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Exception\ThankableException;
 use Claromentis\ThankYou\Tags;
-use Claromentis\ThankYou\Exception\ThankYouException;
-use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
 use Claromentis\ThankYou\Thankable;
 use Date;
 use DateTimeZone;
 use InvalidArgumentException;
-use LogicException;
 use Psr\Log\LoggerInterface;
 use User;
 
@@ -58,6 +55,11 @@ class ThankYousRepository
 	private $thank_you_factory;
 
 	/**
+	 * @var UserRepository
+	 */
+	private $user_repository;
+
+	/**
 	 * @var ThankYouUtility
 	 */
 	private $utility;
@@ -72,10 +74,23 @@ class ThankYousRepository
 	 */
 	private $tags;
 
+	/**
+	 * ThankYousRepository constructor.
+	 *
+	 * @param ThankYouFactory   $thank_you_factory
+	 * @param ThankYouUtility   $thank_you_utility
+	 * @param DbInterface       $db_interface
+	 * @param UserRepository    $user_repository
+	 * @param LoggerInterface   $logger
+	 * @param QueryFactory      $query_factory
+	 * @param Tags\Api          $tag_api
+	 * @param Thankable\Factory $thankable_factory
+	 */
 	public function __construct(
 		ThankYouFactory $thank_you_factory,
 		ThankYouUtility $thank_you_utility,
 		DbInterface $db_interface,
+		UserRepository $user_repository,
 		LoggerInterface $logger,
 		QueryFactory $query_factory,
 		Tags\Api $tag_api,
@@ -83,6 +98,7 @@ class ThankYousRepository
 	) {
 		$this->thank_you_factory = $thank_you_factory;
 		$this->utility           = $thank_you_utility;
+		$this->user_repository   = $user_repository;
 		$this->db                = $db_interface;
 		$this->logger            = $logger;
 		$this->query_factory     = $query_factory;
@@ -95,6 +111,7 @@ class ThankYousRepository
 	 *
 	 * @param int[] $ids
 	 * @return ThankYou[]
+	 * @throws MappingException
 	 */
 	public function GetThankYous(array $ids)
 	{
@@ -134,7 +151,7 @@ class ThankYousRepository
 
 		$user_ids = array_keys($user_ids);
 
-		$users = $this->GetUsers($user_ids);
+		$users = $this->user_repository->find($user_ids);//var_dump($users->find($user_ids[0])->getFullnameAttribute());die('pees');
 
 		$thank_yous = [];
 		foreach ($ids as $id)
@@ -144,7 +161,11 @@ class ThankYousRepository
 				continue;
 			}
 
-			$thank_you = $this->Create(($users[$rows[$id]['author_id']] ?? $rows[$id]['author_id']), $rows[$id]['description'], new Date($rows[$id]['date_created'], new DateTimeZone('UTC')));
+			$thank_you = $this->Create(
+				($users->find($rows[$id]['author_id']) ?? $rows[$id]['author_id']),
+				$rows[$id]['description'],
+				new Date($rows[$id]['date_created'], new DateTimeZone('UTC'))
+			);
 			$thank_you->SetId($id);
 
 			$thank_yous[$id] = $thank_you;
@@ -218,6 +239,7 @@ class ThankYousRepository
 	 *
 	 * @param int[] $ids
 	 * @return array[Thankable]
+	 * @throws MappingException
 	 */
 	public function GetThankYousThankedsByThankYouIds(array $ids)
 	{
@@ -274,6 +296,7 @@ class ThankYousRepository
 	 *
 	 * @param int[] $ids
 	 * @return array[]
+	 * @throws MappingException
 	 */
 	public function GetThankYousUsersByThankYouIds(array $ids)
 	{
@@ -302,14 +325,15 @@ class ThankYousRepository
 
 		$user_ids = array_keys($user_ids);
 
-		$users = $this->GetUsers($user_ids);
+		$users_entity_collection = $this->user_repository->find($user_ids);
 
 		$thank_yous_users = [];
 		foreach ($rows as $row)
 		{
-			if (isset($users[$row['user_id']]))
+			$user = $users_entity_collection->find($row['user_id']);
+			if (isset($user))
 			{
-				$thank_yous_users[$row['thank_you_id']][$row['user_id']] = $users[$row['user_id']];
+				$thank_yous_users[$row['thank_you_id']][$row['user_id']] = $user;
 			}
 		}
 
@@ -598,32 +622,11 @@ class ThankYousRepository
 	}
 
 	/**
-	 * Returns an array of Users indexed by their ID.
-	 *
-	 * @param int[] $user_ids
-	 * @return User[]
-	 */
-	public function GetUsers(array $user_ids): array
-		//TODO: Remove this function with and replace uses with a call to a different API, once a suitable one exists.
-	{
-		$users_list_provider = new UsersListProvider();
-		$users_list_provider->SetFilterProtectExtranets(false);
-		$users_list_provider->SetFilterIds($user_ids);
-		try
-		{
-			return $users_list_provider->GetListObjects();
-		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
-		{
-			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
-		}
-	}
-
-	/**
 	 * Create a Thank You object.
 	 *
-	 * @param User|int  $author
-	 * @param string    $description
-	 * @param Date|null $date_created
+	 * @param \Claromentis\People\Entity\User|int $author
+	 * @param string                              $description
+	 * @param Date|null                           $date_created
 	 * @return ThankYou
 	 */
 	public function Create($author, string $description, ?Date $date_created = null)
@@ -638,6 +641,7 @@ class ThankYousRepository
 	 * @param array $thankeds
 	 * @return Thankable\Thankable[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
+	 * @throws MappingException
 	 */
 	public function CreateThankablesFromOClasses(array $thankeds): array
 	{
@@ -730,20 +734,15 @@ class ThankYousRepository
 	 *
 	 * @param int[] $user_ids
 	 * @return Thankable\Thankable[]
+	 * @throws MappingException
 	 */
 	public function CreateThankablesFromUserIds(array $user_ids)
 	{
 		$owner_class_id = PermOClass::INDIVIDUAL;
 
-		$users = $this->GetUsers($user_ids);
+		$users_entity_collection = $this->user_repository->find($user_ids);
 
-		try
-		{
-			$thankables = $this->CreateThankablesFromUsers($users);
-		} catch (ThankYouException $exception)
-		{
-			throw new LogicException("Unexpected Exception thrown when Creating Thankables From Users", null, $exception);
-		}
+		$thankables = $this->CreateThankablesFromUsers($users_entity_collection->getDictionary());
 
 		foreach ($user_ids as $user_id)
 		{
@@ -759,9 +758,8 @@ class ThankYousRepository
 	/**
 	 * Creates an array of Thankables from an array of Users. Retains indexes.
 	 *
-	 * @param User[] $users
+	 * @param \Claromentis\People\Entity\User[] $users
 	 * @return Thankable\Thankable[]
-	 * @throws ThankYouException - If the Users given have not been loaded.
 	 */
 	public function CreateThankablesFromUsers(array $users)
 	{
@@ -769,20 +767,15 @@ class ThankYousRepository
 
 		foreach ($users as $user_offset => $user)
 		{
-			if (!($user instanceof User))
+			if (!($user instanceof \Claromentis\People\Entity\User))
 			{
 				throw new InvalidArgumentException("Failed to Create Thankables From Users, invalid object passed");
-			}
-
-			if (!$user->IsLoaded())
-			{
-				throw new ThankYouException("Failed to Create Thankables From Users, one or more Users are not loaded");
 			}
 
 			try
 			{
 				//TODO: Replace with a non-static post People API update
-				$user_image_url = User::GetPhotoUrl($user->GetId());
+				$user_image_url = User::GetPhotoUrl($user->id);
 			} catch (CDNSystemException $cdn_system_exception)
 			{
 				$this->logger->error("Failed to Get User's Photo URL when Creating Thankable: " . $cdn_system_exception->getMessage());
@@ -790,9 +783,9 @@ class ThankYousRepository
 			}
 
 			//TODO: Replace with a non-static post People API update
-			$user_profile_url = User::GetProfileUrl($user->GetId(), false);
+			$user_profile_url = User::GetProfileUrl($user->id, false);
 
-			$users[$user_offset] = $this->thankable_factory->Create($user->GetFullname(), $user->GetId(), $owner_class_id, $user->GetExAreaId(), $user_image_url, $user_profile_url);
+			$users[$user_offset] = $this->thankable_factory->Create($user->getFullnameAttribute(), $user->id, $owner_class_id, $user->extranet_id, $user_image_url, $user_profile_url);
 		}
 
 		return $users;
@@ -876,7 +869,7 @@ class ThankYousRepository
 	{
 		$id = $thank_you->GetId();
 
-		$author_id = $thank_you->GetAuthor()->GetId();
+		$author_id = $thank_you->GetAuthor()->id;
 
 		$date_created = clone $thank_you->GetDateCreated();
 		$date_created->setTimezone(new DateTimeZone("UTC"));
@@ -958,14 +951,14 @@ class ThankYousRepository
 	 * Due to the hard dependency on the Thank You, it is recommended that a check has been done for the the Thank You
 	 * with the given ID prior to calling this.
 	 *
-	 * @param int  $thank_you_id
-	 * @param User $user
+	 * @param int                             $thank_you_id
+	 * @param \Claromentis\People\Entity\User $user
 	 */
-	private function SaveUser(int $thank_you_id, User $user)
+	private function SaveUser(int $thank_you_id, \Claromentis\People\Entity\User $user)
 	{
 		$db_fields = [
 			'int:thanks_id' => $thank_you_id,
-			'int:user_id'   => $user->GetId()
+			'int:user_id'   => $user->id
 		];
 
 		$query = $this->query_factory->GetQueryInsert(self::THANKED_USERS_TABLE, $db_fields);

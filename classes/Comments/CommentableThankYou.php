@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\Comments;
 
+use Analogue\ORM\Exceptions\MappingException;
 use ClaAggregation;
 use Claromentis\Comments\CommentableInterface;
 use Claromentis\Comments\CommentLocationInterface;
@@ -189,7 +190,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 		try
 		{
 			$thank_you = $api->ThankYous()->GetThankYou($this->thanks_item->GetId(), false, true);
-		} catch (ThankYouNotFoundException $exception)
+		} catch (ThankYouNotFoundException | MappingException $exception)
 		{
 			$this->logger->error("Unexpected Exception thrown by Thank You API Endpoint 'GetThankYous'", [$exception]);
 
@@ -203,7 +204,7 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 			$thanked_users_ids = [];
 			foreach ($thanked_users as $user)
 			{
-				$thanked_users_ids[] = $user->GetId();
+				$thanked_users_ids[] = $user->id;
 			}
 
 			$default_notification->AddRecipients($thanked_users_ids);

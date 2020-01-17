@@ -2,34 +2,35 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Security\SecurityContext;
-use Claromentis\People\Service\UserExtranetService;
+use Claromentis\People\Entity\User;
+use Claromentis\People\PeopleAcl;
 use Claromentis\ThankYou\Thankable\Thankable;
-use User;
 
 class ThankYouAcl
 {
+	/**
+	 * PeopleAcl
+	 */
+	private $people_acl;
+
 	/**
 	 * @var AdminPanel
 	 */
 	private $admin_panel;
 
 	/**
-	 * @var UserExtranetService
-	 */
-	private $user_extranet;
-
-	/**
 	 * ThankYouAcl constructor.
 	 *
-	 * @param AdminPanel          $admin_panel
-	 * @param UserExtranetService $user_extranet_service
+	 * @param PeopleAcl  $people_acl
+	 * @param AdminPanel $admin_panel
 	 */
-	public function __construct(AdminPanel $admin_panel, UserExtranetService $user_extranet_service)
+	public function __construct(PeopleAcl $people_acl, AdminPanel $admin_panel)
 	{
-		$this->admin_panel   = $admin_panel;
-		$this->user_extranet = $user_extranet_service;
+		$this->people_acl  = $people_acl;
+		$this->admin_panel = $admin_panel;
 	}
 
 	/**
@@ -41,7 +42,9 @@ class ThankYouAcl
 	 */
 	public function CanDeleteThankYou(SecurityContext $context, ThankYou $thank_you): bool
 	{
-		return $thank_you->GetAuthor()->GetId() === $context->GetUser()->GetId() || $this->IsAdmin($context);
+		$author_id = $thank_you->GetAuthor()->id;
+
+		return ($author_id !== 0 && $author_id === $context->GetUser()->GetId()) || $this->IsAdmin($context);
 	}
 
 	/**
@@ -53,7 +56,9 @@ class ThankYouAcl
 	 */
 	public function CanEditThankYou(SecurityContext $context, ThankYou $thank_you): bool
 	{
-		return $thank_you->GetAuthor()->GetId() === $context->GetUser()->GetId() || $this->IsAdmin($context);
+		$author_id = $thank_you->GetAuthor()->id;
+
+		return ($author_id !== 0 && $author_id === $context->GetUser()->GetId()) || $this->IsAdmin($context);
 	}
 
 	/**
@@ -63,11 +68,29 @@ class ThankYouAcl
 	 * @param Thankable       $thankable
 	 * @return bool
 	 */
-	public function CanSeeThankableName(SecurityContext $context, Thankable $thankable): bool
+	public function CanSeeThankedName(SecurityContext $context, Thankable $thankable): bool
 	{
 		$thankable_extranet_id = $thankable->GetExtranetId();
+		$owner_class           = $thankable->GetOwnerClass();
+		$item_id               = $thankable->GetItemId();
 
-		return !isset($thankable_extranet_id) || $this->IsExtranetVisible($context, $thankable_extranet_id);
+		if (isset($item_id))
+		{
+			if ($owner_class === PermOClass::INDIVIDUAL)
+			{
+				return $this->people_acl->CanViewUser($context, $item_id);
+			} elseif ($owner_class === PermOClass::GROUP)
+			{
+				return $this->people_acl->CanViewGroup($context, $item_id);
+			}
+		}
+
+		if (isset($thankable_extranet_id))
+		{
+			return $this->people_acl->CanViewExtranet($context, $thankable_extranet_id);
+		}
+
+		return true;
 	}
 
 	/**
@@ -80,7 +103,7 @@ class ThankYouAcl
 	 */
 	public function CanSeeThankYouAuthor(SecurityContext $context, ThankYou $thank_you): bool
 	{
-		return $this->CanSeeUser($context, $thank_you->GetAuthor());
+		return $this->people_acl->CanViewUser($context, $thank_you->GetAuthor());
 	}
 
 	/**
@@ -91,16 +114,9 @@ class ThankYouAcl
 	 * @param User            $user
 	 * @return bool
 	 */
-	public function CanSeeUser(SecurityContext $context, User $user): bool
+	public function CanSeeThankedUser(SecurityContext $context, User $user): bool
 	{
-		$user_extranet_id = $user->GetExAreaId();
-
-		if (!isset($user_extranet_id))
-		{
-			return false;
-		}
-
-		return $this->IsExtranetVisible($context, $user_extranet_id);
+		return $this->people_acl->CanViewUser($context, $user);
 	}
 
 	/**
@@ -112,20 +128,5 @@ class ThankYouAcl
 	public function IsAdmin(SecurityContext $context): bool
 	{
 		return $this->admin_panel->IsAccessible($context);
-	}
-
-	/**
-	 * Determines whether an Extranet Area is visible to a particular User.
-	 *
-	 * @param SecurityContext $context
-	 * @param int             $target_extranet_id
-	 * @return bool
-	 */
-	public function IsExtranetVisible(SecurityContext $context, int $target_extranet_id): bool
-	{
-		$user_extranet_id    = $context->GetExtranetAreaId();
-		$primary_extranet_id = (int) $this->user_extranet->GetPrimaryId();
-
-		return $target_extranet_id === $primary_extranet_id || $user_extranet_id === $primary_extranet_id || $target_extranet_id === $user_extranet_id;
 	}
 }

@@ -2,14 +2,18 @@
 
 namespace Claromentis\ThankYou\ThankYous\DataTables\User;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
 use Claromentis\Core\DataTable\Shared\ColumnHelper;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
+use Claromentis\People\Entity\User;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
+use Psr\Log\LoggerInterface;
 
 class UsersDataTableSource extends FilterDataTableSource
 {
@@ -20,9 +24,21 @@ class UsersDataTableSource extends FilterDataTableSource
 	 */
 	private $lmsg;
 
-	public function __construct(ThankYous\Api $thank_you_api, SugreUtility $sugre_utility, Lmsg $lmsg)
+	/**
+	 * @var LoggerInterface
+	 */
+	private $logger;
+
+	/**
+	 * @var UserRepository
+	 */
+	private $user_repository;
+
+	public function __construct(ThankYous\Api $thank_you_api, SugreUtility $sugre_utility, UserRepository $user_repository, Lmsg $lmsg, LoggerInterface $logger)
 	{
-		$this->lmsg = $lmsg;
+		$this->lmsg            = $lmsg;
+		$this->user_repository = $user_repository;
+		$this->logger          = $logger;
 
 		parent::__construct($thank_you_api, $sugre_utility);
 	}
@@ -54,15 +70,29 @@ class UsersDataTableSource extends FilterDataTableSource
 
 		$user_ids = array_keys($users_total_thank_yous);
 
-		$users = $this->api->GetUsers($user_ids);
+		$users_entity_collection = $this->user_repository->find($user_ids);
 
 		$rows = [];
 		foreach ($users_total_thank_yous as $user_id => $user_total_thank_yous)
 		{
-			$rows[] = [
-				'user'             => $users[$user_id]->GetFullname(),
-				'total_thank_yous' => $user_total_thank_yous
-			];
+			try
+			{
+				/**
+				 * @var User $user
+				 */
+				$user = $users_entity_collection->find($user_id);
+				if (isset($user))
+				{
+					$rows[] = [
+						'user'             => $user->getFullnameAttribute(),
+						'total_thank_yous' => $user_total_thank_yous
+					];
+				}
+			} catch (MappingException $exception)
+			{
+				$this->logger->error("Unexpected MappingException", [$exception]);
+				continue;
+			}
 		}
 
 		return $rows;

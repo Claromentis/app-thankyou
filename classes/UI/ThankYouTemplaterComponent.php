@@ -2,10 +2,10 @@
 
 namespace Claromentis\ThankYou\UI;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Carbon\Carbon;
 use Claromentis\Core\Application;
 use Claromentis\Core\CDN\CDNSystemException;
-use Claromentis\Core\Config\Config;
 use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
@@ -13,7 +13,6 @@ use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
-use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use DateClaTimeZone;
 use InvalidArgumentException;
@@ -22,7 +21,7 @@ use User;
 
 /**
  * Class ThankYouTemplaterComponent
- * #Templater Component:
+ * # Templater Component:
  * * class_key = "thankyou.thank_you"
  *
  */
@@ -130,6 +129,9 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			} catch (ThankYouNotFoundException $exception)
 			{
 				return ($this->lmsg)('thankyou.error.thanks_not_found');
+			} catch (MappingException $exception)
+			{
+				$this->logger->error("Unexpected MappingException", [$exception]);
 			}
 		}
 		if (!($thank_you instanceof ThankYou))
@@ -163,7 +165,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			$thank_you_url = $this->api->ThankYous()->GetThankYouUrl($thank_you);
 		}
 
-		$author_id = $thank_you->GetAuthor()->GetId();
+		$author_id = $thank_you->GetAuthor()->id;
 		//TODO: Replace with a non-static call when People API is available
 		$author_link = User::GetProfileUrl($author_id, true);
 
@@ -172,13 +174,13 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			$author_name = ($this->lmsg)('common.perms.hidden_name');
 		} else
 		{
-			$author_name = $thank_you->GetAuthor()->GetFullname();
+			$author_name = $thank_you->GetAuthor()->getFullnameAttribute();
 		}
 
 		try
 		{
 			//TODO: Replace with a non-static call when People API is available
-			$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->GetId(), true);
+			$author_image_url = User::GetPhotoUrl($thank_you->GetAuthor()->id, true);
 		} catch (CDNSystemException $exception)
 		{
 			$this->logger->error("Error thrown when getting User's Photo's URL in Thank Templater Component: " . $exception->getMessage(), [$exception]);

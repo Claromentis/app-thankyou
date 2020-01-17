@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\Controllers\Rest;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\Http\JsonPrettyResponse;
 use Claromentis\Core\Http\ResponseFactory;
 use Claromentis\Core\Localization\Lmsg;
@@ -113,6 +114,9 @@ class ThanksRestV2
 		} catch (ThankYouNotFoundException $exception)
 		{
 			throw new RestExNotFound(($this->lmsg)('thankyou.error.thanks_not_found'), "Not found", $exception);
+		} catch (MappingException $exception)
+		{
+			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);
 		}
 
 		$display_thank_you = $this->thank_you_formatter->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
@@ -124,6 +128,7 @@ class ThanksRestV2
 	 * @param ServerRequestInterface $request
 	 * @param SecurityContext        $security_context
 	 * @return JsonPrettyResponse
+	 * @throws RestExError - If a Repository error occurred.
 	 */
 	public function GetThankYous(ServerRequestInterface $request, SecurityContext $security_context): JsonPrettyResponse
 	{
@@ -134,7 +139,13 @@ class ThanksRestV2
 		$get_users    = (bool) (int) ($query_params['users'] ?? null);
 		$get_tags     = (bool) (int) ($query_params['tags'] ?? null);
 
-		$thank_yous = $this->api->ThankYous()->GetRecentThankYous($security_context, $get_thanked, $get_users, $get_tags, $limit, $offset);
+		try
+		{
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($security_context, $get_thanked, $get_users, $get_tags, $limit, $offset);
+		} catch (MappingException $exception)
+		{
+			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);
+		}
 
 		$display_thank_yous = $this->thank_you_formatter->ConvertThankYousToArrays($thank_yous, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
@@ -146,6 +157,7 @@ class ThanksRestV2
 	 * @param SecurityContext        $context
 	 * @return JsonPrettyResponse
 	 * @throws RestExBadRequest
+	 * @throws RestExError - If a Repository error occurred.
 	 */
 	public function CreateThankYou(ServerRequestInterface $request, SecurityContext $context): JsonPrettyResponse
 	{
@@ -156,7 +168,7 @@ class ThanksRestV2
 			throw new RestExBadRequest();
 		}
 
-		$post['author'] = $context->GetUser();
+		$post['author'] = $context->GetUserId();
 
 		try
 		{
@@ -176,6 +188,9 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.thankyou.tags.error.not_found'),
 				'status' => 404
 			], 404);
+		} catch (MappingException $exception)
+		{
+			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);
@@ -187,6 +202,7 @@ class ThanksRestV2
 	 * @param SecurityContext        $context
 	 * @return JsonPrettyResponse
 	 * @throws RestExBadRequest
+	 * @throws RestExError - If a Repository error occurred.
 	 */
 	public function UpdateThankYou(int $id, ServerRequestInterface $request, SecurityContext $context): JsonPrettyResponse
 	{
@@ -231,6 +247,9 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.thankyou.tags.error.not_found'),
 				'status' => 404
 			], 404);
+		} catch (MappingException $exception)
+		{
+			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true);
@@ -240,6 +259,7 @@ class ThanksRestV2
 	 * @param int             $id
 	 * @param SecurityContext $context
 	 * @return JsonPrettyResponse
+	 * @throws RestExError - If a Repository error occurred.
 	 */
 	public function DeleteThankYou(int $id, SecurityContext $context): JsonPrettyResponse
 	{
@@ -267,6 +287,9 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.delete.error.repository'),
 				'status' => 500
 			], 500);
+		} catch (MappingException $exception)
+		{
+			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);
 		}
 
 		return $this->response->GetJsonPrettyResponse(true, 200);

@@ -1,6 +1,7 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\PermOClass;
@@ -21,6 +22,8 @@ use Claromentis\Core\Services;
 use Claromentis\Core\Templater\Plugin\TemplaterComponent;
 use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
+use Claromentis\People\PeopleAcl;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\People\Service\UserExtranetService;
 use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Configuration;
@@ -141,6 +144,7 @@ class Plugin implements
 				$app[LikesRepository::class],
 				$app[AclRepository::class],
 				$app[UserExtranetService::class],
+				$app[UserRepository::class],
 				$app[Tags\Api::class],
 				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
 			);
@@ -182,6 +186,7 @@ class Plugin implements
 				$app[ThankYouFactory::class],
 				$app[ThankYouUtility::class],
 				$app[DbInterface::class],
+				$app[UserRepository::class],
 				$app['logger_factory']->GetLogger(self::APPLICATION_NAME),
 				$app[QueryFactory::class],
 				$app[Tags\Api::class],
@@ -190,7 +195,7 @@ class Plugin implements
 		};
 
 		$app[ThankYouAcl::class] = function ($app) {
-			return new ThankYouAcl($app['admin.panels_list']->GetOne(self::APPLICATION_NAME), $app[UserExtranetService::class]);
+			return new ThankYouAcl($app[PeopleAcl::class], $app['admin.panels_list']->GetOne(self::APPLICATION_NAME));
 		};
 
 		// Pages component
@@ -203,7 +208,7 @@ class Plugin implements
 		};
 
 		$app['templater.ui.thankyou.list'] = function ($app) {
-			return new ThankYousListTemplaterComponent($app[Api::class], $app[Lmsg::class]);
+			return new ThankYousListTemplaterComponent($app[Api::class], $app[Lmsg::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
 		};
 
 		$app['templater.ui.thankyou.thank_you'] = function ($app) {
@@ -219,7 +224,8 @@ class Plugin implements
 				$app[ThankYous\Api::class],
 				$app[Configuration\Api::class],
 				$app[SugreUtility::class],
-				$app[Lmsg::class]
+				$app[Lmsg::class],
+				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
 			);
 		};
 
@@ -227,7 +233,9 @@ class Plugin implements
 			return new UsersDataTableSource(
 				$app[ThankYous\Api::class],
 				$app[SugreUtility::class],
-				$app[Lmsg::class]
+				$app[UserRepository::class],
+				$app[Lmsg::class],
+				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
 			);
 		};
 
@@ -385,7 +393,7 @@ class Plugin implements
 			$thank_you_api->GetThankYou($object_id);
 
 			return true;
-		} catch (ThankYouNotFoundException $exception)
+		} catch (ThankYouNotFoundException | MappingException$exception)
 		{
 			return false;
 		}
@@ -443,7 +451,7 @@ class Plugin implements
 					{
 						$create = $thankable;
 					}
-				} catch (UnsupportedOwnerClassException $exception)
+				} catch (UnsupportedOwnerClassException | MappingException $exception)
 				{
 					$logger->error("Failed to lock Thank You Creation to User Id '" . $user_id . "' on User's Profile", [$exception]);
 				}

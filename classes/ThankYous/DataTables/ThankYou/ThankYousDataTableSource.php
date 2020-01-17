@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\ThankYous\DataTables\ThankYou;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
@@ -14,6 +15,7 @@ use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\ThankYous;
 use Claromentis\ThankYou\ThankYous\DataTables\FilterDataTableSource;
 use DateClaTimeZone;
+use Psr\Log\LoggerInterface;
 
 class ThankYousDataTableSource extends FilterDataTableSource
 {
@@ -29,10 +31,16 @@ class ThankYousDataTableSource extends FilterDataTableSource
 	 */
 	private $lmsg;
 
-	public function __construct(ThankYous\Api $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Lmsg $lmsg)
+	/**
+	 * @var LoggerInterface
+	 */
+	private $logger;
+
+	public function __construct(ThankYous\Api $thank_you_api, Configuration\Api $config_api, SugreUtility $sugre_utility, Lmsg $lmsg, LoggerInterface $logger)
 	{
 		$this->config_api = $config_api;
 		$this->lmsg       = $lmsg;
+		$this->logger     = $logger;
 
 		parent::__construct($thank_you_api, $sugre_utility);
 	}
@@ -81,7 +89,15 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 		$rows = [];
 
-		$thank_yous = $this->api->GetRecentThankYous($context, true, true, $get_tags, $limit, $offset, $filters['date_range'], $filters['thanked_user_ids'], $filters['tags']);
+		try
+		{
+			$thank_yous = $this->api->GetRecentThankYous($context, true, true, $get_tags, $limit, $offset, $filters['date_range'], $filters['thanked_user_ids'], $filters['tags']);
+		} catch (MappingException $exception)
+		{
+			$this->logger->error("Unexpected MappingException", [$exception]);
+
+			return [];
+		}
 
 		if ($get_comments)
 		{
@@ -112,7 +128,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$first_user           = true;
 			foreach ($thanked_users as $user)
 			{
-				$user_name            = $this->api->CanSeeUser($context, $user) ? $user->GetFullname() : ($this->lmsg)('common.perms.hidden_name');
+				$user_name            = $this->api->CanSeeThankedUser($context, $user) ? $user->GetFullname() : ($this->lmsg)('common.perms.hidden_name');
 				$thanked_users_string .= $first_user ? $user_name : ", " . $user_name;
 				$first_user           = false;
 			}

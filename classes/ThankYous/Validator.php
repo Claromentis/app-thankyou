@@ -2,11 +2,13 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\People\Entity\User;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Exception\ValidationException;
 use Date;
-use User;
 
 class Validator
 {
@@ -25,11 +27,17 @@ class Validator
 	 */
 	private $repository;
 
-	public function __construct(Lmsg $lmsg, Configuration\Api $config_api, ThankYousRepository $repository)
+	/**
+	 * @var UserRepository
+	 */
+	private $user_repository;
+
+	public function __construct(Lmsg $lmsg, Configuration\Api $config_api, ThankYousRepository $repository, UserRepository $user_repository)
 	{
-		$this->config_api = $config_api;
-		$this->lmsg       = $lmsg;
-		$this->repository = $repository;
+		$this->config_api      = $config_api;
+		$this->lmsg            = $lmsg;
+		$this->repository      = $repository;
+		$this->user_repository = $user_repository;
 	}
 
 	/**
@@ -37,6 +45,7 @@ class Validator
 	 *
 	 * @param ThankYou $thank_you
 	 * @throws ValidationException - If the Thank You has one or more issues making it unsuitable to save to the
+	 * @throws MappingException
 	 * Repository.
 	 */
 	public function ValidateThankYou(ThankYou $thank_you): void
@@ -59,21 +68,17 @@ class Validator
 		}
 
 		//Author
-		$author = $thank_you->GetAuthor();
+		$author    = $thank_you->GetAuthor();
+		$author_id = $author->id;
 		//If it's new or the Author has changed
-		if (!isset($original_thank_you) || $author->GetId() !== $original_thank_you->GetAuthor()->GetId())
+		if (!isset($original_thank_you) || $author_id !== $original_thank_you->GetAuthor()->id)
 		{
-			$author_id = $author->GetId();
 			if (!$this->CanUserBeAuthor($author))
 			{
 				$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.invalid')];
-			} else
+			} elseif ($this->user_repository->find($author_id) === null)
 			{
-				$users = $this->repository->GetUsers([$author_id]);
-				if (!isset($users[$author_id]))
-				{
-					$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.not_found', $author_id)];
-				}
+				$errors[] = ['name' => 'author', 'reason' => ($this->lmsg)('thankyou.thankyou.author.error.not_found', $author_id)];
 			}
 		}
 
@@ -120,7 +125,6 @@ class Validator
 		}
 
 		//Users
-		//TODO: check Thanking a Group with a deleted Users!
 		$users = $thank_you->GetUsers();
 		if (isset($users))
 		{
@@ -130,8 +134,7 @@ class Validator
 				{
 					$errors[] = [
 						'name'   => 'users',
-						'reason' => ($this->lmsg)('thankyou.thankyou.users.user.id.error.invalid',
-							(int) $user->GetId())
+						'reason' => ($this->lmsg)('thankyou.thankyou.users.user.id.error.invalid', $user->id)
 					];
 				}
 			}
@@ -171,7 +174,7 @@ class Validator
 	 */
 	public function CanUserBeAuthor(User $user): bool
 	{
-		$id = $user->GetId();
+		$id = $user->id;
 
 		return $id !== 0 && is_int($id);
 	}
@@ -184,7 +187,7 @@ class Validator
 	 */
 	public function CanUserBeThanked(User $user): bool
 	{
-		$id = $user->GetId();
+		$id = $user->id;
 
 		return $id !== 0 && is_int($id);
 	}

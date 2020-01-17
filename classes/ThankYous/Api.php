@@ -2,6 +2,7 @@
 
 namespace Claromentis\ThankYou\ThankYous;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
 use Claromentis\Core\Acl\PermOClass;
@@ -10,9 +11,9 @@ use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
-use Claromentis\People\InvalidFieldIsNotSingle;
+use Claromentis\People\Entity\User;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\People\Service\UserExtranetService;
-use Claromentis\People\UsersListProvider;
 use Claromentis\ThankYou\Comments;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
@@ -27,10 +28,8 @@ use Claromentis\ThankYou\Thankable\Thankable;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
-use LogicException;
 use NotificationMessage;
 use Psr\Log\LoggerInterface;
-use User;
 
 class Api
 {
@@ -107,6 +106,11 @@ class Api
 	private $thank_yous_repository;
 
 	/**
+	 * @var UserRepository
+	 */
+	private $user_repository;
+
+	/**
 	 * @var ThankYouUtility
 	 */
 	private $utility;
@@ -133,6 +137,7 @@ class Api
 	 * @param LikesRepository     $likes_repository
 	 * @param AclRepository       $acl_repository
 	 * @param UserExtranetService $user_extranet_service
+	 * @param UserRepository      $user_repository
 	 * @param Tags\Api            $tag_api
 	 * @param LoggerInterface     $logger
 	 */
@@ -151,6 +156,7 @@ class Api
 		LikesRepository $likes_repository,
 		AclRepository $acl_repository,
 		UserExtranetService $user_extranet_service,
+		UserRepository $user_repository,
 		Tags\Api $tag_api,
 		LoggerInterface $logger
 	) {
@@ -168,6 +174,7 @@ class Api
 		$this->logger                = $logger;
 		$this->thank_yous_repository = $thank_yous_repository;
 		$this->utility               = $thank_you_utility;
+		$this->user_repository       = $user_repository;
 		$this->validator             = $validator;
 		$this->tag_api               = $tag_api;
 	}
@@ -179,6 +186,7 @@ class Api
 	 * @param bool $tags
 	 * @return ThankYou
 	 * @throws ThankYouNotFoundException - If the Thank You could not be found.
+	 * @throws MappingException
 	 */
 	public function GetThankYou(int $id, bool $thanked = false, bool $users = false, bool $tags = false): ThankYou
 	{
@@ -199,6 +207,7 @@ class Api
 	 * @param bool  $users
 	 * @param bool  $tags
 	 * @return ThankYou[]
+	 * @throws MappingException
 	 */
 	public function GetThankYous(array $ids, bool $thanked = false, bool $users = false, bool $tags = false)
 	{
@@ -224,6 +233,7 @@ class Api
 
 	/**
 	 * @param ThankYou[] $thank_yous
+	 * @throws MappingException
 	 */
 	public function LoadThankYousThankeds(array $thank_yous)
 	{
@@ -255,6 +265,7 @@ class Api
 
 	/**
 	 * @param ThankYou[] $thank_yous
+	 * @throws MappingException
 	 */
 	public function LoadThankYousUsers(array $thank_yous)
 	{
@@ -328,6 +339,7 @@ class Api
 	 * @param int[]|null            $thanked_user_ids
 	 * @param int[]|null            $tag_ids
 	 * @return ThankYou[]
+	 * @throws MappingException
 	 */
 	public function GetRecentThankYous(SecurityContext $context, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false, ?int $limit = null, ?int $offset = null, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
@@ -455,17 +467,6 @@ class Api
 	}
 
 	/**
-	 * Returns an array of Users indexed by their IDs.
-	 *
-	 * @param int[] $user_ids
-	 * @return User[]
-	 */
-	public function GetUsers(array $user_ids)
-	{
-		return $this->thank_yous_repository->GetUsers($user_ids);
-	}
-
-	/**
 	 * Given an array of arrays with offset id = int, oclass = int, returns a distinct list of User IDs.
 	 *
 	 * @param array $owner_classes
@@ -590,6 +591,7 @@ class Api
 	 * @return int
 	 * @throws ValidationException - If the Thank You could not be created from the parameter provided.
 	 * @throws TagNotFoundException - If one or more Tags could not be found.
+	 * @throws MappingException
 	 */
 	public function CreateAndSave(array $data): int
 	{
@@ -653,6 +655,7 @@ class Api
 	 * @throws ThankYouForbiddenException
 	 * @throws ThankYouNotFoundException
 	 * @throws ValidationException
+	 * @throws MappingException
 	 */
 	public function UpdateAndSave(SecurityContext $context, int $id, array $data): int
 	{
@@ -712,6 +715,7 @@ class Api
 	 * @param int $id
 	 * @return Thankable
 	 * @throws UnsupportedOwnerClassException - If the Owner Class given is not supported.
+	 * @throws MappingException
 	 */
 	public function CreateThankableFromOClass(int $o_class, int $id)
 	{
@@ -725,6 +729,7 @@ class Api
 	 * @param array $oclasses
 	 * @return Thankable[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
+	 * @throws MappingException
 	 */
 	public function CreateThankablesFromOClasses(array $oclasses)
 	{
@@ -737,6 +742,7 @@ class Api
 	 * @throws ThankYouNotFoundException - If the Thank You could not be found.
 	 * @throws ThankYouForbiddenException - If the Security Context's User does not have permission.
 	 * @throws StorageException - If the Thank You could not be deleted from the repository.
+	 * @throws MappingException
 	 */
 	public function Delete(SecurityContext $security_context, int $id)
 	{
@@ -790,7 +796,7 @@ class Api
 	 */
 	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool
 	{
-		return $this->acl->CanSeeThankableName($security_context, $thankable);
+		return $this->acl->CanSeeThankedName($security_context, $thankable);
 	}
 
 	/**
@@ -800,9 +806,9 @@ class Api
 	 * @param User            $user
 	 * @return bool
 	 */
-	public function CanSeeUser(SecurityContext $context, User $user): bool
+	public function CanSeeThankedUser(SecurityContext $context, User $user): bool
 	{
-		return $this->acl->CanSeeUser($context, $user);
+		return $this->acl->CanSeeThankedUser($context, $user);
 	}
 
 	/**
@@ -816,6 +822,7 @@ class Api
 
 	/**
 	 * @param ThankYou $thank_you
+	 * @throws MappingException
 	 */
 	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
 	{
@@ -843,18 +850,9 @@ class Api
 
 		$user_ids = $this->GetOwnersUserIds($owner_classes);
 
-		$users_list_provider = new UsersListProvider();
-		$users_list_provider->SetFilterIds($user_ids);
+		$users_entity_collection = $this->user_repository->find($user_ids);
 
-		try
-		{
-			$users = $users_list_provider->GetListObjects();
-		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
-		{
-			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
-		}
-
-		$thank_you->SetUsers($users);
+		$thank_you->SetUsers($users_entity_collection->getDictionary());
 	}
 
 	/**
@@ -864,6 +862,7 @@ class Api
 	 * @return int
 	 * @throws TagNotFoundException - If one or more of the Thank You's Tags could not be found in the Repository.
 	 * @throws ValidationException - If the Thank You is not in a Valid state to be saved.
+	 * @throws MappingException
 	 */
 	private function SaveNew(ThankYou $thank_you): int
 	{
@@ -898,6 +897,7 @@ class Api
 	 * @throws ThankYouForbiddenException
 	 * @throws ValidationException
 	 * @throws ThankYouNotFoundException - If the Thank You does not have an ID set.
+	 * @throws MappingException
 	 */
 	private function SaveUpdate(SecurityContext $security_context, ThankYou $thank_you): int
 	{
@@ -946,7 +946,7 @@ class Api
 		$all_users_ids = [];
 		foreach ($thanked_users as $thanked_user)
 		{
-			$all_users_ids[] = $thanked_user->GetId();
+			$all_users_ids[] = $thanked_user->id;
 		}
 
 		$description = $thank_you->GetDescription();
@@ -956,7 +956,7 @@ class Api
 			NotificationMessage::AddApplicationPrefix(Plugin::APPLICATION_NAME, Plugin::APPLICATION_NAME);
 
 			$params = [
-				'author'              => $thank_you->GetAuthor()->GetFullName(),
+				'author'              => $thank_you->GetAuthor()->getFullnameAttribute(),
 				'other_people_number' => count($all_users_ids) - 1,
 				'description'         => $description
 			];
@@ -994,6 +994,7 @@ class Api
 	 * @param ThankYou $thank_you
 	 * @param array    $thanked
 	 * @throws ValidationException - If the Thank You's Thanked could not be set from the given array.
+	 * @throws MappingException
 	 */
 	private function SetThankedFromArray(ThankYou $thank_you, array $thanked)
 	{
