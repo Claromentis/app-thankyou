@@ -393,7 +393,7 @@ class Plugin implements
 			$thank_you_api->GetThankYou($object_id);
 
 			return true;
-		} catch (ThankYouNotFoundException | MappingException$exception)
+		} catch (ThankYouNotFoundException | MappingException $exception)
 		{
 			return false;
 		}

@@ -956,7 +956,7 @@ class Api
 			NotificationMessage::AddApplicationPrefix(Plugin::APPLICATION_NAME, Plugin::APPLICATION_NAME);
 
 			$params = [
-				'author'              => $thank_you->GetAuthor()->getFullnameAttribute(),
+				'author'              => $thank_you->GetAuthor()->getFullname(),
 				'other_people_number' => count($all_users_ids) - 1,
 				'description'         => $description
 			];

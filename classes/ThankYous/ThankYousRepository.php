@@ -151,7 +151,7 @@ class ThankYousRepository
 
 		$user_ids = array_keys($user_ids);
 
-		$users = $this->user_repository->find($user_ids);//var_dump($users->find($user_ids[0])->getFullnameAttribute());die('pees');
+		$users = $this->user_repository->find($user_ids);
 
 		$thank_yous = [];
 		foreach ($ids as $id)
@@ -785,7 +785,7 @@ class ThankYousRepository
 			//TODO: Replace with a non-static post People API update
 			$user_profile_url = User::GetProfileUrl($user->id, false);
 
-			$users[$user_offset] = $this->thankable_factory->Create($user->getFullnameAttribute(), $user->id, $owner_class_id, $user->extranet_id, $user_image_url, $user_profile_url);
+			$users[$user_offset] = $this->thankable_factory->Create($user->getFullname(), $user->id, $owner_class_id, $user->extranet_id, $user_image_url, $user_profile_url);
 		}
 
 		return $users;

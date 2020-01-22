@@ -174,7 +174,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			$author_name = ($this->lmsg)('common.perms.hidden_name');
 		} else
 		{
-			$author_name = $thank_you->GetAuthor()->getFullnameAttribute();
+			$author_name = $thank_you->GetAuthor()->getFullname();
 		}
 
 		try

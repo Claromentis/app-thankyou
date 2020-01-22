@@ -98,7 +98,7 @@ class ThankYouFormatter
 			$author_name = ($this->lmsg)('common.perms.hidden_name');
 		} else
 		{
-			$author_name = $thank_you->GetAuthor()->getFullnameAttribute();
+			$author_name = $thank_you->GetAuthor()->getFullname();
 		}
 
 		$output = [
@@ -126,7 +126,7 @@ class ThankYouFormatter
 		{
 			foreach ($users as $index => $user)
 			{
-				$user_name     = (isset($security_context) && !$this->acl->CanSeeThankedUser($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->getFullnameAttribute();
+				$user_name     = (isset($security_context) && !$this->acl->CanSeeThankedUser($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->getFullname();
 				$users[$index] = ['id' => $user->id, 'name' => $user_name];
 			}
 		}

@@ -84,7 +84,7 @@ class UsersDataTableSource extends FilterDataTableSource
 				if (isset($user))
 				{
 					$rows[] = [
-						'user'             => $user->getFullnameAttribute(),
+						'user'             => $user->getFullname(),
 						'total_thank_yous' => $user_total_thank_yous
 					];
 				}
