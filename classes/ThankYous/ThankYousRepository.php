@@ -163,7 +163,7 @@ class ThankYousRepository
 
 			$thank_you = $this->Create(
 				($users->find($rows[$id]['author_id']) ?? $rows[$id]['author_id']),
-				$rows[$id]['description'],
+				$rows[$id]['description'] ?? '',
 				new Date($rows[$id]['date_created'], new DateTimeZone('UTC'))
 			);
 			$thank_you->SetId($id);
@@ -186,11 +186,13 @@ class ThankYousRepository
 	 */
 	public function GetRecentThankYousIds(?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
+		$table = self::THANK_YOU_TABLE;
+
 		$query = "
-			SELECT " . self::THANK_YOU_TABLE . ".id
-			FROM " . self::THANK_YOU_TABLE
-			. "	GROUP BY " . self::THANK_YOU_TABLE . ".id
-			ORDER BY " . self::THANK_YOU_TABLE . ".date_created DESC";
+			SELECT $table.id
+			FROM $table
+			GROUP BY $table.id, $table.date_created
+			ORDER BY $table.date_created DESC";
 
 		$query = $this->query_factory->GetQueryBuilder($query);
 
