@@ -207,6 +207,7 @@ define(['jquery', 'cla_select2'], function ($) {
     };
 
     ThankYou.prototype.submit = function () {
+        $('.btn-submit-modal').prop('disabled', true);
         var self = this;
 
         self.resetErrors();
@@ -257,6 +258,7 @@ define(['jquery', 'cla_select2'], function ($) {
             contentType: 'application/json',
             data: JSON.stringify(body),
             error: function (response) {
+                $('.btn-submit-modal').prop('disabled', false);
                 var body = response.responseJSON;
 
                 var form_errors = self.form.find('.js-form-error');
@@ -290,7 +292,8 @@ define(['jquery', 'cla_select2'], function ($) {
 
     ThankYou.prototype.addError = function (container, message) {
         var error = $(this.form_error_template({message: message}));
-        container.append(error);
+        container.html(error);
+
     };
 
     ThankYou.prototype.submitDelete = function () {
