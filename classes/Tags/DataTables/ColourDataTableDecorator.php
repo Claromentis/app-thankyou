@@ -13,7 +13,7 @@ class ColourDataTableDecorator extends Decorator
 	public function Decorate($content): array
 	{
 		return [
-			'bees' => $content['bg_colour']
+			'bg_colour' => $content['bg_colour']
 		];
 	}
 
