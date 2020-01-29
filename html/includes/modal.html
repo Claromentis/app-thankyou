@@ -11,7 +11,6 @@
 					<h4 name="thankyou:component:say_thank_you" class="modal-title">Say thank you</h4>
 				</div>
 				<div class="modal-body">
-					<div class="js-form-error text-center mb-10" data-name="problem_details-title"></div>
 					<div id="thank_you_user_row" class="form-group">
 						<label name="thankyou:component:modal:to" class="control-label col-sm-2">To</label>
 						<div class="form-control-static pt-0 col-sm-10">
@@ -22,7 +21,7 @@
 							<div class="js-thank_you-thanked-names-container" style="display:none;">
 								<span class="js-thank_you-thanked-names">John Smith</span>
 							</div>
-							<div class="js-form-error" data-name="thankeds"></div>
+							<div class="js-form-error form-error" data-name="thankeds"></div>
 						</div>
 					</div>
 
@@ -33,7 +32,7 @@
 						<div class="col-sm-10">
 							<select name="thank_you_tags[]" datasrc="" multiple="multiple"
 									class="form-control"></select>
-							<div class="js-form-error" data-name="tags"></div>
+							<div class="js-form-error form-error" data-name="tags"></div>
 						</div>
 					</div>
 
@@ -41,17 +40,23 @@
 						<label name="thankyou:common:description" class="control-label col-sm-2">Comment</label>
 						<div class="col-sm-10">
 							<textarea name="thank_you_description" class="form-control"></textarea>
-							<div class="js-form-error" data-name="description"></div>
+							<div class="js-form-error form-error" data-name="description"></div>
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal"
-							aria-hidden="true">Close
-					</button>
-					<button name="thankyou:component:modal:submit" class="btn btn-primary btn-submit-modal">Submit</button>
+					<div class="form-group">
+						<div class="col-sm-8">
+							<div class="js-form-error form-error" data-name="problem_details-title"></div>
+						</div>
+						<div class="col-sm-4">
+							<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal"
+									aria-hidden="true">Close
+							</button>
+							<button name="thankyou:component:modal:submit" class="btn btn-primary btn-submit-modal">Submit</button>
+						</div>
+					</div>
 				</div>
-
 				<input type="hidden" name="csrf_token">
 			</form>
 		</div>
