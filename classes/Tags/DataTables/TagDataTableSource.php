@@ -38,7 +38,7 @@ class TagDataTableSource implements DataSource
 	{
 		$columns = [
 			['name', ($this->lmsg)('common.name')],
-			['bg_colour', ($this->lmsg)('common.background_colour')],
+			['bg_colour', ($this->lmsg)('common.background_colour'), new ColourDataTableDecorator()],
 			['actions', ($this->lmsg)('thankyou.common.actions'), new ActionsDataTableDecorator()]
 		];
 
@@ -63,7 +63,7 @@ class TagDataTableSource implements DataSource
 
 			$rows[] = [
 				'name'      => $tag->GetName(),
-				'bg_colour' => $bg_colour,
+				'bg_colour' => ['bg_colour' => $bg_colour],
 				'actions'   => ['active' => $tag->GetActive(), 'id' => $tag->GetId()]
 			];
 		}
