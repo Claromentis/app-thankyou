@@ -1,5 +1,5 @@
 <div class="table-cell-actions" data-id="{{ content.id }}">
-	<span class="js-tag-active glyphicons {{ content.icon }}" data-value="{{ content.new_active_state }}"></span>
-	<span class="js-tag-edit glyphicons glyphicons-pencil"></span>
-	<span class="js-tag-delete glyphicons glyphicons-bin"></span>
+	<a rel="tooltip" title="${thankyou:admin:toggle_vis.body}" class="js-tag-active" data-value="{{ content.new_active_state }}"><span class=" glyphicons {{ content.icon }}" ></span></a>
+	<a rel="tooltip" title="${common:edit.body}" class="js-tag-edit"><span class=" glyphicons glyphicons-pencil"></span></a>
+	<a rel="tooltip" title="${common:delete.body}" class="js-tag-delete"><span class=" glyphicons glyphicons-bin"></span></a>
 </div>

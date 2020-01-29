@@ -3,6 +3,7 @@ lm	thankyou.admin.core_values.description
 lm	thankyou.admin.panel.messages		Xabarlar
 lm	thankyou.admin.panel.notifications		Bildirishnomalar
 lm	thankyou.admin.statistics.title		
+lm	thankyou.admin.toggle_vis		
 lm	thankyou.app_name		rahmat
 lm	thankyou.audit.create_thank_you		
 lm	thankyou.audit.delete_thank_you		
@@ -114,6 +115,7 @@ lt	thankyou:admin:notifications:save.body		Saqlash
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		Foydalanuvchilarga minnatdorchilik bildirilganda ularga xabar beriladi.
 lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']	
+lt	thankyou:admin:toggle_vis.body	$lm["thankyou.admin.toggle_vis"]	
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
 lt	thankyou:common:description.body	$lm['common.description']	

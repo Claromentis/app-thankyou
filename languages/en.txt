@@ -3,6 +3,7 @@ lm	thankyou.admin.core_values.description		Thank Yous can be linked to your Core
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
 lm	thankyou.admin.statistics.title		Reports & Statistics
+lm	thankyou.admin.toggle_vis		Toggle visibility
 lm	thankyou.app_name		Thank you
 lm	thankyou.audit.create_thank_you		Created Thank You
 lm	thankyou.audit.delete_thank_you		Deleted Thank You
@@ -114,6 +115,7 @@ lt	thankyou:admin:notifications:save.body		Save
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		Users will be notified whenever they're being thanked.
 lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']	
+lt	thankyou:admin:toggle_vis.body	$lm["thankyou.admin.toggle_vis"]	
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
 lt	thankyou:common:description.body	$lm['common.description']	
