@@ -153,6 +153,14 @@
     }
 
     .panel-heading {
+        .custom-header-title, .header-title {
+            width: calc(100% - 130px);
+            display: block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
         .thank-you--button {
             position: absolute;
             right: 7px;
