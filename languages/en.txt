@@ -1,5 +1,5 @@
 .	.	.	en
-lm	thankyou.admin.core_values.description		Thank Yous can be linked to your Core Values to encourage engagement.
+lm	thankyou.admin.core_values.description		Thank You notes can be linked to your Core Values to encourage engagement.
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
 lm	thankyou.admin.statistics.title		Reports & Statistics
@@ -33,7 +33,7 @@ lm	thankyou.component.options.show_button		Show "Say thank you" button
 lm	thankyou.component.options.show_header		Show title
 lm	thankyou.component.options.user_id		Filter by user
 lm	thankyou.component_heading		Thank you
-lm	thankyou.configuration.core_values_mandatory.description		Make Core Values mandatory for Thank Yous
+lm	thankyou.configuration.core_values_mandatory.description		Make Core Values mandatory for Thank You notes
 lm	thankyou.configurations.notify_line_manager.title		Notify the Line Manager of Thanked Users
 lm	thankyou.configurations.thank_you_comments.title		Allow Comments on Thank Yous
 lm	thankyou.delete.error.repository		Could not delete the given Thank You, an error occurred when contacting the Repository.

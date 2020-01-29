@@ -93,7 +93,7 @@ class AdminController
 			'core_values_mandatory.checked'  => $tags_mandatory,
 			'core_values_enabled.offtext'    => ($this->lmsg)('common.disabled'),
 			'core_values_enabled.ontext'     => ($this->lmsg)('common.enabled'),
-			'core_values_enabled.body'       => ($this->lmsg)('thankyou.admin.core_values.description'),
+			'core_values_enabled_desc.body'  => ($this->lmsg)('thankyou.admin.core_values.description'),
 			'core_values_mandatory.body'     => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
 			'core_values_enabled_body.style' => $tags_enabled ? '' : 'display:none;'
 		];
