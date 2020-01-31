@@ -192,6 +192,21 @@
     }
 }
 
-.form-error {
-    height: 21px;
+// ------------------------------
+// ---- THANK YOU FORM
+// ------------------------------
+.thank-you-form {
+    .form-error {
+        height: 21px;
+
+        &[data-name="problem_details-title"] {
+            padding: 5px 0;
+        }
+    }
+
+    .user-form-group {
+        margin-bottom: 0;
+    }
 }
+
+

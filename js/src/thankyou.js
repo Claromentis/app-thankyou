@@ -263,10 +263,8 @@ define(['jquery', 'cla_select2'], function ($) {
 
                 var form_errors = self.form.find('.js-form-error');
                 var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
-                if (problem_details_title_error.length > 0 && 'title' in body) {
-                    self.addError(problem_details_title_error, body.title);
-                }
 
+                var error_displayed = false;
                 if ('invalid-params' in body) {
                     for (var offset in body['invalid-params']) {
                         var invalid_param = body['invalid-params'][offset];
@@ -274,9 +272,15 @@ define(['jquery', 'cla_select2'], function ($) {
                             var error_container = form_errors.filter('[data-name="' + invalid_param.name + '"]');
                             if (error_container.length > 0 && 'reason' in invalid_param) {
                                 self.addError(error_container, invalid_param.reason);
+                                error_displayed = true;
                             }
                         }
                     }
+                    return;
+
+                }
+                if (problem_details_title_error.length > 0 && 'title' in body && !error_displayed) {
+                    self.addError(problem_details_title_error, body.title);
                 }
             },
             success: function (response) {

@@ -175,7 +175,8 @@ class ThanksRestV2
 			$this->api->ThankYous()->CreateAndSave($post);
 		} catch (ValidationException $validation_exception)
 		{
-			return $this->response->GetJsonPrettyResponse([
+			return $this->response->GetJsonPrettyResponse(
+				[
 				'type'           => 'https://developer.claromentis.com',
 				'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
 				'status'         => 400,
