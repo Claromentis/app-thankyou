@@ -366,9 +366,8 @@ class ThankYousRepository
 		$query_string .= " GROUP BY " . implode(',', $group_columns);
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
-		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . self::AGGREGATION_ID);
 
-		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
+		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id AND " . self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . self::AGGREGATION_ID);
 
 		if ($active !== null)
 		{
