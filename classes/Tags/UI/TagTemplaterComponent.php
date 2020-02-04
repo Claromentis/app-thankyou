@@ -63,6 +63,7 @@ class TagTemplaterComponent extends TemplaterComponentTmpl
 		}
 
 		$args['tag.body'] = $tag->GetName();
+		$args['tag.title'] = $tag->GetName();
 
 		$bg_colour = $tag->GetBackgroundColour();
 
