@@ -48,7 +48,9 @@ class ThankYouController
 			$args['ty_list.offset'] = $offset;
 
 			$tags_enabled = $this->api->Configuration()->IsTagsEnabled();
-			if ($tags_enabled)
+			$active_tags_count = $this->api->Tag()->GetTotalTags(true);
+
+			if ($tags_enabled && $active_tags_count > 0)
 			{
 				$args['thankyou_list_container.+class'] = "col-sm-9 col-md-pull-3";
 			} else
