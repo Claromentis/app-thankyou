@@ -16,6 +16,7 @@ define(['jquery', 'cla_select2'], function ($) {
                 data: function (params) {
                     return {
                         name: params.term,
+                        active: true,
                         limit: 4
                     };
                 },
