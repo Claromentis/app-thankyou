@@ -8,6 +8,7 @@ use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
 use Claromentis\Core\DataTable\Decorator\Link;
 use Claromentis\Core\DataTable\Shared\ColumnHelper;
+use Claromentis\Core\Date\DateFormatter;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Widget\Sugre\SugreUtility;
@@ -134,7 +135,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			}
 
 			$row = [
-				'date_created'        => $date_created->format('d-m-Y'),
+				'date_created'        => $date_created->getDate(DateFormatter::SHORT_DATE),
 				'thanked_groups'      => implode(', ', $thanked_groups),
 				'total_thanked_users' => $thanked_users_string
 			];
