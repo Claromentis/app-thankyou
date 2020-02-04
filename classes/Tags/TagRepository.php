@@ -130,7 +130,16 @@ class TagRepository
 	 */
 	public function GetTagsTaggingTotals(?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $orders = null): array
 	{
-		$query_string = "SELECT COUNT(" . self::TAGGING_TABLE . ".item_id) AS total, " . self::TAGGING_TABLE . ".tag_id FROM " . self::TAGGING_TABLE . " GROUP BY " . self::TAGGING_TABLE . ".tag_id";
+		// build group by string using query and order fields
+		$group_columns = [self::TAGGING_TABLE . ".tag_id"];
+		foreach ($orders as $o)
+		{
+			$group_columns[] = $o['column'];
+		}
+		// ensure no duplicated columns in the grouping
+		$group_columns = array_unique($group_columns);
+
+		$query_string = "SELECT COUNT(" . self::TAGGING_TABLE . ".item_id) AS total, " . self::TAGGING_TABLE . ".tag_id FROM " . self::TAGGING_TABLE . " GROUP BY " . implode(',', $group_columns);
 
 		if (isset($orders))
 		{

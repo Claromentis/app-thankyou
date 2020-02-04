@@ -350,11 +350,20 @@ class ThankYousRepository
 			$order = $this->utility->BuildOrderString($orders);
 		}
 
+		// build group by string using query and order fields
+		$group_columns = [self::TAG_TABLE . ".id"];
+		foreach ($orders as $o)
+		{
+			$group_columns[] = $o['column'];
+		}
+		// ensure no duplicated columns in the grouping
+		$group_columns = array_unique($group_columns);
+
 		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
 		$query_string .= ", " . self::TAG_TABLE . ".id AS \"" . self::TAG_TABLE . ".id\"";
 		$query_string .= " FROM " . self::TAG_TABLE;
 		$query_string .= $order;
-		$query_string .= " GROUP BY " . self::TAG_TABLE . ".id";
+		$query_string .= " GROUP BY " . implode(',', $group_columns);
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
 		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . self::AGGREGATION_ID);
