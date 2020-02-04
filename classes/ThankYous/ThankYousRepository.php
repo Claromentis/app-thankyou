@@ -477,7 +477,7 @@ class ThankYousRepository
 		$query_string .= ", " . self::USER_TABLE . ".id AS \"" . self::USER_TABLE . ".id\"";
 		$query_string .= " FROM " . self::USER_TABLE;
 		$query_string .= " ORDER BY " . self::USER_TABLE . ".firstname ASC";
-		$query_string .= " GROUP BY " . self::USER_TABLE . ".id";
+		$query_string .= " GROUP BY " . self::USER_TABLE . ".id, " . self::USER_TABLE . ".firstname";
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
 
