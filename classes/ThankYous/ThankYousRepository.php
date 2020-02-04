@@ -342,7 +342,7 @@ class ThankYousRepository
 		return $thank_yous_users;
 	}
 
-	public function GetTagsTotalThankYouUses(?array $orders = null, ?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
+	public function GetTagsTotalThankYouUses(?array $orders = null, ?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
 		$order = "";
 		if (isset($orders))
@@ -360,6 +360,11 @@ class ThankYousRepository
 		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".aggregation_id = " . self::AGGREGATION_ID);
 
 		$query->AddJoin(self::TAG_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TAGS_TABLE . ".tag_id = " . self::TAG_TABLE . ".id");
+
+		if ($active !== null)
+		{
+			$query->AddWhereAndClause(self::TAG_TABLE . ".active = int:active", (int) $active);
+		}
 
 		if (isset($thanked_user_ids) || isset($extranet_ids))
 		{

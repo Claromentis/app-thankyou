@@ -62,7 +62,7 @@ class TagsDataTableSource extends FilterDataTableSource
 		$rows = [];
 
 		$order                    = ['column' => ThankYousRepository::TAG_TABLE . ".name"];
-		$tags_thankyou_total_uses = $this->api->GetTagsTotalThankYouUses($context, [$order], $limit, $offset, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
+		$tags_thankyou_total_uses = $this->api->GetTagsTotalThankYouUses($context, [$order], $limit, $offset, null, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
 
 		$tag_ids = array_keys($tags_thankyou_total_uses);
 
