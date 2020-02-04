@@ -73,12 +73,13 @@ class Api
 	 * @param int|null    $limit
 	 * @param int|null    $offset
 	 * @param string|null $name
+	 * @param bool|null   $active
 	 * @param array|null  $orders
 	 * @return Tag[]
 	 */
-	public function GetTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
+	public function GetTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?bool $active = null, ?array $orders = null): array
 	{
-		return $this->repository->GetFilteredTags($limit, $offset, $name, $orders);
+		return $this->repository->GetFilteredTags($limit, $offset, $name, $active, $orders);
 	}
 
 	/**

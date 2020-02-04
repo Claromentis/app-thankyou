@@ -61,7 +61,7 @@ class StatisticsController
 		{
 			$tag_options = [['tag_option.body' => ($this->lmsg)('thankyou.tag.all'), 'tag_option.value' => null, 'tag_option.selected' => "selected"]];
 
-			$tags = $this->tag_api->GetTags(null, null, null, [['column' => 'name']]);
+			$tags = $this->tag_api->GetTags(null, null, null, null, [['column' => 'name']]);
 
 			foreach ($tags as $tag)
 			{

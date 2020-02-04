@@ -54,7 +54,7 @@ class TagDataTableSource implements DataSource
 		$offset = (int) $params->GetOffset();
 		$limit  = (int) $params->GetLimit();
 
-		$tags = $this->repository->GetFilteredTags($limit, $offset, null, [['column' => 'name']]);
+		$tags = $this->repository->GetFilteredTags($limit, $offset, null, null, [['column' => 'name']]);
 
 		$rows = [];
 		foreach ($tags as $tag)

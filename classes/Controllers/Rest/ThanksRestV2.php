@@ -177,11 +177,11 @@ class ThanksRestV2
 		{
 			return $this->response->GetJsonPrettyResponse(
 				[
-				'type'           => 'https://developer.claromentis.com',
-				'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
-				'status'         => 400,
-				'invalid-params' => $validation_exception->GetErrors()
-			], 400);
+					'type'           => 'https://developer.claromentis.com',
+					'title'          => ($this->lmsg)('thankyou.thankyou.error.create'),
+					'status'         => 400,
+					'invalid-params' => $validation_exception->GetErrors()
+				], 400);
 		} catch (TagNotFoundException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -323,9 +323,10 @@ class ThanksRestV2
 		$query_params = $request->getQueryParams();
 		$limit        = (int) ($query_params['limit'] ?? 20);
 		$name         = $query_params['name'] ?? null;
+		$active       = isset($query_params['active']) ? (bool) $query_params['active'] : null;
 		$offset       = (int) ($query_params['offset'] ?? 0);
 
-		$tags = $this->api->Tag()->GetTags($limit, $offset, $name, [['column' => 'name']]);
+		$tags = $this->api->Tag()->GetTags($limit, $offset, $name, $active, [['column' => 'name']]);
 
 		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTags($tags));
 	}

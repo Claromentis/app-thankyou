@@ -85,10 +85,11 @@ class TagRepository
 	 * @param int|null    $limit
 	 * @param int|null    $offset
 	 * @param string|null $name
+	 * @param bool|null   $active
 	 * @param array|null  $orders
 	 * @return Tag[]
 	 */
-	public function GetFilteredTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?array $orders = null): array
+	public function GetFilteredTags(?int $limit = null, ?int $offset = null, ?string $name = null, ?bool $active = null, ?array $orders = null): array
 	{
 		$query_string = "SELECT * FROM " . self::TABLE_NAME;
 		if (isset($orders))
@@ -97,9 +98,15 @@ class TagRepository
 		}
 
 		$query = new QueryBuilder($query_string);
+
 		if (isset($name))
 		{
 			$query->AddSubstringFilter('name', $name);
+		}
+
+		if ($active !== null)
+		{
+			$query->AddWhereAndClause("active = int:active", (int) $active);
 		}
 
 		$query->setLimit($limit, $offset);
