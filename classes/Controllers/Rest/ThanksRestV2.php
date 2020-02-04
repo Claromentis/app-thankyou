@@ -332,11 +332,15 @@ class ThanksRestV2
 	}
 
 	/**
+	 * @param ServerRequestInterface $request
 	 * @return JsonPrettyResponse
 	 */
-	public function GetTotalTags(): JsonPrettyResponse
+	public function GetTotalTags(ServerRequestInterface $request): JsonPrettyResponse
 	{
-		return $this->response->GetJsonPrettyResponse($this->api->Tag()->GetTotalTags());
+		$query_params = $request->getQueryParams();
+		$active       = isset($query_params['active']) ? (bool) $query_params['active'] : null;
+
+		return $this->response->GetJsonPrettyResponse($this->api->Tag()->GetTotalTags($active));
 	}
 
 	/**

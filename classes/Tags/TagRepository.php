@@ -119,11 +119,22 @@ class TagRepository
 	/**
 	 * Returns the total number of Tags in the Database.
 	 *
+	 * @param bool|null $active
+	 *                         - null: count all Tags.
+	 *                         - true: only count Active Tags.
+	 *                         - false: only count Inactive Tags.
 	 * @return int
 	 */
-	public function GetTotalTags(): int
+	public function GetTotalTags(?bool $active = null): int
 	{
-		return (int) $this->db->query_row("SELECT COUNT(1) FROM " . self::TABLE_NAME)[0];
+		$query = new QueryBuilder("SELECT COUNT(1) FROM " . self::TABLE_NAME);
+
+		if ($active !== null)
+		{
+			$query->AddWhereAndClause("active = int:active", (int) $active);
+		}
+
+		return (int) $this->db->query_row($query->GetQuery())[0];
 	}
 
 	/**

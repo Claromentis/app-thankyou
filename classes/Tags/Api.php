@@ -129,11 +129,15 @@ class Api
 	/**
 	 * Returns the total number of Tags in the Repository.
 	 *
+	 * @param bool|null $active
+	 *                         - null: count all Tags.
+	 *                         - true: only count Active Tags.
+	 *                         - false: only count Inactive Tags.
 	 * @return int
 	 */
-	public function GetTotalTags(): int
+	public function GetTotalTags(?bool $active = null): int
 	{
-		return $this->repository->GetTotalTags();
+		return $this->repository->GetTotalTags($active);
 	}
 
 	/**
