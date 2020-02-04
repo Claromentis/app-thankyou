@@ -1,22 +1,29 @@
 <div name="thank_you" class="js-thank-you thank-you">
 	<div class="thank-you-note">
-		<span>
-			<loc name="thankyou:component:thankyou_users_name"></loc>
-		</span>
-		<datasrc name="thanked">
-			<a name="thanked_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
-				<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
-				<txt name="thanked_name">John Smith</txt>
-			</a>
-			<span name="thanked_no_link">
-				<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
-				<txt name="thanked_name">John Smith</txt>
-			 </span>
-			<txt name="delimiter_visible">,</txt>
-		</datasrc>
-		<datasrc name="tags">
-			<component class_key="thankyou.tag" name="tag"/>
-		</datasrc>
+		<div class="thank-you-note__top">
+			<div class="thank-you-note__subject">
+				<span>
+					<loc name="thankyou:component:thankyou_users_name"></loc>
+				</span>
+				<datasrc name="thanked">
+					<a name="thanked_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
+						<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+						<txt name="thanked_name">John Smith</txt>
+					</a>
+					<span name="thanked_no_link">
+						<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+						<txt name="thanked_name">John Smith</txt>
+					</span>
+					<span><txt name="delimiter_visible">,</txt></span>
+				</datasrc>
+			</div>
+			<div class="thank-you-note__value">
+				<datasrc name="tags">
+					<component class_key="thankyou.tag" name="tag"/>
+				</datasrc>
+			</div>
+		</div>
+
 		<hr>
 		<div class="row">
 			<div class="col-xs-12">
@@ -26,7 +33,7 @@
 			</div>
 		</div>
 		<div class="row small">
-			<div class="col-xs-6">
+			<div class="col-xs-9">
 				<component name="like_component" class_key="like_it" object_type="thanks" object_id=""/>
 				<span class="comments-toggle-wrapper comments-border">
 					<a name="comments_link">
@@ -40,7 +47,7 @@
 					</a>
 				</span>
 			</div>
-			<div class="col-xs-6">
+			<div class="col-xs-3">
 				<span class="text-muted text-right edit-tools">
 					<txt name="edit_thanks">
 						<a href="javascript:void(0)" name="edit_thanks_link"
