@@ -206,7 +206,6 @@ class Api
 	 * Saves a Tag to the Repository. If the Tag does not have an ID, one will be set.
 	 *
 	 * @param Tag $tag
-	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
 	 * @throws ValidationException - If the Tag has one or more issues making it unsuitable to save to the Repository.
 	 */
 	public function Save(Tag $tag)

@@ -398,14 +398,6 @@ class ThanksRestV2
 				'status'         => 400,
 				'invalid-params' => $validation_exception->GetErrors()
 			], 400);
-		} catch (TagDuplicateNameException $exception)
-		{
-			return $this->response->GetJsonPrettyResponse([
-				'type'           => 'https://developer.claromentis.com',
-				'title'          => ($this->lmsg)('thankyou.tag.error.create'),
-				'status'         => 400,
-				'invalid-params' => [['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.not_unique')]]
-			], 400);
 		} catch (TagInvalidNameException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -507,14 +499,6 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.tag.error.id.not_found', $id),
 				'status' => 404
 			], 404);
-		} catch (TagDuplicateNameException $exception)
-		{
-			return $this->response->GetJsonPrettyResponse([
-				'type'           => 'https://developer.claromentis.com',
-				'title'          => ($this->lmsg)('thankyou.tag.error.modify'),
-				'status'         => 400,
-				'invalid-params' => [['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.not_unique')]]
-			], 400);
 		}
 
 		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag), 200);

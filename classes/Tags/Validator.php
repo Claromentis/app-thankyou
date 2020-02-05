@@ -9,11 +9,20 @@ class Validator
 {
 	const NAME_MAX_CHARACTERS = 20;
 
+	/**
+	 * @var Lmsg
+	 */
 	private $lmsg;
 
-	public function __construct(Lmsg $lmsg)
+	/**
+	 * @var TagRepository
+	 */
+	private $repository;
+
+	public function __construct(TagRepository $repository, Lmsg $lmsg)
 	{
-		$this->lmsg = $lmsg;
+		$this->repository = $repository;
+		$this->lmsg       = $lmsg;
 	}
 
 	/**
@@ -28,6 +37,11 @@ class Validator
 
 		$errors = [];
 
+		if (!$this->IsNameUnique($tag))
+		{
+			$errors[] = ['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.not_unique')];
+		}
+
 		if ($this->IsNameTooLong($name))
 		{
 			$errors[] = ['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.name.error.too_long')];
@@ -39,8 +53,26 @@ class Validator
 		}
 	}
 
+	/**
+	 * Determines if a Tag's Name is too long.
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
 	private function IsNameTooLong(string $name)
 	{
 		return mb_strlen($name) > self::NAME_MAX_CHARACTERS;
 	}
+
+	/**
+	 * Determines whether a Tag's Name is unique, excluding itself.
+	 *
+	 * @param Tag $tag
+	 * @return bool
+	 */
+	private function IsNameUnique(Tag $tag)
+	{
+		return $this->repository->IsNameUnique($tag->GetName(), $tag->GetId());
+	}
 }
+

@@ -200,18 +200,12 @@ class TagRepository
 	 * Saves a Tag to the database. If the Tag does not have an ID, it will be added.
 	 *
 	 * @param Tag $tag
-	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
 	 */
 	public function Save(Tag $tag)
 	{
 		$name = $tag->GetName();
 
 		$id = $tag->GetId();
-
-		if (!$this->IsTagNameUnique($name, $id))
-		{
-			throw new TagDuplicateNameException("Failed to save Tag, Tag's Name is not unique");
-		}
 
 		$db_fields = [
 			'str(255):name'     => $name,
@@ -415,13 +409,13 @@ class TagRepository
 	}
 
 	/**
-	 * Detemines whether a Tag's Name is unique. If an ID is given, results for this ID will not be retrieved.
+	 * Determines whether a Tag's Name is unique. If an ID is given, results for this ID will not be retrieved.
 	 *
 	 * @param string   $name
 	 * @param int|null $id
 	 * @return bool
 	 */
-	public function IsTagNameUnique(string $name, ?int $id): bool
+	public function IsNameUnique(string $name, ?int $id): bool
 	{
 		$params       = [$name];
 		$query_string = "SELECT COUNT(1) FROM " . self::TABLE_NAME . " WHERE name=str:name";
