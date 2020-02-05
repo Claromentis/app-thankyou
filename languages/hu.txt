@@ -84,6 +84,7 @@ lm	thankyou.thankyou.core_values.empty
 lm	thankyou.thankyou.date_created.error.future		
 lm	thankyou.thankyou.description.error.empty		
 lm	thankyou.thankyou.description.error.not_string		
+lm	thankyou.thankyou.description.error.too_long		
 lm	thankyou.thankyou.error.create		
 lm	thankyou.thankyou.error.modify		
 lm	thankyou.thankyou.error.server		

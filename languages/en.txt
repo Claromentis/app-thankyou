@@ -84,6 +84,7 @@ lm	thankyou.thankyou.core_values.empty		One or more Core Values must be selected
 lm	thankyou.thankyou.date_created.error.future		A Thank You's Created Date may only be in the past
 lm	thankyou.thankyou.description.error.empty		Enter a description
 lm	thankyou.thankyou.description.error.not_string		Thank You Description must be a string
+lm	thankyou.thankyou.description.error.too_long		Description can only be %d characters or less
 lm	thankyou.thankyou.error.create		Could not create Thank You
 lm	thankyou.thankyou.error.modify		Could not modify Thank You
 lm	thankyou.thankyou.error.server		The Thank You you've requested could not be loaded due to a server error

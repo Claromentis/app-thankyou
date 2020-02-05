@@ -12,6 +12,8 @@ use Date;
 
 class Validator
 {
+	const DESCRIPTION_MAX_CHARACTERS = 1000;
+
 	/**
 	 * @var Configuration\Api
 	 */
@@ -87,6 +89,9 @@ class Validator
 		if ($description === '')
 		{
 			$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.empty')];
+		} elseif (mb_strlen($description) > self::DESCRIPTION_MAX_CHARACTERS)
+		{
+			$errors[] = ['name' => 'description', 'reason' => ($this->lmsg)('thankyou.thankyou.description.error.too_long', self::DESCRIPTION_MAX_CHARACTERS)];
 		}
 
 		//Dates
