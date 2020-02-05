@@ -12,7 +12,6 @@ use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\Exception\ValidationException;
-use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
@@ -391,7 +390,8 @@ class ThanksRestV2
 			$tag = $this->api->Tag()->Create($security_context->GetUser(), $name);
 			$tag->SetBackgroundColour($bg_colour);
 			$this->api->Tag()->Save($tag);
-		} catch (\Claromentis\ThankYou\Tags\Exceptions\ValidationException $validation_exception) {
+		} catch (\Claromentis\ThankYou\Tags\Exceptions\ValidationException $validation_exception)
+		{
 			return $this->response->GetJsonPrettyResponse([
 				'type'           => 'https://developer.claromentis.com',
 				'title'          => ($this->lmsg)('thankyou.tag.error.create'),

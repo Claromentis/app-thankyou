@@ -6,7 +6,6 @@ use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Plugin;
-use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
@@ -57,7 +56,7 @@ class Api
 		$this->audit      = $audit;
 		$this->factory    = $tag_factory;
 		$this->repository = $tag_repository;
-		$this->validator = $validator;
+		$this->validator  = $validator;
 	}
 
 	/**

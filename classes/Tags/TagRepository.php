@@ -10,7 +10,6 @@ use Claromentis\Core\DAL\ResultInterface;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\People\InvalidFieldIsNotSingle;
 use Claromentis\People\UsersListProvider;
-use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Date;
