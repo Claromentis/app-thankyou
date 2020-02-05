@@ -5,7 +5,6 @@ namespace Claromentis\ThankYou\ThankYous;
 use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Comments\CommentsRepository;
 use Claromentis\Core\Acl\AclRepository;
-use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Like\LikesRepository;
 use Claromentis\Core\Localization\Lmsg;
@@ -965,23 +964,7 @@ class Api
 
 			if ($this->config_api->IsLineManagerNotificationEnabled())
 			{
-				$thankables = $thank_you->GetThankables();
-				if (!isset($thankables))
-				{
-					return;
-				}
-
-				$user_ids = [];
-				foreach ($thankables as $thankable)
-				{
-					$owner_class_id = $thankable->GetOwnerClass();
-					$thanked_id     = $thankable->GetItemId();
-					if ($owner_class_id === PermOClass::INDIVIDUAL && isset($id))
-					{
-						$user_ids[] = $thanked_id;
-					}
-				}
-				$this->line_manager_notifier->SendMessage($description, $user_ids);
+				$this->line_manager_notifier->SendMessage($description, $all_users_ids);
 			}
 		} catch (Exception $exception)
 		{
