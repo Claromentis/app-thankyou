@@ -94,7 +94,7 @@ lm	thankyou.thankyou.tags.error.disabled		Core Values are disabled for Thank You
 lm	thankyou.thankyou.tags.error.empty		One or more Core Values must be given
 lm	thankyou.thankyou.tags.error.not_array		Thank You Core Values must be given as an array of integers
 lm	thankyou.thankyou.tags.error.not_found		One or more Core Values could not be found
-lm	thankyou.thankyou.thanked.error.empty		Enter a User and / or Group
+lm	thankyou.thankyou.thanked.error.empty		Enter a User or Group
 lm	thankyou.thankyou.thanked.error.not_array		A Thank You's Thanked must be an array if defined
 lm	thankyou.thankyou.thanked.id.error.not_integer		Thanked ID must be an integer
 lm	thankyou.thankyou.thanked.id.error.undefined		Thanked must contain an ID
