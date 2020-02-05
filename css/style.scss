@@ -217,10 +217,6 @@
 .js-thank_you-picker-container.thank_you-picker-container {
     .select2-container {
         max-width: 362px;
-
-        .select2-selection__clear {
-            display: none;
-        }
     }
 
     .btn-default[name="select_link"] {
@@ -230,6 +226,18 @@
         padding: 7px 12px;
     }
 }
+
+.select2-container {
+    .select2-selection__clear {
+        display: none;
+    }
+}
+
+
+.thank_you-thanked-names-container {
+    padding-top: 8px;
+}
+
 
 // ------------------------------
 // ---- THANK YOU FORM
