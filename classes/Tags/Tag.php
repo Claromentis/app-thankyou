@@ -2,9 +2,9 @@
 
 namespace Claromentis\ThankYou\Tags;
 
+use Claromentis\People\Entity\User;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Date;
-use User;
 
 class Tag
 {

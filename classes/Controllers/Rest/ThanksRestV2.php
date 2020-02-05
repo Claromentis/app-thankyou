@@ -12,6 +12,7 @@ use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouForbiddenException;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\Exception\ValidationException;
+use Claromentis\ThankYou\Tags\Exceptions\TagAuthorInvalidException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
@@ -387,7 +388,7 @@ class ThanksRestV2
 
 		try
 		{
-			$tag = $this->api->Tag()->Create($security_context->GetUser(), $name);
+			$tag = $this->api->Tag()->Create($security_context->GetUserId(), $name);
 			$tag->SetBackgroundColour($bg_colour);
 			$this->api->Tag()->Save($tag);
 		} catch (\Claromentis\ThankYou\Tags\Exceptions\ValidationException $validation_exception)
@@ -405,6 +406,14 @@ class ThanksRestV2
 				'title'          => ($this->lmsg)('thankyou.tag.error.create'),
 				'status'         => 400,
 				'invalid-params' => [['name' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.error.name.invalid')]]
+			], 400);
+		} catch (TagAuthorInvalidException $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.tag.error.create'),
+				'status'         => 400,
+				'invalid-params' => [['created_by' => 'name', 'reason' => ($this->lmsg)('thankyou.tag.author.error.invalid')]]
 			], 400);
 		}
 
@@ -470,7 +479,7 @@ class ThanksRestV2
 				$tag->SetBackgroundColour($bg_colour);
 			}
 
-			$tag->SetModifiedBy($security_context->GetUser());
+			$this->api->Tag()->SetModifiedByFromUserId($tag, $security_context->GetUserId());
 			$tag->SetModifiedDate(new Date());
 
 			if (count($invalid_params) > 0)
@@ -499,6 +508,14 @@ class ThanksRestV2
 				'title'  => ($this->lmsg)('thankyou.tag.error.id.not_found', $id),
 				'status' => 404
 			], 404);
+		} catch (TagAuthorInvalidException $exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.tag.error.modify'),
+				'status'         => 400,
+				'invalid-params' => [['author' => 'modified_by', 'reason' => ($this->lmsg)('thankyou.tag.author.error.invalid')]]
+			], 400);
 		}
 
 		return $this->response->GetJsonPrettyResponse($this->tag_formatter->FormatTag($tag), 200);

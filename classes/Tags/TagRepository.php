@@ -2,14 +2,16 @@
 
 namespace Claromentis\ThankYou\Tags;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\DAL\Exceptions\TransactionException;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\DAL\ResultInterface;
+use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Repository\Exception\StorageException;
-use Claromentis\People\InvalidFieldIsNotSingle;
-use Claromentis\People\UsersListProvider;
+use Claromentis\People\Entity\User;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Date;
@@ -17,7 +19,6 @@ use DateTimeZone;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
-use User;
 
 class TagRepository
 {
@@ -29,6 +30,11 @@ class TagRepository
 	 * @var DbInterface
 	 */
 	private $db;
+
+	/**
+	 * @var Lmsg
+	 */
+	private $lmsg;
 
 	/**
 	 * @var LoggerInterface
@@ -45,12 +51,19 @@ class TagRepository
 	 */
 	private $tag_factory;
 
-	public function __construct(DbInterface $db, QueryFactory $query_factory, LoggerInterface $logger, TagFactory $tag_factory)
+	/**
+	 * @var UserRepository
+	 */
+	private $user_repository;
+
+	public function __construct(DbInterface $db, QueryFactory $query_factory, LoggerInterface $logger, TagFactory $tag_factory, UserRepository $user_repository, Lmsg $lmsg)
 	{
-		$this->db            = $db;
-		$this->logger        = $logger;
-		$this->query_factory = $query_factory;
-		$this->tag_factory   = $tag_factory;
+		$this->db              = $db;
+		$this->logger          = $logger;
+		$this->query_factory   = $query_factory;
+		$this->tag_factory     = $tag_factory;
+		$this->user_repository = $user_repository;
+		$this->lmsg            = $lmsg;
 	}
 
 	/**
@@ -218,7 +231,7 @@ class TagRepository
 		$created_by = $tag->GetCreatedBy();
 		if (isset($created_by))
 		{
-			$db_fields['int:created_by'] = $created_by->GetId();
+			$db_fields['int:created_by'] = $created_by->id;
 		}
 
 		$created_date = $tag->GetCreatedDate();
@@ -230,7 +243,7 @@ class TagRepository
 		$modified_by = $tag->GetModifiedBy();
 		if (isset($modified_by))
 		{
-			$db_fields['int:modified_by'] = $modified_by->GetId();
+			$db_fields['int:modified_by'] = $modified_by->id;
 		}
 
 		$modified_date = $tag->GetModifiedDate();
@@ -446,7 +459,9 @@ class TagRepository
 			$users[(int) $row['modified_by']] = null;
 		}
 
-		$users = $this->GetUsers(array_keys($users));
+		$user_ids = array_keys($users);
+
+		$users = $this->GetUsers($user_ids);
 
 		$tags = [];
 		foreach ($rows as $id => $row)
@@ -464,6 +479,7 @@ class TagRepository
 				$this->logger->error("Corrupted Tag data for Tag ID $id, invalid Name", $row);
 				continue;
 			}
+
 			$tag->SetId($id);
 			$tag->SetCreatedBy($users[(int) $row['created_by']] ?? null);
 			$tag->SetCreatedDate(new Date($row['created_date'], new DateTimeZone('UTC')));
@@ -500,24 +516,37 @@ class TagRepository
 	}
 
 	/**
-	 * Returns an array of Users indexed by their ID.
+	 * Returns an array of Users indexed by their ID. If the User could not be found, a dummy User will be created.
 	 *
 	 * @param array $user_ids
 	 * @return User[]
 	 */
 	private function GetUsers(array $user_ids): array
-		//TODO: Get rid of this method when possible, this class should be able to use something else to mass build Users really.
 	{
-		$users_list_provider = new UsersListProvider();
-		$users_list_provider->SetFilterProtectExtranets(false);
-		$users_list_provider->SetFilterIds($user_ids);
-		try
+		$users_array = [];
+		$users       = $this->user_repository->find($user_ids);
+
+		foreach ($user_ids as $user_id)
 		{
-			return $users_list_provider->GetListObjects();
-		} catch (InvalidFieldIsNotSingle $invalid_field_is_not_single)
-		{
-			throw new LogicException("Unexpected InvalidFieldIsNotSingle Exception throw by UserListProvider, GetListObjects", null, $invalid_field_is_not_single);
+			try
+			{
+				$user = $users->find($user_id);
+			} catch (MappingException $exception)
+			{
+				throw new LogicException("Unexpected Exception", null, $exception);
+			}
+
+			if (!isset($user))
+			{
+				$user            = $this->user_repository->newInstance();
+				$user->firstname = '';
+				$user->surname   = ($this->lmsg)('orgchart.common.deleted_user');
+			}
+
+			$users_array[$user_id] = $user;
 		}
+
+		return $users_array;
 	}
 
 	private function QueryFilterAggregationId(QueryBuilder $query, int $aggregation_id)

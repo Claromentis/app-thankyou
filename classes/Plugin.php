@@ -101,7 +101,14 @@ class Plugin implements
 		};
 
 		$app[TagRepository::class] = function ($app) {
-			return new TagRepository($app[DbInterface::class], $app[QueryFactory::class], $app['logger_factory']->GetLogger('tags'), $app[TagFactory::class]);
+			return new TagRepository(
+				$app[DbInterface::class],
+				$app[QueryFactory::class],
+				$app['logger_factory']->GetLogger('tags'),
+				$app[TagFactory::class],
+				$app[UserRepository::class],
+				$app[Lmsg::class]
+			);
 		};
 
 		$app[TagFormatter::class] = function ($app) {

@@ -5,6 +5,8 @@ namespace Claromentis\ThankYou\Tags\Tests\Unit;
 use Claromentis\Core\Audit\Audit;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
+use Claromentis\People\Entity\User;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Tags\Api;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
@@ -17,7 +19,6 @@ use Date;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use User;
 
 class ApiTest extends TestCase
 {
@@ -66,6 +67,11 @@ class ApiTest extends TestCase
 	 */
 	private $validator_mock;
 
+	/**
+	 * @var UserRepository|MockObject
+	 */
+	private $user_repository_mock;
+
 	public function SetUp()
 	{
 		$this->audit_mock            = $this->createMock(Audit::class);
@@ -76,8 +82,16 @@ class ApiTest extends TestCase
 		$this->user_mock             = $this->createMock(User::class);
 		$this->security_context_mock = $this->createMock(SecurityContext::class);
 		$this->validator_mock        = $this->createMock(Validator::class);
+		$this->user_repository_mock  = $this->createMock(UserRepository::class);
 
-		$this->api = new Api($this->audit_mock, $this->tag_repository_mock, $this->tag_factory_mock, $this->tag_acl_mock, $this->validator_mock);
+		$this->api = new Api(
+			$this->audit_mock,
+			$this->tag_repository_mock,
+			$this->tag_factory_mock,
+			$this->tag_acl_mock,
+			$this->validator_mock,
+			$this->user_repository_mock
+		);
 	}
 
 	public function testGetTagSuccessful()

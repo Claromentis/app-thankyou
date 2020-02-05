@@ -3,16 +3,19 @@
 namespace Claromentis\ThankYou\Tags;
 
 use Claromentis\Core\Audit\Audit;
+use Claromentis\Core\ORM\Exceptions\EntityNotFoundException;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\Core\Security\SecurityContext;
+use Claromentis\People\Entity\User;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Plugin;
+use Claromentis\ThankYou\Tags\Exceptions\TagAuthorInvalidException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
 use Claromentis\ThankYou\Tags\Exceptions\ValidationException;
 use Date;
 use InvalidArgumentException;
-use User;
 
 class Api
 {
@@ -42,21 +45,28 @@ class Api
 	private $validator;
 
 	/**
+	 * @var UserRepository
+	 */
+	private $user_repository;
+
+	/**
 	 * Api constructor.
 	 *
-	 * @param Audit         $audit
-	 * @param TagRepository $tag_repository
-	 * @param TagFactory    $tag_factory
-	 * @param TagAcl        $tag_acl
-	 * @param Validator     $validator
+	 * @param Audit          $audit
+	 * @param TagRepository  $tag_repository
+	 * @param TagFactory     $tag_factory
+	 * @param TagAcl         $tag_acl
+	 * @param Validator      $validator
+	 * @param UserRepository $user_repository
 	 */
-	public function __construct(Audit $audit, TagRepository $tag_repository, TagFactory $tag_factory, TagAcl $tag_acl, Validator $validator)
+	public function __construct(Audit $audit, TagRepository $tag_repository, TagFactory $tag_factory, TagAcl $tag_acl, Validator $validator, UserRepository $user_repository)
 	{
-		$this->acl        = $tag_acl;
-		$this->audit      = $audit;
-		$this->factory    = $tag_factory;
-		$this->repository = $tag_repository;
-		$this->validator  = $validator;
+		$this->acl             = $tag_acl;
+		$this->audit           = $audit;
+		$this->factory         = $tag_factory;
+		$this->repository      = $tag_repository;
+		$this->validator       = $validator;
+		$this->user_repository = $user_repository;
 	}
 
 	/**
@@ -183,19 +193,52 @@ class Api
 	}
 
 	/**
+	 * @param Tag $tag
+	 * @param int $user_id
+	 * @throws TagAuthorInvalidException
+	 */
+	public function SetModifiedByFromUserId(Tag $tag, int $user_id)
+	{
+		try
+		{
+			$tag->SetModifiedBy($this->user_repository->findOrFail($user_id));
+		} catch (EntityNotFoundException $exception)
+		{
+			throw new TagAuthorInvalidException("Failed to create Tag, Author could not be found");
+		}
+	}
+
+	/**
 	 * Creates a Tag with defaults. Used for creating Tags not in the Repository.
 	 *
-	 * @param User   $user
-	 * @param string $name
+	 * @param User|int $author
+	 * @param string   $name
 	 * @return Tag
 	 * @throws TagInvalidNameException
+	 * @throws TagAuthorInvalidException - If the Author could not be found.
 	 */
-	public function Create(User $user, string $name): Tag
+	public function Create($author, string $name): Tag
 	{
+		if (!is_int($author) && !($author instanceof User))
+		{
+			throw new InvalidArgumentException("Failed to Create Tag, Author must be a User object or ID integer");
+		}
+
+		if (is_int($author))
+		{
+			try
+			{
+				$author = $this->user_repository->findOrFail($author);
+			} catch (EntityNotFoundException $exception)
+			{
+				throw new TagAuthorInvalidException("Failed to create Tag, Author could not be found");
+			}
+		}
+
 		$tag = $this->factory->Create($name);
-		$tag->SetCreatedBy($user);
+		$tag->SetCreatedBy($author);
 		$tag->SetCreatedDate(new Date());
-		$tag->SetModifiedBy($user);
+		$tag->SetModifiedBy($author);
 		$tag->SetModifiedDate(new Date());
 
 		return $tag;
