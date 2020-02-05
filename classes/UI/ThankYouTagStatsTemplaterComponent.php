@@ -40,7 +40,7 @@ class ThankYouTagStatsTemplaterComponent extends TemplaterComponentTmpl
 
 		$args = ['tags.datasrc' => []];
 
-		$order = ['column' => 'COUNT(' . ThankYousRepository::THANK_YOU_TAGS_TABLE . '.item_id)', 'desc' => true];
+		$order = ['column' => 'COUNT(' . ThankYousRepository::THANK_YOU_TAGS_TABLE . '.item_id)', 'desc' => true, 'aggregate' => true];
 
 		$tags_thankyou_total_uses = $this->thank_you_api->GetTagsTotalThankYouUses($context, [$order], null, null, true);
 

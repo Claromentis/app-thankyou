@@ -344,17 +344,20 @@ class ThankYousRepository
 
 	public function GetTagsTotalThankYouUses(?array $orders = null, ?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
-		$order = "";
+		$order_string = "";
 		if (isset($orders))
 		{
-			$order = $this->utility->BuildOrderString($orders);
+			$order_string = $this->utility->BuildOrderString($orders);
 		}
 
 		// build group by string using query and order fields
 		$group_columns = [self::TAG_TABLE . ".id"];
-		foreach ($orders as $o)
+		foreach ($orders as $order)
 		{
-			$group_columns[] = $o['column'];
+			if (!isset($order['aggregate']) || $order['aggregate'] !== true)
+			{
+				$group_columns[] = $order['column'];
+			}
 		}
 		// ensure no duplicated columns in the grouping
 		$group_columns = array_unique($group_columns);
@@ -362,7 +365,7 @@ class ThankYousRepository
 		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
 		$query_string .= ", " . self::TAG_TABLE . ".id AS \"" . self::TAG_TABLE . ".id\"";
 		$query_string .= " FROM " . self::TAG_TABLE;
-		$query_string .= $order;
+		$query_string .= $order_string;
 		$query_string .= " GROUP BY " . implode(',', $group_columns);
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
