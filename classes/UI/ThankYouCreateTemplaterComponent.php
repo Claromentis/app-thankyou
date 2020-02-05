@@ -7,6 +7,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\ThankYous\Validator;
 use Psr\Log\LoggerInterface;
 
 class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
@@ -44,8 +45,9 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 		$args['create_container.+class']             = $class;
 		$args['class.json']                          = $class;
 		$args['thank_you_form_tags_segment.visible'] = $this->config_api->IsTagsEnabled();
-		$args['thank_you_user.placeholder']   = ($this->lmsg)('thankyou.thank.placeholder');
+		$args['thank_you_user.placeholder']          = ($this->lmsg)('thankyou.thank.placeholder');
 		$args['thank_you_description.placeholder']   = ($this->lmsg)('thankyou.common.add_description');
+		$args['description_max_length.json']         = Validator::DESCRIPTION_MAX_CHARACTERS;
 
 		if (isset($thankables))
 		{

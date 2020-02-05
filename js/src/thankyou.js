@@ -146,6 +146,10 @@ define(['jquery', 'cla_select2'], function ($) {
         this.getDescriptionInput().val(value);
     };
 
+    ThankYou.prototype.setDescriptionMaxLength = function (length) {
+        this.getDescriptionInput().attr('maxlength', length);
+    };
+
     ThankYou.prototype.setPreselected = function (string) {
         this.form.find('.js-thank_you-thanked-names').text(string);
     };

@@ -14,6 +14,7 @@ use Claromentis\Core\TextUtil\ClaText;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Claromentis\ThankYou\ThankYous\ThankYou;
+use Claromentis\ThankYou\ThankYous\Validator;
 use DateClaTimeZone;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -290,7 +291,8 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			'thank_you_user.filter_perm_oclasses' => $thankable_object_types,
 			'thank_you_user.placeholder'          => ($this->lmsg)('thankyou.thank.placeholder'),
 			'thank_you_form.visible'              => $form,
-			'thank_you_description.placeholder'   => ($this->lmsg)('thankyou.common.add_description')
+			'thank_you_description.placeholder'   => ($this->lmsg)('thankyou.common.add_description'),
+			'description_max_length.json'         => Validator::DESCRIPTION_MAX_CHARACTERS
 		];
 
 		return $this->CallTemplater('thankyou/UI/thank_you_templater_component.html', $args);

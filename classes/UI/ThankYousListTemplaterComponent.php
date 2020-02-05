@@ -9,6 +9,7 @@ use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
 use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\ThankYous\Validator;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -138,8 +139,8 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		$args['list.+class']                       = $class;
 		$args['class.json']                        = $class;
 		$args['thank_you_description.placeholder'] = ($this->lmsg)('thankyou.common.add_description');
-		$args['thank_you_user.placeholder']   = ($this->lmsg)('thankyou.thank.placeholder');
-
+		$args['thank_you_user.placeholder']        = ($this->lmsg)('thankyou.thank.placeholder');
+		$args['description_max_length.json']       = Validator::DESCRIPTION_MAX_CHARACTERS;
 
 		$args['thank_you_form_tags_segment.visible'] = $this->api->Configuration()->IsTagsEnabled();
 

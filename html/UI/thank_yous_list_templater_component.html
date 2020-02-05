@@ -29,9 +29,14 @@
 	<include file="../includes/delete_modal.html"/>
 </div>
 <script type="text/javascript">
-    require(["domReady", "/intranet/thankyou/js/build/thankyou.bundle.js", "jquery"], function (domReady, ThankYou, $) {
-        domReady(function () {
-            var thank_you = new ThankYou($('.' + ${class.json}));
-        });
-    });
+	require(["domReady", "/intranet/thankyou/js/build/thankyou.bundle.js", "jquery"], function (domReady, ThankYou, $) {
+		domReady(function () {
+			var description_max_length = ${description_max_length.json};
+			var thank_you = new ThankYou($('.' + ${class.json}));
+
+			if (typeof description_max_length === 'number') {
+				thank_you.setDescriptionMaxLength(description_max_length);
+			}
+		});
+	});
 </script>
