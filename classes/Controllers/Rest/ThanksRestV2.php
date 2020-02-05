@@ -391,6 +391,13 @@ class ThanksRestV2
 			$tag = $this->api->Tag()->Create($security_context->GetUser(), $name);
 			$tag->SetBackgroundColour($bg_colour);
 			$this->api->Tag()->Save($tag);
+		} catch (\Claromentis\ThankYou\Tags\Exceptions\ValidationException $validation_exception) {
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.tag.error.create'),
+				'status'         => 400,
+				'invalid-params' => $validation_exception->GetErrors()
+			], 400);
 		} catch (TagDuplicateNameException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([
@@ -485,6 +492,14 @@ class ThanksRestV2
 			}
 
 			$this->api->Tag()->Save($tag);
+		} catch (\Claromentis\ThankYou\Tags\Exceptions\ValidationException $validation_exception)
+		{
+			return $this->response->GetJsonPrettyResponse([
+				'type'           => 'https://developer.claromentis.com',
+				'title'          => ($this->lmsg)('thankyou.tag.error.modify'),
+				'status'         => 400,
+				'invalid-params' => $validation_exception->GetErrors()
+			], 400);
 		} catch (TagNotFoundException $exception)
 		{
 			return $this->response->GetJsonPrettyResponse([

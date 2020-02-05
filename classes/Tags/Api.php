@@ -10,6 +10,7 @@ use Claromentis\ThankYou\Tags\Exceptions\TagDuplicateNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagForbiddenException;
 use Claromentis\ThankYou\Tags\Exceptions\TagInvalidNameException;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
+use Claromentis\ThankYou\Tags\Exceptions\ValidationException;
 use Date;
 use InvalidArgumentException;
 use User;
@@ -37,19 +38,26 @@ class Api
 	private $repository;
 
 	/**
+	 * @var Validator
+	 */
+	private $validator;
+
+	/**
 	 * Api constructor.
 	 *
 	 * @param Audit         $audit
 	 * @param TagRepository $tag_repository
 	 * @param TagFactory    $tag_factory
 	 * @param TagAcl        $tag_acl
+	 * @param Validator     $validator
 	 */
-	public function __construct(Audit $audit, TagRepository $tag_repository, TagFactory $tag_factory, TagAcl $tag_acl)
+	public function __construct(Audit $audit, TagRepository $tag_repository, TagFactory $tag_factory, TagAcl $tag_acl, Validator $validator)
 	{
 		$this->acl        = $tag_acl;
 		$this->audit      = $audit;
 		$this->factory    = $tag_factory;
 		$this->repository = $tag_repository;
+		$this->validator = $validator;
 	}
 
 	/**
@@ -167,6 +175,15 @@ class Api
 	}
 
 	/**
+	 * @param Tag $tag
+	 * @throws ValidationException  - If the Tag has one or more issues making it unsuitable to save to the Repository.
+	 */
+	public function ValidateTag(Tag $tag): void
+	{
+		$this->validator->Validate($tag);
+	}
+
+	/**
 	 * Creates a Tag with defaults. Used for creating Tags not in the Repository.
 	 *
 	 * @param User   $user
@@ -190,10 +207,13 @@ class Api
 	 *
 	 * @param Tag $tag
 	 * @throws TagDuplicateNameException - If the Tag's Name is not unique to the Repository.
+	 * @throws ValidationException - If the Tag has one or more issues making it unsuitable to save to the Repository.
 	 */
 	public function Save(Tag $tag)
 	{
 		$new = ($tag->GetId() === null);
+
+		$this->ValidateTag($tag);
 
 		$this->repository->Save($tag);
 

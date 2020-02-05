@@ -10,6 +10,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\Exception\AccessDeniedException;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Tags\Validator;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AdminController
@@ -95,9 +96,10 @@ class AdminController
 			'core_values_enabled.ontext'     => ($this->lmsg)('common.enabled'),
 			'core_values_enabled_desc.body'  => ($this->lmsg)('thankyou.admin.core_values.description'),
 			'core_values_mandatory.body'     => ($this->lmsg)('thankyou.configuration.core_values_mandatory.description'),
-			'core_values_enabled_body.style' => $tags_enabled ? '' : 'display:none;'
+			'core_values_enabled_body.style' => $tags_enabled ? '' : 'display:none;',
+			'tag_name.maxlength' => Validator::NAME_MAX_CHARACTERS
 		];
 
-		return new TemplaterCallResponse('thankyou/admin/core_values.html', $args, ($this->lmsg)('thankyou.app_name'));
+		return new TemplaterCallResponse('thankyou/admin/tags.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}
 }

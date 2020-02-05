@@ -67,6 +67,7 @@ lm	thankyou.tag.error.name.not_empty
 lm	thankyou.tag.error.name.not_unique		
 lm	thankyou.tag.error.name.undefined		
 lm	thankyou.tag.name		
+lm	thankyou.tag.name.error.too_long		
 lm	thankyou.tag.total_uses		
 lm	thankyou.thank.placeholder		
 lm	thankyou.thankable.error.unsuitable_owner_classes		

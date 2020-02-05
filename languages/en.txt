@@ -67,6 +67,7 @@ lm	thankyou.tag.error.name.not_empty		Core Value's Name cannot be empty
 lm	thankyou.tag.error.name.not_unique		This Core Value Name has already been used
 lm	thankyou.tag.error.name.undefined		Core Value Name must be defined
 lm	thankyou.tag.name		Core Value
+lm	thankyou.tag.name.error.too_long		Core Value Name cannot be more than 20 characters
 lm	thankyou.tag.total_uses		Number of times selected
 lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked

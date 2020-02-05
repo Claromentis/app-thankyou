@@ -12,6 +12,7 @@ use Claromentis\ThankYou\Tags\Tag;
 use Claromentis\ThankYou\Tags\TagAcl;
 use Claromentis\ThankYou\Tags\TagFactory;
 use Claromentis\ThankYou\Tags\TagRepository;
+use Claromentis\ThankYou\Tags\Validator;
 use Date;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -60,6 +61,11 @@ class ApiTest extends TestCase
 	 */
 	private $user_mock;
 
+	/**
+	 * @var Validator|MockObject
+	 */
+	private $validator_mock;
+
 	public function SetUp()
 	{
 		$this->audit_mock            = $this->createMock(Audit::class);
@@ -69,8 +75,9 @@ class ApiTest extends TestCase
 		$this->tag_mock              = $this->createMock(Tag::class);
 		$this->user_mock             = $this->createMock(User::class);
 		$this->security_context_mock = $this->createMock(SecurityContext::class);
+		$this->validator_mock        = $this->createMock(Validator::class);
 
-		$this->api = new Api($this->audit_mock, $this->tag_repository_mock, $this->tag_factory_mock, $this->tag_acl_mock);
+		$this->api = new Api($this->audit_mock, $this->tag_repository_mock, $this->tag_factory_mock, $this->tag_acl_mock, $this->validator_mock);
 	}
 
 	public function testGetTagSuccessful()
