@@ -64,7 +64,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 			'show_header'    => ['type' => 'bool', 'title' => ($this->lmsg)('thankyou.component.options.show_header'), 'default' => true, 'mutate_on_change' => true],
 			'allow_new'      => ['type' => 'bool', 'default' => true, 'title' => ($this->lmsg)('thankyou.component.options.show_button')],
 			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('thankyou.component.options.profile_images')],
-			'comments'       => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('common.show_comments')],
+			'comments'       => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('thankyou.common.enable_in-line_comments')],
 			'user_id'        => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.user_id'), 'default' => null, 'input' => 'user_picker', 'width' => 'medium'],
 			'group_ids'      => ['type' => 'array_int', 'title' => ($this->lmsg)('thankyou.common.filter_by_groups'), 'default' => [], 'input' => 'group_picker', 'width' => 'medium'],
 			'limit'          => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50]
