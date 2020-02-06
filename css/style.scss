@@ -181,7 +181,7 @@
     }
 
     .panel-heading {
-        .custom-header-title, .header-title {
+        .custom-header-title:not(.no-thanks-button), .header-title:not(.no-thanks-button) {
             width: calc(100% - 130px);
             display: block;
             text-overflow: ellipsis;
