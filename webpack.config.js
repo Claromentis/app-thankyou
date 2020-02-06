@@ -12,7 +12,6 @@ for (var i=0; i<items.length; i++) {
     externals[name] = { amd: name };
 }
 
-externals['./tags.libs.js'] = { amd: '/intranet/thankyou/js/built/tags.libs.js' };
 externals['jquery'] = { amd: 'jquery' };
 externals['moment'] = { amd: 'moment' };
 
