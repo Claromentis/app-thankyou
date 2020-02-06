@@ -161,7 +161,7 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		if ($options->Get('title') !== '')
 		{
-			$args['custom_title.body']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
+			$args['custom_title.body_html']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
 			$args['custom_title.title']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
 			$args['custom_title.visible']  = 1;
 			$args['default_title.visible'] = 0;
