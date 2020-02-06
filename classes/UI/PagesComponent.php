@@ -156,7 +156,9 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 
 		if (!$options->Get('allow_new'))
 		{
-			$args = ['create_container.visible' => 0];
+			$args['create_container.visible'] = 0;
+			$args['custom_title.+class']  = 'no-thanks-button';
+			$args['default_title.+class'] = 'no-thanks-button';
 		}
 
 		if ($options->Get('title') !== '')

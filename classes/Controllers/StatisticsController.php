@@ -47,7 +47,10 @@ class StatisticsController
 
 		foreach ($this->GetReports() as $report_index => $report)
 		{
-			$args['reports.datasrc'][] = ['report.body' => $report['name'], 'reportlink.href' => $url . '/statistics/' . $report_index];
+			if ($report['is_enabled'])
+			{
+				$args['reports.datasrc'][] = ['report.body' => $report['name'], 'reportlink.href' => $url . '/statistics/' . $report_index];
+			}
 		}
 
 		return new TemplaterCallResponse('thankyou/admin/statistics/reports.html', $args, ($this->lmsg)('thankyou.app_name'));
@@ -77,9 +80,20 @@ class StatisticsController
 		$datatable_service = $report['datatable_service'] ?? null;
 		$report_name       = $report['name'] ?? '';
 
-		if (!isset($datatable_service))
+		if (!$report) // requested report doesn't exist at all
 		{
 			return $this->response->GetRedirectResponse(substr($request->getRequestTarget(), 0, -strlen($report_index)));
+		}
+
+		if (!$report['is_enabled']) // requested report exists but is not enabled
+		{
+			$args['current_page_title.body']    = ($this->lmsg)('thankyou.admin.reports.disabled.heading');
+			$args['report_disabled_error.body'] = ($this->lmsg)('thankyou.admin.reports.disabled.generic');
+			if ($this->lmsg->lmsg_key_exist('thankyou.admin.reports.disabled.' . $report_index))
+			{
+				$args['report_disabled_error.body'] = ($this->lmsg)('thankyou.admin.reports.disabled.' . $report_index);
+			}
+			return new TemplaterCallResponse('thankyou/admin/statistics/report_disabled.html', $args, ($this->lmsg)('thankyou.app_name'));
 		}
 
 		$args['thankyou_reports_datatable.service'] = $datatable_service;
@@ -93,16 +107,22 @@ class StatisticsController
 	 */
 	private function GetReports(): array
 	{
-		$reports = [
-			'thankyous' => ['name' => ($this->lmsg)('thankyou.common.thank_yous'), 'datatable_service' => 'thankyou.datatable.thank_yous'],
-			'users'     => ['name' => ($this->lmsg)('common.users'), 'datatable_service' => 'thankyou.datatable.users']
+		return [
+			'thankyous' => [
+				'name'              => ($this->lmsg)('thankyou.common.thank_yous'),
+				'datatable_service' => 'thankyou.datatable.thank_yous',
+				'is_enabled'        => true
+			],
+			'users'     => [
+				'name'              => ($this->lmsg)('common.users'),
+				'datatable_service' => 'thankyou.datatable.users',
+				'is_enabled'        => true
+			],
+			'tags'      => [
+				'name'              => ($this->lmsg)('thankyou.common.tags'),
+				'datatable_service' => 'thankyou.datatable.statistics.tags',
+				'is_enabled'        => $this->config_api->IsTagsEnabled()
+			]
 		];
-
-		if ($this->config_api->IsTagsEnabled())
-		{
-			$reports ['tags'] = ['name' => ($this->lmsg)('thankyou.common.tags'), 'datatable_service' => 'thankyou.datatable.statistics.tags'];
-		}
-
-		return $reports;
 	}
 }
