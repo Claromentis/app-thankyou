@@ -245,7 +245,7 @@ define(['jquery', 'cla_select2'], function ($) {
 
         var tags_input = self.getTagsInput();
         if (tags_input !== null) {
-            tags = tags_input.val();
+            var tags = tags_input.val();
             body.tags = [];
             if (Array.isArray(tags)) {
                 var tags_length = tags.length;
