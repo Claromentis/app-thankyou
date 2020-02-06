@@ -2,6 +2,9 @@
 lm	thankyou.admin.core_values.description		Thank You notes can be linked to your Core Values to encourage engagement.
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
+lm	thankyou.admin.reports.disabled.generic		The report you have requested does not exist.
+lm	thankyou.admin.reports.disabled.heading		Report unavailable
+lm	thankyou.admin.reports.disabled.tags		The core values report is only available if core values are enabled.
 lm	thankyou.admin.statistics.title		Reports & Statistics
 lm	thankyou.admin.toggle_vis		Toggle visibility
 lm	thankyou.app_name		Thank you

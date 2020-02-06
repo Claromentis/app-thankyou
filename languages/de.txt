@@ -2,6 +2,9 @@
 lm	thankyou.admin.core_values.description		
 lm	thankyou.admin.panel.messages		Mitteilungen
 lm	thankyou.admin.panel.notifications		
+lm	thankyou.admin.reports.disabled.generic		
+lm	thankyou.admin.reports.disabled.heading		
+lm	thankyou.admin.reports.disabled.tags		
 lm	thankyou.admin.statistics.title		
 lm	thankyou.admin.toggle_vis		
 lm	thankyou.app_name		Vielen Dank
