@@ -10,7 +10,6 @@ lm	thankyou.audit.delete_thank_you		Deleted Thank You
 lm	thankyou.audit.edit_thank_you		Edited Thank You
 lm	thankyou.common.actions		Actions
 lm	thankyou.common.add_description		Add a description
-lm	thankyou.common.enable_in-line_comments		Enable in-line comments
 lm	thankyou.common.filter_by_groups		Filter by Groups
 lm	thankyou.common.select_core_values		Select Core Values
 lm	thankyou.common.tags		Core Values
@@ -92,6 +91,7 @@ lm	thankyou.thankyou.error.server		The Thank You you've requested could not be l
 lm	thankyou.thankyou.id.error.invalid		Invalid Thank You ID given
 lm	thankyou.thankyou.id.error.not_found		Thank You with ID %d could not be found
 lm	thankyou.thankyou.name		Thank You
+lm	thankyou.thankyou.pages_component.options.comment_editing		Expand comments within the component
 lm	thankyou.thankyou.tags.error.disabled		Core Values are disabled for Thank Yous
 lm	thankyou.thankyou.tags.error.empty		One or more Core Values must be given
 lm	thankyou.thankyou.tags.error.not_array		Thank You Core Values must be given as an array of integers
