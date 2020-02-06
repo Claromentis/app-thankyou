@@ -119,27 +119,29 @@ define(['jquery', 'cla_select2'], function ($) {
         picker.val(null);
         picker.html(null);
 
-        if (typeof values === 'object') {
-            for (var offset in values) {
-                cla_multi_object_picker.addOption(values[offset].object_type.id, values[offset].id, values[offset].object_type.name + ": " + values[offset].name, picker.attr('id'));
+        if (Array.isArray(values)) {
+            var values_length = values.length;
+            for (var index = 0; index < values_length; index++) {
+                cla_multi_object_picker.addOption(values[index].object_type.id, values[index].id, values[index].object_type.name + ": " + values[index].name, picker.attr('id'));
             }
         }
 
         picker.trigger('change');
     };
 
-    ThankYou.prototype.setTags = function (values) {
-        var tags = this.getTagsInput();
-        tags.val(null);
-        tags.html(null);
+    ThankYou.prototype.setTags = function (tags) {
+        var tags_input = this.getTagsInput();
+        tags_input.val(null);
+        tags_input.html(null);
 
-        if (typeof values === 'object') {
-            for (var offset in values) {
-                tags.append('<option selected value="' + values[offset].id + '">' + values[offset].name + '</option>');
+        if (Array.isArray(tags)) {
+            var tags_length = tags.length;
+            for (var tags_offset = 0; tags_offset < tags_length; tags_offset++) {
+                tags_input.append('<option selected value="' + tags[tags_offset].id + '">' + tags[tags_offset].name + '</option>');
             }
         }
 
-        tags.trigger('change');
+        tags_input.trigger('change');
     };
 
     ThankYou.prototype.setDescription = function (value) {
@@ -181,8 +183,9 @@ define(['jquery', 'cla_select2'], function ($) {
 
             var thanked_names = '';
             var options = cla_multi_object_picker.GetSelected(picker);
-            for (var i in options) {
-                thanked_names += options[i].text();
+            var options_length = options.length;
+            for (var options_offset = 0; options_offset < options_length; options_offset++) {
+                thanked_names += options[options_offset].text();
             }
             this.setPreselected(thanked_names);
             this.displayThankedNames(true);
@@ -224,28 +227,30 @@ define(['jquery', 'cla_select2'], function ($) {
         }
 
         var thanked = self.getThankedInput().val();
-        var tags = self.getTagsInput().val();
         var description = self.getDescriptionInput().val();
 
         var body = {
             description: description
         };
 
-        if (typeof thanked === 'object') {
+        if (Array.isArray(thanked)) {
             var thanked_array = [];
-            for (var offset in thanked) {
-                var thanked_split = thanked[offset].split('_');
+            var thanked_length = thanked.length;
+            for (var thanked_offset = 0; thanked_offset < thanked_length; thanked_offset++) {
+                var thanked_split = thanked[thanked_offset].split('_');
                 thanked_array.push({oclass: parseInt(thanked_split[0]), id: parseInt(thanked_split[1])});
             }
             body.thanked = thanked_array;
         }
 
-        if (typeof tags === 'object') {
+        var tags_input = self.getTagsInput();
+        if (tags_input !== null) {
+            tags = tags_input.val();
             body.tags = [];
-
-            if (tags !== null) {
-                for (var offset in tags) {
-                    body.tags.push(parseInt(tags[offset]));
+            if (Array.isArray(tags)) {
+                var tags_length = tags.length;
+                for (var tags_offset = 0; tags_offset < tags_length; tags_offset++) {
+                    body.tags.push(parseInt(tags[tags_offset]));
                 }
             }
         }
@@ -270,9 +275,10 @@ define(['jquery', 'cla_select2'], function ($) {
                 var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
 
                 var error_displayed = false;
-                if ('invalid-params' in body) {
-                    for (var offset in body['invalid-params']) {
-                        var invalid_param = body['invalid-params'][offset];
+                if ('invalid-params' in body && Array.isArray(body['invalid-params'])) {
+                    var invalid_params_length = body['invalid-params'].length;
+                    for (var invalid_params_offset = 0; invalid_params_offset < invalid_params_length; invalid_params_offset++) {
+                        var invalid_param = body['invalid-params'][invalid_params_offset];
                         if ('name' in invalid_param) {
                             var error_container = form_errors.filter('[data-name="' + invalid_param.name + '"]');
                             if (error_container.length > 0 && 'reason' in invalid_param) {
