@@ -124,7 +124,7 @@ lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']
 lt	thankyou:admin:toggle_vis.body	$lm["thankyou.admin.toggle_vis"]	
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
-lt	thankyou:common:description.body	$lm['common.description']	
+lt	thankyou:common:description.body		
 lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
 lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
