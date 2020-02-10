@@ -30,9 +30,9 @@ class TagFormatter
 	public function FormatTags(array $tags): array
 	{
 		$tags_array = [];
-		foreach ($tags as $offset => $tag)
+		foreach ($tags as $tag)
 		{
-			$tags_array[$offset] = $this->FormatTag($tag);
+			$tags_array[] = $this->FormatTag($tag);
 		}
 
 		return $tags_array;

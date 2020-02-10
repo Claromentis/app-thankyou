@@ -22,8 +22,9 @@ define(['jquery', 'cla_select2'], function ($) {
                 },
                 processResults: function (tags) {
                     var results = [];
-                    for (var id in tags) {
-                        results.push({id: id, text: tags[id].name});
+                    var tags_length = tags.length;
+                    for (var index = 0; index < tags_length; index++) {
+                        results.push({id: tags[index].id, text: tags[index].name});
                     }
 
                     return {results: results};
