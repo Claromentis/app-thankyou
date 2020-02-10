@@ -37,23 +37,16 @@ class ThankYouFormatter
 	}
 
 	/**
-	 * @param ThankYou|ThankYou[]  $thank_yous
+	 * @param ThankYou[]           $thank_yous
 	 * @param DateTimeZone|null    $time_zone
 	 * @param SecurityContext|null $security_context
 	 * @return array
 	 */
-	public function ConvertThankYousToArrays($thank_yous, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null): array
+	public function ConvertThankYousToArrays(array $thank_yous, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null): array
 	{
 		if (!isset($time_zone))
 		{
-			$time_zone = DateClaTimeZone::GetCurrentTZ();
-		}
-
-		$array_return = true;
-		if (!is_array($thank_yous))
-		{
-			$array_return = false;
-			$thank_yous   = [$thank_yous];
+			$time_zone = $this->GetDefaultTimeZone();
 		}
 
 		$thank_yous_array = [];
@@ -66,7 +59,7 @@ class ThankYouFormatter
 			$thank_yous_array[] = $this->ConvertThankYouToArray($thank_you, $time_zone, $security_context);
 		}
 
-		return $array_return ? $thank_yous_array : $thank_yous_array[0];
+		return $thank_yous_array;
 	}
 
 	/**
@@ -88,8 +81,13 @@ class ThankYouFormatter
 	 *         ]
 	 *         ]
 	 */
-	public function ConvertThankYouToArray(ThankYou $thank_you, DateTimeZone $time_zone, ?SecurityContext $security_context = null): array
+	public function ConvertThankYouToArray(ThankYou $thank_you, ?DateTimeZone $time_zone = null, ?SecurityContext $security_context = null): array
 	{
+		if (!isset($time_zone))
+		{
+			$time_zone = $this->GetDefaultTimeZone();
+		}
+
 		$date_created = clone $thank_you->GetDateCreated();
 		$date_created->setTimezone($time_zone);
 
@@ -198,5 +196,13 @@ class ThankYouFormatter
 		];
 
 		return $output;
+	}
+
+	/**
+	 * @return DateTimeZone
+	 */
+	private function GetDefaultTimeZone()
+	{
+		return DateClaTimeZone::GetCurrentTZ();
 	}
 }

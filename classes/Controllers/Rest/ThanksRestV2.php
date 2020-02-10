@@ -119,7 +119,7 @@ class ThanksRestV2
 			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);
 		}
 
-		$display_thank_you = $this->thank_you_formatter->ConvertThankYousToArrays($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
+		$display_thank_you = $this->thank_you_formatter->ConvertThankYouToArray($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
 
 		return $this->response->GetJsonPrettyResponse($display_thank_you);
 	}
