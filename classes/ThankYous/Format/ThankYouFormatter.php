@@ -112,23 +112,25 @@ class ThankYouFormatter
 		$thanked = $thank_you->GetThankables();
 		if (isset($thanked))
 		{
-			foreach ($thanked as $offset => $thank)
+			$thankeds_array = [];
+			foreach ($thanked as $thank)
 			{
-				$thanked[$offset] = $this->ConvertThankableToArray($thank, $security_context);
+				$thankeds_array[] = $this->ConvertThankableToArray($thank, $security_context);
 			}
+			$output['thanked'] = $thankeds_array;
 		}
-		$output['thanked'] = $thanked;
 
 		$users = $thank_you->GetUsers();
 		if (isset($users))
 		{
-			foreach ($users as $index => $user)
+			$users_array = [];
+			foreach ($users as $user)
 			{
 				$user_name     = (isset($security_context) && !$this->acl->CanSeeThankedUser($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->getFullname();
-				$users[$index] = ['id' => $user->id, 'name' => $user_name];
+				$users_array[] = ['id' => $user->id, 'name' => $user_name];
 			}
+			$output['users'] = $users_array;
 		}
-		$output['users'] = $users;
 
 		$tags = $thank_you->GetTags();
 		if (isset($tags))
