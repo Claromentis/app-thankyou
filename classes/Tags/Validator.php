@@ -26,7 +26,7 @@ class Validator
 	}
 
 	/**
-	 * Determines whether a Tag is in a suitable state to be save to the Repository.
+	 * Determines whether a Tag is in a suitable state to be saved to the Repository.
 	 *
 	 * @param Tag $tag
 	 * @throws ValidationException - If the Tag has one or more issues making it unsuitable to save to the Repository.
