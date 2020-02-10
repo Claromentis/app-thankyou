@@ -11,6 +11,7 @@ use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\People\Repository\UserRepository;
+use Claromentis\ThankYou\Exception\EmptyQueryFilterException;
 use Claromentis\ThankYou\Exception\ThankableException;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
@@ -200,7 +201,7 @@ class ThankYousRepository
 
 		if (isset($date_range))
 		{
-			$this->QueryAddCreatedBetweenFilter($query, $date_range);
+			$this->QueryFilterCreatedBetween($query, $date_range);
 		}
 
 		if (isset($extranet_ids) || isset($thanked_user_ids))
@@ -208,21 +209,27 @@ class ThankYousRepository
 			$query->AddJoin(self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANKED_USERS_TABLE . ".thanks_id");
 		}
 
-		if (isset($thanked_user_ids))
+		try
 		{
-			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
-		}
+			if (isset($thanked_user_ids))
+			{
+				$this->QueryFilterThankedUser($query, $thanked_user_ids);
+			}
 
-		if (isset($tag_ids))
-		{
-			$this->QueryJoinThankYouToTagged($query);
-			$this->QueryAddTagsFilter($query, $tag_ids);
-		}
+			if (isset($tag_ids))
+			{
+				$this->QueryJoinThankYouToTagged($query);
+				$this->QueryFilterTags($query, $tag_ids);
+			}
 
-		if (isset($extranet_ids))
+			if (isset($extranet_ids))
+			{
+				$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+				$this->QueryFilterExtranet($query, $extranet_ids, $allow_no_thanked);
+			}
+		} catch (EmptyQueryFilterException $exception)
 		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
-			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
+			return [];
 		}
 
 		$result = $this->db->query($query->GetQuery());
@@ -382,26 +389,32 @@ class ThankYousRepository
 			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANKED_USERS_TABLE . ".thanks_id");
 		}
 
-		if (isset($thanked_user_ids))
+		try
 		{
-			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
-		}
+			if (isset($thanked_user_ids))
+			{
+				$this->QueryFilterThankedUser($query, $thanked_user_ids);
+			}
 
-		if (isset($date_range))
-		{
-			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
-			$this->QueryAddCreatedBetweenFilter($query, $date_range);
-		}
+			if (isset($date_range))
+			{
+				$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
+				$this->QueryFilterCreatedBetween($query, $date_range);
+			}
 
-		if (isset($tag_ids))
-		{
-			$this->QueryAddTagsFilter($query, $tag_ids);
-		}
+			if (isset($tag_ids))
+			{
+				$this->QueryFilterTags($query, $tag_ids);
+			}
 
-		if (isset($extranet_ids))
+			if (isset($extranet_ids))
+			{
+				$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+				$this->QueryFilterExtranet($query, $extranet_ids, $allow_no_thanked);
+			}
+		} catch (EmptyQueryFilterException $exception)
 		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
-			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
+			return [];
 		}
 
 		$query->SetLimit($limit, $offset);
@@ -449,26 +462,32 @@ class ThankYousRepository
 			$query->AddJoin(self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE . ".id = " . self::THANKED_USERS_TABLE . ".thanks_id");
 		}
 
-		if (isset($extranet_ids))
+		try
 		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
-			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
-		}
+			if (isset($extranet_ids))
+			{
+				$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+				$this->QueryFilterExtranet($query, $extranet_ids, $allow_no_thanked);
+			}
 
-		if (isset($date_range))
-		{
-			$this->QueryAddCreatedBetweenFilter($query, $date_range);
-		}
+			if (isset($date_range))
+			{
+				$this->QueryFilterCreatedBetween($query, $date_range);
+			}
 
-		if (isset($thanked_user_ids))
-		{
-			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
-		}
+			if (isset($thanked_user_ids))
+			{
+				$this->QueryFilterThankedUser($query, $thanked_user_ids);
+			}
 
-		if (isset($tag_ids))
+			if (isset($tag_ids))
+			{
+				$this->QueryJoinThankYouToTagged($query);
+				$this->QueryFilterTags($query, $tag_ids);
+			}
+		} catch (EmptyQueryFilterException $exception)
 		{
-			$this->QueryJoinThankYouToTagged($query);
-			$this->QueryAddTagsFilter($query, $tag_ids);
+			return 0;
 		}
 
 		[$count] = $this->db->query_row($query->GetQuery());
@@ -499,26 +518,32 @@ class ThankYousRepository
 
 		$query->AddJoin(self::USER_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
 
-		if (isset($user_ids))
+		try
 		{
-			$this->QueryAddThankedUserFilter($query, $user_ids);
-		}
+			if (isset($user_ids))
+			{
+				$this->QueryFilterThankedUser($query, $user_ids);
+			}
 
-		if (isset($date_range))
-		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
-			$this->QueryAddCreatedBetweenFilter($query, $date_range);
-		}
+			if (isset($date_range))
+			{
+				$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
+				$this->QueryFilterCreatedBetween($query, $date_range);
+			}
 
-		if (isset($tag_ids))
-		{
-			$this->QueryJoinThankedUsersToTagged($query);
-			$this->QueryAddTagsFilter($query, $tag_ids);
-		}
+			if (isset($tag_ids))
+			{
+				$this->QueryJoinThankedUsersToTagged($query);
+				$this->QueryFilterTags($query, $tag_ids);
+			}
 
-		if (isset($extranet_ids))
+			if (isset($extranet_ids))
+			{
+				$this->QueryFilterExtranet($query, $extranet_ids);
+			}
+		} catch (EmptyQueryFilterException $exception)
 		{
-			$this->QueryAddExtranetFilter($query, $extranet_ids);
+			return [];
 		}
 
 		$query->SetLimit($limit, $offset);
@@ -560,27 +585,33 @@ class ThankYousRepository
 
 		$query->AddJoin(self::USER_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
 
-		if (isset($user_ids))
+		try
 		{
-			$this->QueryAddThankedUserFilter($query, $user_ids);
-		}
+			if (isset($user_ids))
+			{
+				$this->QueryFilterThankedUser($query, $user_ids);
+			}
 
-		if (isset($date_range))
-		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
-			$this->QueryAddCreatedBetweenFilter($query, $date_range);
-		}
+			if (isset($date_range))
+			{
+				$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
+				$this->QueryFilterCreatedBetween($query, $date_range);
+			}
 
-		if (isset($tag_ids))
-		{
-			$this->QueryJoinThankedUsersToTagged($query);
-			$this->QueryAddTagsFilter($query, $tag_ids);
-		}
+			if (isset($tag_ids))
+			{
+				$this->QueryJoinThankedUsersToTagged($query);
+				$this->QueryFilterTags($query, $tag_ids);
+			}
 
-		if (isset($extranet_ids))
+			if (isset($extranet_ids))
+			{
+				$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+				$this->QueryFilterExtranet($query, $extranet_ids);
+			}
+		} catch (EmptyQueryFilterException $exception)
 		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
-			$this->QueryAddExtranetFilter($query, $extranet_ids);
+			return 0;
 		}
 
 		[$count] = $this->db->query_row($query->GetQuery());
@@ -612,26 +643,32 @@ class ThankYousRepository
 			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANKED_USERS_TABLE, self::THANKED_USERS_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANKED_USERS_TABLE . ".thanks_id");
 		}
 
-		if (isset($thanked_user_ids))
+		try
 		{
-			$this->QueryAddThankedUserFilter($query, $thanked_user_ids);
-		}
+			if (isset($thanked_user_ids))
+			{
+				$this->QueryFilterThankedUser($query, $thanked_user_ids);
+			}
 
-		if (isset($date_range))
-		{
-			$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
-			$this->QueryAddCreatedBetweenFilter($query, $date_range);
-		}
+			if (isset($date_range))
+			{
+				$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
+				$this->QueryFilterCreatedBetween($query, $date_range);
+			}
 
-		if (isset($tag_ids))
-		{
-			$this->QueryAddTagsFilter($query, $tag_ids);
-		}
+			if (isset($tag_ids))
+			{
+				$this->QueryFilterTags($query, $tag_ids);
+			}
 
-		if (isset($extranet_ids))
+			if (isset($extranet_ids))
+			{
+				$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
+				$this->QueryFilterExtranet($query, $extranet_ids, $allow_no_thanked);
+			}
+		} catch (EmptyQueryFilterException $exception)
 		{
-			$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
-			$this->QueryAddExtranetFilter($query, $extranet_ids, $allow_no_thanked);
+			return 0;
 		}
 
 		[$count] = $this->db->query_row($query->GetQuery());
@@ -1032,7 +1069,7 @@ class ThankYousRepository
 	 * @param QueryBuilder $query
 	 * @param int[]        $date_range
 	 */
-	private function QueryAddCreatedBetweenFilter(QueryBuilder $query, array $date_range)
+	private function QueryFilterCreatedBetween(QueryBuilder $query, array $date_range)
 	{
 		$date_range = $this->utility->FormatDateRange($date_range);
 
@@ -1052,11 +1089,16 @@ class ThankYousRepository
 		$query->AddWhereAndClause(self::THANK_YOU_TABLE . ".date_created BETWEEN " . $lower_date . " AND " . $upper_date);
 	}
 
-	private function QueryAddThankedUserFilter(QueryBuilder $query, array $thanked_user_ids)
+	/**
+	 * @param QueryBuilder $query
+	 * @param array        $thanked_user_ids
+	 * @throws EmptyQueryFilterException - If an empty array of User IDs is given.
+	 */
+	private function QueryFilterThankedUser(QueryBuilder $query, array $thanked_user_ids)
 	{
 		if (count($thanked_user_ids) === 0)
 		{
-			return;
+			throw new EmptyQueryFilterException("Empty Thanked User Filter");
 		}
 
 		$invalid_user_ids = [];
@@ -1076,11 +1118,16 @@ class ThankYousRepository
 		$query->AddWhereAndClause(self::THANKED_USERS_TABLE . ".user_id IN in:int:thanked_user_ids", $thanked_user_ids);
 	}
 
-	private function QueryAddTagsFilter(QueryBuilder $query, array $tag_ids)
+	/**
+	 * @param QueryBuilder $query
+	 * @param array        $tag_ids
+	 * @throws EmptyQueryFilterException - If an empty array of Tag IDs is given.
+	 */
+	private function QueryFilterTags(QueryBuilder $query, array $tag_ids)
 	{
 		if (count($tag_ids) === 0)
 		{
-			return;
+			throw new EmptyQueryFilterException("Empty Tags Filter");
 		}
 
 		$invalid_tag_ids = [];
@@ -1100,11 +1147,17 @@ class ThankYousRepository
 		$query->AddWhereAndClause(self::THANK_YOU_TAGS_TABLE . ".tag_id IN in:int:tag_ids", $tag_ids);
 	}
 
-	private function QueryAddExtranetFilter(QueryBuilder $query, array $extranet_ids, bool $allow_absence = false)
+	/**
+	 * @param QueryBuilder $query
+	 * @param array        $extranet_ids
+	 * @param bool         $allow_absence
+	 * @throws EmptyQueryFilterException
+	 */
+	private function QueryFilterExtranet(QueryBuilder $query, array $extranet_ids, bool $allow_absence = false)
 	{
 		if (count($extranet_ids) === 0)
 		{
-			return;
+			throw new EmptyQueryFilterException("Empty Extranets Filter");
 		}
 
 		$where             = "(" . self::USER_TABLE . ".ex_area_id IN (";
