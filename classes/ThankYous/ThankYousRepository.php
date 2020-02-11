@@ -776,7 +776,7 @@ class ThankYousRepository
 		{
 			if (!isset($group_thankables[$groups_id]))
 			{
-				$group_thankables[$groups_id] = $this->thankable_factory->CreateUnknown($groups_id, $owner_class_id);
+				$group_thankables[$groups_id] = $this->thankable_factory->CreateUnknown($owner_class_id);
 			}
 		}
 
@@ -803,7 +803,7 @@ class ThankYousRepository
 		{
 			if (!isset($thankables[$user_id]))
 			{
-				$thankables[$user_id] = $this->thankable_factory->CreateUnknown($user_id, $owner_class_id);
+				$thankables[$user_id] = $this->thankable_factory->CreateUnknown($owner_class_id);
 			}
 		}
 
@@ -1067,7 +1067,7 @@ class ThankYousRepository
 
 	/**
 	 * @param QueryBuilder $query
-	 * @param string[]        $date_range
+	 * @param string[]     $date_range
 	 */
 	private function QueryFilterCreatedBetween(QueryBuilder $query, array $date_range)
 	{

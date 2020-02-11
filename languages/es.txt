@@ -45,7 +45,6 @@ lm	thankyou.error.invalid_users
 lm	thankyou.error.no_edit_permission		
 lm	thankyou.error.thanks_not_found		
 lm	thankyou.grammar.list.and		
-lm	thankyou.group.not_found		
 lm	thankyou.lia.error.saving		
 lm	thankyou.lia.no_results		
 lm	thankyou.notifications.saved		
@@ -74,11 +73,13 @@ lm	thankyou.tag.name.error.too_long
 lm	thankyou.tag.total_uses		
 lm	thankyou.thank.placeholder		
 lm	thankyou.thankable.error.unsuitable_owner_classes		
-lm	thankyou.thankable.not_found		
 lm	thankyou.thankable.owner_class.error.not_supported		
+lm	thankyou.thanked.deleted		
 lm	thankyou.thanked.error.invalid		
+lm	thankyou.thanked.group.deleted		
 lm	thankyou.thanked.item_id.error.undefined		
 lm	thankyou.thanked.owner_class.error.undefined		
+lm	thankyou.thanked.user.deleted		
 lm	thankyou.thanks_list.no_thanks		
 lm	thankyou.thankyou.author.error.invalid		
 lm	thankyou.thankyou.author.error.not_found		
@@ -107,7 +108,6 @@ lm	thankyou.thankyou.thanked.oclass.error.not_integer
 lm	thankyou.thankyou.thanked.oclass.error.undefined		
 lm	thankyou.thankyou.users.error.empty		
 lm	thankyou.thankyou.users.user.id.error.invalid		
-lm	thankyou.user.not_found		
 lm	thankyou.user_profile.tab_name		
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	

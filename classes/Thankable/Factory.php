@@ -47,8 +47,7 @@ class Factory
 		?int $extranet_id = null,
 		?string $image_url = null,
 		?string $profile_url = null
-	)
-	{
+	) {
 		$owner_class_name = null;
 		if (isset($owner_class_id))
 		{
@@ -69,11 +68,10 @@ class Factory
 	/**
 	 * Creates and returns a Thankable to represent Thanked objects which could not be identified.
 	 *
-	 * @param int|null $item_id
 	 * @param int|null $owner_class_id
 	 * @return Thankable
 	 */
-	public function CreateUnknown(?int $item_id = null, ?int $owner_class_id = null)
+	public function CreateUnknown(?int $owner_class_id = null)
 	{
 		$owner_class_name = null;
 		if (isset($owner_class_id))
@@ -83,17 +81,16 @@ class Factory
 
 		if ($owner_class_id === PermOClass::INDIVIDUAL)
 		{
-			$name = ($this->lmsg)('thankyou.user.not_found');
+			$name = ($this->lmsg)('thankyou.thanked.user.deleted');
 		} elseif ($owner_class_id === PermOClass::GROUP)
 		{
-			$name = ($this->lmsg)('thankyou.group.not_found');
+			$name = ($this->lmsg)('thankyou.thanked.group.deleted');
 		} else
 		{
-			$name = ($this->lmsg)('thankyou.thankable.not_found');
+			$name = ($this->lmsg)('thankyou.thanked.deleted');
 		}
 
 		$thankable = new Thankable($name);
-		$thankable->SetItemId($item_id);
 		$thankable->SetOwnerClassId($owner_class_id);
 		$thankable->SetOwnerClassName($owner_class_name);
 

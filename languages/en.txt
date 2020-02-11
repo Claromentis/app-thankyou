@@ -45,7 +45,6 @@ lm	thankyou.error.invalid_users		Failed to save Thank You, the Users provided we
 lm	thankyou.error.no_edit_permission		You do not have permission to modify this thank you message
 lm	thankyou.error.thanks_not_found		Thank you message does not exist
 lm	thankyou.grammar.list.and		and
-lm	thankyou.group.not_found		Group not found
 lm	thankyou.lia.error.saving		One or more Items could not be saved
 lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
@@ -74,11 +73,13 @@ lm	thankyou.tag.name.error.too_long		Core Value Name cannot be more than 20 char
 lm	thankyou.tag.total_uses		Number of times selected
 lm	thankyou.thank.placeholder		Select User or Group
 lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
-lm	thankyou.thankable.not_found		Thankable not found
 lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to %s
+lm	thankyou.thanked.deleted		Thanked Deleted
 lm	thankyou.thanked.error.invalid		Invalid Thanked given
+lm	thankyou.thanked.group.deleted		Group Deleted
 lm	thankyou.thanked.item_id.error.undefined		Thanked Item undefined
 lm	thankyou.thanked.owner_class.error.undefined		Thanked Owner Class is undefined
+lm	thankyou.thanked.user.deleted		User Deleted
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
 lm	thankyou.thankyou.author.error.invalid		Invalid Author given
 lm	thankyou.thankyou.author.error.not_found		User with ID %d could not be found
@@ -107,7 +108,6 @@ lm	thankyou.thankyou.thanked.oclass.error.not_integer		Thanked oclass must be an
 lm	thankyou.thankyou.thanked.oclass.error.undefined		Thanked must contain an oclass
 lm	thankyou.thankyou.users.error.empty		No Users have been thanked
 lm	thankyou.thankyou.users.user.id.error.invalid		User %d cannot be thanked
-lm	thankyou.user.not_found		User not found
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	

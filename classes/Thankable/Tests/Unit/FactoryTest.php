@@ -58,7 +58,7 @@ class FactoryTest extends TestCase
 	public function testCreateUnknownSuccessfulNoDetails()
 	{
 		$unknown_owner_class_name = 'I have no idea...';
-		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.thankable.not_found')
+		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.thanked.deleted')
 			->willReturn($unknown_owner_class_name);
 		$thankable_no_details = $this->factory->CreateUnknown();
 
@@ -70,11 +70,11 @@ class FactoryTest extends TestCase
 		$name             = 'Unknown User';
 		$owner_class_id   = PermOClass::INDIVIDUAL;
 		$owner_class_name = "Some Owner Class Name";
-		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.user.not_found')
+		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.thanked.user.deleted')
 			->willReturn($name);
 		$this->thank_you_utility_mock->method('GetOwnerClassName')
 			->willReturn($owner_class_name);
-		$thankable_unknown_user = $this->factory->CreateUnknown(null, $owner_class_id);
+		$thankable_unknown_user = $this->factory->CreateUnknown($owner_class_id);
 
 		$this->assertSame($name, $thankable_unknown_user->GetName());
 		$this->assertSame($owner_class_name, $thankable_unknown_user->GetOwnerClassName());
@@ -85,11 +85,11 @@ class FactoryTest extends TestCase
 		$name             = 'Unknown Group';
 		$owner_class_id   = PermOClass::GROUP;
 		$owner_class_name = "Some Owner Class Name";
-		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.group.not_found')
+		$this->lmsg_mock->expects($this->once())->method('__invoke')->with('thankyou.thanked.group.deleted')
 			->willReturn($name);
 		$this->thank_you_utility_mock->method('GetOwnerClassName')
 			->willReturn($owner_class_name);
-		$thankable_unknown_group = $this->factory->CreateUnknown(null, $owner_class_id);
+		$thankable_unknown_group = $this->factory->CreateUnknown($owner_class_id);
 
 		$this->assertSame($name, $thankable_unknown_group->GetName());
 		$this->assertSame($owner_class_name, $thankable_unknown_group->GetOwnerClassName());
