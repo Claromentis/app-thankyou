@@ -72,12 +72,12 @@ lm	thankyou.tag.name
 lm	thankyou.tag.name.error.too_long		
 lm	thankyou.tag.total_uses		
 lm	thankyou.thank.placeholder		
-lm	thankyou.thankable.error.unsuitable_owner_classes		
-lm	thankyou.thankable.owner_class.error.not_supported		
 lm	thankyou.thanked.deleted		
 lm	thankyou.thanked.error.invalid		
+lm	thankyou.thanked.error.unsuitable_owner_classes		
 lm	thankyou.thanked.group.deleted		
 lm	thankyou.thanked.item_id.error.undefined		
+lm	thankyou.thanked.owner_class.error.not_supported		
 lm	thankyou.thanked.owner_class.error.undefined		
 lm	thankyou.thanked.user.deleted		
 lm	thankyou.thanks_list.no_thanks		

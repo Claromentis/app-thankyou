@@ -5,7 +5,7 @@ namespace Claromentis\ThankYou\ThankYous\Format;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Tags\Format\TagFormatter;
-use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\Thanked\Thanked;
 use Claromentis\ThankYou\ThankYous\ThankYou;
 use Claromentis\ThankYou\ThankYous\ThankYouAcl;
 use DateClaTimeZone;
@@ -74,7 +74,7 @@ class ThankYouFormatter
 	 *         date_created => Date,
 	 *         description => string,
 	 *         id => int|null,
-	 *         thanked => null|array(see ConvertThankableToArray),
+	 *         thanked => null|array(see ConvertThankedToArray),
 	 *         users => null|array[
 	 *         id => int,
 	 *         name => string
@@ -109,13 +109,13 @@ class ThankYouFormatter
 			'id'           => $thank_you->GetId()
 		];
 
-		$thanked = $thank_you->GetThankables();
+		$thanked = $thank_you->GetThanked();
 		if (isset($thanked))
 		{
 			$thankeds_array = [];
 			foreach ($thanked as $thank)
 			{
-				$thankeds_array[] = $this->ConvertThankableToArray($thank, $security_context);
+				$thankeds_array[] = $this->ConvertThankedToArray($thank, $security_context);
 			}
 			$output['thanked'] = $thankeds_array;
 		}
@@ -142,23 +142,23 @@ class ThankYouFormatter
 	}
 
 	/**
-	 * @param Thankable[]          $thankables
+	 * @param Thanked[]            $thankeds
 	 * @param SecurityContext|null $security_context
 	 * @return array
 	 */
-	public function ConvertThankablesToArrays(array $thankables, ?SecurityContext $security_context = null): array
+	public function ConvertThankedsToArrays(array $thankeds, ?SecurityContext $security_context = null): array
 	{
-		$thankables_array = [];
-		foreach ($thankables as $thankable)
+		$thankeds_array = [];
+		foreach ($thankeds as $thanked)
 		{
-			$thankables_array[] = $this->ConvertThankableToArray($thankable, $security_context);
+			$thankeds_array[] = $this->ConvertThankedToArray($thanked, $security_context);
 		}
 
-		return $thankables_array;
+		return $thankeds_array;
 	}
 
 	/**
-	 * @param Thankable            $thankable
+	 * @param Thanked              $thanked
 	 * @param SecurityContext|null $security_context
 	 * @return array:
 	 *         [
@@ -171,28 +171,28 @@ class ThankYouFormatter
 	 *         ]
 	 *         ]
 	 */
-	public function ConvertThankableToArray(Thankable $thankable, ?SecurityContext $security_context = null): array
+	public function ConvertThankedToArray(Thanked $thanked, ?SecurityContext $security_context = null): array
 	{
 		$object_type    = null;
-		$object_type_id = $thankable->GetOwnerClass();
+		$object_type_id = $thanked->GetOwnerClass();
 		if (isset($object_type_id))
 		{
-			$owner_class_name = $thankable->GetOwnerClassName() ?? '';
+			$owner_class_name = $thanked->GetOwnerClassName() ?? '';
 
 			$object_type = ['id' => $object_type_id, 'name' => $owner_class_name];
 		}
 
-		if (isset($security_context) && !$this->acl->CanSeeThankedName($security_context, $thankable))
+		if (isset($security_context) && !$this->acl->CanSeeThankedName($security_context, $thanked))
 		{
 			$name = ($this->lmsg)('common.perms.hidden_name');
 		} else
 		{
-			$name = $thankable->GetName();
+			$name = $thanked->GetName();
 		}
 
 		$output = [
-			'id'               => $thankable->GetItemId(),
-			'extranet_area_id' => $thankable->GetExtranetId(),
+			'id'               => $thanked->GetItemId(),
+			'extranet_area_id' => $thanked->GetExtranetId(),
 			'name'             => $name,
 			'object_type'      => $object_type
 		];

@@ -7,7 +7,7 @@ use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\Entity\User;
 use Claromentis\People\PeopleAcl;
-use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\Thanked\Thanked;
 
 class ThankYouAcl
 {
@@ -62,17 +62,17 @@ class ThankYouAcl
 	}
 
 	/**
-	 * Determines whether a Security Context can view a Thankable's Name.
+	 * Determines whether a Security Context can view a Thanked's Name.
 	 *
 	 * @param SecurityContext $context
-	 * @param Thankable       $thankable
+	 * @param Thanked         $thanked
 	 * @return bool
 	 */
-	public function CanSeeThankedName(SecurityContext $context, Thankable $thankable): bool
+	public function CanSeeThankedName(SecurityContext $context, Thanked $thanked): bool
 	{
-		$thankable_extranet_id = $thankable->GetExtranetId();
-		$owner_class           = $thankable->GetOwnerClass();
-		$item_id               = $thankable->GetItemId();
+		$thanked_extranet_id = $thanked->GetExtranetId();
+		$owner_class         = $thanked->GetOwnerClass();
+		$item_id             = $thanked->GetItemId();
 
 		if (isset($item_id))
 		{
@@ -85,9 +85,9 @@ class ThankYouAcl
 			}
 		}
 
-		if (isset($thankable_extranet_id))
+		if (isset($thanked_extranet_id))
 		{
-			return $this->people_acl->CanViewExtranet($context, $thankable_extranet_id);
+			return $this->people_acl->CanViewExtranet($context, $thanked_extranet_id);
 		}
 
 		return true;

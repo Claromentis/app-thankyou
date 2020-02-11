@@ -36,12 +36,12 @@ class ThankYouUtility
 		{
 			if (!is_int($id))
 			{
-				throw new InvalidArgumentException("Failed to Get Thankable Object Type's Name From ID, non-integer value given");
+				throw new InvalidArgumentException("Failed to Get Thanked Object Type's Name From ID, non-integer value given");
 			}
 			$names[$id] = PermOClass::GetName($id);
 			if (!is_string($names[$id]))
 			{
-				throw new OwnerClassNameException("Failed to Get Thankable Object Type's Name From ID, oClass did not return string");
+				throw new OwnerClassNameException("Failed to Get Thanked Object Type's Name From ID, oClass did not return string");
 			}
 		}
 

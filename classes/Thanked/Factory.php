@@ -1,6 +1,6 @@
 <?php
 
-namespace Claromentis\ThankYou\Thankable;
+namespace Claromentis\ThankYou\Thanked;
 
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Localization\Lmsg;
@@ -38,7 +38,7 @@ class Factory
 	 * @param int|null    $extranet_id
 	 * @param string|null $image_url
 	 * @param string|null $profile_url
-	 * @return Thankable
+	 * @return Thanked
 	 */
 	public function Create(
 		string $name,
@@ -54,22 +54,22 @@ class Factory
 			$owner_class_name = $this->GetOwnerClassName($owner_class_id);
 		}
 
-		$thankable = new Thankable($name);
-		$thankable->SetExtranetId($extranet_id);
-		$thankable->SetItemId($item_id);
-		$thankable->SetImageUrl($image_url);
-		$thankable->SetOwnerClassId($owner_class_id);
-		$thankable->SetOwnerClassName($owner_class_name);
-		$thankable->SetObjectUrl($profile_url);
+		$thanked = new Thanked($name);
+		$thanked->SetExtranetId($extranet_id);
+		$thanked->SetItemId($item_id);
+		$thanked->SetImageUrl($image_url);
+		$thanked->SetOwnerClassId($owner_class_id);
+		$thanked->SetOwnerClassName($owner_class_name);
+		$thanked->SetObjectUrl($profile_url);
 
-		return $thankable;
+		return $thanked;
 	}
 
 	/**
-	 * Creates and returns a Thankable to represent Thanked objects which could not be identified.
+	 * Creates and returns a Thanked to represent Thanked objects which could not be identified.
 	 *
 	 * @param int|null $owner_class_id
-	 * @return Thankable
+	 * @return Thanked
 	 */
 	public function CreateUnknown(?int $owner_class_id = null)
 	{
@@ -90,11 +90,11 @@ class Factory
 			$name = ($this->lmsg)('thankyou.thanked.deleted');
 		}
 
-		$thankable = new Thankable($name);
-		$thankable->SetOwnerClassId($owner_class_id);
-		$thankable->SetOwnerClassName($owner_class_name);
+		$thanked = new Thanked($name);
+		$thanked->SetOwnerClassId($owner_class_id);
+		$thanked->SetOwnerClassName($owner_class_name);
 
-		return $thankable;
+		return $thanked;
 	}
 
 	/**

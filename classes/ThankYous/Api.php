@@ -23,7 +23,7 @@ use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
-use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\Thanked\Thanked;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
@@ -357,9 +357,9 @@ class Api
 	/**
 	 * @return int[]
 	 */
-	public function GetThankableObjectTypes(): array
+	public function GetThankedObjectTypes(): array
 	{
-		return $this->thank_yous_repository::THANKABLES;
+		return $this->thank_yous_repository::THANKED_OWNER_CLASSES;
 	}
 
 	/**
@@ -641,7 +641,7 @@ class Api
 			throw new ValidationException($errors);
 		}
 
-		$this->PopulateThankYouUsersFromThankables($thank_you);
+		$this->PopulateThankYouUsersFromThanked($thank_you);
 
 		return $this->SaveNew($thank_you);
 	}
@@ -684,7 +684,7 @@ class Api
 			try
 			{
 				$this->SetThankedFromArray($thank_you, $thanked);
-				$this->PopulateThankYouUsersFromThankables($thank_you);
+				$this->PopulateThankYouUsersFromThanked($thank_you);
 			} catch (ValidationException $exception)
 			{
 				$errors = array_merge($errors, $exception->GetErrors());
@@ -713,13 +713,13 @@ class Api
 	/**
 	 * @param int $o_class
 	 * @param int $id
-	 * @return Thankable
+	 * @return Thanked
 	 * @throws UnsupportedOwnerClassException - If the Owner Class given is not supported.
 	 * @throws MappingException
 	 */
-	public function CreateThankableFromOClass(int $o_class, int $id)
+	public function CreateThankedFromOClass(int $o_class, int $id)
 	{
-		return $this->CreateThankablesFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
+		return $this->CreateThankedFromOClasses([['oclass' => $o_class, 'id' => $id]])[0];
 	}
 
 	/**
@@ -727,13 +727,13 @@ class Api
 	 * Returns an array of Thanked Objects, retaining indexing.
 	 *
 	 * @param array $oclasses
-	 * @return Thankable[]
+	 * @return Thanked[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
 	 * @throws MappingException
 	 */
-	public function CreateThankablesFromOClasses(array $oclasses)
+	public function CreateThankedFromOClasses(array $oclasses)
 	{
-		return $this->thank_yous_repository->CreateThankablesFromOClasses($oclasses);
+		return $this->thank_yous_repository->CreateThanked($oclasses);
 	}
 
 	/**
@@ -791,12 +791,12 @@ class Api
 
 	/**
 	 * @param SecurityContext $security_context
-	 * @param Thankable       $thankable
+	 * @param Thanked         $thanked
 	 * @return bool
 	 */
-	public function CanSeeThankableName(SecurityContext $security_context, Thankable $thankable): bool
+	public function CanSeeThankedName(SecurityContext $security_context, Thanked $thanked): bool
 	{
-		return $this->acl->CanSeeThankedName($security_context, $thankable);
+		return $this->acl->CanSeeThankedName($security_context, $thanked);
 	}
 
 	/**
@@ -824,11 +824,11 @@ class Api
 	 * @param ThankYou $thank_you
 	 * @throws MappingException
 	 */
-	public function PopulateThankYouUsersFromThankables(ThankYou $thank_you)
+	public function PopulateThankYouUsersFromThanked(ThankYou $thank_you)
 	{
-		$thankables = $thank_you->GetThankables();
+		$thankeds = $thank_you->GetThanked();
 
-		if (!isset($thankables))
+		if (!isset($thankeds))
 		{
 			$thank_you->SetUsers(null);
 
@@ -836,10 +836,10 @@ class Api
 		}
 
 		$owner_classes = [];
-		foreach ($thankables as $thankable)
+		foreach ($thankeds as $thanked)
 		{
-			$id        = $thankable->GetItemId();
-			$oclass_id = $thankable->GetOwnerClass();
+			$id        = $thanked->GetItemId();
+			$oclass_id = $thanked->GetOwnerClass();
 
 			if (!isset($id) || !isset($oclass_id))
 			{
@@ -976,31 +976,31 @@ class Api
 	 * Given a Thank You and an array, tries to populate the Thank You's Thanked.
 	 *
 	 * @param ThankYou $thank_you
-	 * @param array    $thanked
+	 * @param array    $thankeds
 	 * @throws ValidationException - If the Thank You's Thanked could not be set from the given array.
 	 * @throws MappingException
 	 */
-	private function SetThankedFromArray(ThankYou $thank_you, array $thanked)
+	private function SetThankedFromArray(ThankYou $thank_you, array $thankeds)
 	{
-		if (!is_array($thanked))
+		if (!is_array($thankeds))
 		{
 			$errors[] = ['name' => 'thanked', 'reason' => ($this->lmsg)('thankyou.thanked.error.invalid')];
 		} else
 		{
-			foreach ($thanked as $offset => $oclass)
+			foreach ($thankeds as $offset => $oclass)
 			{
-				$thanked[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
+				$thankeds[$offset] = ['oclass' => (int) ($oclass['oclass'] ?? null), 'id' => (int) ($oclass['id'] ?? null)];
 			}
 			try
 			{
-				$thankables = $this->CreateThankablesFromOClasses($thanked);
-				$thank_you->SetThanked($thankables);
+				$thanked = $this->CreateThankedFromOClasses($thankeds);
+				$thank_you->SetThanked($thanked);
 			} catch (UnsupportedOwnerClassException $exception)
 			{
 				$errors[] = [
 					'name'   => 'thanked',
-					'reason' => ($this->lmsg)('thankyou.thankable.owner_class.error.not_supported',
-						implode(', ', $this->GetThankableObjectTypes())
+					'reason' => ($this->lmsg)('thankyou.thanked.owner_class.error.not_supported',
+						implode(', ', $this->GetThankedObjectTypes())
 					)
 				];
 			}

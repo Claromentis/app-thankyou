@@ -125,9 +125,9 @@ class Plugin implements
 
 		$app['tags.datatable.admin'] = TagDataTableSource::class;
 
-		//Thankable
-		$app[Thankable\Factory::class] = function ($app) {
-			return new Thankable\Factory($app[Lmsg::class], $app[ThankYouUtility::class]);
+		//Thanked
+		$app[Thanked\Factory::class] = function ($app) {
+			return new Thanked\Factory($app[Lmsg::class], $app[ThankYouUtility::class]);
 		};
 
 		//Thank Yous
@@ -197,7 +197,7 @@ class Plugin implements
 				$app['logger_factory']->GetLogger(self::APPLICATION_NAME),
 				$app[QueryFactory::class],
 				$app[Tags\Api::class],
-				$app[Thankable\Factory::class]
+				$app[Thanked\Factory::class]
 			);
 		};
 
@@ -453,10 +453,10 @@ class Plugin implements
 				$create = 0;
 				try
 				{
-					$thankable = $api->ThankYous()->CreateThankableFromOClass(PermOClass::INDIVIDUAL, $user_id);
-					if ($api->ThankYous()->CanSeeThankableName($context, $thankable))
+					$thanked = $api->ThankYous()->CreateThankedFromOClass(PermOClass::INDIVIDUAL, $user_id);
+					if ($api->ThankYous()->CanSeeThankedName($context, $thanked))
 					{
-						$create = $thankable;
+						$create = $thanked;
 					}
 				} catch (UnsupportedOwnerClassException | MappingException $exception)
 				{

@@ -12,10 +12,10 @@ use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Repository\Exception\StorageException;
 use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Exception\EmptyQueryFilterException;
-use Claromentis\ThankYou\Exception\ThankableException;
+use Claromentis\ThankYou\Exception\ThankedException;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
-use Claromentis\ThankYou\Thankable;
+use Claromentis\ThankYou\Thanked;
 use Date;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -25,7 +25,7 @@ use User;
 class ThankYousRepository
 {
 	const AGGREGATION_ID = 143;
-	const THANKABLES = [PermOClass::INDIVIDUAL, PermOClass::GROUP];
+	const THANKED_OWNER_CLASSES = [PermOClass::INDIVIDUAL, PermOClass::GROUP];
 
 	const TAG_TABLE = 'thankyou_tag';
 	const THANK_YOU_TABLE = 'thankyou_item';
@@ -46,9 +46,9 @@ class ThankYousRepository
 	private $logger;
 
 	/**
-	 * @var Thankable\Factory
+	 * @var Thanked\Factory
 	 */
-	private $thankable_factory;
+	private $thanked_factory;
 
 	/**
 	 * @var ThankYouFactory
@@ -78,14 +78,14 @@ class ThankYousRepository
 	/**
 	 * ThankYousRepository constructor.
 	 *
-	 * @param ThankYouFactory   $thank_you_factory
-	 * @param ThankYouUtility   $thank_you_utility
-	 * @param DbInterface       $db_interface
-	 * @param UserRepository    $user_repository
-	 * @param LoggerInterface   $logger
-	 * @param QueryFactory      $query_factory
-	 * @param Tags\Api          $tag_api
-	 * @param Thankable\Factory $thankable_factory
+	 * @param ThankYouFactory $thank_you_factory
+	 * @param ThankYouUtility $thank_you_utility
+	 * @param DbInterface     $db_interface
+	 * @param UserRepository  $user_repository
+	 * @param LoggerInterface $logger
+	 * @param QueryFactory    $query_factory
+	 * @param Tags\Api        $tag_api
+	 * @param Thanked\Factory $thanked_factory
 	 */
 	public function __construct(
 		ThankYouFactory $thank_you_factory,
@@ -95,7 +95,7 @@ class ThankYousRepository
 		LoggerInterface $logger,
 		QueryFactory $query_factory,
 		Tags\Api $tag_api,
-		Thankable\Factory $thankable_factory
+		Thanked\Factory $thanked_factory
 	) {
 		$this->thank_you_factory = $thank_you_factory;
 		$this->utility           = $thank_you_utility;
@@ -104,7 +104,7 @@ class ThankYousRepository
 		$this->logger            = $logger;
 		$this->query_factory     = $query_factory;
 		$this->tags              = $tag_api;
-		$this->thankable_factory = $thankable_factory;
+		$this->thanked_factory   = $thanked_factory;
 	}
 
 	/**
@@ -247,7 +247,7 @@ class ThankYousRepository
 	 * Given an array of Thank You IDs, returns an array of Thankeds, indexed by the Thank You's ID and then the Thanked's ID.
 	 *
 	 * @param int[] $ids
-	 * @return array[Thankable]
+	 * @return array[Thanked]
 	 * @throws MappingException
 	 */
 	public function GetThankYousThankedsByThankYouIds(array $ids)
@@ -281,7 +281,7 @@ class ThankYousRepository
 
 		try
 		{
-			$thankeds = $this->CreateThankablesFromOClasses($thankeds);
+			$thankeds = $this->CreateThanked($thankeds);
 		} catch (UnsupportedOwnerClassException $exception)
 		{
 			$this->logger->error("One or more Thanked in the Repository is invalid", [$exception]);
@@ -694,11 +694,11 @@ class ThankYousRepository
 	 * Returns an array of Thanked Objects, retaining indexing.
 	 *
 	 * @param array $thankeds
-	 * @return Thankable\Thankable[]
+	 * @return Thanked\Thanked[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
 	 * @throws MappingException
 	 */
-	public function CreateThankablesFromOClasses(array $thankeds): array
+	public function CreateThanked(array $thankeds): array
 	{
 		//TODO: Expand accepted objects to include all PERM_OCLASS_*
 		$owner_classes_ids = [];
@@ -709,7 +709,7 @@ class ThankYousRepository
 				throw new InvalidArgumentException("Failed to Get Permission Object Classes Names, Object Class not specified");
 			}
 
-			if (!in_array($thanked['oclass'], self::THANKABLES))
+			if (!in_array($thanked['oclass'], self::THANKED_OWNER_CLASSES))
 			{
 				throw new UnsupportedOwnerClassException("Failed to Get Permission Object Classes Names, Object class is not supported");
 			}
@@ -729,12 +729,12 @@ class ThankYousRepository
 
 		if (isset($owner_classes_ids[PermOClass::GROUP]))
 		{
-			$owner_classes_ids[PermOClass::GROUP] = $this->CreateThankablesFromGroupIds(array_keys($owner_classes_ids[PermOClass::GROUP]));
+			$owner_classes_ids[PermOClass::GROUP] = $this->CreateThankedFromGroupIds(array_keys($owner_classes_ids[PermOClass::GROUP]));
 		}
 
 		if (isset($owner_classes_ids[PermOClass::INDIVIDUAL]))
 		{
-			$owner_classes_ids[PermOClass::INDIVIDUAL] = $this->CreateThankablesFromUserIds(array_keys($owner_classes_ids[PermOClass::INDIVIDUAL]));
+			$owner_classes_ids[PermOClass::INDIVIDUAL] = $this->CreateThankedFromUserIds(array_keys($owner_classes_ids[PermOClass::INDIVIDUAL]));
 		}
 
 		foreach ($thankeds as $offset => $thanked)
@@ -746,12 +746,12 @@ class ThankYousRepository
 	}
 
 	/**
-	 * Create an array of Thankables from an array of Group IDs. The returned array is indexed by the Group's ID
+	 * Create an array of Thanked from an array of Group IDs. The returned array is indexed by the Group's ID
 	 *
 	 * @param int[] $groups_ids
-	 * @return Thankable\Thankable[]
+	 * @return Thanked\Thanked[]
 	 */
-	public function CreateThankablesFromGroupIds(array $groups_ids): array
+	public function CreateThankedFromGroupIds(array $groups_ids): array
 	{
 		$owner_class_id = PermOClass::GROUP;
 
@@ -759,64 +759,64 @@ class ThankYousRepository
 		{
 			if (!is_int($groups_id))
 			{
-				throw new InvalidArgumentException("Failed to Create Thankables from Groups, invalid Group ID provided");
+				throw new InvalidArgumentException("Failed to Create Thanked from Groups, invalid Group ID provided");
 			}
 		}
 
 		$result = $this->db->query("SELECT groupid, groupname, ex_area_id FROM " . self::GROUP_TABLE . " WHERE groupid IN in:int:groups ORDER BY groupid", $groups_ids);
 
-		$group_thankables = [];
+		$group_thanked = [];
 		while ($group = $result->fetchArray())
 		{
-			$id                    = (int) $group['groupid'];
-			$group_thankables[$id] = $this->thankable_factory->Create($group['groupname'], $id, $owner_class_id, (int) $group['ex_area_id']);
+			$id                 = (int) $group['groupid'];
+			$group_thanked[$id] = $this->thanked_factory->Create($group['groupname'], $id, $owner_class_id, (int) $group['ex_area_id']);
 		}
 
 		foreach ($groups_ids as $groups_id)
 		{
-			if (!isset($group_thankables[$groups_id]))
+			if (!isset($group_thanked[$groups_id]))
 			{
-				$group_thankables[$groups_id] = $this->thankable_factory->CreateUnknown($owner_class_id);
+				$group_thanked[$groups_id] = $this->thanked_factory->CreateUnknown($owner_class_id);
 			}
 		}
 
-		return $group_thankables;
+		return $group_thanked;
 	}
 
 	/**
-	 * Creates Thankables from User IDs. If the User cannot be found, a substitute Thankable will be created.
+	 * Creates Thanked from User IDs. If the User cannot be found, a substitute Thanked will be created.
 	 * Returns array indexed by the IDs.
 	 *
 	 * @param int[] $user_ids
-	 * @return Thankable\Thankable[]
+	 * @return Thanked\Thanked[]
 	 * @throws MappingException
 	 */
-	public function CreateThankablesFromUserIds(array $user_ids)
+	public function CreateThankedFromUserIds(array $user_ids)
 	{
 		$owner_class_id = PermOClass::INDIVIDUAL;
 
 		$users_entity_collection = $this->user_repository->find($user_ids);
 
-		$thankables = $this->CreateThankablesFromUsers($users_entity_collection->getDictionary());
+		$thanked = $this->CreateThankedFromUsers($users_entity_collection->getDictionary());
 
 		foreach ($user_ids as $user_id)
 		{
-			if (!isset($thankables[$user_id]))
+			if (!isset($thanked[$user_id]))
 			{
-				$thankables[$user_id] = $this->thankable_factory->CreateUnknown($owner_class_id);
+				$thanked[$user_id] = $this->thanked_factory->CreateUnknown($owner_class_id);
 			}
 		}
 
-		return $thankables;
+		return $thanked;
 	}
 
 	/**
-	 * Creates an array of Thankables from an array of Users. Retains indexes.
+	 * Creates an array of Thanked from an array of Users. Retains indexes.
 	 *
 	 * @param \Claromentis\People\Entity\User[] $users
-	 * @return Thankable\Thankable[]
+	 * @return Thanked\Thanked[]
 	 */
-	public function CreateThankablesFromUsers(array $users)
+	public function CreateThankedFromUsers(array $users)
 	{
 		$owner_class_id = PermOClass::INDIVIDUAL;
 
@@ -824,7 +824,7 @@ class ThankYousRepository
 		{
 			if (!($user instanceof \Claromentis\People\Entity\User))
 			{
-				throw new InvalidArgumentException("Failed to Create Thankables From Users, invalid object passed");
+				throw new InvalidArgumentException("Failed to Create Thanked From Users, invalid object passed");
 			}
 
 			try
@@ -833,14 +833,14 @@ class ThankYousRepository
 				$user_image_url = User::GetPhotoUrl($user->id);
 			} catch (CDNSystemException $cdn_system_exception)
 			{
-				$this->logger->error("Failed to Get User's Photo URL when Creating Thankable: " . $cdn_system_exception->getMessage());
+				$this->logger->error("Failed to Get User's Photo URL when Creating Thanked: " . $cdn_system_exception->getMessage());
 				$user_image_url = null;
 			}
 
 			//TODO: Replace with a non-static post People API update
 			$user_profile_url = User::GetProfileUrl($user->id, false);
 
-			$users[$user_offset] = $this->thankable_factory->Create($user->getFullname(), $user->id, $owner_class_id, $user->extranet_id, $user_image_url, $user_profile_url);
+			$users[$user_offset] = $this->thanked_factory->Create($user->getFullname(), $user->id, $owner_class_id, $user->extranet_id, $user_image_url, $user_profile_url);
 		}
 
 		return $users;
@@ -860,7 +860,7 @@ class ThankYousRepository
 
 		$thank_you->SetId($id);
 
-		$thankeds = $thank_you->GetThankables();
+		$thankeds = $thank_you->GetThanked();
 		if (isset($thankeds))
 		{
 			$this->DeleteThankYouThanked($id);
@@ -871,7 +871,7 @@ class ThankYousRepository
 				{
 					$thanked_id = $this->SaveThanked($id, $thanked);
 					$thanked->SetId($thanked_id);
-				} catch (ThankableException $exception)
+				} catch (ThankedException $exception)
 				{
 					$this->logger->warning("Could not save a Thank You's Thanked, not enough data", [$exception]);
 				}
@@ -960,24 +960,24 @@ class ThankYousRepository
 	 * with the given ID prior to calling this.
 	 * Returns the ID of the saved Thanked.
 	 *
-	 * @param int                 $thank_you_id
-	 * @param Thankable\Thankable $thankable
+	 * @param int             $thank_you_id
+	 * @param Thanked\Thanked $thanked
 	 * @return int
-	 * @throws ThankableException - If the Thankable does not have an Owner Class ID or Item ID.
+	 * @throws ThankedException - If the Thanked does not have an Owner Class ID or Item ID.
 	 */
-	private function SaveThanked(int $thank_you_id, Thankable\Thankable $thankable): int
+	private function SaveThanked(int $thank_you_id, Thanked\Thanked $thanked): int
 	{
-		$id             = $thankable->GetId();
-		$owner_class_id = $thankable->GetOwnerClass();
-		$item_id        = $thankable->GetItemId();
+		$id             = $thanked->GetId();
+		$owner_class_id = $thanked->GetOwnerClass();
+		$item_id        = $thanked->GetItemId();
 
 		if (!isset($owner_class_id))
 		{
-			throw new ThankableException("Failed to Save Thanked, Thanked does not have an Owner Class ID set");
+			throw new ThankedException("Failed to Save Thanked, Thanked does not have an Owner Class ID set");
 		}
 		if (!isset($item_id))
 		{
-			throw new ThankableException("Failed to Save Thanked, Thanked does not have an Item ID set");
+			throw new ThankedException("Failed to Save Thanked, Thanked does not have an Item ID set");
 		}
 
 		$db_fields = [

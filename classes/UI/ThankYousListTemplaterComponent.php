@@ -8,7 +8,7 @@ use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Api;
-use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\Thanked\Thanked;
 use Claromentis\ThankYou\ThankYous\Validator;
 use Psr\Log\LoggerInterface;
 
@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
  * * create:
  *     * 0 = Creating Thank Yous is disabled.
  *     * 1 = Creating Thank Yous is enabled.
- *     * Thankable[] = Creating ThankYous is locked to the array of Thankables given.
+ *     * Thanked[] = Creating ThankYous is locked to the array of Thanked given.
  * * delete:
  *     * 0 = Deleting Thank Yous is disabled.
  *     * 1 = Deleting Thank Yous is enabled (subject to permissions).
@@ -94,16 +94,16 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		$can_delete = (bool) ($attributes['delete'] ?? null);
 		$can_edit   = (bool) ($attributes['edit'] ?? null);
 		/**
-		 * @var Thankable[] $create_thankables
+		 * @var Thanked[] $create_thankeds
 		 */
-		$create_thankables = (isset($attributes['create']) && is_array($attributes['create'])) ? $attributes['create'] : null;
-		$display_comments  = (bool) ($attributes['comments'] ?? null);
-		$thanked_images    = (bool) ($attributes['thanked_images'] ?? null);
-		$links             = (bool) ($attributes['links'] ?? null);
-		$limit             = (int) ($attributes['limit'] ?? 20);
-		$offset            = (int) ($attributes['offset'] ?? null);
-		$thanks_links      = (bool) ($attributes['thanks_links'] ?? null);
-		$user_ids          = $attributes['user_ids'] ?? null;
+		$create_thankeds  = (isset($attributes['create']) && is_array($attributes['create'])) ? $attributes['create'] : null;
+		$display_comments = (bool) ($attributes['comments'] ?? null);
+		$thanked_images   = (bool) ($attributes['thanked_images'] ?? null);
+		$links            = (bool) ($attributes['links'] ?? null);
+		$limit            = (int) ($attributes['limit'] ?? 20);
+		$offset           = (int) ($attributes['offset'] ?? null);
+		$thanks_links     = (bool) ($attributes['thanks_links'] ?? null);
+		$user_ids         = $attributes['user_ids'] ?? null;
 
 		try
 		{
@@ -142,7 +142,7 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		$args['thank_you_user.placeholder']        = ($this->lmsg)('thankyou.thank.placeholder');
 		$args['description_max_length.json']       = Validator::DESCRIPTION_MAX_CHARACTERS;
 
-		$args['thank_you_form_tags_segment.visible'] = $this->api->Configuration()->IsTagsEnabled();
+		$args['thank_you_form_tags_segment.visible']  = $this->api->Configuration()->IsTagsEnabled();
 		$args['thankyou_form_tags_mandatory.visible'] = $this->api->Configuration()->IsTagsMandatory();
 
 		if (count($args['thank_yous.datasrc']) === 0)
@@ -153,9 +153,9 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		if ($can_create)
 		{
 			$args['create_container.visible'] = 1;
-			if (isset($create_thankables))
+			if (isset($create_thankeds))
 			{
-				$args['create.thankables'] = $create_thankables;
+				$args['create.thankeds'] = $create_thankeds;
 			}
 		} else
 		{

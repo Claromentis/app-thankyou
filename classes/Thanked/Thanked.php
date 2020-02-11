@@ -1,8 +1,8 @@
 <?php
 
-namespace Claromentis\ThankYou\Thankable;
+namespace Claromentis\ThankYou\Thanked;
 
-class Thankable
+class Thanked
 {
 	/**
 	 * @var string
@@ -47,7 +47,7 @@ class Thankable
 	private $object_url;
 
 	/**
-	 * Thankable constructor.
+	 * Thanked constructor.
 	 *
 	 * @param string $name
 	 */

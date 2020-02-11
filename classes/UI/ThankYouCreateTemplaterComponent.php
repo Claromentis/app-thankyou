@@ -6,7 +6,7 @@ use Claromentis\Core\Application;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Configuration;
-use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\Thanked\Thanked;
 use Claromentis\ThankYou\ThankYous\Validator;
 use Psr\Log\LoggerInterface;
 
@@ -36,52 +36,52 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 
 	public function Show($attributes, Application $app)
 	{
-		$thankables = $attributes['thankables'] ?? null;
-		$form       = (bool) ($attributes['form'] ?? true);
+		$thanked = $attributes['thankeds'] ?? null;
+		$form    = (bool) ($attributes['form'] ?? true);
 
 		$args = ['thank_you_form.visible' => $form];
 
-		$class                                       = uniqid();
-		$args['create_container.+class']             = $class;
-		$args['class.json']                          = $class;
-		$args['thank_you_form_tags_segment.visible'] = $this->config_api->IsTagsEnabled();
+		$class                                        = uniqid();
+		$args['create_container.+class']              = $class;
+		$args['class.json']                           = $class;
+		$args['thank_you_form_tags_segment.visible']  = $this->config_api->IsTagsEnabled();
 		$args['thankyou_form_tags_mandatory.visible'] = $this->config_api->IsTagsMandatory();
-		$args['thank_you_user.placeholder']          = ($this->lmsg)('thankyou.thank.placeholder');
-		$args['thank_you_description.placeholder']   = ($this->lmsg)('thankyou.common.add_description');
-		$args['description_max_length.json']         = Validator::DESCRIPTION_MAX_CHARACTERS;
+		$args['thank_you_user.placeholder']           = ($this->lmsg)('thankyou.thank.placeholder');
+		$args['thank_you_description.placeholder']    = ($this->lmsg)('thankyou.common.add_description');
+		$args['description_max_length.json']          = Validator::DESCRIPTION_MAX_CHARACTERS;
 
-		if (isset($thankables))
+		if (isset($thanked))
 		{
-			if ($thankables instanceof Thankable)
+			if ($thanked instanceof Thanked)
 			{
-				$thankables = [$thankables];
+				$thanked = [$thanked];
 			}
 
-			if (is_array($thankables))
+			if (is_array($thanked))
 			{
-				$preselected_thankables = [];
-				foreach ($thankables as $thankable)
+				$preselected_thanked = [];
+				foreach ($thanked as $a_thanked)
 				{
-					if ($thankable instanceof Thankable)
+					if ($a_thanked instanceof Thanked)
 					{
-						$preselected_thankables[] = [
-							'id'          => $thankable->GetItemId(),
-							'name'        => $thankable->GetName(),
+						$preselected_thanked[] = [
+							'id'          => $a_thanked->GetItemId(),
+							'name'        => $a_thanked->GetName(),
 							'object_type' => [
-								'id'   => $thankable->GetOwnerClass(),
-								'name' => $thankable->GetOwnerClassName() ?? ''
+								'id'   => $a_thanked->GetOwnerClass(),
+								'name' => $a_thanked->GetOwnerClassName() ?? ''
 							]
 						];
 					} else
 					{
-						$this->logger->error("Value in Templater Component 'thankyou.create' attribute 'thankables' is not a Thankable");
+						$this->logger->error("Value in Templater Component 'thankyou.create' attribute 'thankeds' is not a Thanked");
 					}
 				}
 
-				$args['thank_you_create_button.data-preselected_thanked'] = json_encode($preselected_thankables);
+				$args['thank_you_create_button.data-preselected_thanked'] = json_encode($preselected_thanked);
 			} else
 			{
-				$this->logger->error("Value given to Templater Component 'thankyou.create' attribute 'thankables' was not an array");
+				$this->logger->error("Value given to Templater Component 'thankyou.create' attribute 'thankeds' was not an array");
 			}
 		}
 

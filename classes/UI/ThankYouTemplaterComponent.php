@@ -192,25 +192,25 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 		$date_created->setTimezone($time_zone);
 
 		$thanked_args = [];
-		$thankables   = $thank_you->GetThankables();
+		$thankeds     = $thank_you->GetThanked();
 
-		if (isset($thankables))
+		if (isset($thankeds))
 		{
-			$total_thanked = count($thankables);
+			$total_thanked = count($thankeds);
 
 			$thanked_displayed = 0;
-			foreach ($thankables as $thankable)
+			foreach ($thankeds as $thanked)
 			{
 				$thanked_displayed++;
 
-				$thankable_hidden = !$this->api->ThankYous()->CanSeeThankableName($context, $thankable);
+				$thanked_hidden = !$this->api->ThankYous()->CanSeeThankedName($context, $thanked);
 
-				$image_url             = $thankable_hidden ? null : $thankable->GetImageUrl();
-				$thanked_link          = $thankable_hidden ? null : $thankable->GetObjectUrl();
-				$display_thanked_image = !$thankable_hidden && $thanked_images && isset($image_url);
-				$thanked_tooltip       = $display_thanked_image ? $thankable->GetName() : '';
-				$thanked_link_enabled  = !$thankable_hidden && $links_enabled && isset($thanked_link);
-				$thanked_name          = $thankable_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thankable->GetName();
+				$image_url             = $thanked_hidden ? null : $thanked->GetImageUrl();
+				$thanked_link          = $thanked_hidden ? null : $thanked->GetObjectUrl();
+				$display_thanked_image = !$thanked_hidden && $thanked_images && isset($image_url);
+				$thanked_tooltip       = $display_thanked_image ? $thanked->GetName() : '';
+				$thanked_link_enabled  = !$thanked_hidden && $links_enabled && isset($thanked_link);
+				$thanked_name          = $thanked_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thanked->GetName();
 
 				$thanked_args[] = [
 					'thanked_name.body'         => $thanked_name,
@@ -235,26 +235,25 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			}
 		}
 
-		$thankable_object_types      = '';
-		$first_thankable_object_type = true;
-		foreach ($this->api->ThankYous()->GetThankableObjectTypes() as $object_type_id)
+		$thanked_object_types      = '';
+		$first_thanked_object_type = true;
+		foreach ($this->api->ThankYous()->GetThankedObjectTypes() as $object_type_id)
 		{
-			if ($first_thankable_object_type)
+			if ($first_thanked_object_type)
 			{
-				$thankable_object_types      = (string) $object_type_id;
-				$first_thankable_object_type = false;
+				$thanked_object_types      = (string) $object_type_id;
+				$first_thanked_object_type = false;
 			} else
 			{
-				$thankable_object_types .= "," . $object_type_id;
+				$thanked_object_types .= "," . $object_type_id;
 			}
 		}
 
 		$args = [
-			'thank_you_form_tags_segment.visible' => $tags_enabled,
+			'thank_you_form_tags_segment.visible'  => $tags_enabled,
 			'thankyou_form_tags_mandatory.visible' => $this->api->Configuration()->IsTagsMandatory(),
 
-
-		'thank_you.data-id'        => $id,
+			'thank_you.data-id'        => $id,
 			'id.json'                  => $id,
 			'thank_title.visible'      => !$thank_link,
 			'thank_title_link.visible' => $thank_link,
@@ -290,7 +289,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			'date_created.body'  => Carbon::instance($date_created)->diffForHumans(),
 			'date_created.title' => $date_created->getDate(DateFormatter::LONG_DATE),
 
-			'thank_you_user.filter_perm_oclasses' => $thankable_object_types,
+			'thank_you_user.filter_perm_oclasses' => $thanked_object_types,
 			'thank_you_user.placeholder'          => ($this->lmsg)('thankyou.thank.placeholder'),
 			'thank_you_form.visible'              => $form,
 			'thank_you_description.placeholder'   => ($this->lmsg)('thankyou.common.add_description'),

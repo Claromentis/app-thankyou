@@ -102,7 +102,7 @@ class Validator
 		}
 
 		//Thanked
-		$thankeds = $thank_you->GetThankables();
+		$thankeds = $thank_you->GetThanked();
 		if (isset($thankeds))
 		{
 			if (count($thankeds) === 0)

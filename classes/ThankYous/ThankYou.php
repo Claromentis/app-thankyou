@@ -5,7 +5,7 @@ namespace Claromentis\ThankYou\ThankYous;
 use Claromentis\People\Entity\User;
 use Claromentis\ThankYou\Comments\CommentableThankYou;
 use Claromentis\ThankYou\Tags\Tag;
-use Claromentis\ThankYou\Thankable\Thankable;
+use Claromentis\ThankYou\Thanked\Thanked;
 use Date;
 use InvalidArgumentException;
 
@@ -37,7 +37,7 @@ class ThankYou
 	private $id;
 
 	/**
-	 * @var Thankable[]|null
+	 * @var Thanked[]|null
 	 */
 	private $thanked;
 
@@ -106,9 +106,9 @@ class ThankYou
 	}
 
 	/**
-	 * @return Thankable[]|null
+	 * @return Thanked[]|null
 	 */
-	public function GetThankables(): ?array
+	public function GetThanked(): ?array
 	{
 		return $this->thanked;
 	}
@@ -154,7 +154,7 @@ class ThankYou
 	}
 
 	/**
-	 * @param Thankable[] $thanked
+	 * @param Thanked[] $thanked
 	 */
 	public function SetThanked(?array $thanked)
 	{
@@ -162,9 +162,9 @@ class ThankYou
 		{
 			foreach ($thanked as $thanked_object)
 			{
-				if (!($thanked_object instanceof Thankable))
+				if (!($thanked_object instanceof Thanked))
 				{
-					throw new InvalidArgumentException("Failed to Set Thank You's Thanked, invalid Thankable provided");
+					throw new InvalidArgumentException("Failed to Set Thank You's Thanked, invalid Thanked provided");
 				}
 			}
 		}

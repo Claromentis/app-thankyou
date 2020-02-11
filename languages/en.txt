@@ -72,12 +72,12 @@ lm	thankyou.tag.name		Core Value
 lm	thankyou.tag.name.error.too_long		Core Value Name cannot be more than 20 characters
 lm	thankyou.tag.total_uses		Number of times selected
 lm	thankyou.thank.placeholder		Select User or Group
-lm	thankyou.thankable.error.unsuitable_owner_classes		One or more items cannot be Thanked
-lm	thankyou.thankable.owner_class.error.not_supported		Thankable Owner Classes are limited to %s
 lm	thankyou.thanked.deleted		Thanked Deleted
 lm	thankyou.thanked.error.invalid		Invalid Thanked given
+lm	thankyou.thanked.error.unsuitable_owner_classes		One or more items cannot be Thanked
 lm	thankyou.thanked.group.deleted		Group Deleted
 lm	thankyou.thanked.item_id.error.undefined		Thanked Item undefined
+lm	thankyou.thanked.owner_class.error.not_supported		Thanked Owner Classes are limited to %s
 lm	thankyou.thanked.owner_class.error.undefined		Thanked Owner Class is undefined
 lm	thankyou.thanked.user.deleted		User Deleted
 lm	thankyou.thanks_list.no_thanks		There are no Thanks to show

@@ -115,11 +115,11 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$date_created->setTimezone($time_zone);
 
 			$thanked_groups = [];
-			foreach ($thank_you->GetThankables() as $thankable)
+			foreach ($thank_you->GetThanked() as $thanked)
 			{
-				if ($thankable->GetOwnerClass() === PermOClass::GROUP)
+				if ($thanked->GetOwnerClass() === PermOClass::GROUP)
 				{
-					$thanked_groups[] = $thankable->GetName();
+					$thanked_groups[] = $thanked->GetName();
 				}
 			}
 

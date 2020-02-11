@@ -4,7 +4,7 @@ namespace Claromentis\ThankYou\Exception;
 
 use Exception;
 
-class ThankableException extends Exception
+class ThankedException extends Exception
 {
 
 }
