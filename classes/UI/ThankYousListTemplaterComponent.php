@@ -143,6 +143,7 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		$args['description_max_length.json']       = Validator::DESCRIPTION_MAX_CHARACTERS;
 
 		$args['thank_you_form_tags_segment.visible'] = $this->api->Configuration()->IsTagsEnabled();
+		$args['thankyou_form_tags_mandatory.visible'] = $this->api->Configuration()->IsTagsMandatory();
 
 		if (count($args['thank_yous.datasrc']) === 0)
 		{

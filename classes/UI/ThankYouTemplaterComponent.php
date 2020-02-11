@@ -251,8 +251,10 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 
 		$args = [
 			'thank_you_form_tags_segment.visible' => $tags_enabled,
+			'thankyou_form_tags_mandatory.visible' => $this->api->Configuration()->IsTagsMandatory(),
 
-			'thank_you.data-id'        => $id,
+
+		'thank_you.data-id'        => $id,
 			'id.json'                  => $id,
 			'thank_title.visible'      => !$thank_link,
 			'thank_title_link.visible' => $thank_link,
