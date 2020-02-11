@@ -1067,7 +1067,7 @@ class ThankYousRepository
 
 	/**
 	 * @param QueryBuilder $query
-	 * @param int[]        $date_range
+	 * @param string[]        $date_range
 	 */
 	private function QueryFilterCreatedBetween(QueryBuilder $query, array $date_range)
 	{
@@ -1076,12 +1076,12 @@ class ThankYousRepository
 		$lower_date = $date_range[0] ?? null;
 		$upper_date = $date_range[1] ?? null;
 
-		if (!is_int($lower_date))
+		if (!is_string($lower_date))
 		{
 			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Lower Date is not an integer");
 		}
 
-		if (!is_int($upper_date))
+		if (!is_string($upper_date))
 		{
 			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Upper Date is not an integer");
 		}

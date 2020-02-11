@@ -50,7 +50,7 @@ class ThankYouUtility
 
 	/**
 	 * @param DateTime[]|int[] $date_range
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function FormatDateRange(array $date_range): array
 	{
@@ -62,7 +62,7 @@ class ThankYouUtility
 			$from_date = clone $date_range[0];
 			$from_date->setTimezone(new DateTimeZone('UTC'));
 
-			$date_range[0] = (int) $from_date->format('YmdHis');
+			$date_range[0] = $from_date->format('YmdHis');
 		}
 		if (isset($date_range[1]) && ($date_range[1] instanceof DateTime))
 		{
@@ -72,7 +72,7 @@ class ThankYouUtility
 			$to_date = clone $date_range[1];
 			$to_date->setTimezone(new DateTimeZone('UTC'));
 
-			$date_range[1] = (int) $to_date->format('YmdHis');
+			$date_range[1] = $to_date->format('YmdHis');
 		}
 
 		return $date_range;
