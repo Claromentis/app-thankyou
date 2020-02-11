@@ -216,7 +216,19 @@
 
 .js-thank_you-picker-container.thank_you-picker-container {
     .select2-container {
-        max-width: 362px;
+        max-width: 162px;
+
+        @media only screen and (min-width: 480px) {
+            max-width: 325px;
+        }
+
+        @media only screen and (min-width: 768px) {
+            max-width: 312px;
+        }
+
+        @media only screen and (min-width: 992px) {
+            max-width: 532px;
+        }
     }
 
     .btn-default[name="select_link"] {
@@ -254,10 +266,6 @@
 
     .user-form-group {
         margin-bottom: 0;
-    }
-
-    .description-label {
-        white-space: nowrap;
     }
 
 }

@@ -124,7 +124,7 @@ lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']
 lt	thankyou:admin:toggle_vis.body	$lm["thankyou.admin.toggle_vis"]	
 lt	thankyou:app_name.body	$lm['thankyou.app_name']	
 lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
-lt	thankyou:common:description.body		Description *
+lt	thankyou:common:description.body		Description
 lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
 lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
 lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
@@ -136,7 +136,7 @@ lt	thankyou:component:edit.body		Edit
 lt	thankyou:component:modal:close.body		Close
 lt	thankyou:component:modal:comment.body		Comment
 lt	thankyou:component:modal:submit.body		Submit
-lt	thankyou:component:modal:to.body		To *
+lt	thankyou:component:modal:to.body		To
 lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		Say thank you
 lt	thankyou:component:thankyou_users_name.body		Thank you

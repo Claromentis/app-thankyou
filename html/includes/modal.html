@@ -1,7 +1,7 @@
 <include file="../../common/select2_inc.html"/>
 <component class_key="js_localize" keys="thankyou.common.tags.multiselect"/>
 <div id="thank_you_modal" class="modal fade js-thank_you-modal" tabindex="-1" role="dialog">
-	<div class="modal-dialog">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<form method="post" class="form-horizontal js-thank_you-form thank-you-form">
 				<input type="hidden" name="id"/>
@@ -12,8 +12,9 @@
 				</div>
 				<div class="modal-body">
 					<div id="thank_you_user_row" class="form-group user-form-group">
-						<label name="thankyou:component:modal:to" class="control-label col-sm-2">To</label>
-						<div class="form-control-static pt-0 col-sm-10">
+						<label class="control-label col-sm-3 col-lg-2"><loc name="thankyou:component:modal:to">To</loc><span class="text-danger"> *</span>
+						</label>
+						<div class="form-control-static pt-0 col-sm-9 col-lg-10">
 							<div class="js-thank_you-picker-container thank_you-picker-container">
 								<component class_key="sugre_picker" name="thank_you_user" multiple="1"
 										    allow_unset="1" filter_perm_oclasses="1,3"/>
@@ -26,10 +27,10 @@
 					</div>
 
 					<div name="thank_you_form_tags_segment" class="form-group">
-						<label class="control-label core-values-label col-sm-2">
-							<loc name="thankyou:common:tags"></loc>
+						<label class="control-label core-values-label col-sm-3 col-lg-2">
+							<loc name="thankyou:common:tags"></loc> <span name="thankyou_form_tags_mandatory" class="text-danger"> *</span>
 						</label>
-						<div class="col-sm-10">
+						<div class="col-sm-9 col-lg-10">
 							<select name="thank_you_tags[]" datasrc="" multiple="multiple"
 									class="form-control"></select>
 							<div class="js-form-error form-error" data-name="tags"></div>
@@ -37,8 +38,8 @@
 					</div>
 
 					<div class="form-group">
-						<label name="thankyou:common:description" class="control-label col-sm-2 description-label">Comment</label>
-						<div class="col-sm-10">
+						<label class="control-label col-sm-3 col-lg-2"><loc name="thankyou:common:description">Comment</loc><span class="text-danger"> *</span></label>
+						<div class="col-sm-9 col-lg-10">
 							<textarea name="thank_you_description" class="form-control"></textarea>
 							<div class="js-form-error form-error" data-name="description"></div>
 						</div>
@@ -46,13 +47,11 @@
 				</div>
 				<div class="modal-footer">
 					<div class="form-group">
-						<div class="col-sm-8">
+						<div class="col-sm-12">
 							<div class="js-form-error form-error" data-name="problem_details-title"></div>
 						</div>
-						<div class="col-sm-4">
-							<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal"
-									aria-hidden="true">Close
-							</button>
+						<div class="col-sm-12">
+							<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
 							<button name="thankyou:component:modal:submit" class="btn btn-primary btn-submit-modal">Submit</button>
 						</div>
 					</div>
