@@ -138,7 +138,8 @@ define(['jquery', 'cla_select2'], function ($) {
         if (Array.isArray(tags)) {
             var tags_length = tags.length;
             for (var tags_offset = 0; tags_offset < tags_length; tags_offset++) {
-                tags_input.append('<option selected value="' + tags[tags_offset].id + '">' + tags[tags_offset].name + '</option>');
+                var option = new Option(tags[tags_offset].name, tags[tags_offset].id, null, true);
+                tags_input.append(option);
             }
         }
 
