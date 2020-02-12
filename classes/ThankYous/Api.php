@@ -967,7 +967,7 @@ class Api
 			$params = [
 				'author'              => $thank_you->GetAuthor()->getFullname(),
 				'other_people_number' => count($all_users_ids) - 1,
-				'description'         => $description
+				'description'         => nl2br($description)
 			];
 			NotificationMessage::Send('thankyou.new_thanks', $params, $all_users_ids, self::IM_TYPE_THANKYOU);
 
