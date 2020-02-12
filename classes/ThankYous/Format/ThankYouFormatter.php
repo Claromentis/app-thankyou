@@ -126,7 +126,7 @@ class ThankYouFormatter
 			$users_array = [];
 			foreach ($users as $user)
 			{
-				$user_name     = (isset($security_context) && !$this->acl->CanSeeThankedUser($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->getFullname();
+				$user_name     = (isset($security_context) && !$this->acl->CanSeeThankedUserName($security_context, $user)) ? ($this->lmsg)('common.perms.hidden_name') : $user->getFullname();
 				$users_array[] = ['id' => $user->id, 'name' => $user_name];
 			}
 			$output['users'] = $users_array;

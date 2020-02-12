@@ -140,9 +140,9 @@ class ThankYouAcl
 	 * @param User            $user
 	 * @return bool
 	 */
-	public function CanSeeThankedUser(SecurityContext $context, User $user): bool
+	public function CanSeeThankedUserName(SecurityContext $context, User $user): bool
 	{
-		return $this->people_acl->CanViewUser($context, $user);
+		return $this->people_acl->CanViewExtranet($context, $user->extranet_id);
 	}
 
 	/**

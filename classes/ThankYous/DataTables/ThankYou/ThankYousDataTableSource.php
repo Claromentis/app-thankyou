@@ -129,7 +129,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			$first_user           = true;
 			foreach ($thanked_users as $user)
 			{
-				$user_name            = $this->api->CanSeeThankedUser($context, $user) ? $user->GetFullname() : ($this->lmsg)('common.perms.hidden_name');
+				$user_name            = $this->api->CanSeeThankedUserName($context, $user) ? $user->GetFullname() : ($this->lmsg)('common.perms.hidden_name');
 				$thanked_users_string .= $first_user ? $user_name : ", " . $user_name;
 				$first_user           = false;
 			}
