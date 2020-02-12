@@ -57,14 +57,13 @@ class Factory implements LoggerAwareInterface
 
 		$this->logger = new NullLogger();
 	}
-//YOUAREHERE.IMPROVE ACL SPEED WITH USER/GROUP ENTITIES. REVISIT VISIBILITY CHECKS
 
 	/**
 	 * Given an Owner Class ID and an array of entity IDs, creates an array of Thankeds.
 	 *
 	 * @param int   $owner_class_id
 	 * @param array $item_ids
-	 * @return Thanked[]
+	 * @return ThankedInterface[]
 	 */
 	public function Create(int $owner_class_id, array $item_ids): array
 	{

@@ -9,6 +9,7 @@ use Claromentis\People\Entity\User;
 use Claromentis\People\PeopleAcl;
 use Claromentis\ThankYou\Thanked\ThankedGroup;
 use Claromentis\ThankYou\Thanked\ThankedInterface;
+use Claromentis\ThankYou\Thanked\ThankedUser;
 
 class ThankYouAcl
 {
@@ -97,6 +98,28 @@ class ThankYouAcl
 	}
 
 	/**
+	 * Determines whether a Security Context can view a Thanked's Object URL.
+	 *
+	 * @param SecurityContext  $context
+	 * @param ThankedInterface $thanked
+	 * @return bool
+	 */
+	public function CanSeeThankedLink(SecurityContext $context, ThankedInterface $thanked): bool
+	{
+		if (!$this->CanSeeThankedName($context, $thanked))
+		{
+			return false;
+		}
+
+		if ($thanked instanceof ThankedUser)
+		{
+			return $thanked->GetUser()->isActive();
+		}
+
+		return true;
+	}
+
+	/**
 	 * Determines whether a Security Context can view a Thank You Author's Name.
 	 * If the Author's Extranet is not set, `false` is returned.
 	 *
@@ -114,7 +137,7 @@ class ThankYouAcl
 	 * If the User's Extranet is not set, `false` is returned.
 	 *
 	 * @param SecurityContext $context
-	 * @param User     $user
+	 * @param User            $user
 	 * @return bool
 	 */
 	public function CanSeeThankedUser(SecurityContext $context, User $user): bool

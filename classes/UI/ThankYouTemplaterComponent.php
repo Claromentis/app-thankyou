@@ -203,14 +203,15 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 			{
 				$thanked_displayed++;
 
-				$thanked_hidden = !$this->api->ThankYous()->CanSeeThankedName($context, $thanked);
+				$thanked_name_hidden  = !$this->api->ThankYous()->CanSeeThankedName($context, $thanked);
+				$can_see_thanked_link = !$this->api->ThankYous()->CanSeeThankedLink($context, $thanked);
 
-				$image_url             = $thanked_hidden ? null : $thanked->GetImageUrl();
-				$thanked_link          = $thanked_hidden ? null : $thanked->GetObjectUrl();
-				$display_thanked_image = !$thanked_hidden && $thanked_images && isset($image_url);
+				$image_url             = $thanked_name_hidden ? null : $thanked->GetImageUrl();
+				$thanked_link          = $can_see_thanked_link ? null : $thanked->GetObjectUrl();
+				$display_thanked_image = !$thanked_name_hidden && $thanked_images && isset($image_url);
 				$thanked_tooltip       = $display_thanked_image ? $thanked->GetName() : '';
-				$thanked_link_enabled  = !$thanked_hidden && $links_enabled && isset($thanked_link);
-				$thanked_name          = $thanked_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thanked->GetName();
+				$thanked_link_enabled  = !$can_see_thanked_link && $links_enabled && isset($thanked_link);
+				$thanked_name          = $thanked_name_hidden ? ($this->lmsg)('common.perms.hidden_name') : $thanked->GetName();
 
 				$thanked_args[] = [
 					'thanked_name.body'         => $thanked_name,
@@ -219,6 +220,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 					'thanked_no_link.visible'   => !$thanked_link_enabled,
 					'thanked_link.href'         => $thanked_link,
 					'thanked_link.title'        => $thanked_tooltip,
+					'thanked_no_link.title'     => $thanked_tooltip,
 					'profile_image.src'         => $image_url,
 					'profile_image.visible'     => $display_thanked_image,
 					'delimiter_visible.visible' => !($thanked_displayed === $total_thanked)

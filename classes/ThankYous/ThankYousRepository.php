@@ -691,7 +691,7 @@ class ThankYousRepository
 	 * Returns an array of Thanked Objects, retaining indexing.
 	 *
 	 * @param array $thankeds
-	 * @return Thanked\Thanked[]
+	 * @return Thanked\ThankedInterface[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
 	 */
 	public function CreateThanked(array $thankeds): array
@@ -855,12 +855,12 @@ class ThankYousRepository
 	 * with the given ID prior to calling this.
 	 * Returns the ID of the saved Thanked.
 	 *
-	 * @param int             $thank_you_id
-	 * @param Thanked\Thanked $thanked
+	 * @param int                      $thank_you_id
+	 * @param Thanked\ThankedInterface $thanked
 	 * @return int
 	 * @throws ThankedException - If the Thanked does not have an Owner Class ID or Item ID.
 	 */
-	private function SaveThanked(int $thank_you_id, Thanked\Thanked $thanked): int
+	private function SaveThanked(int $thank_you_id, Thanked\ThankedInterface $thanked): int
 	{
 		$id             = $thanked->GetId();
 		$owner_class_id = $thanked->GetOwnerClass();

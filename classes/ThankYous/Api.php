@@ -23,7 +23,7 @@ use Claromentis\ThankYou\LineManagerNotifier;
 use Claromentis\ThankYou\Plugin;
 use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Tags\Exceptions\TagNotFoundException;
-use Claromentis\ThankYou\Thanked\Thanked;
+use Claromentis\ThankYou\Thanked\ThankedInterface;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
@@ -712,7 +712,7 @@ class Api
 	/**
 	 * @param int $o_class
 	 * @param int $id
-	 * @return Thanked
+	 * @return ThankedInterface
 	 * @throws UnsupportedOwnerClassException - If the Owner Class given is not supported.
 	 */
 	public function CreateThankedFromOClass(int $o_class, int $id)
@@ -725,10 +725,10 @@ class Api
 	 * Returns an array of Thanked Objects, retaining indexing.
 	 *
 	 * @param array $oclasses
-	 * @return Thanked[]
+	 * @return ThankedInterface[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
 	 */
-	public function CreateThankedFromOClasses(array $oclasses)
+	public function CreateThankedFromOClasses(array $oclasses): array
 	{
 		return $this->thank_yous_repository->CreateThanked($oclasses);
 	}
@@ -787,13 +787,25 @@ class Api
 	}
 
 	/**
-	 * @param SecurityContext $security_context
-	 * @param Thanked         $thanked
+	 * @param SecurityContext  $security_context
+	 * @param ThankedInterface $thanked
 	 * @return bool
 	 */
-	public function CanSeeThankedName(SecurityContext $security_context, Thanked $thanked): bool
+	public function CanSeeThankedName(SecurityContext $security_context, ThankedInterface $thanked): bool
 	{
 		return $this->acl->CanSeeThankedName($security_context, $thanked);
+	}
+
+	/**
+	 * Determines whether a Security Context can view a Thanked's Object URL.
+	 *
+	 * @param SecurityContext  $context
+	 * @param ThankedInterface $thanked
+	 * @return bool
+	 */
+	public function CanSeeThankedLink(SecurityContext $context, ThankedInterface $thanked): bool
+	{
+		return $this->acl->CanSeeThankedLink($context, $thanked);
 	}
 
 	/**
