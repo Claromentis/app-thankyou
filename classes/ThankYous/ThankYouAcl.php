@@ -7,7 +7,8 @@ use Claromentis\Core\Admin\AdminPanel;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\People\Entity\User;
 use Claromentis\People\PeopleAcl;
-use Claromentis\ThankYou\Thanked\Thanked;
+use Claromentis\ThankYou\Thanked\ThankedGroup;
+use Claromentis\ThankYou\Thanked\ThankedInterface;
 
 class ThankYouAcl
 {
@@ -64,25 +65,27 @@ class ThankYouAcl
 	/**
 	 * Determines whether a Security Context can view a Thanked's Name.
 	 *
-	 * @param SecurityContext $context
-	 * @param Thanked         $thanked
+	 * @param SecurityContext  $context
+	 * @param ThankedInterface $thanked
 	 * @return bool
 	 */
-	public function CanSeeThankedName(SecurityContext $context, Thanked $thanked): bool
+	public function CanSeeThankedName(SecurityContext $context, ThankedInterface $thanked): bool
 	{
 		$thanked_extranet_id = $thanked->GetExtranetId();
 		$owner_class         = $thanked->GetOwnerClass();
 		$item_id             = $thanked->GetItemId();
 
-		if (isset($item_id))
+		if (isset($item_id) && $owner_class === PermOClass::GROUP)
 		{
-			if ($owner_class === PermOClass::INDIVIDUAL)
+			if ($thanked instanceof ThankedGroup)
 			{
-				return $this->people_acl->CanViewUser($context, $item_id);
-			} elseif ($owner_class === PermOClass::GROUP)
+				$group = $thanked->GetGroup();
+			} else
 			{
-				return $this->people_acl->CanViewGroup($context, $item_id);
+				$group = $thanked->GetItemId();
 			}
+
+			return $this->people_acl->CanViewGroup($context, $group);
 		}
 
 		if (isset($thanked_extranet_id))
@@ -111,7 +114,7 @@ class ThankYouAcl
 	 * If the User's Extranet is not set, `false` is returned.
 	 *
 	 * @param SecurityContext $context
-	 * @param User            $user
+	 * @param User     $user
 	 * @return bool
 	 */
 	public function CanSeeThankedUser(SecurityContext $context, User $user): bool
