@@ -520,27 +520,7 @@ class ThankYousRepository
 
 		try
 		{
-			if (isset($user_ids))
-			{
-				$this->QueryFilterThankedUser($query, $user_ids);
-			}
-
-			if (isset($date_range))
-			{
-				$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
-				$this->QueryFilterCreatedBetween($query, $date_range);
-			}
-
-			if (isset($tag_ids))
-			{
-				$this->QueryJoinThankedUsersToTagged($query);
-				$this->QueryFilterTags($query, $tag_ids);
-			}
-
-			if (isset($extranet_ids))
-			{
-				$this->QueryFilterExtranet($query, $extranet_ids);
-			}
+			$this->QueryFilterUserThankYouCounts($query, $user_ids, $date_range, $tag_ids, $extranet_ids);
 		} catch (EmptyQueryFilterException $exception)
 		{
 			return [];
@@ -571,6 +551,10 @@ class ThankYousRepository
 	}
 
 	/**
+	 * Counts the number of results for a list of the total number of Thank Yous associated with a User.
+	 *
+	 * Count equivalent of GetTotalUsersThankYous().
+	 *
 	 * @param int[]|null $user_ids
 	 * @param array|null $date_range
 	 * @param int[]|null $tag_ids
@@ -587,28 +571,7 @@ class ThankYousRepository
 
 		try
 		{
-			if (isset($user_ids))
-			{
-				$this->QueryFilterThankedUser($query, $user_ids);
-			}
-
-			if (isset($date_range))
-			{
-				$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
-				$this->QueryFilterCreatedBetween($query, $date_range);
-			}
-
-			if (isset($tag_ids))
-			{
-				$this->QueryJoinThankedUsersToTagged($query);
-				$this->QueryFilterTags($query, $tag_ids);
-			}
-
-			if (isset($extranet_ids))
-			{
-				$query->AddJoin(self::THANKED_USERS_TABLE, self::USER_TABLE, self::USER_TABLE, self::THANKED_USERS_TABLE . ".user_id = " . self::USER_TABLE . ".id");
-				$this->QueryFilterExtranet($query, $extranet_ids);
-			}
+			$this->QueryFilterUserThankYouCounts($query, $user_ids, $date_range, $tag_ids, $extranet_ids);
 		} catch (EmptyQueryFilterException $exception)
 		{
 			return 0;
@@ -1182,5 +1145,47 @@ class ThankYousRepository
 		$where .= ")";
 
 		$query->AddWhereAndClause($where);
+	}
+
+	/**
+	 * Filters a user thank you count query.
+	 *
+	 * Filters by user IDs, date range, thank you tags and user extranet IDs.
+	 *
+	 * @param QueryBuilder $query
+	 * @param array|null   $user_ids
+	 * @param array|null   $date_range
+	 * @param array|null   $tag_ids
+	 * @param array|null   $extranet_ids
+	 * @throws EmptyQueryFilterException
+	 */
+	private function QueryFilterUserThankYouCounts(
+		QueryBuilder $query,
+		?array $user_ids = null,
+		?array $date_range = null,
+		?array $tag_ids = null,
+		?array $extranet_ids = null
+	): void {
+		if (isset($user_ids))
+		{
+			$this->QueryFilterThankedUser($query, $user_ids);
+		}
+
+		if (isset($date_range))
+		{
+			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
+			$this->QueryFilterCreatedBetween($query, $date_range);
+		}
+
+		if (isset($tag_ids))
+		{
+			$this->QueryJoinThankedUsersToTagged($query);
+			$this->QueryFilterTags($query, $tag_ids);
+		}
+
+		if (isset($extranet_ids))
+		{
+			$this->QueryFilterExtranet($query, $extranet_ids);
+		}
 	}
 }
