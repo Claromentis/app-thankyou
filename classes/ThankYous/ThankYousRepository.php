@@ -4,12 +4,12 @@ namespace Claromentis\ThankYou\ThankYous;
 
 use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\Acl\PermOClass;
-use Claromentis\Core\CDN\CDNSystemException;
 use Claromentis\Core\DAL\Exceptions\TransactionException;
 use Claromentis\Core\DAL\Interfaces\DbInterface;
 use Claromentis\Core\DAL\QueryBuilder;
 use Claromentis\Core\DAL\QueryFactory;
 use Claromentis\Core\Repository\Exception\StorageException;
+use Claromentis\People\Entity\User;
 use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Exception\EmptyQueryFilterException;
 use Claromentis\ThankYou\Exception\ThankedException;
@@ -20,7 +20,6 @@ use Date;
 use DateTimeZone;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use User;
 
 class ThankYousRepository
 {
@@ -32,7 +31,6 @@ class ThankYousRepository
 	const THANKED_USERS_TABLE = 'thankyou_user';
 	const THANK_YOU_TAGS_TABLE = 'thankyou_tagged';
 	const USER_TABLE = 'users';
-	const GROUP_TABLE = 'groups';
 	const THANKED_TABLE = 'thankyou_thanked';
 
 	/**
@@ -248,7 +246,6 @@ class ThankYousRepository
 	 *
 	 * @param int[] $ids
 	 * @return array[Thanked]
-	 * @throws MappingException
 	 */
 	public function GetThankYousThankedsByThankYouIds(array $ids)
 	{
@@ -679,9 +676,9 @@ class ThankYousRepository
 	/**
 	 * Create a Thank You object.
 	 *
-	 * @param \Claromentis\People\Entity\User|int $author
-	 * @param string                              $description
-	 * @param Date|null                           $date_created
+	 * @param User|int  $author
+	 * @param string    $description
+	 * @param Date|null $date_created
 	 * @return ThankYou
 	 */
 	public function Create($author, string $description, ?Date $date_created = null)
@@ -696,7 +693,6 @@ class ThankYousRepository
 	 * @param array $thankeds
 	 * @return Thanked\Thanked[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
-	 * @throws MappingException
 	 */
 	public function CreateThanked(array $thankeds): array
 	{
@@ -729,12 +725,12 @@ class ThankYousRepository
 
 		if (isset($owner_classes_ids[PermOClass::GROUP]))
 		{
-			$owner_classes_ids[PermOClass::GROUP] = $this->CreateThankedFromGroupIds(array_keys($owner_classes_ids[PermOClass::GROUP]));
+			$owner_classes_ids[PermOClass::GROUP] = $this->thanked_factory->Create(PermOClass::GROUP, array_keys($owner_classes_ids[PermOClass::GROUP]));
 		}
 
 		if (isset($owner_classes_ids[PermOClass::INDIVIDUAL]))
 		{
-			$owner_classes_ids[PermOClass::INDIVIDUAL] = $this->CreateThankedFromUserIds(array_keys($owner_classes_ids[PermOClass::INDIVIDUAL]));
+			$owner_classes_ids[PermOClass::INDIVIDUAL] = $this->thanked_factory->Create(PermOClass::INDIVIDUAL, array_keys($owner_classes_ids[PermOClass::INDIVIDUAL]));
 		}
 
 		foreach ($thankeds as $offset => $thanked)
@@ -743,107 +739,6 @@ class ThankYousRepository
 		}
 
 		return $thankeds;
-	}
-
-	/**
-	 * Create an array of Thanked from an array of Group IDs. The returned array is indexed by the Group's ID
-	 *
-	 * @param int[] $groups_ids
-	 * @return Thanked\Thanked[]
-	 */
-	public function CreateThankedFromGroupIds(array $groups_ids): array
-	{
-		$owner_class_id = PermOClass::GROUP;
-
-		foreach ($groups_ids as $groups_id)
-		{
-			if (!is_int($groups_id))
-			{
-				throw new InvalidArgumentException("Failed to Create Thanked from Groups, invalid Group ID provided");
-			}
-		}
-
-		$result = $this->db->query("SELECT groupid, groupname, ex_area_id FROM " . self::GROUP_TABLE . " WHERE groupid IN in:int:groups ORDER BY groupid", $groups_ids);
-
-		$group_thanked = [];
-		while ($group = $result->fetchArray())
-		{
-			$id                 = (int) $group['groupid'];
-			$group_thanked[$id] = $this->thanked_factory->Create($group['groupname'], $id, $owner_class_id, (int) $group['ex_area_id']);
-		}
-
-		foreach ($groups_ids as $groups_id)
-		{
-			if (!isset($group_thanked[$groups_id]))
-			{
-				$group_thanked[$groups_id] = $this->thanked_factory->CreateUnknown($owner_class_id);
-			}
-		}
-
-		return $group_thanked;
-	}
-
-	/**
-	 * Creates Thanked from User IDs. If the User cannot be found, a substitute Thanked will be created.
-	 * Returns array indexed by the IDs.
-	 *
-	 * @param int[] $user_ids
-	 * @return Thanked\Thanked[]
-	 * @throws MappingException
-	 */
-	public function CreateThankedFromUserIds(array $user_ids)
-	{
-		$owner_class_id = PermOClass::INDIVIDUAL;
-
-		$users_entity_collection = $this->user_repository->find($user_ids);
-
-		$thanked = $this->CreateThankedFromUsers($users_entity_collection->getDictionary());
-
-		foreach ($user_ids as $user_id)
-		{
-			if (!isset($thanked[$user_id]))
-			{
-				$thanked[$user_id] = $this->thanked_factory->CreateUnknown($owner_class_id);
-			}
-		}
-
-		return $thanked;
-	}
-
-	/**
-	 * Creates an array of Thanked from an array of Users. Retains indexes.
-	 *
-	 * @param \Claromentis\People\Entity\User[] $users
-	 * @return Thanked\Thanked[]
-	 */
-	public function CreateThankedFromUsers(array $users)
-	{
-		$owner_class_id = PermOClass::INDIVIDUAL;
-
-		foreach ($users as $user_offset => $user)
-		{
-			if (!($user instanceof \Claromentis\People\Entity\User))
-			{
-				throw new InvalidArgumentException("Failed to Create Thanked From Users, invalid object passed");
-			}
-
-			try
-			{
-				//TODO: Replace with a non-static post People API update
-				$user_image_url = User::GetPhotoUrl($user->id);
-			} catch (CDNSystemException $cdn_system_exception)
-			{
-				$this->logger->error("Failed to Get User's Photo URL when Creating Thanked: " . $cdn_system_exception->getMessage());
-				$user_image_url = null;
-			}
-
-			//TODO: Replace with a non-static post People API update
-			$user_profile_url = User::GetProfileUrl($user->id, false);
-
-			$users[$user_offset] = $this->thanked_factory->Create($user->getFullname(), $user->id, $owner_class_id, $user->extranet_id, $user_image_url, $user_profile_url);
-		}
-
-		return $users;
 	}
 
 	/**
@@ -1006,10 +901,10 @@ class ThankYousRepository
 	 * Due to the hard dependency on the Thank You, it is recommended that a check has been done for the the Thank You
 	 * with the given ID prior to calling this.
 	 *
-	 * @param int                             $thank_you_id
-	 * @param \Claromentis\People\Entity\User $user
+	 * @param int  $thank_you_id
+	 * @param User $user
 	 */
-	private function SaveUser(int $thank_you_id, \Claromentis\People\Entity\User $user)
+	private function SaveUser(int $thank_you_id, User $user)
 	{
 		$db_fields = [
 			'int:thanks_id' => $thank_you_id,

@@ -232,7 +232,6 @@ class Api
 
 	/**
 	 * @param ThankYou[] $thank_yous
-	 * @throws MappingException
 	 */
 	public function LoadThankYousThankeds(array $thank_yous)
 	{
@@ -715,7 +714,6 @@ class Api
 	 * @param int $id
 	 * @return Thanked
 	 * @throws UnsupportedOwnerClassException - If the Owner Class given is not supported.
-	 * @throws MappingException
 	 */
 	public function CreateThankedFromOClass(int $o_class, int $id)
 	{
@@ -729,7 +727,6 @@ class Api
 	 * @param array $oclasses
 	 * @return Thanked[]
 	 * @throws UnsupportedOwnerClassException - If one or more of the Owner Classes given is not supported.
-	 * @throws MappingException
 	 */
 	public function CreateThankedFromOClasses(array $oclasses)
 	{
@@ -978,7 +975,6 @@ class Api
 	 * @param ThankYou $thank_you
 	 * @param array    $thankeds
 	 * @throws ValidationException - If the Thank You's Thanked could not be set from the given array.
-	 * @throws MappingException
 	 */
 	private function SetThankedFromArray(ThankYou $thank_you, array $thankeds)
 	{

@@ -2,7 +2,7 @@
 
 namespace Claromentis\ThankYou\Thanked;
 
-class Thanked
+class Thanked implements ThankedInterface
 {
 	/**
 	 * @var string
@@ -20,6 +20,11 @@ class Thanked
 	private $id;
 
 	/**
+	 * @var string|null
+	 */
+	private $image_url;
+
+	/**
 	 * @var int|null
 	 */
 	private $item_id;
@@ -27,11 +32,9 @@ class Thanked
 	/**
 	 * @var string|null
 	 */
-	private $image_url;
+	private $object_url;
 
 	/**
-	 * PermOClass constant.
-	 *
 	 * @var int|null
 	 */
 	private $owner_class_id;
@@ -41,23 +44,28 @@ class Thanked
 	 */
 	private $owner_class_name;
 
-	/**
-	 * @var string|null
-	 */
-	private $object_url;
-
-	/**
-	 * Thanked constructor.
-	 *
-	 * @param string $name
-	 */
-	public function __construct(string $name)
-	{
-		$this->SetName($name);
+	public function __construct(
+		string $name,
+		?int $extranet_id,
+		?int $id,
+		?string $image_url,
+		?int $item_id,
+		?string $object_url,
+		?int $owner_class_id,
+		?string $owner_class_name
+	) {
+		$this->name        = $name;
+		$this->extranet_id = $extranet_id;
+		$this->SetId($id);
+		$this->image_url        = $image_url;
+		$this->item_id          = $item_id;
+		$this->object_url       = $object_url;
+		$this->owner_class_id   = $owner_class_id;
+		$this->owner_class_name = $owner_class_name;
 	}
 
 	/**
-	 * @return string
+	 * @inheritDoc
 	 */
 	public function GetName(): string
 	{
@@ -65,7 +73,7 @@ class Thanked
 	}
 
 	/**
-	 * @return int|null
+	 * @inheritDoc
 	 */
 	public function GetExtranetId(): ?int
 	{
@@ -73,9 +81,7 @@ class Thanked
 	}
 
 	/**
-	 * Returns the Repository ID.
-	 *
-	 * @return int|null
+	 * @inheritDoc
 	 */
 	public function GetId(): ?int
 	{
@@ -83,7 +89,7 @@ class Thanked
 	}
 
 	/**
-	 * @return string|null
+	 * @inheritDoc
 	 */
 	public function GetImageUrl(): ?string
 	{
@@ -91,7 +97,7 @@ class Thanked
 	}
 
 	/**
-	 * @return int|null
+	 * @inheritDoc
 	 */
 	public function GetItemId(): ?int
 	{
@@ -99,7 +105,7 @@ class Thanked
 	}
 
 	/**
-	 * @return string|null
+	 * @inheritDoc
 	 */
 	public function GetObjectUrl(): ?string
 	{
@@ -107,7 +113,7 @@ class Thanked
 	}
 
 	/**
-	 * @return int|null
+	 * @inheritDoc
 	 */
 	public function GetOwnerClass(): ?int
 	{
@@ -115,7 +121,7 @@ class Thanked
 	}
 
 	/**
-	 * @return string|null
+	 * @inheritDoc
 	 */
 	public function GetOwnerClassName(): ?string
 	{
@@ -123,65 +129,10 @@ class Thanked
 	}
 
 	/**
-	 * @param string $name
+	 * @inheritDoc
 	 */
-	public function SetName(string $name)
-	{
-		$this->name = $name;
-	}
-
-	public function SetExtranetId(?int $id)
-	{
-		$this->extranet_id = $id;
-	}
-
-	/**
-	 * Set the Repository ID.
-	 *
-	 * @param int|null $id
-	 */
-	public function SetId(?int $id)
+	public function SetId(?int $id): void
 	{
 		$this->id = $id;
-	}
-
-	/**
-	 * @param string|null $url
-	 */
-	public function SetImageUrl(?string $url)
-	{
-		$this->image_url = $url;
-	}
-
-	/**
-	 * @param int|null $item_id
-	 */
-	public function SetItemId(?int $item_id)
-	{
-		$this->item_id = $item_id;
-	}
-
-	/**
-	 * @param string|null $url
-	 */
-	public function SetObjectUrl(?string $url)
-	{
-		$this->object_url = $url;
-	}
-
-	/**
-	 * @param int|null $owner_class_id
-	 */
-	public function SetOwnerClassId(?int $owner_class_id)
-	{
-		$this->owner_class_id = $owner_class_id;
-	}
-
-	/**
-	 * @param string|null $name
-	 */
-	public function SetOwnerClassName(?string $name)
-	{
-		$this->owner_class_name = $name;
 	}
 }

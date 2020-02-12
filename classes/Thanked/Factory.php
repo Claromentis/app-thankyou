@@ -2,17 +2,38 @@
 
 namespace Claromentis\ThankYou\Thanked;
 
+use Analogue\ORM\Exceptions\MappingException;
 use Claromentis\Core\Acl\PermOClass;
+use Claromentis\Core\CDN\CDNSystemException;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\People\Entity;
+use Claromentis\People\Repository\GroupRepository;
+use Claromentis\People\Repository\UserRepository;
 use Claromentis\ThankYou\Exception\OwnerClassNameException;
 use Claromentis\ThankYou\ThankYous\ThankYouUtility;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
+use User;
 
-class Factory
+class Factory implements LoggerAwareInterface
 {
+	use LoggerAwareTrait;
+
+	/**
+	 * @var GroupRepository
+	 */
+	private $group_repository;
+
 	/**
 	 * @var Lmsg
 	 */
 	private $lmsg;
+
+	/**
+	 * @var UserRepository
+	 */
+	private $user_repository;
 
 	/**
 	 * @var ThankYouUtility
@@ -24,45 +45,126 @@ class Factory
 	 *
 	 * @param Lmsg            $lmsg
 	 * @param ThankYouUtility $utility
+	 * @param UserRepository  $user_repository
+	 * @param GroupRepository $group_repository
 	 */
-	public function __construct(Lmsg $lmsg, ThankYouUtility $utility)
+	public function __construct(Lmsg $lmsg, ThankYouUtility $utility, UserRepository $user_repository, GroupRepository $group_repository)
 	{
-		$this->lmsg    = $lmsg;
-		$this->utility = $utility;
+		$this->lmsg             = $lmsg;
+		$this->utility          = $utility;
+		$this->user_repository  = $user_repository;
+		$this->group_repository = $group_repository;
+
+		$this->logger = new NullLogger();
+	}
+//YOUAREHERE.IMPROVE ACL SPEED WITH USER/GROUP ENTITIES. REVISIT VISIBILITY CHECKS
+
+	/**
+	 * Given an Owner Class ID and an array of entity IDs, creates an array of Thankeds.
+	 *
+	 * @param int   $owner_class_id
+	 * @param array $item_ids
+	 * @return Thanked[]
+	 */
+	public function Create(int $owner_class_id, array $item_ids): array
+	{
+		$thankeds = [];
+		switch ($owner_class_id)
+		{
+			case PermOClass::INDIVIDUAL:
+				try
+				{
+					$users = $this->user_repository->find($item_ids)->getDictionary();
+				} catch (MappingException $e)
+				{
+					$users = [];
+				}
+
+				foreach ($item_ids as $user_id)
+				{
+					if (isset($users[$user_id]))
+					{
+						$thankeds[$user_id] = $this->CreateThankedUser($users[$user_id], null);
+					} else
+					{
+						$thankeds[$user_id] = $this->CreateUnknown($owner_class_id);
+					}
+				}
+				break;
+			case PermOClass::GROUP:
+				try
+				{
+					$groups = $this->group_repository->find($item_ids)->getDictionary();
+				} catch (MappingException $e)
+				{
+					$groups = [];
+				}
+
+				foreach ($item_ids as $group_id)
+				{
+					if (isset($groups[$group_id]))
+					{
+						$thankeds[$group_id] = $this->CreateThankedGroup($groups[$group_id], null);
+					} else
+					{
+						$thankeds[$group_id] = $this->CreateUnknown($owner_class_id);
+					}
+				}
+				break;
+			default:
+				foreach ($item_ids as $item_id)
+				{
+					$thankeds[$item_id] = $this->CreateUnknown($owner_class_id);
+				}
+				break;
+		}
+
+		return $thankeds;
 	}
 
 	/**
-	 * @param string      $name
-	 * @param int|null    $item_id
-	 * @param int|null    $owner_class_id
-	 * @param int|null    $extranet_id
-	 * @param string|null $image_url
-	 * @param string|null $profile_url
-	 * @return Thanked
+	 * Given a User Entity, creates a ThankedUser.
+	 *
+	 * @param Entity\User $user - The Thanked User.
+	 * @param int|null    $id   - The ID of the Thanked.
+	 * @return ThankedUser
 	 */
-	public function Create(
-		string $name,
-		?int $item_id = null,
-		?int $owner_class_id = null,
-		?int $extranet_id = null,
-		?string $image_url = null,
-		?string $profile_url = null
-	) {
-		$owner_class_name = null;
-		if (isset($owner_class_id))
+	public function CreateThankedUser(Entity\User $user, ?int $id): ThankedUser
+	{
+		$owner_class_name = $this->GetOwnerClassName(PermOClass::INDIVIDUAL);
+
+		//TODO: Remove as this may later be determined from the User.
+		try
 		{
-			$owner_class_name = $this->GetOwnerClassName($owner_class_id);
+			$image_url = User::GetPhotoUrl($user->id);
+		} catch (CDNSystemException $cdn_system_exception)
+		{
+			$this->logger->error("Failed to Get User's Photo URL when Creating Thanked: " . $cdn_system_exception->getMessage());
+			$image_url = null;
 		}
 
-		$thanked = new Thanked($name);
-		$thanked->SetExtranetId($extranet_id);
-		$thanked->SetItemId($item_id);
-		$thanked->SetImageUrl($image_url);
-		$thanked->SetOwnerClassId($owner_class_id);
-		$thanked->SetOwnerClassName($owner_class_name);
-		$thanked->SetObjectUrl($profile_url);
+		//TODO: Replace with a non-static post People API update
+		$profile_url = User::GetProfileUrl($user->id, false);
 
-		return $thanked;
+		return new ThankedUser($user, $owner_class_name, $id, $image_url, $profile_url);
+	}
+
+	/**
+	 * Given a Group Entity, creates a ThankedGroup.
+	 *
+	 * @param Entity\Group $group
+	 * @param int|null     $id
+	 * @return ThankedGroup
+	 */
+	public function CreateThankedGroup(Entity\Group $group, ?int $id): ThankedGroup
+	{
+		return new ThankedGroup(
+			$group,
+			$this->GetOwnerClassName(PermOClass::GROUP),
+			$id,
+			null,
+			null
+		);
 	}
 
 	/**
@@ -90,11 +192,16 @@ class Factory
 			$name = ($this->lmsg)('thankyou.thanked.deleted');
 		}
 
-		$thanked = new Thanked($name);
-		$thanked->SetOwnerClassId($owner_class_id);
-		$thanked->SetOwnerClassName($owner_class_name);
-
-		return $thanked;
+		return new Thanked(
+			$name,
+			null,
+			null,
+			null,
+			null,
+			null,
+			$owner_class_id,
+			$owner_class_name
+		);
 	}
 
 	/**

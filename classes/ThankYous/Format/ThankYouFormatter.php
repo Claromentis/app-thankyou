@@ -190,14 +190,12 @@ class ThankYouFormatter
 			$name = $thanked->GetName();
 		}
 
-		$output = [
+		return [
 			'id'               => $thanked->GetItemId(),
 			'extranet_area_id' => $thanked->GetExtranetId(),
 			'name'             => $name,
 			'object_type'      => $object_type
 		];
-
-		return $output;
 	}
 
 	/**

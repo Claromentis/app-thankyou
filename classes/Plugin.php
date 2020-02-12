@@ -125,11 +125,6 @@ class Plugin implements
 
 		$app['tags.datatable.admin'] = TagDataTableSource::class;
 
-		//Thanked
-		$app[Thanked\Factory::class] = function ($app) {
-			return new Thanked\Factory($app[Lmsg::class], $app[ThankYouUtility::class]);
-		};
-
 		//Thank Yous
 		$app[LineManagerNotifier::class] = function ($app) {
 			return new LineManagerNotifier($app['logger_factory']->GetLogger(self::APPLICATION_NAME));
@@ -458,7 +453,7 @@ class Plugin implements
 					{
 						$create = $thanked;
 					}
-				} catch (UnsupportedOwnerClassException | MappingException $exception)
+				} catch (UnsupportedOwnerClassException $exception)
 				{
 					$logger->error("Failed to lock Thank You Creation to User Id '" . $user_id . "' on User's Profile", [$exception]);
 				}
