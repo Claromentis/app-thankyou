@@ -192,7 +192,8 @@ class Plugin implements
 				$app['logger_factory']->GetLogger(self::APPLICATION_NAME),
 				$app[QueryFactory::class],
 				$app[Tags\Api::class],
-				$app[Thanked\Factory::class]
+				$app[Thanked\Factory::class],
+				$app[ThankYous\DeletedUserFactory::class]
 			);
 		};
 

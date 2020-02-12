@@ -108,6 +108,7 @@ lm	thankyou.thankyou.thanked.oclass.error.not_integer
 lm	thankyou.thankyou.thanked.oclass.error.undefined		
 lm	thankyou.thankyou.users.error.empty		
 lm	thankyou.thankyou.users.user.id.error.invalid		
+lm	thankyou.user.deleted		
 lm	thankyou.user_profile.tab_name		Vielen Dank
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	

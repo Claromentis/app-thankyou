@@ -39,6 +39,11 @@ class ThankYousRepository
 	private $db;
 
 	/**
+	 * @var DeletedUserFactory
+	 */
+	private $deleted_user_factory;
+
+	/**
 	 * @var LoggerInterface
 	 */
 	private $logger;
@@ -76,14 +81,15 @@ class ThankYousRepository
 	/**
 	 * ThankYousRepository constructor.
 	 *
-	 * @param ThankYouFactory $thank_you_factory
-	 * @param ThankYouUtility $thank_you_utility
-	 * @param DbInterface     $db_interface
-	 * @param UserRepository  $user_repository
-	 * @param LoggerInterface $logger
-	 * @param QueryFactory    $query_factory
-	 * @param Tags\Api        $tag_api
-	 * @param Thanked\Factory $thanked_factory
+	 * @param ThankYouFactory    $thank_you_factory
+	 * @param ThankYouUtility    $thank_you_utility
+	 * @param DbInterface        $db_interface
+	 * @param UserRepository     $user_repository
+	 * @param LoggerInterface    $logger
+	 * @param QueryFactory       $query_factory
+	 * @param Tags\Api           $tag_api
+	 * @param Thanked\Factory    $thanked_factory
+	 * @param DeletedUserFactory $deleted_user_factory
 	 */
 	public function __construct(
 		ThankYouFactory $thank_you_factory,
@@ -93,16 +99,18 @@ class ThankYousRepository
 		LoggerInterface $logger,
 		QueryFactory $query_factory,
 		Tags\Api $tag_api,
-		Thanked\Factory $thanked_factory
+		Thanked\Factory $thanked_factory,
+		DeletedUserFactory $deleted_user_factory
 	) {
-		$this->thank_you_factory = $thank_you_factory;
-		$this->utility           = $thank_you_utility;
-		$this->user_repository   = $user_repository;
-		$this->db                = $db_interface;
-		$this->logger            = $logger;
-		$this->query_factory     = $query_factory;
-		$this->tags              = $tag_api;
-		$this->thanked_factory   = $thanked_factory;
+		$this->thank_you_factory    = $thank_you_factory;
+		$this->utility              = $thank_you_utility;
+		$this->user_repository      = $user_repository;
+		$this->db                   = $db_interface;
+		$this->logger               = $logger;
+		$this->query_factory        = $query_factory;
+		$this->tags                 = $tag_api;
+		$this->thanked_factory      = $thanked_factory;
+		$this->deleted_user_factory = $deleted_user_factory;
 	}
 
 	/**
@@ -340,6 +348,9 @@ class ThankYousRepository
 			if (isset($user))
 			{
 				$thank_yous_users[$row['thank_you_id']][$row['user_id']] = $user;
+			} else
+			{
+				$thank_yous_users[$row['thank_you_id']][$row['user_id']] = $this->deleted_user_factory->Create($row['user_id']);
 			}
 		}
 
