@@ -377,7 +377,7 @@ class ThankYousRepository
 		// ensure no duplicated columns in the grouping
 		$group_columns = array_unique($group_columns);
 
-		$query_string = "SELECT COUNT(" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
+		$query_string = "SELECT COUNT(DISTINCT" . self::THANK_YOU_TAGS_TABLE . ".item_id) AS \"" . self::THANK_YOU_TAGS_TABLE . ".total_uses\"";
 		$query_string .= ", " . self::TAG_TABLE . ".id AS \"" . self::TAG_TABLE . ".id\"";
 		$query_string .= " FROM " . self::TAG_TABLE;
 		$query_string .= $order_string;
@@ -516,7 +516,7 @@ class ThankYousRepository
 	 */
 	public function GetTotalUsersThankYous(?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): array
 	{
-		$query_string = "SELECT COUNT(" . self::THANKED_USERS_TABLE . ".thanks_id) AS \"" . self::THANKED_USERS_TABLE . ".total_thank_yous\"";
+		$query_string = "SELECT COUNT(DISTINCT" . self::THANKED_USERS_TABLE . ".thanks_id) AS \"" . self::THANKED_USERS_TABLE . ".total_thank_yous\"";
 		$query_string .= ", " . self::USER_TABLE . ".id AS \"" . self::USER_TABLE . ".id\"";
 		$query_string .= " FROM " . self::USER_TABLE;
 		$query_string .= " ORDER BY " . self::USER_TABLE . ".firstname ASC";
