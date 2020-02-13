@@ -208,7 +208,7 @@ class ThankYousRepository
 
 		if (isset($date_range))
 		{
-			$this->QueryFilterCreatedBetween($query, $date_range);
+			$this->QueryFilterDateCreated($query, $date_range);
 		}
 
 		if (isset($extranet_ids) || isset($thanked_user_ids))
@@ -420,7 +420,7 @@ class ThankYousRepository
 			if (isset($date_range))
 			{
 				$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
-				$this->QueryFilterCreatedBetween($query, $date_range);
+				$this->QueryFilterDateCreated($query, $date_range);
 			}
 
 			if (isset($tag_ids))
@@ -493,7 +493,7 @@ class ThankYousRepository
 
 			if (isset($date_range))
 			{
-				$this->QueryFilterCreatedBetween($query, $date_range);
+				$this->QueryFilterDateCreated($query, $date_range);
 			}
 
 			if (isset($thanked_user_ids))
@@ -637,7 +637,7 @@ class ThankYousRepository
 			if (isset($date_range))
 			{
 				$query->AddJoin(self::THANK_YOU_TAGS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TAGS_TABLE . ".item_id = " . self::THANK_YOU_TABLE . ".id");
-				$this->QueryFilterCreatedBetween($query, $date_range);
+				$this->QueryFilterDateCreated($query, $date_range);
 			}
 
 			if (isset($tag_ids))
@@ -948,27 +948,66 @@ class ThankYousRepository
 	}
 
 	/**
+	 * Given a Query and a Date Range, routes to the correct QueryFilter for Date Created.
+	 *
 	 * @param QueryBuilder $query
 	 * @param DateTime[]   $date_range
 	 */
-	private function QueryFilterCreatedBetween(QueryBuilder $query, array $date_range)
+	private function QueryFilterDateCreated(QueryBuilder $query, array $date_range): void
 	{
-		$date_range = $this->utility->FormatDateRange($date_range);
-
-		$lower_date = $date_range[0] ?? null;
-		$upper_date = $date_range[1] ?? null;
-
-		if (!is_string($lower_date))
+		if (isset($date_range[0]) && isset($date_range[1]))
 		{
-			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Lower Date is not an integer");
-		}
-
-		if (!is_string($upper_date))
+			$this->QueryFilterDateCreatedBetween($query, $date_range[0], $date_range[1]);
+		} elseif (isset($date_range[0]))
 		{
-			throw new InvalidArgumentException("Failed to Add Created Between Filter to Query, Upper Date is not an integer");
+			$this->QueryFilterDateCreatedAfter($query, $date_range[0]);
+		} elseif (isset($date_range[1]))
+		{
+			$this->QueryFilterDateCreatedBefore($query, $date_range[1]);
+		} else
+		{
+			throw new InvalidArgumentException("Failed to Filter Date Created, invalid Argument 2");
 		}
+	}
 
-		$query->AddWhereAndClause(self::THANK_YOU_TABLE . ".date_created BETWEEN " . $lower_date . " AND " . $upper_date);
+	/**
+	 * Given a Query and two DateTimes, applies a Filter to the Query that limits the Thank You's Date Created to a
+	 * range defined by the DateTimes.
+	 *
+	 * @param QueryBuilder $query
+	 * @param DateTime     $from
+	 * @param DateTime     $to
+	 */
+	private function QueryFilterDateCreatedBetween(QueryBuilder $query, DateTime $from, DateTime $to): void
+	{
+		$query->AddWhereAndClause(
+			self::THANK_YOU_TABLE . ".date_created BETWEEN "
+			. $this->FormatQueryDate($from)
+			. " AND "
+			. $this->FormatQueryDate($to)
+		);
+	}
+
+	/**
+	 * Given a Query and a DateTime, applies a Filter to the Query that limits the Thank You's earliest Date Created.
+	 *
+	 * @param QueryBuilder $query
+	 * @param DateTime     $from
+	 */
+	private function QueryFilterDateCreatedAfter(QueryBuilder $query, DateTime $from): void
+	{
+		$query->AddWhereAndClause(self::THANK_YOU_TABLE . ".date_created > " . $this->FormatQueryDate($from));
+	}
+
+	/**
+	 * Given a Query and a DateTime, applies a Filter to the Query that limits the Thank You's latest Date Created.
+	 *
+	 * @param QueryBuilder $query
+	 * @param DateTime     $to
+	 */
+	private function QueryFilterDateCreatedBefore(QueryBuilder $query, DateTime $to): void
+	{
+		$query->AddWhereAndClause(self::THANK_YOU_TABLE . ".date_created < " . $this->FormatQueryDate($to));
 	}
 
 	/**
@@ -1093,7 +1132,7 @@ class ThankYousRepository
 		if (isset($date_range))
 		{
 			$query->AddJoin(self::THANKED_USERS_TABLE, self::THANK_YOU_TABLE, self::THANK_YOU_TABLE, self::THANKED_USERS_TABLE . ".thanks_id = " . self::THANK_YOU_TABLE . ".id");
-			$this->QueryFilterCreatedBetween($query, $date_range);
+			$this->QueryFilterDateCreated($query, $date_range);
 		}
 
 		if (isset($tag_ids))
@@ -1106,5 +1145,19 @@ class ThankYousRepository
 		{
 			$this->QueryFilterExtranet($query, $extranet_ids);
 		}
+	}
+
+	/**
+	 * Given a DateTime, formats it into a string that may be used to query the Database.
+	 *
+	 * @param DateTime $date_time
+	 * @return string
+	 */
+	private function FormatQueryDate(DateTime $date_time)
+	{
+		$date_time = clone $date_time;
+		$date_time->setTimezone(new DateTimeZone('UTC'));
+
+		return $date_time->format('YmdHis');
 	}
 }
