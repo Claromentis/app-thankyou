@@ -66,7 +66,7 @@ class UsersDataTableSource extends FilterDataTableSource
 
 		$filters = $this->FormatFilters($params->GetFilters());
 
-		$users_total_thank_yous = $this->api->GetUsersTotalThankYous($context, $limit, $offset, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
+		$users_total_thank_yous = $this->api->GetUsersTotalThankYous($context, [['column' => ThankYous\ThankYousRepository::USER_TABLE . '.firstname']], $limit, $offset, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
 
 		$user_ids = array_keys($users_total_thank_yous);
 

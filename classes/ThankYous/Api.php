@@ -376,6 +376,7 @@ class Api
 	 * Returns an array of the total number of Thank Yous associated with a User, indexed by the User's ID.
 	 *
 	 * @param SecurityContext $context
+	 * @param array|null      $orders
 	 * @param int|null        $limit
 	 * @param int|null        $offset
 	 * @param int[]|null      $user_ids
@@ -383,11 +384,11 @@ class Api
 	 * @param int[]|null      $tag_ids
 	 * @return int[]
 	 */
-	public function GetUsersTotalThankYous(SecurityContext $context, ?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null): array
+	public function GetUsersTotalThankYous(SecurityContext $context, ?array $orders = null, ?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null): array
 	{
 		$extranet_ids = $this->GetVisibleExtranetIds($context);
 
-		return $this->thank_yous_repository->GetTotalUsersThankYous($limit, $offset, $user_ids, $date_range, $tag_ids, $extranet_ids);
+		return $this->thank_yous_repository->GetTotalUsersThankYous($orders, $limit, $offset, $user_ids, $date_range, $tag_ids, $extranet_ids);
 	}
 
 	/**

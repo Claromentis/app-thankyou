@@ -519,6 +519,7 @@ class ThankYousRepository
 	/**
 	 * Returns an array of the total number of Thank Yous associated with a User, indexed by the User's ID.
 	 *
+	 * @param array|null      $orders
 	 * @param int|null        $limit
 	 * @param int|null        $offset
 	 * @param int[]           $user_ids
@@ -527,13 +528,28 @@ class ThankYousRepository
 	 * @param int[]|null      $extranet_ids
 	 * @return int[]
 	 */
-	public function GetTotalUsersThankYous(?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): array
+	public function GetTotalUsersThankYous(?array $orders = null, ?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): array
 	{
+		$group_columns = [self::USER_TABLE . ".id"];
+		$order_string = "";
+		if (isset($orders))
+		{
+			$order_string = $this->utility->BuildOrderString($orders);
+
+			foreach ($orders as $order)
+			{
+				if (!isset($order['aggregate']) || $order['aggregate'] !== true)
+				{
+					$group_columns[] = $order['column'];
+				}
+			}
+		}
+
 		$query_string = "SELECT COUNT(DISTINCT " . self::THANKED_USERS_TABLE . ".thanks_id) AS \"" . self::THANKED_USERS_TABLE . ".total_thank_yous\"";
 		$query_string .= ", " . self::USER_TABLE . ".id AS \"" . self::USER_TABLE . ".id\"";
 		$query_string .= " FROM " . self::USER_TABLE;
-		$query_string .= " ORDER BY " . self::USER_TABLE . ".firstname ASC";
-		$query_string .= " GROUP BY " . self::USER_TABLE . ".id, " . self::USER_TABLE . ".firstname";
+		$query_string .= $order_string;
+		$query_string .= " GROUP BY " . implode(',', $group_columns);
 
 		$query = $this->query_factory->GetQueryBuilder($query_string);
 

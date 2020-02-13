@@ -442,7 +442,7 @@ class Plugin implements
 		switch ($attr['page'])
 		{
 			case 'viewprofile.tab_nav':
-				$count = $api->ThankYous()->GetUsersTotalThankYous($context, null, null, [$user_id])[$user_id];
+				$count = $api->ThankYous()->GetUsersTotalThankYous($context, null, null, null, [$user_id])[$user_id];
 
 				return '<li><a href="#thanks"><span class="glyphicons glyphicons-donate"></span> ' . $lmsg("thankyou.user_profile.tab_name") . ' (<b>' . $count . '</b>)</a></li>';
 			case 'viewprofile.tab_content':
