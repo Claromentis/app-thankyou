@@ -123,6 +123,10 @@
     .edit-tools {
         display: block;
 
+        &.float-right {
+            float: right;
+        }
+
         .edit-thanks {
             border-right: 1px solid #e7e7e7;
             margin-right: 3px;
