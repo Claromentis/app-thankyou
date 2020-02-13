@@ -47,12 +47,13 @@ abstract class FilterDataTableSource implements DataSource
 			$user_ids      = $this->api->GetOwnersUserIds($owner_classes);
 		}
 
+		// Date Range
 		$date_range = null;
-		$from_date  = $filters['from_date'] ?? null;
-		$to_date    = $filters['to_date'] ?? null;
+		$from_date  = isset($filters['from_date']) ? Date::CreateFrom($filters['from_date']) : null;
+		$to_date    = isset($filters['to_date']) ? Date::CreateFrom($filters['to_date'], '23:59') : null;
 		if (isset($from_date) && isset($to_date))
 		{
-			$date_range = [Date::CreateFrom($from_date), Date::CreateFrom($to_date, '23:59')];
+			$date_range = [$from_date, $to_date];
 		}
 
 		$tags = null;
