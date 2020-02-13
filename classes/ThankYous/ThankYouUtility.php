@@ -4,8 +4,6 @@ namespace Claromentis\ThankYou\ThankYous;
 
 use Claromentis\Core\Acl\PermOClass;
 use Claromentis\ThankYou\Exception\OwnerClassNameException;
-use DateTime;
-use DateTimeZone;
 use InvalidArgumentException;
 
 class ThankYouUtility
