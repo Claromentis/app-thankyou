@@ -48,12 +48,20 @@ abstract class FilterDataTableSource implements DataSource
 		}
 
 		// Date Range
-		$date_range = null;
+		$date_range = [];
 		$from_date  = isset($filters['from_date']) ? Date::CreateFrom($filters['from_date']) : null;
-		$to_date    = isset($filters['to_date']) ? Date::CreateFrom($filters['to_date'], '23:59') : null;
-		if (isset($from_date) && isset($to_date))
+		if (isset($from_date))
 		{
-			$date_range = [$from_date, $to_date];
+			$date_range[0] = $from_date;
+		}
+		$to_date = isset($filters['to_date']) ? Date::CreateFrom($filters['to_date'], '23:59') : null;
+		if (isset($to_date))
+		{
+			$date_range[1] = $to_date;
+		}
+		if (empty($date_range))
+		{
+			$date_range = null;
 		}
 
 		$tags = null;
