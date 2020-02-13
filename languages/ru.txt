@@ -108,6 +108,7 @@ lm	thankyou.thankyou.thanked.oclass.error.not_integer
 lm	thankyou.thankyou.thanked.oclass.error.undefined		
 lm	thankyou.thankyou.users.error.empty		
 lm	thankyou.thankyou.users.user.id.error.invalid		
+lm	thankyou.thankyous.visibility.logged_in		
 lm	thankyou.user.deleted		
 lm	thankyou.user_profile.tab_name		Спасибо
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	

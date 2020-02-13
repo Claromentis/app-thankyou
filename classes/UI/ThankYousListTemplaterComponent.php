@@ -90,6 +90,11 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 		 */
 		$context = $app[SecurityContext::class];
 
+		if (!($context->GetUserId() > 0))
+		{
+			return ($this->lmsg)('thankyou.thankyous.visibility.logged_in');
+		}
+
 		$can_create = (bool) ($attributes['create'] ?? null);
 		$can_delete = (bool) ($attributes['delete'] ?? null);
 		$can_edit   = (bool) ($attributes['edit'] ?? null);

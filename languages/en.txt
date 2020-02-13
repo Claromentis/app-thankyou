@@ -108,6 +108,7 @@ lm	thankyou.thankyou.thanked.oclass.error.not_integer		Thanked oclass must be an
 lm	thankyou.thankyou.thanked.oclass.error.undefined		Thanked must contain an oclass
 lm	thankyou.thankyou.users.error.empty		No Users have been thanked
 lm	thankyou.thankyou.users.user.id.error.invalid		User %d cannot be thanked
+lm	thankyou.thankyous.visibility.logged_in		You must be logged in to view Thank Yous
 lm	thankyou.user.deleted		User Deleted
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	

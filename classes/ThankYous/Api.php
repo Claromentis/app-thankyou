@@ -495,14 +495,21 @@ class Api
 	 * @param SecurityContext $context
 	 * @return int[]|null
 	 */
-	public function GetVisibleExtranetIds(SecurityContext $context)
+	public function GetVisibleExtranetIds(SecurityContext $context): ?array
 	{
 		if ($context->IsPrimaryExtranet())
 		{
 			return null;
 		} else
 		{
-			return [(int) $context->GetExtranetAreaId(), (int) $this->extranet_service->GetPrimaryId()];
+			$visible_extranets   = [(int) $this->extranet_service->GetPrimaryId()];
+			$current_extranet_id = $context->GetExtranetAreaId();
+			if (is_int($current_extranet_id) && $current_extranet_id > 0)
+			{
+				$visible_extranets[] = $current_extranet_id;
+			}
+
+			return $visible_extranets;
 		}
 	}
 
