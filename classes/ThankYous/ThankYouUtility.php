@@ -49,31 +49,35 @@ class ThankYouUtility
 	}
 
 	/**
-	 * @param DateTime[]|int[] $date_range
+	 * @param DateTime[] $date_range
 	 * @return string[]
 	 */
 	public function FormatDateRange(array $date_range): array
 	{
-		if (isset($date_range[0]) && ($date_range[0] instanceof DateTime))
+		if (!isset($date_range[0]) || !($date_range[0] instanceof DateTime))
 		{
-			/**
-			 * @var DateTime $from_date
-			 */
-			$from_date = clone $date_range[0];
-			$from_date->setTimezone(new DateTimeZone('UTC'));
-
-			$date_range[0] = $from_date->format('YmdHis');
+			throw new InvalidArgumentException("Failed to Format Date Range, Argument 1 offset 0 must be a DateTime");
 		}
-		if (isset($date_range[1]) && ($date_range[1] instanceof DateTime))
+		if (!isset($date_range[1]) || !($date_range[1] instanceof DateTime))
 		{
-			/**
-			 * @var DateTime $from_date
-			 */
-			$to_date = clone $date_range[1];
-			$to_date->setTimezone(new DateTimeZone('UTC'));
-
-			$date_range[1] = $to_date->format('YmdHis');
+			throw new InvalidArgumentException("Failed to Format Date Range, Argument 1 offset 1 must be a DateTime");
 		}
+
+		/**
+		 * @var DateTime $from_date
+		 */
+		$from_date = clone $date_range[0];
+		$from_date->setTimezone(new DateTimeZone('UTC'));
+
+		$date_range[0] = $from_date->format('YmdHis');
+
+		/**
+		 * @var DateTime $from_date
+		 */
+		$to_date = clone $date_range[1];
+		$to_date->setTimezone(new DateTimeZone('UTC'));
+
+		$date_range[1] = $to_date->format('YmdHis');
 
 		return $date_range;
 	}

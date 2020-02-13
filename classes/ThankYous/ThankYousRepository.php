@@ -17,6 +17,7 @@ use Claromentis\ThankYou\Tags;
 use Claromentis\ThankYou\Exception\UnsupportedOwnerClassException;
 use Claromentis\ThankYou\Thanked;
 use Date;
+use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -182,13 +183,13 @@ class ThankYousRepository
 	}
 
 	/**
-	 * @param int        $limit
-	 * @param int        $offset
-	 * @param array|null $date_range
-	 * @param int[]|null $thanked_user_ids
-	 * @param int[]|null $tag_ids
-	 * @param int[]|null $extranet_ids
-	 * @param bool       $allow_no_thanked
+	 * @param int             $limit
+	 * @param int             $offset
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $thanked_user_ids
+	 * @param int[]|null      $tag_ids
+	 * @param int[]|null      $extranet_ids
+	 * @param bool            $allow_no_thanked
 	 * @return int[]
 	 */
 	public function GetRecentThankYousIds(?int $limit = null, ?int $offset = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
@@ -357,6 +358,18 @@ class ThankYousRepository
 		return $thank_yous_users;
 	}
 
+	/**
+	 * @param array|null      $orders
+	 * @param int|null        $limit
+	 * @param int|null        $offset
+	 * @param bool|null       $active
+	 * @param int[]|null      $extranet_ids
+	 * @param bool            $allow_no_thanked
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $thanked_user_ids
+	 * @param int[]|null      $tag_ids
+	 * @return array
+	 */
 	public function GetTagsTotalThankYouUses(?array $orders = null, ?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
 		$order_string = "";
@@ -452,11 +465,11 @@ class ThankYousRepository
 	/**
 	 * Returns total number of thanks items in the database
 	 *
-	 * @param int[]|null $extranet_ids
-	 * @param bool       $allow_no_thanked
-	 * @param array|null $date_range
-	 * @param int[]|null $thanked_user_ids
-	 * @param int[]|null $tag_ids
+	 * @param int[]|null      $extranet_ids
+	 * @param bool            $allow_no_thanked
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $thanked_user_ids
+	 * @param int[]|null      $tag_ids
 	 * @return int
 	 */
 	public function GetTotalThankYousCount(?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
@@ -506,12 +519,12 @@ class ThankYousRepository
 	/**
 	 * Returns an array of the total number of Thank Yous associated with a User, indexed by the User's ID.
 	 *
-	 * @param int[]      $user_ids
-	 * @param array|null $date_range
-	 * @param int[]|null $tag_ids
-	 * @param int[]|null $extranet_ids
-	 * @param int|null   $limit
-	 * @param int|null   $offset
+	 * @param int|null        $limit
+	 * @param int|null        $offset
+	 * @param int[]           $user_ids
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $tag_ids
+	 * @param int[]|null      $extranet_ids
 	 * @return int[]
 	 */
 	public function GetTotalUsersThankYous(?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): array
@@ -563,10 +576,10 @@ class ThankYousRepository
 	 *
 	 * Count equivalent of GetTotalUsersThankYous().
 	 *
-	 * @param int[]|null $user_ids
-	 * @param array|null $date_range
-	 * @param int[]|null $tag_ids
-	 * @param int[]|null $extranet_ids
+	 * @param int[]|null      $user_ids
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $tag_ids
+	 * @param int[]|null      $extranet_ids
 	 * @return int
 	 */
 	public function GetTotalUsers(?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null, ?array $extranet_ids = null): int
@@ -593,11 +606,11 @@ class ThankYousRepository
 	/**
 	 * Returns the number of tags which satisfy the filtering provided.
 	 *
-	 * @param int[]|null $extranet_ids
-	 * @param bool       $allow_no_thanked
-	 * @param array|null $date_range
-	 * @param int[]|null $thanked_user_ids
-	 * @param int[]|null $tag_ids
+	 * @param int[]|null      $extranet_ids
+	 * @param bool            $allow_no_thanked
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $thanked_user_ids
+	 * @param int[]|null      $tag_ids
 	 * @return int
 	 */
 	public function GetTotalTags(?array $extranet_ids = null, bool $allow_no_thanked = true, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
@@ -936,7 +949,7 @@ class ThankYousRepository
 
 	/**
 	 * @param QueryBuilder $query
-	 * @param string[]     $date_range
+	 * @param DateTime[]   $date_range
 	 */
 	private function QueryFilterCreatedBetween(QueryBuilder $query, array $date_range)
 	{
@@ -1058,11 +1071,11 @@ class ThankYousRepository
 	 *
 	 * Filters by user IDs, date range, thank you tags and user extranet IDs.
 	 *
-	 * @param QueryBuilder $query
-	 * @param array|null   $user_ids
-	 * @param array|null   $date_range
-	 * @param array|null   $tag_ids
-	 * @param array|null   $extranet_ids
+	 * @param QueryBuilder    $query
+	 * @param int[]|null      $user_ids
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $tag_ids
+	 * @param int[]|null      $extranet_ids
 	 * @throws EmptyQueryFilterException
 	 */
 	private function QueryFilterUserThankYouCounts(

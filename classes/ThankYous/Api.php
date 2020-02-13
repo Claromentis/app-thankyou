@@ -327,26 +327,21 @@ class Api
 	}
 
 	/**
-	 * @param SecurityContext       $context
-	 * @param bool                  $get_thanked
-	 * @param bool                  $get_users
-	 * @param bool                  $get_tags
-	 * @param int                   $limit
-	 * @param int                   $offset
-	 * @param DateTime[]|int[]|null $date_range
-	 * @param int[]|null            $thanked_user_ids
-	 * @param int[]|null            $tag_ids
+	 * @param SecurityContext $context
+	 * @param bool            $get_thanked
+	 * @param bool            $get_users
+	 * @param bool            $get_tags
+	 * @param int             $limit
+	 * @param int             $offset
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $thanked_user_ids
+	 * @param int[]|null      $tag_ids
 	 * @return ThankYou[]
 	 * @throws MappingException
 	 */
 	public function GetRecentThankYous(SecurityContext $context, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false, ?int $limit = null, ?int $offset = null, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
 	{
 		$extranet_ids = $this->GetVisibleExtranetIds($context);
-
-		if (isset($date_range))
-		{
-			$date_range = $this->utility->FormatDateRange($date_range);
-		}
 
 		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
 
@@ -364,10 +359,10 @@ class Api
 	/**
 	 * Return total number of Thank Yous in the database
 	 *
-	 * @param SecurityContext       $context
-	 * @param DateTime[]|int[]|null $date_range
-	 * @param int[]|null            $thanked_user_ids
-	 * @param array|null            $tag_ids
+	 * @param SecurityContext $context
+	 * @param DateTime[]|null $date_range
+	 * @param int[]|null      $thanked_user_ids
+	 * @param int[]|null      $tag_ids
 	 * @return int
 	 */
 	public function GetTotalThankYousCount(SecurityContext $context, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
@@ -384,7 +379,7 @@ class Api
 	 * @param int|null        $limit
 	 * @param int|null        $offset
 	 * @param int[]|null      $user_ids
-	 * @param array|null      $date_range
+	 * @param DateTime[]|null $date_range
 	 * @param int[]|null      $tag_ids
 	 * @return int[]
 	 */
@@ -404,7 +399,7 @@ class Api
 	 * @param int|null        $offset
 	 * @param bool|null       $active
 	 * @param int[]|null      $thanked_user_ids
-	 * @param array|null      $date_range
+	 * @param DateTime[]|null $date_range
 	 * @param int[]|null      $tag_ids
 	 * @return int[]
 	 */
@@ -447,7 +442,7 @@ class Api
 	/**
 	 * @param SecurityContext $context
 	 * @param int[]|null      $user_ids
-	 * @param array|null      $date_range
+	 * @param DateTime[]|null $date_range
 	 * @param int[]|null      $tag_ids
 	 * @return int
 	 */
