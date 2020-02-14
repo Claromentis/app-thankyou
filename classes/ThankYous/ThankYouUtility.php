@@ -57,6 +57,7 @@ class ThankYouUtility
 			return '';
 		}
 
+		$first = true;
 		$query_string = " ORDER BY";
 		foreach ($orders as $offset => $order)
 		{
@@ -65,8 +66,9 @@ class ThankYouUtility
 			if (!isset($column) || !is_string($column))
 			{
 				throw new InvalidArgumentException("Failed to GetTags, one or more Orders does not have a column");
-			}
-			$query_string .= " " . $column . " " . $direction;
+			} ;
+			$query_string .= ($first ? '' : ',') . " " . $column . " " . $direction;
+			$first = false;
 		}
 
 		return $query_string;
