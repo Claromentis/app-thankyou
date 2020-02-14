@@ -4,6 +4,7 @@ namespace Claromentis\ThankYou\UI;
 
 use Claromentis\Core\Application;
 use Claromentis\Core\Localization\Lmsg;
+use Claromentis\Core\Security\SecurityContext;
 use Claromentis\Core\Templater\Plugin\TemplaterComponentTmpl;
 use Claromentis\ThankYou\Configuration;
 use Claromentis\ThankYou\Thanked\Thanked;
@@ -36,6 +37,13 @@ class ThankYouCreateTemplaterComponent extends TemplaterComponentTmpl
 
 	public function Show($attributes, Application $app)
 	{
+		$context = $app[SecurityContext::class];
+
+		if (!($context->GetUserId() > 0))
+		{
+			return '';
+		}
+
 		$thanked = $attributes['thankeds'] ?? null;
 		$form    = (bool) ($attributes['form'] ?? true);
 
