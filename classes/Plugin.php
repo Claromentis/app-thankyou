@@ -238,7 +238,8 @@ class Plugin implements
 				$app[SugreUtility::class],
 				$app[UserRepository::class],
 				$app[Lmsg::class],
-				$app['logger_factory']->GetLogger(self::APPLICATION_NAME)
+				$app['logger_factory']->GetLogger(self::APPLICATION_NAME),
+				$app['config']
 			);
 		};
 

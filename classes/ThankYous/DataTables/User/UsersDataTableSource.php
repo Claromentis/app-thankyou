@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\ThankYous\DataTables\User;
 
 use Analogue\ORM\Exceptions\MappingException;
+use Claromentis\Core\Config\Config;
 use Claromentis\Core\DataTable\Contract\Parameters;
 use Claromentis\Core\DataTable\Contract\TableFilter;
 use Claromentis\Core\DataTable\Shared\ColumnHelper;
@@ -20,6 +21,11 @@ class UsersDataTableSource extends FilterDataTableSource
 	use ColumnHelper;
 
 	/**
+	 * @var Config
+	 */
+	private $core_config;
+
+	/**
 	 * @var Lmsg
 	 */
 	private $lmsg;
@@ -34,11 +40,18 @@ class UsersDataTableSource extends FilterDataTableSource
 	 */
 	private $user_repository;
 
-	public function __construct(ThankYous\Api $thank_you_api, SugreUtility $sugre_utility, UserRepository $user_repository, Lmsg $lmsg, LoggerInterface $logger)
-	{
+	public function __construct(
+		ThankYous\Api $thank_you_api,
+		SugreUtility $sugre_utility,
+		UserRepository $user_repository,
+		Lmsg $lmsg,
+		LoggerInterface $logger,
+		Config $core_config
+	) {
 		$this->lmsg            = $lmsg;
 		$this->user_repository = $user_repository;
 		$this->logger          = $logger;
+		$this->core_config     = $core_config;
 
 		parent::__construct($thank_you_api, $sugre_utility);
 	}
@@ -66,7 +79,23 @@ class UsersDataTableSource extends FilterDataTableSource
 
 		$filters = $this->FormatFilters($params->GetFilters());
 
-		$users_total_thank_yous = $this->api->GetUsersTotalThankYous($context, [['column' => ThankYous\ThankYousRepository::USER_TABLE . '.firstname']], $limit, $offset, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
+		if ($this->IsUserSurnameFirst())
+		{
+			$order = [['column' => ThankYous\ThankYousRepository::USER_TABLE . '.surname'], ['column' => ThankYous\ThankYousRepository::USER_TABLE . '.firstname']];
+		} else
+		{
+			$order = [['column' => ThankYous\ThankYousRepository::USER_TABLE . '.firstname'], ['column' => ThankYous\ThankYousRepository::USER_TABLE . '.surname']];
+		}
+
+		$users_total_thank_yous = $this->api->GetUsersTotalThankYous(
+			$context,
+			$order,
+			$limit,
+			$offset,
+			$filters['thanked_user_ids'],
+			$filters['date_range'],
+			$filters['tags']
+		);
 
 		$user_ids = array_keys($users_total_thank_yous);
 
@@ -106,5 +135,34 @@ class UsersDataTableSource extends FilterDataTableSource
 		$filters = $this->FormatFilters($params->GetFilters());
 
 		return $this->api->GetTotalUsers($context, $filters['thanked_user_ids'], $filters['date_range'], $filters['tags']);
+	}
+
+	/**
+	 * Determines whether the Application is configured to display the User's Surname first.
+	 *
+	 * @return bool
+	 */
+	//TODO: Replace this method with something in Core once it exists.
+	private function IsUserSurnameFirst(): bool
+	{
+		$firstname_config_identifier = '{fname}';
+		$surname_config_identifier   = '{sname}';
+
+		$display_config = $this->core_config->Get('cfg_name_format');
+
+		if (!is_string($display_config))
+		{
+			return false;
+		}
+
+		$firstname_position = strpos($display_config, $firstname_config_identifier);
+		$surname_position   = strpos($display_config, $surname_config_identifier);
+
+		if ($firstname_position === false || $surname_position === false)
+		{
+			return false;
+		}
+
+		return $surname_position < $firstname_position;
 	}
 }
