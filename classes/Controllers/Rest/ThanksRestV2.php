@@ -24,6 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use RestExBadRequest;
 use RestExError;
+use RestExForbidden;
 use RestExNotFound;
 use RestFormat;
 
@@ -117,6 +118,11 @@ class ThanksRestV2
 		} catch (MappingException $exception)
 		{
 			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);
+		}
+
+		if (!$this->api->ThankYous()->CanSeeThankYouNote($security_context, $thank_you))
+		{
+			throw new RestExForbidden(($this->lmsg)('thankyou.thankyou.error.permission'));
 		}
 
 		$display_thank_you = $this->thank_you_formatter->ConvertThankYouToArray($thank_you, DateClaTimeZone::GetCurrentTZ(), $security_context);
