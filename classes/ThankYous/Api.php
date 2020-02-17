@@ -800,6 +800,19 @@ class Api
 	}
 
 	/**
+	 * Determines whether a User can view a Thank You Note.
+	 * If the Note's Total Users are undefined, it is assumed that the User cannot see it.
+	 *
+	 * @param SecurityContext $context
+	 * @param ThankYou        $thank_you
+	 * @return bool
+	 */
+	public function CanSeeThankYouNote(SecurityContext $context, ThankYou $thank_you): bool
+	{
+		return $this->acl->CanSeeThankYouNote($context, $thank_you);
+	}
+
+	/**
 	 * @param SecurityContext $security_context
 	 * @param ThankYou        $thank_you
 	 * @return bool
