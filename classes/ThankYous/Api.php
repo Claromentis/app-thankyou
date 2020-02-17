@@ -1006,13 +1006,14 @@ class Api
 			$params = [
 				'author'              => $thank_you->GetAuthor()->getFullname(),
 				'other_people_number' => count($all_users_ids) - 1,
-				'description'         => nl2br($description)
+				'description'         => nl2br($description),
+				'tags' => $thank_you->GetTags() ?? []
 			];
 			NotificationMessage::Send('thankyou.new_thanks', $params, $all_users_ids, self::IM_TYPE_THANKYOU);
 
 			if ($this->config_api->IsLineManagerNotificationEnabled())
 			{
-				$this->line_manager_notifier->SendMessage($description, $all_users_ids);
+				$this->line_manager_notifier->SendMessage($thank_you, $all_users_ids);
 			}
 		} catch (Exception $exception)
 		{

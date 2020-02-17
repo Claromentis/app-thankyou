@@ -2,3 +2,6 @@
 
 {% if num_other_recipients %} {{ author|raw }} said Thank you to {{ recipients }}{% endif %}
 {{ description }}
+{%  for tag in tags %}
+    {{ tag.name }}
+{% endfor %}

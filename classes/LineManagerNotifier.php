@@ -2,7 +2,7 @@
 namespace Claromentis\ThankYou;
 
 use AuthUser;
-use Claromentis\ThankYou\ThankYous;
+use Claromentis\ThankYou\ThankYous\ThankYou;
 use Exception;
 use NotificationMessage;
 use Psr\Log\LoggerInterface;
@@ -22,14 +22,15 @@ class LineManagerNotifier
 	}
 
 	/**
-	 * @param string $description
-	 * @param int[]  $user_ids
+	 * @param ThankYou $thank_you
+	 * @param int[]    $user_ids
 	 */
-	public function SendMessage($description, $user_ids)
+	public function SendMessage(ThankYou $thank_you, $user_ids)
 	{
 		$params = [
 			'author'      => AuthUser::I()->GetFullName(),
-			'description' => $description
+			'description' => $thank_you->GetDescription(),
+			'tags'        => $thank_you->GetTags() ?? []
 		];
 
 		$line_managers = [];
