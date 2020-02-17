@@ -327,22 +327,29 @@ class Api
 	}
 
 	/**
-	 * @param SecurityContext $context
 	 * @param bool            $get_thanked
 	 * @param bool            $get_users
 	 * @param bool            $get_tags
-	 * @param int             $limit
-	 * @param int             $offset
+	 * @param int|null        $limit
+	 * @param int|null        $offset
+	 * @param int[]|null      $extranet_ids
 	 * @param DateTime[]|null $date_range
 	 * @param int[]|null      $thanked_user_ids
 	 * @param int[]|null      $tag_ids
 	 * @return ThankYou[]
 	 * @throws MappingException
 	 */
-	public function GetRecentThankYous(SecurityContext $context, bool $get_thanked = false, bool $get_users = false, bool $get_tags = false, ?int $limit = null, ?int $offset = null, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null)
-	{
-		$extranet_ids = $this->GetVisibleExtranetIds($context);
-
+	public function GetRecentThankYous(
+		bool $get_thanked = false,
+		bool $get_users = false,
+		bool $get_tags = false,
+		?int $limit = null,
+		?int $offset = null,
+		?array $extranet_ids = null,
+		?array $date_range = null,
+		?array $thanked_user_ids = null,
+		?array $tag_ids = null
+	) {
 		$thank_you_ids = $this->thank_yous_repository->GetRecentThankYousIds($limit, $offset, $extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
 
 		return $this->GetThankYous($thank_you_ids, $get_thanked, $get_users, $get_tags);
@@ -359,16 +366,14 @@ class Api
 	/**
 	 * Return total number of Thank Yous in the database
 	 *
-	 * @param SecurityContext $context
+	 * @param int[]|null      $extranet_ids
 	 * @param DateTime[]|null $date_range
 	 * @param int[]|null      $thanked_user_ids
 	 * @param int[]|null      $tag_ids
 	 * @return int
 	 */
-	public function GetTotalThankYousCount(SecurityContext $context, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
+	public function GetTotalThankYousCount(?array $extranet_ids = null, ?array $date_range = null, ?array $thanked_user_ids = null, ?array $tag_ids = null): int
 	{
-		$extranet_ids = $this->GetVisibleExtranetIds($context);
-
 		return $this->thank_yous_repository->GetTotalThankYousCount($extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);
 	}
 
@@ -384,8 +389,15 @@ class Api
 	 * @param int[]|null      $tag_ids
 	 * @return int[]
 	 */
-	public function GetUsersTotalThankYous(SecurityContext $context, ?array $orders = null, ?int $limit = null, ?int $offset = null, ?array $user_ids = null, ?array $date_range = null, ?array $tag_ids = null): array
-	{
+	public function GetUsersTotalThankYous(
+		SecurityContext $context,
+		?array $orders = null,
+		?int $limit = null,
+		?int $offset = null,
+		?array $user_ids = null,
+		?array $date_range = null,
+		?array $tag_ids = null
+	): array {
 		$extranet_ids = $this->GetVisibleExtranetIds($context);
 
 		return $this->thank_yous_repository->GetTotalUsersThankYous($orders, $limit, $offset, $user_ids, $date_range, $tag_ids, $extranet_ids);
@@ -404,8 +416,16 @@ class Api
 	 * @param int[]|null      $tag_ids
 	 * @return int[]
 	 */
-	public function GetTagsTotalThankYouUses(SecurityContext $context, ?array $orders = null, ?int $limit = null, ?int $offset = null, ?bool $active = null, ?array $thanked_user_ids = null, ?array $date_range = null, ?array $tag_ids = null): array
-	{
+	public function GetTagsTotalThankYouUses(
+		SecurityContext $context,
+		?array $orders = null,
+		?int $limit = null,
+		?int $offset = null,
+		?bool $active = null,
+		?array $thanked_user_ids = null,
+		?array $date_range = null,
+		?array $tag_ids = null
+	): array {
 		$extranet_ids = $this->GetVisibleExtranetIds($context);
 
 		return $this->thank_yous_repository->GetTagsTotalThankYouUses($orders, $limit, $offset, $active, $extranet_ids, true, $date_range, $thanked_user_ids, $tag_ids);

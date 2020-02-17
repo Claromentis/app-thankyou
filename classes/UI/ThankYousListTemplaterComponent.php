@@ -112,7 +112,17 @@ class ThankYousListTemplaterComponent extends TemplaterComponentTmpl
 
 		try
 		{
-			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($context, true, false, true, $limit, $offset, null, $user_ids, null);
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous(
+				true,
+				false,
+				true,
+				$limit,
+				$offset,
+				$this->api->ThankYous()->GetVisibleExtranetIds($context),
+				null,
+				$user_ids,
+				null
+			);
 		} catch (MappingException $exception)
 		{
 			$thank_yous = [];

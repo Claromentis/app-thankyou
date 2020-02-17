@@ -42,12 +42,18 @@ class ThankYouController
 			$query_params = $request->getQueryParams();
 			$offset       = (int) ($query_params['st'] ?? null);
 
-			$args['paging.body_html'] = get_navigation($request->getUri()->getPath(), $this->api->ThankYous()->GetTotalThankYousCount($context), $offset, '', $limit);
+			$args['paging.body_html'] = get_navigation(
+				$request->getUri()->getPath(),
+				$this->api->ThankYous()->GetTotalThankYousCount($this->api->ThankYous()->GetVisibleExtranetIds($context)),
+				$offset,
+				'',
+				$limit
+			);
 
 			$args['ty_list.limit']  = $limit;
 			$args['ty_list.offset'] = $offset;
 
-			$tags_enabled = $this->api->Configuration()->IsTagsEnabled();
+			$tags_enabled      = $this->api->Configuration()->IsTagsEnabled();
 			$active_tags_count = $this->api->Tag()->GetTotalTags(true);
 
 			if ($tags_enabled && $active_tags_count > 0)

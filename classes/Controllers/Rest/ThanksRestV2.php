@@ -141,7 +141,14 @@ class ThanksRestV2
 
 		try
 		{
-			$thank_yous = $this->api->ThankYous()->GetRecentThankYous($security_context, $get_thanked, $get_users, $get_tags, $limit, $offset);
+			$thank_yous = $this->api->ThankYous()->GetRecentThankYous(
+				$get_thanked,
+				$get_users,
+				$get_tags,
+				$limit,
+				$offset,
+				$this->api->ThankYous()->GetVisibleExtranetIds($security_context)
+			);
 		} catch (MappingException $exception)
 		{
 			throw new RestExError('Internal Server Error', 500, 'Internal Server Error', $exception);

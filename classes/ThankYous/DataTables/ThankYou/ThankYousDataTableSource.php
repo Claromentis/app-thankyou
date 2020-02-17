@@ -92,7 +92,17 @@ class ThankYousDataTableSource extends FilterDataTableSource
 
 		try
 		{
-			$thank_yous = $this->api->GetRecentThankYous($context, true, true, $get_tags, $limit, $offset, $filters['date_range'], $filters['thanked_user_ids'], $filters['tags']);
+			$thank_yous = $this->api->GetRecentThankYous(
+				true,
+				true,
+				$get_tags,
+				$limit,
+				$offset,
+				null,
+				$filters['date_range'],
+				$filters['thanked_user_ids'],
+				$filters['tags']
+			);
 		} catch (MappingException $exception)
 		{
 			$this->logger->error("Unexpected MappingException", [$exception]);
@@ -119,7 +129,7 @@ class ThankYousDataTableSource extends FilterDataTableSource
 			{
 				if ($thanked->GetOwnerClass() === PermOClass::GROUP)
 				{
-					$thanked_groups[] = $thanked->GetName();
+					$thanked_groups[] = $this->api->CanSeeThankedName($context, $thanked) ? $thanked->GetName() : ($this->lmsg)('common.perms.hidden_name');
 				}
 			}
 
@@ -174,6 +184,6 @@ class ThankYousDataTableSource extends FilterDataTableSource
 	{
 		$filters = $this->FormatFilters($params->GetFilters());
 
-		return $this->api->GetTotalThankYousCount($context, $filters['date_range'], $filters['thanked_user_ids'], $filters['tags']);
+		return $this->api->GetTotalThankYousCount(null, $filters['date_range'], $filters['thanked_user_ids'], $filters['tags']);
 	}
 }
