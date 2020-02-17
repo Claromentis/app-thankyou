@@ -64,6 +64,41 @@ class ThankYouAcl
 	}
 
 	/**
+	 * Determines whether a User can view a Thank You Note.
+	 * If the Note's Total Users are undefined, it is assumed that the User cannot see it.
+	 *
+	 * @param SecurityContext $context
+	 * @param ThankYou        $thank_you
+	 * @return bool
+	 */
+	public function CanSeeThankYouNote(SecurityContext $context, ThankYou $thank_you): bool
+	{
+		if ($this->IsAdmin($context))
+		{
+			return true;
+		}
+
+		$users = $thank_you->GetUsers();
+		if (isset($users))
+		{
+			if (count($users) === 0)
+			{
+				return true;
+			}
+
+			foreach ($users as $user)
+			{
+				if ($this->people_acl->CanViewExtranet($context, $user->extranet_id))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determines whether a Security Context can view a Thanked's Name.
 	 *
 	 * @param SecurityContext  $context
