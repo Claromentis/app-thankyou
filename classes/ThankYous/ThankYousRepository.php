@@ -119,7 +119,6 @@ class ThankYousRepository
 	 *
 	 * @param int[] $ids
 	 * @return ThankYou[]
-	 * @throws MappingException
 	 */
 	public function GetThankYous(array $ids)
 	{
@@ -169,11 +168,19 @@ class ThankYousRepository
 				continue;
 			}
 
-			$thank_you = $this->Create(
-				($users->find($rows[$id]['author_id']) ?? $rows[$id]['author_id']),
-				$rows[$id]['description'] ?? '',
-				new Date($rows[$id]['date_created'], new DateTimeZone('UTC'))
-			);
+			try
+			{
+				$thank_you = $this->Create(
+					$users->find($rows[$id]['author_id']) ?? $rows[$id]['author_id'],
+					$rows[$id]['description'] ?? '',
+					new Date($rows[$id]['date_created'], new DateTimeZone('UTC'))
+				);
+			} catch (MappingException $exception)
+			{
+				$this->logger->error("Unexpected MappingException", [$exception]);
+				continue;
+			}
+
 			$thank_you->SetId($id);
 
 			$thank_yous[$id] = $thank_you;

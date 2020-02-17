@@ -48,7 +48,6 @@ class Validator
 	 * @param ThankYou $thank_you
 	 * @throws ValidationException - If the Thank You has one or more issues making it unsuitable to save to the
 	 * Repository.
-	 * @throws MappingException
 	 */
 	public function ValidateThankYou(ThankYou $thank_you): void
 	{

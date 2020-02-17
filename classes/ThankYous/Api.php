@@ -894,7 +894,6 @@ class Api
 	 * @return int
 	 * @throws TagNotFoundException - If one or more of the Thank You's Tags could not be found in the Repository.
 	 * @throws ValidationException - If the Thank You is not in a Valid state to be saved.
-	 * @throws MappingException
 	 */
 	private function SaveNew(ThankYou $thank_you): int
 	{
@@ -929,7 +928,6 @@ class Api
 	 * @throws ThankYouForbiddenException
 	 * @throws ValidationException
 	 * @throws ThankYouNotFoundException - If the Thank You does not have an ID set.
-	 * @throws MappingException
 	 */
 	private function SaveUpdate(SecurityContext $security_context, ThankYou $thank_you): int
 	{
