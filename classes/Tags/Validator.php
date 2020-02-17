@@ -7,7 +7,7 @@ use Claromentis\ThankYou\Tags\Exceptions\ValidationException;
 
 class Validator
 {
-	const NAME_MAX_CHARACTERS = 20;
+	const NAME_MAX_CHARACTERS = 25;
 
 	/**
 	 * @var Lmsg
