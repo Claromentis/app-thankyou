@@ -106,12 +106,11 @@ class ThanksRestV2
 	{
 		$query_params = $request->getQueryParams();
 		$thanked      = (bool) ($query_params['thanked'] ?? null);
-		$users        = (bool) ($query_params['users'] ?? null);
 		$tags         = (bool) ($query_params['tags'] ?? null);
 
 		try
 		{
-			$thank_you = $this->api->ThankYous()->GetThankYou($id, $thanked, $users, $tags);
+			$thank_you = $this->api->ThankYous()->GetThankYou($id, $thanked, true, $tags);
 		} catch (ThankYouNotFoundException $exception)
 		{
 			throw new RestExNotFound(($this->lmsg)('thankyou.error.thanks_not_found'), "Not found", $exception);
