@@ -2,11 +2,15 @@
 
 namespace Claromentis\ThankYou\Controllers;
 
+use Analogue\ORM\Exceptions\MappingException;
+use Claromentis\Core\Http\RedirectResponse;
 use Claromentis\Core\Http\TemplaterCallResponse;
 use Claromentis\Core\Localization\Lmsg;
 use Claromentis\Core\Security\SecurityContext;
 use Claromentis\ThankYou\Api;
+use Claromentis\ThankYou\Exception\ThankYouNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 class ThankYouController
 {
@@ -20,10 +24,16 @@ class ThankYouController
 	 */
 	private $lmsg;
 
-	public function __construct(Lmsg $lmsg, Api $api)
+	/**
+	 * @var LoggerInterface|null
+	 */
+	private $logger;
+
+	public function __construct(Lmsg $lmsg, Api $api, ?LoggerInterface $logger = null)
 	{
-		$this->api  = $api;
-		$this->lmsg = $lmsg;
+		$this->api    = $api;
+		$this->lmsg   = $lmsg;
+		$this->logger = $logger;
 	}
 
 	public function View(ServerRequestInterface $request, SecurityContext $context)
@@ -68,7 +78,21 @@ class ThankYouController
 			return new TemplaterCallResponse('thankyou/view.html', $args, ($this->lmsg)('thankyou.app_name'));
 		}
 
-		$args['thank.thank_you'] = $id;
+		try
+		{
+			$args['thank.thank_you'] = $this->api->ThankYous()->GetThankYou($id, true, true, true);
+		} catch (ThankYouNotFoundException $exception)
+		{
+			return RedirectResponse::httpRedirect('/thankyou/thanks', ($this->lmsg)('thankyou.error.thanks_not_found'), true);
+		} catch (MappingException $exception)
+		{
+			if (isset($this->logger))
+			{
+				$this->logger->error("Unexpected Mapping Exception when viewing a Thank You Note", [$exception]);
+			}
+
+			return RedirectResponse::httpRedirect('/thankyou/thanks', '', true);
+		}
 
 		return new TemplaterCallResponse('thankyou/thank_you.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}

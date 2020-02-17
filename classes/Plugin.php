@@ -201,6 +201,11 @@ class Plugin implements
 			return new ThankYouAcl($app[PeopleAcl::class], $app['admin.panels_list']->GetOne(self::APPLICATION_NAME));
 		};
 
+		//Controllers
+		$app[ThankYouController::class] = function ($app) {
+			return new ThankYouController($app[Lmsg::class], $app[Api::class], $app['logger_factory']->GetLogger(self::APPLICATION_NAME));
+		};
+
 		// Pages component
 		$app['pages.component.thankyou'] = function ($app) {
 			return new UI\PagesComponent($app[Lmsg::class], $app[Configuration\Api::class]);
