@@ -80,7 +80,7 @@ class ThankYouController
 
 		try
 		{
-			$args['thank.thank_you'] = $this->api->ThankYous()->GetThankYou($id, true, true, true);
+			 $thank_you = $this->api->ThankYous()->GetThankYou($id, true, true, true);
 		} catch (ThankYouNotFoundException $exception)
 		{
 			return RedirectResponse::httpRedirect('/thankyou/thanks', ($this->lmsg)('thankyou.error.thanks_not_found'), true);
@@ -93,6 +93,13 @@ class ThankYouController
 
 			return RedirectResponse::httpRedirect('/thankyou/thanks', '', true);
 		}
+
+		if (!$this->api->ThankYous()->CanSeeThankYouNote($context, $thank_you))
+		{
+			return RedirectResponse::httpRedirect('/thankyou/thanks', ($this->lmsg)('thankyou.thankyou.error.permission'), true);
+		}
+
+		$args['thank.thank_you'] = $thank_you;
 
 		return new TemplaterCallResponse('thankyou/thank_you.html', $args, ($this->lmsg)('thankyou.app_name'));
 	}

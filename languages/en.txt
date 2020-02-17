@@ -91,6 +91,7 @@ lm	thankyou.thankyou.description.error.not_string		Thank You Description must be
 lm	thankyou.thankyou.description.error.too_long		Description can only be %d characters or less
 lm	thankyou.thankyou.error.create		Could not create Thank You
 lm	thankyou.thankyou.error.modify		Could not modify Thank You
+lm	thankyou.thankyou.error.permission		You do not have permission to view this Thank You Note
 lm	thankyou.thankyou.error.server		The Thank You you've requested could not be loaded due to a server error
 lm	thankyou.thankyou.id.error.invalid		Invalid Thank You ID given
 lm	thankyou.thankyou.id.error.not_found		Thank You with ID %d could not be found

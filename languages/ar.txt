@@ -91,6 +91,7 @@ lm	thankyou.thankyou.description.error.not_string
 lm	thankyou.thankyou.description.error.too_long		
 lm	thankyou.thankyou.error.create		
 lm	thankyou.thankyou.error.modify		
+lm	thankyou.thankyou.error.permission		
 lm	thankyou.thankyou.error.server		
 lm	thankyou.thankyou.id.error.invalid		
 lm	thankyou.thankyou.id.error.not_found		
