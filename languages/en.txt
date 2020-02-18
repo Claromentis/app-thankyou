@@ -13,6 +13,8 @@ lm	thankyou.audit.delete_thank_you		Deleted Thank You
 lm	thankyou.audit.edit_thank_you		Edited Thank You
 lm	thankyou.common.actions		Actions
 lm	thankyou.common.add_description		Add a description
+lm	thankyou.common.disable		Disable
+lm	thankyou.common.enable		Enable
 lm	thankyou.common.filter_by_groups		Filter by Groups
 lm	thankyou.common.select_core_values		Select Core Values
 lm	thankyou.common.tags		Core Values

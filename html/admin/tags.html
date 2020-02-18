@@ -175,6 +175,7 @@
         });
 
         core_values.on('click', '.js-tag-active', function () {
+			$(this).tooltip('hide');
             tag_modal.setActive($(this).parent().attr('data-id'), $(this).attr('data-value'));
 		});
 

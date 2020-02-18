@@ -3,6 +3,7 @@
 namespace Claromentis\ThankYou\Tags\DataTables;
 
 use Claromentis\Core\DataTable\Decorator\Decorator;
+use Claromentis\Core\Services;
 
 class ActionsDataTableDecorator extends Decorator
 {
@@ -12,10 +13,13 @@ class ActionsDataTableDecorator extends Decorator
 	 */
 	public function Decorate($content): array
 	{
+		$lmsg = Services::I()->lmsg;
+
 		return [
 			'id'               => $content['id'],
 			'new_active_state' => (int) (!$content['active']),
-			'icon'             => $content['active'] ? 'glyphicons-eye-close' : 'glyphicons-eye-open'
+			'icon'             => $content['active'] ? 'glyphicons-eye-open' : 'glyphicons-eye-close',
+			'active_tooltip'   => $content['active'] ? $lmsg('thankyou.common.disable') : $lmsg('thankyou.common.enable')
 		];
 	}
 
