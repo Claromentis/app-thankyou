@@ -186,6 +186,10 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 		 * @var Api $api
 		 */
 		$api = Services::I()->{Api::class};
+		/**
+		 * @var HttpUtil $http_util
+		 */
+		$http_util = Services::I()->{HttpUtil::class};
 
 		try
 		{
@@ -196,6 +200,9 @@ class CommentableThankYou implements CommentableInterface, CommentLocationInterf
 
 			return;
 		}
+
+		$default_notification->AddTemplateValues(['link_to_discuss' => $http_util->CreateInternalLink('/thankyou/thanks/' . $thank_you->GetId())]);
+
 
 		$thanked_users = $thank_you->GetUsers();
 
