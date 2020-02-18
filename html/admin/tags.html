@@ -236,7 +236,7 @@
 				}
 			},
 			reloadDataTable: function () {
-                $('#tags_datatable table').dataTable().api().ajax.reload();
+                $('#tags_datatable table').dataTable().api().draw(false);
 			},
 			resetForm: function () {
                 this.modal.find('input[name="tag_id"]').val(null);
