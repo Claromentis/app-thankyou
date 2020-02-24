@@ -86,7 +86,7 @@ class ThankYouTemplaterComponent extends TemplaterComponentTmpl
 	 *     * 1 = Thanked will display as an image if available.
 	 * * thank_link:
 	 *     * 0 = The Thank will not provide a link to itself.(default)
-	 *     * 1 = The Thank will provide a linke to iteslf.
+	 *     * 1 = The Thank will provide a link to iteslf.
 	 * * form:
 	 *     * 1 = The Form is included within the Thank You.(default)
 	 *     * 0 = The Form is not included within the Thank You. This option allows Thank You's to be displayed within
