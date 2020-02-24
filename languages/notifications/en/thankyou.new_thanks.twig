@@ -1,4 +1,4 @@
 {{ author|raw }} said Thank you to you{% if other_people_number %} (and {{ other_people_number|raw }} other {{ other_people_number == 1 ? 'person' : 'people'  }}){% endif %}
 
-{{ description|raw }}
 {%  for tag in tags %}{{ loop.first ? 'Core Values: ' }}{{ tag.name }}{{ not loop.last ? ', ' }}{% endfor %}
+{{ description|raw }}
