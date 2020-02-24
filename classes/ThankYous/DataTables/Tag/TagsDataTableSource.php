@@ -42,7 +42,7 @@ class TagsDataTableSource extends FilterDataTableSource
 	public function Columns(SecurityContext $context, Parameters $params = null)
 	{
 		$columns = [
-			['name', ($this->lmsg)('common.date_created')],
+			['name', ($this->lmsg)('thankyou.tag.name')],
 			['total_uses', ($this->lmsg)('thankyou.tag.total_uses')]
 		];
 
