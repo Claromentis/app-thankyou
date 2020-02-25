@@ -1,5 +1,6 @@
-define(['jquery', 'cla_select2'], function ($) {
+define(['jquery', 'cla_select2', './thankYouRepository.js'], function ($, cla_select2, repository) {
     var ThankYou = function (list) {
+        this.repository = repository;
         this.list = list;
         this.modal = list.find('.js-thank_you-modal').first();
         this.form = this.modal.find('.js-thank_you-form');
@@ -53,12 +54,10 @@ define(['jquery', 'cla_select2'], function ($) {
 
     ThankYou.prototype.edit = function (id) {
         var self = this;
-        $.ajax('/api/thankyou/v2/thanks/' + id + '?thanked=1&tags=1', {
-            success: function (data) {
-                self.populateForm(data);
-                self.lockThanked(false);
-                self.showModal(true);
-            }
+        this.repository.get(id, true, true, function (data) {
+            self.populateForm(data);
+            self.lockThanked(false);
+            self.showModal(true);
         });
     };
 
@@ -257,19 +256,13 @@ define(['jquery', 'cla_select2'], function ($) {
             }
         }
 
-        var url = '/api/thankyou/v2/thankyou';
-        if (id !== null) {
-            url += '/' + id;
-        }
-
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(body),
-            error: function (response) {
+        this.repository.save(
+            id,
+            body,
+            function (response) {
+                window.location.reload();
+            },
+            function (response) {
                 $('.btn-submit-modal').prop('disabled', false);
                 var body = response.responseJSON;
 
@@ -289,17 +282,12 @@ define(['jquery', 'cla_select2'], function ($) {
                             }
                         }
                     }
-                    return;
-
                 }
                 if (problem_details_title_error.length > 0 && 'title' in body && !error_displayed) {
                     self.addError(problem_details_title_error, body.title);
                 }
-            },
-            success: function (response) {
-                window.location.reload();
             }
-        });
+        );
     };
 
     ThankYou.prototype.resetErrors = function () {
@@ -318,10 +306,12 @@ define(['jquery', 'cla_select2'], function ($) {
 
         var id = self.getDeleteIDInput().val();
 
-        $.ajax({
-            url: '/api/thankyou/v2/thankyou/' + id,
-            type: 'DELETE',
-            error: function (response) {
+        this.repository.delete(
+            id,
+            function (response) {
+                location.reload();
+            },
+            function (response) {
                 var body = response.responseJSON;
 
                 var form_errors = self.delete_form.find('.js-form-error');
@@ -329,11 +319,8 @@ define(['jquery', 'cla_select2'], function ($) {
                 if (problem_details_title_error.length > 0 && 'title' in body) {
                     self.addError(problem_details_title_error, body.title);
                 }
-            },
-            success: function (response) {
-                location.reload();
             }
-        });
+        );
     };
 
     ThankYou.prototype.registerEventListeners = function () {
