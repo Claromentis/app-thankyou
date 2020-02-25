@@ -117,21 +117,24 @@ require(["/intranet/thankyou/js/build/tag.bundle.js"], function (tagApi) {
                     var body = response.responseJSON;
 
                     var form_errors = self.modal.find('.js-form-error');
-                    var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
-                    if (problem_details_title_error.length > 0 && 'title' in body) {
-                        self.addError(problem_details_title_error, body.title);
-                    }
-
-                    if ('invalid-params' in body) {
-                        for (var offset in body['invalid-params']) {
-                            var invalid_param = body['invalid-params'][offset];
+                    var error_displayed = false;
+                    if ('invalid-params' in body && Array.isArray(body['invalid-params'])) {
+                        var invalid_params_length = body['invalid-params'].length;
+                        for (var invalid_params_offset = 0; invalid_params_offset < invalid_params_length; invalid_params_offset++) {
+                            var invalid_param = body['invalid-params'][invalid_params_offset];
                             if ('name' in invalid_param) {
                                 var error_container = form_errors.filter('[data-name="' + invalid_param.name + '"]');
                                 if (error_container.length > 0 && 'reason' in invalid_param) {
                                     self.addError(error_container, invalid_param.reason);
+                                    error_displayed = true;
                                 }
                             }
                         }
+                    }
+
+                    var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
+                    if (problem_details_title_error.length > 0 && 'title' in body && !error_displayed) {
+                        self.addError(problem_details_title_error, body.title);
                     }
                 }
             );
