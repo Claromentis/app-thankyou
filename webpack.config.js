@@ -15,7 +15,7 @@ for (var i=0; i<items.length; i++) {
 externals['jquery'] = { amd: 'jquery' };
 externals['moment'] = { amd: 'moment' };
 
-var tags = {
+var thankyou = {
     context: __dirname,
     entry: {
         'thankyou': [
@@ -53,6 +53,82 @@ var tags = {
     ]
 };
 
+var thankYouConfig = {
+    context: __dirname,
+    entry: {
+        'thankYouConfig': [
+            './js/src/thankYouConfig.js'
+        ]
+    },
+    output: {
+        path: outputPath,
+        filename: '[name].bundle.js',
+        publicPath: '/intranet/thankyou/js/build/',
+        libraryTarget: 'amd'
+    },
+    resolve: {
+        modules: [path.join(__dirname, 'js'), "node_modules"]
+    },
+    externals: externals,
+    module: {
+        loaders: [
+            { test: /\.html$/, loader: "ngtemplate-loader?relativeTo=" + __dirname + "!html-loader" },
+            { test: /\.css$/, loader: "style-loader!css-loader" },
+            { test: /\.(png|jpg|woff|woff2|eot|ttf|otf|gif)/, loader: 'url-loader' },
+            { test: /\.svg/, loader: 'file?name=/img/[hash].[ext]?' },
+            { test: /\.s[a|c]ss/, loader: "style-loader!css-loader!sass-loader" }
+        ]
+    },
+    plugins: [
+        new webpack.NamedModulesPlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false,
+                drop_console: false,
+                drop_debugger: false
+            }
+        })
+    ]
+};
+
+var tag = {
+    context: __dirname,
+    entry: {
+        'tag': [
+            './js/src/tag.js'
+        ]
+    },
+    output: {
+        path: outputPath,
+        filename: '[name].bundle.js',
+        publicPath: '/intranet/thankyou/js/build/',
+        libraryTarget: 'amd'
+    },
+    resolve: {
+        modules: [path.join(__dirname, 'js'), "node_modules"]
+    },
+    externals: externals,
+    module: {
+        loaders: [
+            { test: /\.html$/, loader: "ngtemplate-loader?relativeTo=" + __dirname + "!html-loader" },
+            { test: /\.css$/, loader: "style-loader!css-loader" },
+            { test: /\.(png|jpg|woff|woff2|eot|ttf|otf|gif)/, loader: 'url-loader' },
+            { test: /\.svg/, loader: 'file?name=/img/[hash].[ext]?' },
+            { test: /\.s[a|c]ss/, loader: "style-loader!css-loader!sass-loader" }
+        ]
+    },
+    plugins: [
+        new webpack.NamedModulesPlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false,
+                drop_console: false,
+                drop_debugger: false
+            }
+        })
+    ]
+};
+
 module.exports = [
-    tags
+    thankyou, thankYouConfig, tag
 ];

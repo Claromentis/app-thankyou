@@ -34,7 +34,9 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12 mb-10">
-				<cla-button color="success" class="js-tag-create"><loc name="common:create"></loc></cla-button>
+				<cla-button color="success" class="js-tag-create">
+					<loc name="common:create"></loc>
+				</cla-button>
 			</div>
 		</div>
 		<component class_key="data_table" name="tags_datatable" service="tags.datatable.admin"/>
@@ -51,7 +53,7 @@
 				<input type="hidden" name="csrf_token">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-						aria-hidden="true">&times;</span></button>
+							aria-hidden="true">&times;</span></button>
 					<h4 name="thankyou:common:tags" class="modal-title"></h4>
 				</div>
 				<div class="modal-body">
@@ -115,261 +117,21 @@
 	<span class="text-danger"></span>
 </script>
 <script type="text/javascript">
-    require(['colour_picker'], function() {});
-
-	(function ($) {
-        $('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
-            var checked = $(this).find('input').prop('checked');
-
-            var body = {
-                'thankyou_core_values_enabled': checked
-            };
-
-            $.ajax({
-                url: '/api/thankyou/v2/admin/config',
-                type: 'POST',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify(body)
-            }).done(function (response) {
-                if (response) {
-                    if (checked) {
-                        $('#core_values_enabled_body').slideDown("fast");
-                    } else {
-                        $('#core_values_enabled_body').hide();
-                    }
-                }
-            });
-        });
-
-        $('cla-checkbox[name="core_values_mandatory"]').on('change', function () {
-            var checked = $(this).find('input').prop('checked');
-
-            var body = {
-                'thankyou_core_values_mandatory': checked
-            };
-
-            $.ajax({
-                url: '/api/thankyou/v2/admin/config',
-                type: 'POST',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify(body)
-            });
-        });
-
-        $('#tag_modal, input[name="tag_name"], .js-color-confirm').on('keypress', function(event){
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-            if(keycode == '13'){
-                $('.js-tag-form').submit();
-            }
-		})
-
-        var core_values = $('#core_values_enabled_body');
-
-        core_values.on('click', '.js-tag-create', function () {
-            tag_modal.resetForm();
-            tag_modal.showModal(true);
-            tag_modal.modal.find('input[name="tag_bg_colour"]').val('#00adef');
-            tag_modal.updateColourPickerBg();
-        });
-
-        core_values.on('click', '.js-tag-active', function () {
-			$(this).tooltip('hide');
-            tag_modal.setActive($(this).parent().attr('data-id'), $(this).attr('data-value'));
-		});
-
-        core_values.on('click', '.js-tag-edit', function () {
-            tag_modal.populateFromId($(this).parent().attr('data-id'));
-		});
-
-        core_values.on('click', '.js-tag-delete', function () {
-            tag_delete_modal.populateFromId($(this).parent().attr('data-id'));
-        });
-
-        $('.js-tag-form').on('submit', function (event) {
-            event.preventDefault();
-            tag_modal.submit();
-		});
-
-        var tag_modal = {
-            modal: $('#tag_modal'),
-			error_template: $('#js_modal_error_template'),
-            setActive: function (id, active) {
-                var self = this;
-                active = !(active === "0" || active === 0);
-                $.ajax({
-					url: '/api/thankyou/v2/tags/' + id,
-					type: 'POST',
-					dataType: 'json',
-					contentType: 'application/json',
-					data: JSON.stringify({active: active})
-				}).done(function () {
-				    self.reloadDataTable();
-                });
-            },
-			populateFromId: function (id) {
-                var self = this;
-                $.ajax({
-					url: '/api/thankyou/v2/tags/' + id
-				}).done(function(data){
-                    self.populateFromTag(data);
-                    self.updateColourPickerBg();
-                })
-			},
-			populateFromTag: function (tag) {
-                this.modal.find('input[name="tag_id"]').val(+tag.id);
-                this.modal.find('input[name="tag_name"]').val(tag.name);
-                this.modal.find('input[name="tag_bg_colour"]').val(tag.bg_colour);
-                this.resetErrors();
-                this.showModal(true);
-			},
-			updateColourPickerBg: function () {
-                var colourPicker = $('#tag_modal').find($('.js-color-confirm'));
-                colourPicker.css('background-color', colourPicker.val());
-			},
-			showModal: function (show) {
-                if (show === true) {
-                    this.modal.modal('show');
+	require(['colour_picker', "/intranet/thankyou/js/build/thankYouConfig.bundle.js"], function (colour_picker, thankYouConfig) {
+		$('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
+			var checked = $(this).find('input').prop('checked');
+			thankYouConfig.setTagsEnabled(checked, function () {
+				if (checked) {
+					$('#core_values_enabled_body').slideDown("fast");
 				} else {
-                    this.modal.modal('hide');
+					$('#core_values_enabled_body').hide();
 				}
-			},
-			reloadDataTable: function () {
-                $('#tags_datatable table').dataTable().api().draw(false);
-			},
-			resetForm: function () {
-                this.modal.find('input[name="tag_id"]').val(null);
-                this.modal.find('input[name="tag_name"]').val(null);
-                this.modal.find('input[name="tag_bg_colour"]').val(null);
-
-                this.resetErrors();
-			},
-			resetErrors: function () {
-                var form_errors = this.modal.find('.js-form-error');
-                form_errors.empty();
-			},
-			submit: function () {
-                var self = this;
-
-                self.resetErrors();
-
-                var id = +this.modal.find('input[name="tag_id"]').val();
-                if (!(id > 0)) {
-                    id = null;
-				}
-                var name = this.modal.find('input[name="tag_name"]').val();
-                var bg_colour = this.modal.find('input[name="tag_bg_colour"]').val();
-
-                var body = {
-                    name: name,
-					bg_colour: bg_colour
-				};
-
-                var url = '/api/thankyou/v2/tags';
-                if (id !== null) {
-                    url += '/' + id;
-				}
-
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    data: JSON.stringify(body),
-					error: function (response) {
-                        var body = response.responseJSON;
-
-                        var form_errors = self.modal.find('.js-form-error');
-                        var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
-                        if (problem_details_title_error.length > 0 && 'title' in body) {
-                            self.addError(problem_details_title_error, body.title);
-						}
-
-                        if ('invalid-params' in body) {
-                            for (var offset in body['invalid-params']) {
-                                var invalid_param = body['invalid-params'][offset];
-                                if ('name' in invalid_param) {
-                                    var error_container = form_errors.filter('[data-name="' + invalid_param.name + '"]');
-                                    if (error_container.length > 0 && 'reason' in invalid_param) {
-                                        self.addError(error_container, invalid_param.reason);
-									}
-								}
-							}
-						}
-					},
-					success: function () {
-                        self.showModal(false);
-                        self.reloadDataTable();
-					}
-                });
-			},
-			addError: function (container, message) {
-                var error = $(_.template(this.error_template.html())({}));
-                error.text(message);
-                container.append(error);
-			}
-		};
-
-        var tag_delete_modal = {
-            modal: $('#tag_delete_modal'),
-            error_template: $('#js_modal_error_template'),
-            resetErrors: function () {
-                var form_errors = this.modal.find('.js-form-error');
-                form_errors.empty();
-            },
-            populateFromId: function (id) {
-                this.modal.find('input[name="id"]').val(id);
-                this.resetErrors();
-                this.showModal(true);
-			},
-            showModal: function (show) {
-                if (show === true) {
-                    this.modal.modal('show');
-                } else {
-                    this.modal.modal('hide');
-                }
-            },
-			submit: function () {
-                var self = this;
-
-                self.resetErrors();
-
-                var id = this.modal.find('input[name="id"]').val();
-
-                $.ajax({
-                    url: '/api/thankyou/v2/tags/' + id,
-                    type: 'DELETE',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    error: function (response) {
-                        var body = response.responseJSON;
-
-                        var form_errors = self.modal.find('.js-form-error');
-                        var problem_details_title_error = form_errors.filter('[data-name="problem_details-title"]');
-                        if (problem_details_title_error.length > 0 && 'title' in body) {
-                            self.addError(problem_details_title_error, body.title);
-                        }
-                    },
-                    success: function () {
-                        self.showModal(false);
-                        self.reloadDataTable();
-                    }
-                });
-			},
-            addError: function (container, message) {
-                var error = $(_.template(this.error_template.html())({}));
-                error.text(message);
-                container.append(error);
-            },
-            reloadDataTable: function () {
-                $('#tags_datatable table').dataTable().api().ajax.reload();
-            }
-		};
-
-        tag_delete_modal.modal.find('.js-tag-delete-submit').on('click', function () {
-            tag_delete_modal.submit();
+			});
 		});
 
-    })(jQuery);
+		$('cla-checkbox[name="core_values_mandatory"]').on('change', function () {
+			thankYouConfig.setTagsMandatory($(this).find('input').prop('checked'));
+		});
+	});
 </script>
+<script type="text/javascript" src="/intranet/thankyou/js/src/tag_page.js"></script>
