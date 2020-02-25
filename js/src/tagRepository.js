@@ -1,8 +1,28 @@
 define(['jquery'], function ($) {
-    var tagRepo = function () {
+    var repository = function () {
     };
 
-    tagRepo.prototype.save = function (tag, success, error) {
+    repository.prototype.get = function (id, success, error) {
+        var url = '/api/thankyou/v2/tags/';
+        if (!Number.isNaN(id)) {
+            url += id;
+        }
+
+        var ajaxArgs = {
+            url: url
+        };
+
+        if (success) {
+            ajaxArgs.success = success;
+        }
+        if (error) {
+            ajaxArgs.error = error;
+        }
+
+        $.ajax(ajaxArgs);
+    };
+
+    repository.prototype.save = function (tag, success, error) {
         var url = '/api/thankyou/v2/tags';
         if (tag.hasOwnProperty('id')) {
             url += '/' + tag.id;
@@ -26,7 +46,7 @@ define(['jquery'], function ($) {
         $.ajax(ajaxArgs);
     };
 
-    tagRepo.prototype.delete = function (id, success, error) {
+    repository.prototype.delete = function (id, success, error) {
         var ajaxArgs = {
             url: '/api/thankyou/v2/tags/' + id,
             type: 'DELETE',
@@ -44,5 +64,5 @@ define(['jquery'], function ($) {
         $.ajax(ajaxArgs);
     };
 
-    return new tagRepo();
+    return new repository();
 });

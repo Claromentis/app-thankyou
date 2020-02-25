@@ -44,16 +44,15 @@ require(["/intranet/thankyou/js/build/tag.bundle.js"], function (tagApi) {
     });
 
     var tag_modal = {
+        repository: tagApi.repository,
         modal: $('#tag_modal'),
         error_template: $('#js_modal_error_template'),
         populateFromId: function (id) {
             var self = this;
-            $.ajax({
-                url: '/api/thankyou/v2/tags/' + id
-            }).done(function (data) {
+            this.repository.get(id, function (data) {
                 self.populateFromTag(data);
                 self.updateColourPickerBg();
-            })
+            });
         },
         populateFromTag: function (tag) {
             this.modal.find('input[name="tag_id"]').val(+tag.id);
@@ -108,7 +107,7 @@ require(["/intranet/thankyou/js/build/tag.bundle.js"], function (tagApi) {
                 tag.id = id;
             }
 
-            tagApi.repository.save(tag,
+            this.repository.save(tag,
                 function () {
                     self.showModal(false);
                     self.reloadDataTable();
@@ -147,6 +146,7 @@ require(["/intranet/thankyou/js/build/tag.bundle.js"], function (tagApi) {
     };
 
     var tag_delete_modal = {
+        repository: tagApi.repository,
         modal: $('#tag_delete_modal'),
         error_template: $('#js_modal_error_template'),
         resetErrors: function () {
@@ -172,7 +172,7 @@ require(["/intranet/thankyou/js/build/tag.bundle.js"], function (tagApi) {
 
             var id = this.modal.find('input[name="id"]').val();
 
-            tagApi.repository.delete(id,
+            this.repository.delete(id,
                 function () {
                     self.showModal(false);
                     self.reloadDataTable();
