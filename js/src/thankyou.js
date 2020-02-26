@@ -18,7 +18,7 @@ define(['jquery', 'cla_select2', './thankYouRepository.js'], function ($, cla_se
                     return {
                         name: params.term,
                         active: true,
-                        limit: 4
+                        limit: 50
                     };
                 },
                 processResults: function (tags) {
