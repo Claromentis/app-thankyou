@@ -122,7 +122,11 @@ define(['jquery', 'cla_select2', './thankYouRepository.js'], function ($, cla_se
         if (Array.isArray(values)) {
             var values_length = values.length;
             for (var index = 0; index < values_length; index++) {
-                cla_multi_object_picker.addOption(values[index].object_type.id, values[index].id, values[index].object_type.name + ": " + values[index].name, picker.attr('id'));
+                if (!Number.isNaN(values[index].id) && values[index].id !== null
+                    && !Number.isNaN(values[index].object_type.id) && values[index].object_type.id !== null
+                ) {
+                    cla_multi_object_picker.addOption(values[index].object_type.id, values[index].id, values[index].object_type.name + ": " + values[index].name, picker.attr('id'));
+                }
             }
         }
 
