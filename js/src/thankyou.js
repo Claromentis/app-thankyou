@@ -235,17 +235,16 @@ define(['jquery', 'cla_select2', './thankYouRepository.js'], function ($, cla_se
         var description = self.getDescriptionInput().val();
 
         var body = {
-            description: description
+            description: description,
+            thanked: []
         };
 
         if (Array.isArray(thanked)) {
-            var thanked_array = [];
             var thanked_length = thanked.length;
             for (var thanked_offset = 0; thanked_offset < thanked_length; thanked_offset++) {
                 var thanked_split = thanked[thanked_offset].split('_');
-                thanked_array.push({oclass: parseInt(thanked_split[0]), id: parseInt(thanked_split[1])});
+                body.thanked.push({oclass: parseInt(thanked_split[0]), id: parseInt(thanked_split[1])});
             }
-            body.thanked = thanked_array;
         }
 
         var tags_input = self.getTagsInput();
