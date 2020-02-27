@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 4.0.0 - Unreleased
+## Version 4.0.0-rc - 27th February 2020
 ### New Features
 * Added the Thank You v2 API.
 * Added thanking User Groups.
