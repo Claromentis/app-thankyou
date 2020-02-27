@@ -2,11 +2,13 @@
 namespace Claromentis\ThankYou;
 
 use Claromentis\Core\DAL;
-use Date;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
 use Exception;
-use ObjectsStorage;
 
 /**
+ * @deprecated
+ * @see ThankYousRepository
+ *
  * A repository for thank you items.
  */
 class ThanksRepository
@@ -49,61 +51,6 @@ class ThanksRepository
 	}
 
 	/**
-	 * Gets the most recent thank you items.
-	 *
-	 * @param int $limit
-	 * @param int $offset
-	 *
-	 * @return ThanksItem[]
-	 * @throws Exception
-	 */
-	public function GetRecent($limit, $offset = 0)
-	{
-		/** @var ThanksItem[] $items */
-		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), '', 'date_created DESC', $limit, $offset);
-		$this->PopulateUsers($items);
-		return $items;
-	}
-
-	/**
-	 * Returns total number of thanks items in the database
-	 *
-	 * @return int
-	 */
-	public function GetCount()
-	{
-		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_item");
-
-		return $count;
-	}
-
-	/**
-	 * Gets thank you items between a given date range.
-	 *
-	 * If an end date is not provided, the current date is used in its place.
-	 *
-	 * @param Date $start_date
-	 * @param Date $end_date [optional]
-	 * @return ThanksItem[]
-	 * @throws Exception
-	 */
-	public function GetByDate(Date $start_date, Date $end_date = null)
-	{
-		$end_date = $end_date ?: new Date();
-
-		$filter = new DAL\QueryPart('date_created >= int:start_date AND date_created <= int:end_date', $start_date->getDate(), $end_date->getDate());
-
-		/**
-		 * @var ThanksItem[] $items
-		 */
-		$items = ObjectsStorage::I()->GetMultiple(new ThanksItem(), $filter, 'date_created DESC');
-
-		$this->PopulateUsers($items);
-
-		return $items;
-	}
-
-	/**
 	 * Loads thanked users into the given thanks items.
 	 *
 	 * @param ThanksItem[] $items
@@ -132,59 +79,5 @@ class ThanksRepository
 			else
 				$item->SetUsers([]); // this is actually an error state as at least one user should be thanked
 		}
-	}
-
-	/**
-	 * Get thanks for a given user.
-	 *
-	 * @param int $user_id
-	 * @param int $limit
-	 *
-	 * @return ThanksItem[]
-	 * @throws Exception
-	 */
-	public function GetForUser($user_id, $limit)
-	{
-		/** @var ThanksItem[] $items */
-		$items = ObjectsStorage::I()->GetMultipleExt(new ThanksItem(), function (DAL\QueryBuilder $qb, $table_name) use ($user_id, $limit) {
-			$qb->AddJoin($table_name, 'thankyou_user', 'tu', "tu.thanks_id={$table_name}.id");
-			$qb->AddWhereAndClause(new DAL\QueryPart("tu.user_id=int:id", $user_id));
-			$qb->SetLimit($limit);
-		}, 'date_created DESC');
-
-		$this->PopulateUsers($items);
-
-		return $items;
-	}
-
-	/**
-	 * Returns number of "thanks" for user
-	 *
-	 * @param int $user_id
-	 *
-	 * @return int
-	 */
-	public function GetCountForUser($user_id)
-	{
-		list($count) = $this->db->query_row("SELECT COUNT(1) FROM thankyou_user WHERE user_id=int:uid", $user_id);
-
-		return $count;
-	}
-
-	/**
-	 * Delete the given thank you note and its user associations.
-	 *
-	 * @param ThanksItem $item
-	 */
-	public function Delete(ThanksItem $item)
-	{
-		$id = $item->id;
-
-		if (!$id)
-			return;
-
-		$item->Delete();
-
-		$this->db->query('DELETE FROM thankyou_user WHERE thanks_id = int:id', $id);
 	}
 }

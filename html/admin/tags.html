@@ -1,0 +1,137 @@
+<!--@head@
+<unique_section name="thankyou_component_styles">
+	<component class_key="css_loader" src="/intranet/thankyou/css/admin.scss" >
+</unique_section>
+-->
+
+<block id="admin_breadcrumb">
+	<li><a href="/thankyou/admin/">
+		<loc name="thankyou:admin:breadcrumb">Thank You</loc>
+	</a></li>
+	<li class="active">
+		<loc name="thankyou:common:tags"></loc>
+	</li>
+</block>
+<block id="info_panel_pills">
+	<include file="menu.html"/>
+</block>
+
+<block id="page_body">
+	<h3>
+		<loc name="thankyou:common:tags"></loc>
+	</h3>
+	<div class="row">
+		<div class="col-md-12 mb-10">
+			<p name="core_values_enabled_desc"></p>
+			<cla-toggle-switch name="core_values_enabled" large=""></cla-toggle-switch>
+		</div>
+	</div>
+	<div id="core_values_enabled_body" name="core_values_enabled_body">
+		<div class="row">
+			<div class="col-md-12 mb-10">
+				<cla-checkbox name="core_values_mandatory"></cla-checkbox>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 mb-10">
+				<cla-button color="success" class="js-tag-create">
+					<loc name="common:create"></loc>
+				</cla-button>
+			</div>
+		</div>
+		<component class_key="data_table" name="tags_datatable" service="tags.datatable.admin"/>
+	</div>
+</block>
+
+<include file="../../common/layouts/admin_with_info_panel.html"/>
+
+<div id="tag_modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" class="form-horizontal js-tag-form">
+				<input type="hidden" name="tag_id"/>
+				<input type="hidden" name="csrf_token">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+							aria-hidden="true">&times;</span></button>
+					<h4 name="thankyou:common:tags" class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="js-form-error problem-details-title" data-name="problem_details-title"></div>
+					<div class="form-group">
+						<label name="common:name" class="control-label col-sm-4"></label>
+						<div class="form-control-static pt-0 col-sm-8">
+							<input name="tag_name">
+							<div class="js-form-error" data-name="name"></div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-sm-4">
+							<loc name="common:background_colour"></loc>
+						</label>
+						<div class="col-sm-8">
+							<input type="text" name="tag_bg_colour" id="tag_bg_colour"
+								   class="js-color-confirm js-no-white form-control kolorPicker"/>
+
+							<div class="js-form-error" data-name="bg_colour"></div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button name="thankyou:component:modal:close" class="btn btn-default" data-dismiss="modal"
+							aria-hidden="true">Close
+					</button>
+					<button name="thankyou:component:modal:submit" class="btn btn-primary">Submit</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div id="tag_delete_modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<input type="hidden" name="id"/>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 name="thankyou:tag:delete:title" class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="js-form-error" data-name="problem_details-title" style="text-align: center;"></div>
+				<loc name="thankyou:tag:delete:description"></loc>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default" data-dismiss="modal">
+					<span name="thankyou:component:modal:close" aria-hidden="true"></span>
+				</button>
+				<button name="common:delete" class="btn btn-primary js-tag-delete-submit"></button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/template" id="js_modal_error_template">
+	<span class="text-danger"></span>
+</script>
+<script type="text/javascript">
+	require(['colour_picker', "/intranet/thankyou/js/build/thankYouConfig.bundle.js"], function (colour_picker, thankYouConfig) {
+		$('cla-toggle-switch[name="core_values_enabled"]').on('change', function () {
+			var checked = $(this).find('input').prop('checked');
+			thankYouConfig.setTagsEnabled(checked, function () {
+				if (checked) {
+					$('#core_values_enabled_body').slideDown("fast");
+				} else {
+					$('#core_values_enabled_body').hide();
+				}
+			});
+		});
+
+		$('cla-checkbox[name="core_values_mandatory"]').on('change', function () {
+			thankYouConfig.setTagsMandatory($(this).find('input').prop('checked'));
+		});
+	});
+</script>
+<script type="text/javascript" src="/intranet/thankyou/js/src/tag_page.js"></script>

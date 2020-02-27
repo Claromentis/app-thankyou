@@ -1,11 +1,31 @@
 .	.	.	en
-lm	thankyou.admin.panel.export		Export
+lm	thankyou.admin.core_values.description		Thank You notes can be linked to your Core Values to encourage engagement.
 lm	thankyou.admin.panel.messages		Messages
 lm	thankyou.admin.panel.notifications		Notifications
+lm	thankyou.admin.reports.disabled.generic		The report you have requested does not exist.
+lm	thankyou.admin.reports.disabled.heading		Report unavailable
+lm	thankyou.admin.reports.disabled.tags		The core values report is only available if core values are enabled.
+lm	thankyou.admin.statistics.title		Reports & Statistics
+lm	thankyou.admin.toggle_vis		Toggle visibility
 lm	thankyou.app_name		Thank you
+lm	thankyou.audit.create_thank_you		Created Thank You
+lm	thankyou.audit.delete_thank_you		Deleted Thank You
+lm	thankyou.audit.edit_thank_you		Edited Thank You
+lm	thankyou.common.actions		Actions
+lm	thankyou.common.add_description		Add a description
+lm	thankyou.common.disable		Disable
+lm	thankyou.common.enable		Enable
+lm	thankyou.common.filter_by_groups		Filter by Groups
+lm	thankyou.common.select_core_values		Select Core Values
+lm	thankyou.common.tags		Core Values
+lm	thankyou.common.tags.multiselect		Select one or more Core Values
 lm	thankyou.common.thank_you_message		Thank you message
 lm	thankyou.common.thank_you_messages		Thank you message
+lm	thankyou.common.thank_yous		Thank You notes
+lm	thankyou.common.thanked_groups		Thanked Groups
 lm	thankyou.common.thanks_deleted		Thank you message successfully deleted
+lm	thankyou.common.total_thanked_users		Total Thanked Users
+lm	thankyou.common.total_times_thanked		Total times thanked
 lm	thankyou.communication.imessages		Thank You
 lm	thankyou.component.cover_info.desc		Allows users to tag someone and publicly say thank you. Displays list of recent "thanks"
 lm	thankyou.component.cover_info.title		Thank you
@@ -18,20 +38,85 @@ lm	thankyou.component.options.show_button		Show "Say thank you" button
 lm	thankyou.component.options.show_header		Show title
 lm	thankyou.component.options.user_id		Filter by user
 lm	thankyou.component_heading		Thank you
+lm	thankyou.configuration.core_values_mandatory.description		Make Core Values mandatory for Thank You notes
+lm	thankyou.configurations.notify_line_manager.title		Notify the Line Manager of Thanked Users
+lm	thankyou.configurations.thank_you_comments.title		Allow Comments on Thank Yous
+lm	thankyou.delete.error.repository		Could not delete the given Thank You, an error occurred when contacting the Repository.
+lm	thankyou.error.delete.failure		Unable to delete Thank You, please contact your Administrator
+lm	thankyou.error.invalid_users		Failed to save Thank You, the Users provided were not valid
 lm	thankyou.error.no_edit_permission		You do not have permission to modify this thank you message
 lm	thankyou.error.thanks_not_found		Thank you message does not exist
 lm	thankyou.grammar.list.and		and
+lm	thankyou.lia.error.saving		One or more Items could not be saved
+lm	thankyou.lia.no_results		There are no Items to display
 lm	thankyou.notifications.saved		Settings saved
+lm	thankyou.owner_class.not_found		Unknown Owner Class
+lm	thankyou.tag.all		All Core Values
+lm	thankyou.tag.audit.create		Core Value Created
+lm	thankyou.tag.audit.delete		Core Value Deleted
+lm	thankyou.tag.audit.edit		Core Value Edited
+lm	thankyou.tag.delete.description		Deleting this core value will remove it from all the linked thank you notes. Change visibility to 'hidden' to keep existing notes but prevent it from being selected in the future.
+lm	thankyou.tag.delete.error.permission		You do not have permission to delete this Core Value
+lm	thankyou.tag.delete.error.repository		Could not delete the given Core Value, an error occurred when contacting the Repository.
+lm	thankyou.tag.delete.title		Confirm Deletion
+lm	thankyou.tag.error.active.invalid		Invalid Core Value Active status
+lm	thankyou.tag.error.background.invalid		Invalid Background
+lm	thankyou.tag.error.background.undefined		Core Value Background Colour must be set
+lm	thankyou.tag.error.create		Could not create Core Value
+lm	thankyou.tag.error.id.invalid		Invalid Core Value ID %s
+lm	thankyou.tag.error.id.not_found		Core Value with ID %d could not be found
+lm	thankyou.tag.error.modify		Could not modify Core Value
+lm	thankyou.tag.error.name.invalid		Core Value name must be a string if defined
+lm	thankyou.tag.error.name.not_empty		Core Value's name cannot be empty
+lm	thankyou.tag.error.name.not_unique		The core value name has already been used
+lm	thankyou.tag.error.name.undefined		Core Value name must be defined
+lm	thankyou.tag.name		Core Value
+lm	thankyou.tag.name.error.too_long		Core Value name cannot be more than 20 characters
+lm	thankyou.tag.total_uses		Number of times selected
+lm	thankyou.thank.placeholder		Select User or Group
+lm	thankyou.thanked.deleted		Thanked Deleted
+lm	thankyou.thanked.error.invalid		Invalid Thanked given
+lm	thankyou.thanked.error.unsuitable_owner_classes		One or more items cannot be Thanked
+lm	thankyou.thanked.group.deleted		Group Deleted
+lm	thankyou.thanked.item_id.error.undefined		Thanked Item undefined
+lm	thankyou.thanked.owner_class.error.not_supported		Thanked Owner Classes are limited to %s
+lm	thankyou.thanked.owner_class.error.undefined		Thanked Owner Class is undefined
+lm	thankyou.thanked.user.deleted		User Deleted
+lm	thankyou.thanks_list.no_thanks		There are no Thanks to show
+lm	thankyou.thankyou.author.error.invalid		Invalid Author given
+lm	thankyou.thankyou.author.error.not_found		User with ID %d could not be found
+lm	thankyou.thankyou.author.error.undefined		The Thank You's Author must be defined
+lm	thankyou.thankyou.core_values.empty		One or more Core Values must be selected
+lm	thankyou.thankyou.date_created.error.future		A Thank You's Created Date may only be in the past
+lm	thankyou.thankyou.description.error.empty		Enter a description
+lm	thankyou.thankyou.description.error.not_string		Thank You Description must be a string
+lm	thankyou.thankyou.description.error.too_long		Description can only be %d characters or less
+lm	thankyou.thankyou.error.create		Could not create Thank You
+lm	thankyou.thankyou.error.modify		Could not modify Thank You
+lm	thankyou.thankyou.error.permission		You do not have permission to view this Thank You Note
+lm	thankyou.thankyou.error.server		The Thank You you've requested could not be loaded due to a server error
+lm	thankyou.thankyou.id.error.invalid		Invalid Thank You ID given
+lm	thankyou.thankyou.id.error.not_found		Thank You with ID %d could not be found
+lm	thankyou.thankyou.name		Thank You
+lm	thankyou.thankyou.pages_component.options.comment_editing		Expand comments within the component
+lm	thankyou.thankyou.tags.error.disabled		Core Values are disabled for Thank Yous
+lm	thankyou.thankyou.tags.error.empty		One or more Core Values must be given
+lm	thankyou.thankyou.tags.error.not_array		Thank You Core Values must be given as an array of integers
+lm	thankyou.thankyou.tags.error.not_found		One or more Core Values could not be found
+lm	thankyou.thankyou.thanked.error.empty		Enter a User or Group
+lm	thankyou.thankyou.thanked.error.not_array		A Thank You's Thanked must be an array if defined
+lm	thankyou.thankyou.thanked.id.error.not_integer		Thanked ID must be an integer
+lm	thankyou.thankyou.thanked.id.error.undefined		Thanked must contain an ID
+lm	thankyou.thankyou.thanked.oclass.error.not_integer		Thanked oclass must be an integer
+lm	thankyou.thankyou.thanked.oclass.error.undefined		Thanked must contain an oclass
+lm	thankyou.thankyou.users.error.empty		No Users have been thanked
+lm	thankyou.thankyou.users.user.id.error.invalid		User %d cannot be thanked
+lm	thankyou.thankyous.visibility.logged_in		You must be logged in to view Thank Yous
+lm	thankyou.user.deleted		User Deleted
 lm	thankyou.user_profile.tab_name		Thanks
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
-lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
-lt	thankyou:admin:export:end_date.body		Until
-lt	thankyou:admin:export:start_date.body		From
-lt	thankyou:admin:export_csv.body		Export to *.csv
-lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
-lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:menu:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:messages_heading.body		Thank You Messages
@@ -40,6 +125,15 @@ lt	thankyou:admin:notifications:notify_line_manager.body		Also notify the line m
 lt	thankyou:admin:notifications:save.body		Save
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		Users will be notified whenever they're being thanked.
+lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']	
+lt	thankyou:admin:toggle_vis.body	$lm["thankyou.admin.toggle_vis"]	
+lt	thankyou:app_name.body	$lm['thankyou.app_name']	
+lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
+lt	thankyou:common:description.body		Description
+lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
+lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
+lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
+lt	thankyou:common:total_times_thanked.body	$lm['thankyou.common.total_times_thanked']	
 lt	thankyou:component:delete.body		Delete
 lt	thankyou:component:delete_confirm.body		Are you sure you want to delete this thank you message?
 lt	thankyou:component:delete_thank_you.body		Delete thank you
@@ -51,3 +145,7 @@ lt	thankyou:component:modal:to.body		To
 lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		Say thank you
 lt	thankyou:component:thankyou_users_name.body		Thank you
+lt	thankyou:lia:error:saving.body	$lm['thankyou.lia.error.saving']	
+lt	thankyou:lia:no_results.body	$lm['thankyou.lia.no_results']	
+lt	thankyou:tag:delete:description.body	$lm['thankyou.tag.delete.description']	
+lt	thankyou:tag:delete:title.body	$lm['thankyou.tag.delete.title']	

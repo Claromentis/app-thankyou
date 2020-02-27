@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    stopOnFailure="true"
+    backupGlobals="false"
+    bootstrap="../common/core_php.php"
+>
+    <testsuite name="Tags Test Suite">
+        <directory>./classes/Tags/Tests/Unit</directory>
+    </testsuite>
+</phpunit>

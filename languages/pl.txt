@@ -1,11 +1,31 @@
 .	.	.	pl
-lm	thankyou.admin.panel.export		
+lm	thankyou.admin.core_values.description		
 lm	thankyou.admin.panel.messages		
 lm	thankyou.admin.panel.notifications		
+lm	thankyou.admin.reports.disabled.generic		
+lm	thankyou.admin.reports.disabled.heading		
+lm	thankyou.admin.reports.disabled.tags		
+lm	thankyou.admin.statistics.title		
+lm	thankyou.admin.toggle_vis		
 lm	thankyou.app_name		
+lm	thankyou.audit.create_thank_you		
+lm	thankyou.audit.delete_thank_you		
+lm	thankyou.audit.edit_thank_you		
+lm	thankyou.common.actions		
+lm	thankyou.common.add_description		
+lm	thankyou.common.disable		
+lm	thankyou.common.enable		
+lm	thankyou.common.filter_by_groups		
+lm	thankyou.common.select_core_values		
+lm	thankyou.common.tags		
+lm	thankyou.common.tags.multiselect		
 lm	thankyou.common.thank_you_message		
 lm	thankyou.common.thank_you_messages		
+lm	thankyou.common.thank_yous		
+lm	thankyou.common.thanked_groups		
 lm	thankyou.common.thanks_deleted		
+lm	thankyou.common.total_thanked_users		
+lm	thankyou.common.total_times_thanked		
 lm	thankyou.communication.imessages		
 lm	thankyou.component.cover_info.desc		
 lm	thankyou.component.cover_info.title		
@@ -18,20 +38,85 @@ lm	thankyou.component.options.show_button
 lm	thankyou.component.options.show_header		
 lm	thankyou.component.options.user_id		
 lm	thankyou.component_heading		
+lm	thankyou.configuration.core_values_mandatory.description		
+lm	thankyou.configurations.notify_line_manager.title		
+lm	thankyou.configurations.thank_you_comments.title		
+lm	thankyou.delete.error.repository		
+lm	thankyou.error.delete.failure		
+lm	thankyou.error.invalid_users		
 lm	thankyou.error.no_edit_permission		
 lm	thankyou.error.thanks_not_found		
 lm	thankyou.grammar.list.and		
+lm	thankyou.lia.error.saving		
+lm	thankyou.lia.no_results		
 lm	thankyou.notifications.saved		
+lm	thankyou.owner_class.not_found		
+lm	thankyou.tag.all		
+lm	thankyou.tag.audit.create		
+lm	thankyou.tag.audit.delete		
+lm	thankyou.tag.audit.edit		
+lm	thankyou.tag.delete.description		
+lm	thankyou.tag.delete.error.permission		
+lm	thankyou.tag.delete.error.repository		
+lm	thankyou.tag.delete.title		
+lm	thankyou.tag.error.active.invalid		
+lm	thankyou.tag.error.background.invalid		
+lm	thankyou.tag.error.background.undefined		
+lm	thankyou.tag.error.create		
+lm	thankyou.tag.error.id.invalid		
+lm	thankyou.tag.error.id.not_found		
+lm	thankyou.tag.error.modify		
+lm	thankyou.tag.error.name.invalid		
+lm	thankyou.tag.error.name.not_empty		
+lm	thankyou.tag.error.name.not_unique		
+lm	thankyou.tag.error.name.undefined		
+lm	thankyou.tag.name		
+lm	thankyou.tag.name.error.too_long		
+lm	thankyou.tag.total_uses		
+lm	thankyou.thank.placeholder		
+lm	thankyou.thanked.deleted		
+lm	thankyou.thanked.error.invalid		
+lm	thankyou.thanked.error.unsuitable_owner_classes		
+lm	thankyou.thanked.group.deleted		
+lm	thankyou.thanked.item_id.error.undefined		
+lm	thankyou.thanked.owner_class.error.not_supported		
+lm	thankyou.thanked.owner_class.error.undefined		
+lm	thankyou.thanked.user.deleted		
+lm	thankyou.thanks_list.no_thanks		
+lm	thankyou.thankyou.author.error.invalid		
+lm	thankyou.thankyou.author.error.not_found		
+lm	thankyou.thankyou.author.error.undefined		
+lm	thankyou.thankyou.core_values.empty		
+lm	thankyou.thankyou.date_created.error.future		
+lm	thankyou.thankyou.description.error.empty		
+lm	thankyou.thankyou.description.error.not_string		
+lm	thankyou.thankyou.description.error.too_long		
+lm	thankyou.thankyou.error.create		
+lm	thankyou.thankyou.error.modify		
+lm	thankyou.thankyou.error.permission		
+lm	thankyou.thankyou.error.server		
+lm	thankyou.thankyou.id.error.invalid		
+lm	thankyou.thankyou.id.error.not_found		
+lm	thankyou.thankyou.name		
+lm	thankyou.thankyou.pages_component.options.comment_editing		
+lm	thankyou.thankyou.tags.error.disabled		
+lm	thankyou.thankyou.tags.error.empty		
+lm	thankyou.thankyou.tags.error.not_array		
+lm	thankyou.thankyou.tags.error.not_found		
+lm	thankyou.thankyou.thanked.error.empty		
+lm	thankyou.thankyou.thanked.error.not_array		
+lm	thankyou.thankyou.thanked.id.error.not_integer		
+lm	thankyou.thankyou.thanked.id.error.undefined		
+lm	thankyou.thankyou.thanked.oclass.error.not_integer		
+lm	thankyou.thankyou.thanked.oclass.error.undefined		
+lm	thankyou.thankyou.users.error.empty		
+lm	thankyou.thankyou.users.user.id.error.invalid		
+lm	thankyou.thankyous.visibility.logged_in		
+lm	thankyou.user.deleted		
 lm	thankyou.user_profile.tab_name		
 lt	thankyou:admin:breadcrumb.body	$lm['thankyou.app_name']	
-lt	thankyou:admin:breadcrumb:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:breadcrumb:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:breadcrumb:notifications.body	$lm['thankyou.admin.panel.notifications']	
-lt	thankyou:admin:export:end_date.body		
-lt	thankyou:admin:export:start_date.body		
-lt	thankyou:admin:export_csv.body		
-lt	thankyou:admin:export_heading.body	$lm['thankyou.admin.panel.export']	
-lt	thankyou:admin:menu:export.body	$lm['thankyou.admin.panel.export']	
 lt	thankyou:admin:menu:messages.body	$lm['thankyou.admin.panel.messages']	
 lt	thankyou:admin:menu:notifications.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:messages_heading.body		
@@ -40,6 +125,15 @@ lt	thankyou:admin:notifications:notify_line_manager.body
 lt	thankyou:admin:notifications:save.body		
 lt	thankyou:admin:notifications_heading.body	$lm['thankyou.admin.panel.notifications']	
 lt	thankyou:admin:notifications_help.body		
+lt	thankyou:admin:statistics:title.body	$lm['thankyou.admin.statistics.title']	
+lt	thankyou:admin:toggle_vis.body	$lm["thankyou.admin.toggle_vis"]	
+lt	thankyou:app_name.body	$lm['thankyou.app_name']	
+lt	thankyou:common:actions.body	$lm['thankyou.common.actions']	
+lt	thankyou:common:description.body		
+lt	thankyou:common:select_core_values.body	$lm['thankyou.common.select_core_values']	
+lt	thankyou:common:tags.body	$lm['thankyou.common.tags']	
+lt	thankyou:common:thank_yous.body	$lm['thankyou.common.thank_yous']	
+lt	thankyou:common:total_times_thanked.body	$lm['thankyou.common.total_times_thanked']	
 lt	thankyou:component:delete.body		
 lt	thankyou:component:delete_confirm.body		
 lt	thankyou:component:delete_thank_you.body		
@@ -51,3 +145,7 @@ lt	thankyou:component:modal:to.body
 lt	thankyou:component:say:heading.body	$lm['thankyou.component_heading']	
 lt	thankyou:component:say_thank_you.body		
 lt	thankyou:component:thankyou_users_name.body		
+lt	thankyou:lia:error:saving.body	$lm['thankyou.lia.error.saving']	
+lt	thankyou:lia:no_results.body	$lm['thankyou.lia.no_results']	
+lt	thankyou:tag:delete:description.body	$lm['thankyou.tag.delete.description']	
+lt	thankyou:tag:delete:title.body	$lm['thankyou.tag.delete.title']	

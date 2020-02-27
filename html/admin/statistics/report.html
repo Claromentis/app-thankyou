@@ -1,0 +1,32 @@
+<!--@head@
+<unique_section name="thankyou_component_styles">
+	<component class_key="css_loader" src="/intranet/thankyou/css/admin.scss" >
+</unique_section>
+-->
+<block id="admin_breadcrumb">
+	<li><a href="/thankyou/admin/">
+		<loc name="thankyou:admin:breadcrumb">Thank You</loc>
+	</a></li>
+	<li>
+		<a href="/thankyou/admin">
+			<loc name="thankyou:admin:statistics:title"></loc>
+		</a>
+	</li>
+	<li name="current_page_title" class="active">
+	</li>
+</block>
+<block id="info_panel_pills">
+	<include file="../menu.html"/>
+</block>
+
+<block id="page_body">
+	<h3 name="current_page_title">
+	</h3>
+	<div>
+		<component class_key="data_table_form" name="dt_form" table="thankyou_reports_datatable"
+				   template="thankyou/admin/statistics/filter.html"/>
+	</div>
+	<component class_key="data_table" name="thankyou_reports_datatable"/>
+</block>
+
+<include file="../../../common/layouts/admin_with_info_panel.html"/>

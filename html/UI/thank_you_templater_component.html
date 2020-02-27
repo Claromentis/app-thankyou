@@ -1,0 +1,111 @@
+<div name="thank_you" class="js-thank-you thank-you">
+	<div class="thank-you-note">
+		<div class="thank-you-note__top">
+			<div class="thank-you-note__subject">
+				<span>
+					<loc name="thankyou:component:thankyou_users_name"></loc>
+				</span>
+				<datasrc name="thanked">
+					<a name="thanked_link" class="no-decoration" rel="tooltip" data-placement="top" title="">
+						<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+						<txt name="thanked_name">John Smith</txt>
+					</a>
+					<span name="thanked_no_link" rel="tooltip">
+						<img class="profile-img user-photo" name="profile_image" src="/appdata/people/no_photo.jpg" alt="">
+						<txt name="thanked_name">John Smith</txt>
+					</span>
+					<span><txt name="delimiter_visible">,</txt></span>
+				</datasrc>
+			</div>
+			<div class="thank-you-note__value">
+				<datasrc name="tags">
+					<component class_key="thankyou.tag" name="tag"/>
+				</datasrc>
+			</div>
+		</div>
+
+		<hr>
+		<div class="row">
+			<div class="col-xs-12">
+				<txt name="has_description">
+					<p name="description"></p>
+				</txt>
+			</div>
+		</div>
+		<div class="row small">
+			<div class="col-xs-12">
+				<component name="like_component" class_key="like_it" object_type="thanks" object_id=""/>
+				<span class="comments-toggle-wrapper comments-border">
+					<a name="comments_link">
+						<span class="glyphicons-comments glyphicons"></span>
+						<txt name="comments_count" class="badge"></txt>
+					</a>
+				</span>
+				<span class="thankyou-link-border" style="">
+					<a name="thank_title_link">
+						<span class="glyphicons glyphicons-link"></span>
+					</a>
+				</span>
+				<span class="text-muted text-right edit-tools float-right">
+					<txt name="edit_thanks">
+						<a href="javascript:void(0)" name="edit_thanks_link"
+						   class="no-decoration edit-thanks js-thank_you-edit-button" data-id="0" rel="tooltip"
+						   title="${common:edit.body}">
+							<span class="glyphicons glyphicons-pencil" rel="tooltip" title=""></span>
+						</a>
+					</txt>
+					<txt name="delete_thanks">
+						<a href="javascript:void(0)" name="delete_thanks_link"
+						   class="no-decoration delete-thanks js-thank_you-delete-button" data-id="0" rel="tooltip"
+						   title="${common:delete.body}">
+							<span class="glyphicons glyphicons-bin"></span>
+						</a>
+					</txt>
+				</span>
+			</div>
+		</div>
+	</div>
+	<div class="thank-you-meta">
+		<div class="media">
+			<div class="media-body">
+				<a name="author_link">
+					<txt name="author_name"></txt>
+				</a>
+				<br>
+				<small rel="tooltip" class="text-muted" data-placement="left" title="" name="date_created">2 days
+					ago</small>
+			</div>
+			<div class="media-right">
+				<a name="author_link" class="no-decoration">
+					<img class="profile-img author-photo" name="profile_image" src="/appdata/people/no_photo.jpg">
+				</a>
+			</div>
+		</div>
+	</div>
+	<div name="comment_list" class="js-comments comments mt-10">
+		<component class="\Claromentis\Comments\UI\Comments" name="thank_you_comment" object_type="thanks"
+				   new_on_top="1" compact_mode="1"/>
+	</div>
+	<txt name="thank_you_form">
+		<include file="../includes/delete_modal.html"/>
+		<include file="../includes/modal.html"/>
+		<script type="text/javascript">
+			require(["domReady", "/intranet/thankyou/js/build/thankyou.bundle.js", "jquery"], function (domReady, ThankYou, $) {
+				domReady(function () {
+					var description_max_length = ${description_max_length.json};
+					var id = ${id.json};
+					var thank_you = new ThankYou($('.js-thank-you[data-id="' + id + '"]'));
+
+					if (typeof description_max_length === 'number') {
+						thank_you.setDescriptionMaxLength(description_max_length);
+					}
+				});
+			});
+		</script>
+		<!--@head@
+		<unique_section name="thankyou_styles">
+			<component class_key="css_loader" src="/intranet/thankyou/css/style.scss" >
+		</unique_section>
+		-->
+	</txt>
+</div>

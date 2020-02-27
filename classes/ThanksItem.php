@@ -1,7 +1,12 @@
 <?php
 namespace Claromentis\ThankYou;
 
+use ActiveRecord;
+use ClaAggregation;
 use Claromentis\Core\Services;
+use Claromentis\ThankYou\ThankYous\ThankYousRepository;
+use Exception;
+use LogicException;
 use ObjectsStorage;
 
 /**
@@ -12,11 +17,9 @@ use ObjectsStorage;
  * @property-read int    $date_created
  * @property-read string $description
  */
-class ThanksItem extends \ActiveRecord
+class ThanksItem extends ActiveRecord implements ClaAggregation
 {
-	const AGGREGATION = 143;
-
-	protected $users_ids = null;
+	protected $users_ids;
 
 	public function InitDbMapping(ObjectsStorage $storage)
 	{
@@ -28,27 +31,50 @@ class ThanksItem extends \ActiveRecord
 		$storage->MapDbColumn($this, 'description', ObjectsStorage::T_CLOB);
 	}
 
-	public function Save()
+	public function Load($id)
 	{
-		parent::Save();
+		if (!($parent_load = parent::Load($id)))
+		{
+			return $parent_load;
+		}
 
 		$db = Services::I()->GetDb();
 
-		$db->query("DELETE FROM thankyou_user WHERE thanks_id=int:id", $this->GetProperty('id'));
+		$thank_you_users = $db->query("SELECT user_id FROM thankyou_user WHERE thanks_id IN in:int:ids", $id)->fetchAllValues();
+		$this->SetUsers($thank_you_users);
 
-		foreach ($this->users_ids as $user_id)
+		return true;
+	}
+
+	/**
+	 * @param int $id
+	 */
+	public function SetId(int $id)
+	{
+		try
 		{
-			$db->query("INSERT INTO thankyou_user (thanks_id, user_id) VALUES (int:th, int:u)", $this->GetProperty('id'), $user_id);
+			$this->SetProperty('id', $id);
+		} catch (Exception $exception)
+		{
+			throw new LogicException("Unexpected Exception thrown by Set Property", null, $exception);
 		}
 	}
 
-	public function SetDescription($value)
-	{
-		$this->SetProperty('description', $value);
-	}
-
+	/**
+	 * @param $users_ids
+	 */
 	public function SetUsers($users_ids)
 	{
+		if (!is_array($users_ids))
+		{
+			$users_ids = [$users_ids];
+		}
+
+		foreach ($users_ids as $offset => $user_id)
+		{
+			$users_ids[$offset] = (int) $user_id;
+		}
+
 		$this->users_ids = $users_ids;
 	}
 
@@ -57,5 +83,21 @@ class ThanksItem extends \ActiveRecord
 		// potentially can load users from the database, if they are not loaded yet
 		// but not doing this now
 		return $this->users_ids;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function GetAggregation(): int
+	{
+		return ThankYousRepository::AGGREGATION_ID;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function GetUrl()
+	{
+		return '';
 	}
 }

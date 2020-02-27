@@ -1,0 +1,21 @@
+<block id="app_title">
+	<a href="/thankyou/thanks">
+		<loc name="thankyou:common:thank_yous"></loc>
+	</a>
+</block>
+<block id="app_buttons">
+</block>
+<block id="breadcrumb">
+	<li class="active">
+		<loc name="thankyou:app_name"></loc>
+	</li>
+</block>
+<block id="page_body">
+	<div class="row">
+		<div class="col-md-12">
+			<component class_key="thankyou.thank_you" name="thank" edit="1" delete="1" links="1" comments="2"/>
+		</div>
+	</div>
+</block>
+
+<include file="../common/layouts/standard_page.html"/>

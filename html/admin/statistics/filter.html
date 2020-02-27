@@ -1,0 +1,38 @@
+<div class="mb-10">
+	<div name="tags_filter_container" class="form-group">
+		<div class="col-md-2 control-label">
+			<label>
+				<loc name="thankyou:common:tags"></loc>
+			</label>
+		</div>
+		<div class="col-md-10 form-inline">
+			<select class="form-control" name="tags" ng-model="controller.fields['tag']" datasrc="">
+				<option name="tag_option"></option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-md-2 control-label">
+			<label>
+				<loc name="common:users"></loc>
+			</label>
+		</div>
+		<div class="col-md-10 form-inline">
+			<cla-sugre-picker ng-model="controller.fields['owner_classes']" multiple="true"></cla-sugre-picker>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-md-2 control-label">
+			<label>
+				<loc name="common:date_range"></loc>
+			</label>
+		</div>
+		<div class="col-md-10 form-inline">
+			<cla-date-picker id="from_date" ng-model="controller.fields['from_date']"></cla-date-picker>
+			<span><b>-</b></span>
+			<cla-date-picker id="to_date" ng-model="controller.fields['to_date']"></cla-date-picker>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,26 @@
+<block id="admin_breadcrumb">
+	<li><a href="/thankyou/admin/">
+		<loc name="thankyou:admin:breadcrumb">Thank You</loc>
+	</a></li>
+	<li class="active">
+		<loc name="common:configuration"></loc>
+	</li>
+</block>
+<block id="info_panel_pills">
+	<include file="menu.html"/>
+</block>
+
+<block id="page_body">
+	<h3>
+		<loc name="common:configuration"></loc>
+	</h3>
+
+	<form method="post" href="/thankyou/admin/configuration" class="form">
+		<input type="hidden" name="csrf_token"/>
+		<include file="../../common/config_dialog.html"/>
+
+		<button type="submit" name="common:save_configuration" class="btn btn-primary">Save configuration</button>
+	</form>
+</block>
+
+<include file="../../common/layouts/admin_with_info_panel.html"/>

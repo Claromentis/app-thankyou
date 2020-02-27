@@ -2,26 +2,43 @@
 namespace Claromentis\ThankYou;
 
 use AuthUser;
+use Claromentis\ThankYou\ThankYous\ThankYou;
+use Exception;
 use NotificationMessage;
+use Psr\Log\LoggerInterface;
 use User;
+use UsersHierarchy;
 
 class LineManagerNotifier
 {
 	/**
-	 * @param string $description
-	 * @param int[] $user_ids
+	 * @var LoggerInterface
 	 */
-	public function SendMessage($description, $user_ids)
+	private $logger;
+
+	public function __construct(LoggerInterface $logger)
+	{
+		$this->logger = $logger;
+	}
+
+	/**
+	 * @param ThankYou $thank_you
+	 * @param int[]    $user_ids
+	 */
+	public function SendMessage(ThankYou $thank_you, $user_ids)
 	{
 		$params = [
-			'author'		=> AuthUser::I()->GetFullName(),
-			'description'	=> $description
+			'author'      => AuthUser::I()->GetFullName(),
+			'description' => $thank_you->GetDescription(),
+			'tags'        => $thank_you->GetTags() ?? []
 		];
 
 		$line_managers = [];
 
-		foreach ($user_ids as $user_id) {
-			if ($manager = \UsersHierarchy::GetManager($user_id)) {
+		foreach ($user_ids as $user_id)
+		{
+			if ($manager = UsersHierarchy::GetManager($user_id))
+			{
 				$user = new User($user_id);
 				$user->Load();
 
@@ -31,22 +48,30 @@ class LineManagerNotifier
 
 		$author_id = AuthUser::I()->GetId();
 
-		foreach ($line_managers as $line_manager => $recipients) {
+		foreach ($line_managers as $line_manager => $recipients)
+		{
 			$params['first_recipient'] = $recipients[0];
 
-			$num_recipients = count($recipients);
+			$num_recipients                 = count($recipients);
 			$params['num_other_recipients'] = $num_recipients - 1;
 
-			if ($num_recipients == 1) {
+			if ($num_recipients == 1)
+			{
 				$params['recipients'] = $recipients[0];
-			}
-			else {
+			} else
+			{
 				$all_except_last_recipient_csv = implode(', ', array_slice($recipients, 0, -1));
-				$last_recipient = array_pop($recipients);
-				$params['recipients'] = $all_except_last_recipient_csv . ' ' . lmsg('thankyou.grammar.list.and') . ' ' . $last_recipient;
+				$last_recipient                = array_pop($recipients);
+				$params['recipients']          = $all_except_last_recipient_csv . ' ' . lmsg('thankyou.grammar.list.and') . ' ' . $last_recipient;
 			}
 
-			NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], Constants::IM_TYPE_THANKYOU, null, $author_id);
+			try
+			{
+				NotificationMessage::Send('thankyou.new_thanks_manager', $params, [$line_manager], ThankYous\Api::IM_TYPE_THANKYOU, null, $author_id);
+			} catch (Exception $exception)
+			{
+				$this->logger->error("Unexpected Exception thrown when sending Thank You Line Manager Notifications", [$exception]);
+			}
 		}
 	}
 }

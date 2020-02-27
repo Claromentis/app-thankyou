@@ -1,0 +1,30 @@
+.problem-details-title {
+    text-align: center;
+}
+
+.report-link {
+    display: block;
+}
+
+.table-cell-actions a:hover {
+    cursor: pointer;
+}
+
+.table-cell-bg-colour {
+    display: flex;
+    text-transform: uppercase;
+}
+
+.bg-colour-example {
+    width: 20px;
+    height: 20px;
+    border-radius: 50px;
+}
+
+#thankyou_reports_datatable th[aria-label="Total Thanked Users"] {
+    width: 300px !important;
+}
+
+#thankyou_reports_datatable th[aria-label="Description"] {
+    width: 300px !important;
+}

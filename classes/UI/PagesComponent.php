@@ -1,22 +1,48 @@
 <?php
 namespace Claromentis\ThankYou\UI;
 
+use Claromentis\Core\Acl\PermOClass;
 use Claromentis\Core\Application;
 use Claromentis\Core\Component\ComponentInterface;
 use Claromentis\Core\Component\MutatableOptionsInterface;
 use Claromentis\Core\Component\OptionsInterface;
 use Claromentis\Core\Component\TemplaterTrait;
-use Claromentis\ThankYou\ThanksRepository;
-use Claromentis\ThankYou\View\ThanksListView;
+use Claromentis\Core\Localization\Lmsg;
+use Claromentis\Core\Security\SecurityContext;
+use Claromentis\ThankYou\ThankYous;
+use Claromentis\ThankYou\Configuration;
 use ClaText;
 
 /**
  * 'Thank you' component for Pages application. Shows list of latest "thanks" and optionally
  * a button to allow adding a new "thank you"
  */
+//TODO fix redirecting away from Page when saying Thank You.
 class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 {
 	use TemplaterTrait;
+
+	/**
+	 * @var Configuration\Api
+	 */
+	private $config_api;
+
+	/**
+	 * @var Lmsg
+	 */
+	private $lmsg;
+
+	/**
+	 * PagesComponent constructor.
+	 *
+	 * @param Lmsg              $lmsg
+	 * @param Configuration\Api $config_api
+	 */
+	public function __construct(Lmsg $lmsg, Configuration\Api $config_api)
+	{
+		$this->config_api = $config_api;
+		$this->lmsg       = $lmsg;
+	}
 
 	/**
 	 * Returns information about supported options for this component as array
@@ -34,68 +60,79 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function GetOptions()
 	{
 		return [
-			'title' => ['type' => 'string', 'title' => lmsg('thankyou.component.options.custom_title'), 'default' => '', 'placeholder' => lmsg('thankyou.component_heading')],
-			'show_header' => ['type' => 'bool', 'title' => lmsg('thankyou.component.options.show_header'), 'default' => true, 'mutate_on_change' => true],
-			'allow_new' => ['type' => 'bool', 'default' => true, 'title' => lmsg('thankyou.component.options.show_button')],
-			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => lmsg('thankyou.component.options.profile_images')],
-			'limit' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50],
-			'user_id' => ['type' => 'int', 'title' => lmsg('thankyou.component.options.user_id'), 'default' => 0, 'input' => 'user_picker', 'width' => 'medium'],
+			'title'          => ['type' => 'string', 'title' => ($this->lmsg)('thankyou.component.options.custom_title'), 'default' => '', 'placeholder' => ($this->lmsg)('thankyou.component_heading')],
+			'show_header'    => ['type' => 'bool', 'title' => ($this->lmsg)('thankyou.component.options.show_header'), 'default' => true, 'mutate_on_change' => true],
+			'allow_new'      => ['type' => 'bool', 'default' => true, 'title' => ($this->lmsg)('thankyou.component.options.show_button')],
+			'profile_images' => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('thankyou.component.options.profile_images')],
+			'comments'       => ['type' => 'bool', 'default' => false, 'title' => ($this->lmsg)('thankyou.thankyou.pages_component.options.comment_editing')],
+			'user_id'        => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.user_id'), 'default' => null, 'input' => 'user_picker', 'width' => 'medium'],
+			'group_ids'      => ['type' => 'array_int', 'title' => ($this->lmsg)('thankyou.common.filter_by_groups'), 'default' => [], 'input' => 'group_picker', 'width' => 'medium'],
+			'limit'          => ['type' => 'int', 'title' => ($this->lmsg)('thankyou.component.options.num_items'), 'default' => 10, 'min' => 1, 'max' => 50]
 		];
 	}
 
 	/**
 	 * Render this component with the specified options
 	 *
-	 * @param string $id_string
+	 * @param string           $id_string
 	 * @param OptionsInterface $options
-	 * @param Application $app
+	 * @param Application      $app
 	 *
 	 * @return string
 	 */
 	public function ShowBody($id_string, OptionsInterface $options, Application $app)
 	{
-		$args = array();
-
-		/** @var ThanksRepository $repository */
-		$repository = $app['thankyou.repository'];
-
-		$user_id = $options->Get('user_id');
-		$limit = $options->Get('limit');
-
-		if ($user_id)
-			$thanks = $repository->GetForUser($user_id, $limit);
-		else
-			$thanks = $repository->GetRecent($limit);
+		/**
+		 * @var ThankYous\Api $api
+		 */
+		$api = $app[ThankYous\Api::class];
 
 		/**
-		 * @var ThanksListView $view
+		 * @var SecurityContext $context
 		 */
-		$view = $app['thankyou.thanks_list_view'];
-		$args['items.datasrc'] = $view->Show($thanks, [
-			'profile_images' => $options->Get('profile_images')
-		], $app->security);
+		$context          = $app[SecurityContext::class];
+		$viewer_logged_in = !($context->GetUserId() === 0);
 
-		if (count($args['items.datasrc']) === 0)
+		$thank_user_id = $options->Get('user_id');
+		$group_ids     = $options->Get('group_ids');
+
+		$args = [];
+
+		$args['ty_list.limit'] = $options->Get('limit');
+		if (!is_int($args['ty_list.limit']))
 		{
-			$msg = lmsg('thankyou.component.no_thanks_all');
-
-			if ($user_id)
-				$msg = lmsg('thankyou.component.no_thanks_user', \User::GetNameById($user_id));
-
-			$args['no_thanks.body'] = $msg;
+			$args['ty_list.limit'] = 20;
 		}
 
-		// show "say thank you" within body if header is hidden
-		if ($options->Get('allow_new') && !$options->Get('show_header'))
+		$args['ty_list.create']         = (bool) $options->Get('allow_new') && !(bool) $options->Get('show_header');
+		$args['ty_list.thanked_images'] = (bool) $options->Get('profile_images');
+		$args['ty_list.comments']       = (bool) $options->Get('comments') && $viewer_logged_in;
+
+		$thanked_owner_classes = [];
+		if (isset($thank_user_id) && $thank_user_id > 0)
 		{
-			$args = $view->ShowAddNew($user_id) + $args;
-		} else
-		{
-			$args['allow_new.visible'] = 0;
+			$thanked_owner_classes[] = ['id' => (int) $thank_user_id, 'oclass' => PermOClass::INDIVIDUAL];
 		}
 
-		$template = 'thankyou/pages_component.html';
-		return $this->CallTemplater($template, $args);
+		if (is_array($group_ids))
+		{
+			foreach ($group_ids as $group_id)
+			{
+				if ($group_id > 0)
+				{
+					$thanked_owner_classes[] = ['id' => (int) $group_id, 'oclass' => PermOClass::GROUP];
+				}
+			}
+		}
+
+		$user_ids = $api->GetOwnersUserIds($thanked_owner_classes);
+
+		if (count($user_ids) > 0)
+		{
+			$args['ty_list.user_ids'] = $user_ids;
+		}
+
+		return $this->CallTemplater('thankyou/UI/pages_component.html', $args);
 	}
 
 	/**
@@ -111,30 +148,28 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function ShowHeader($id_string, OptionsInterface $options, Application $app)
 	{
 		if (!$options->Get('show_header'))
-			return null;
-
-		$user_id = $options->Get('user_id');
-
-		if ($options->Get('allow_new'))
 		{
-			/**
-			 * @var ThanksListView $view
-			 */
-			$view = $app['thankyou.thanks_list_view'];
-			$args = $view->ShowAddNew($user_id);
-		} else
+			return '';
+		}
+
+		$args = [];
+
+		if (!$options->Get('allow_new'))
 		{
-			$args = ['allow_new.visible' => 0];
+			$args['create_container.visible'] = 0;
+			$args['custom_title.+class']  = 'no-thanks-button';
+			$args['default_title.+class'] = 'no-thanks-button';
 		}
 
 		if ($options->Get('title') !== '')
 		{
-			$args['custom_title.body']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
+			$args['custom_title.body_html']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
+			$args['custom_title.title']     = cla_htmlsafe(ClaText::ProcessAvailableLocalisation((string) $options->Get('title')));
 			$args['custom_title.visible']  = 1;
 			$args['default_title.visible'] = 0;
 		}
 
-		$template = 'thankyou/pages_component_header.html';
+		$template = 'thankyou/UI/pages_component_header.html';
 
 		return $this->CallTemplater($template, $args);
 	}
@@ -186,8 +221,8 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function GetCoverInfo()
 	{
 		return [
-			'title'       => lmsg('thankyou.component.cover_info.title'),
-			'description' => lmsg('thankyou.component.cover_info.desc'),
+			'title'       => ($this->lmsg)('thankyou.component.cover_info.title'),
+			'description' => ($this->lmsg)('thankyou.component.cover_info.desc'),
 			'application' => 'thankyou',
 			'icon_class'  => 'glyphicons glyphicons-donate',
 			'categories'  => ['people']
@@ -199,14 +234,14 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	 *
 	 * Input and output are the same array that GetOptions() returns, plus each items current value -
 	 *
-	 * array(
+	 * [
 	 *   'option_name' => ['type' => ...,
 	 *                     'default' => ...,
 	 *                     'title' => ...,
 	 *                     'value' => ...,
 	 *                    ],
 	 *   'other_option' => ...
-	 * )
+	 * ]
 	 *
 	 * @param array $options
 	 *
@@ -215,7 +250,15 @@ class PagesComponent implements ComponentInterface, MutatableOptionsInterface
 	public function MutateOptions($options)
 	{
 		if (empty($options['show_header']['value']))
+		{
 			unset($options['title']);
+		}
+
+		if (!$this->config_api->IsCommentsEnabled())
+		{
+			unset($options['comments']);
+		}
+
 		return $options;
 	}
 }
