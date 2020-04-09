@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 4.0.1 - Unreleased
+### Bug Fixes
+* BT-1494 Fixed issue when creating Thank You Notes with Core Values disabled.
+
 ## Version 4.0.0 - 27th February 2020
 ### New Features
 * Added the Thank You v2 API.

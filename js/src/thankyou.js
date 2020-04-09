@@ -98,7 +98,13 @@ define(['jquery', 'cla_select2', './thankYouRepository.js'], function ($, cla_se
     };
 
     ThankYou.prototype.getTagsInput = function () {
-        return this.form.find('select[name="thank_you_tags[]"]');
+        var tags_input = this.form.find('select[name="thank_you_tags[]"]');
+        if (tags_input.length === 0)
+        {
+            return null;
+        }
+
+        return tags_input;
     };
 
     ThankYou.prototype.getDescriptionInput = function () {
@@ -135,6 +141,10 @@ define(['jquery', 'cla_select2', './thankYouRepository.js'], function ($, cla_se
 
     ThankYou.prototype.setTags = function (tags) {
         var tags_input = this.getTagsInput();
+        if (tags_input === null)
+        {
+            return;
+        }
         tags_input.val(null);
         tags_input.html(null);
 
