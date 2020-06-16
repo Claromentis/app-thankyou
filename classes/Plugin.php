@@ -393,6 +393,11 @@ class Plugin implements
 	 */
 	public function IsObjectValid(int $aggregation_id, int $object_id)
 	{
+		if ((int) $aggregation_id !== ThankYousRepository::AGGREGATION_ID)
+		{
+			return null;
+		}
+
 		try
 		{
 			/**
