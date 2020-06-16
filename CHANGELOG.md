@@ -1,6 +1,9 @@
 # Change Log
 
-## Version 4.0.1 - Unreleased
+## Version 4.0.2 - Unreleased
+* f9bf09a8 BT-1620 Disco 027952 Fixed greedy valid object checks that caused errors in other modules
+
+## Version 4.0.1 - 9th April 2020
 ### Bug Fixes
 * BT-1494 Fixed issue when creating Thank You Notes with Core Values disabled.
 
