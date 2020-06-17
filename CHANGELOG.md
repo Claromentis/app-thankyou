@@ -1,6 +1,7 @@
 # Change Log
 
-## Version 4.0.2 - Unreleased
+## Version 4.0.2 - 17th June 2020
+### Bug Fixes
 * f9bf09a8 BT-1620 Disco 027952 Fixed greedy valid object checks that caused errors in other modules
 
 ## Version 4.0.1 - 9th April 2020

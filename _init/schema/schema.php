@@ -1,5 +1,5 @@
 <?php
-// This file contains the database schema version 06.02
+// This file contains the database schema version 06.03
 if (!isset($migrations) || !is_object($migrations))
 	die("This file cannot be executed directly");
 if ($migrations->GetVersion() > 0)
@@ -79,4 +79,4 @@ $db->CreateTable('thankyou_user', $table_descr, true);
 
 
 //===========================================================================================
-$migrations->SetVersion('06.02');
+$migrations->SetVersion('06.03');
